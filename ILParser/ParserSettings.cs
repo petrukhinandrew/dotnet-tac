@@ -5,7 +5,10 @@ class ParserSettings
     public List<string> Methods;
     public ParserSettings(string dllPath, List<string> methods)
     {
-        DllPath = dllPath;
+        if (dllPath.StartsWith('/'))
+            DllPath = dllPath;
+        else 
+            DllPath = Environment.CurrentDirectory + Path.DirectorySeparatorChar + dllPath;
         Methods = methods;
     }
 }
