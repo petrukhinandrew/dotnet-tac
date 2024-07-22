@@ -24,3 +24,13 @@ class ILCastExpr : ILExpr
     public ILType Type => throw new NotImplementedException();
 }
 
+
+interface ILCallExpr : ILExpr { }
+class ILStaticCall : ILCallExpr
+{
+    public ILType Type => throw new NotImplementedException();
+}
+class ILInstanceCall : ILCallExpr
+{
+    public ILType Type => throw new NotImplementedException();
+}
