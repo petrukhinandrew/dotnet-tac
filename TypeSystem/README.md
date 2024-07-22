@@ -12,3 +12,5 @@
 
 - casts + `is / as` expr 
 - `delete` expr
+
+- LValue interface
