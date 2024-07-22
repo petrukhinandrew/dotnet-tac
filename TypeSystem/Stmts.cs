@@ -1,6 +1,6 @@
 namespace Usvm.IL.TypeSystem;
 interface ILStmt { }
-
+class ILStmtLocation;
 interface ILAssignStmt : ILStmt { }
 interface ILCallStmt : ILStmt { }
 
@@ -10,6 +10,5 @@ interface ILLeaveScopeStmt : ILStmt { }
 interface ILBranchStmt : ILStmt { }
 
 class ILGotoStmt : ILBranchStmt { }
-class ILTargetLocation;
-// class ILCondGotoStmt ?
+
 class ILIfStmt : ILBranchStmt { }

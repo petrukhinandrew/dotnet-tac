@@ -185,6 +185,14 @@ class ILRewriter
                 ILInstrOperand.Arg32 arg;
                 switch (ilinstr.opCode.Name)
                 {
+                    case "newarr":
+                        arg = (ILInstrOperand.Arg32)ilinstr.arg;
+                        tryResolveType(arg.value);
+                        break;
+                    case "ldtoken":
+                        arg = (ILInstrOperand.Arg32)ilinstr.arg;
+                        tryResolveToken(arg.value);
+                        break;
                     case "newobj":
                     case "jmp":
                     case "ldvirtftn":
@@ -210,6 +218,18 @@ class ILRewriter
                     default: continue;
                 }
             }
+        }
+    }
+    private void tryResolveType(int arg)
+    {
+        try
+        {
+            Type t = _module.ResolveType(arg);
+            Console.WriteLine(" ∟--resolved {0}", t);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("error resolving {0}", e.Message);
         }
     }
     private void tryResolveMethod(int arg)
@@ -247,6 +267,19 @@ class ILRewriter
         try
         {
             string res = _module.ResolveString(arg);
+            Console.WriteLine(" ∟--resolved `{0}`", res);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("error resolving {0}", e.Message);
+        }
+    }
+    private void tryResolveToken(int arg)
+    {
+        try
+        {
+            MemberInfo? res = _module.ResolveMember(arg);
+            if (res == null) return;
             Console.WriteLine(" ∟--resolved `{0}`", res);
         }
         catch (Exception e)

@@ -4,7 +4,7 @@ interface ILRefType : ILType { }
 
 interface ILObjectRefType : ILRefType { }
 class ILObjectRef : ILObjectRefType { }
-class ILThisRef : ILObjectRefType { }
+class ILNullRef : ILObjectRef { }
 class ILArrayAccessRef : ILObjectRefType { }
 class ILTypeRef : ILObjectRefType { }
 
@@ -15,7 +15,4 @@ class ILInstanceFieldRef : ILFieldRef { }
 
 interface ILRuntimePointerType : ILRefType { }
 interface ILManagedPointerType : ILRuntimePointerType { } // -> ILValue
-
 interface ILUnmanagedPointerType : ILRuntimePointerType { } // ?? 
-
-// null, string, {1, 2, 3}, parameter
