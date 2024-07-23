@@ -12,3 +12,6 @@ interface ILValue : ILEntity { }
 
 interface ILStmt { }
 class ILStmtLocation;
+
+interface ILLValue : ILEntity { }
+class ILLocal : ILEntity { }

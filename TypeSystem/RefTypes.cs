@@ -5,13 +5,22 @@ interface ILRefType : ILType { }
 interface ILObjectRefType : ILRefType { }
 class ILObjectRef : ILObjectRefType { }
 class ILNullRef : ILObjectRef { }
-class ILArrayAccessRef : ILObjectRefType { }
+class ILArrayAccessRef : ILObjectRefType, ILLValue
+{
+    public ILType Type => throw new NotImplementedException();
+}
 class ILTypeRef : ILObjectRefType { }
 
-interface ILFieldRef : ILRefType { }
+interface ILFieldRef : ILRefType, ILLValue { }
 
-class ILStaticFieldRef : ILFieldRef { }
-class ILInstanceFieldRef : ILFieldRef { }
+class ILStaticFieldRef : ILFieldRef
+{
+    public ILType Type => throw new NotImplementedException();
+}
+class ILInstanceFieldRef : ILFieldRef
+{
+    public ILType Type => throw new NotImplementedException();
+}
 
 interface ILRuntimePointerType : ILRefType { }
 interface ILManagedPointerType : ILRuntimePointerType { } // -> ILValue
