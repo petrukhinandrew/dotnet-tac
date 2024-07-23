@@ -14,4 +14,7 @@ interface ILStmt { }
 class ILStmtLocation;
 
 interface ILLValue : ILEntity { }
-class ILLocal : ILEntity { }
+class ILLocal : ILEntity
+{
+    public ILType Type => throw new NotImplementedException();
+}
