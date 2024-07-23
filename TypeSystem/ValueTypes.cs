@@ -20,4 +20,6 @@ interface ILEnumType : ILValueType { }
 
 interface ILStructType : ILValueType { }
 
-// ? interface ILTupleType : ILValueType { }
+class ILThisValue : ILValueType { }
+class ILTupleValue : ILValueType { }
+
