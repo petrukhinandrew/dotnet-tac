@@ -19,11 +19,20 @@ class ILNewArrayExpr : ILExpr
     public ILType Type => throw new NotImplementedException();
 }
 
-class ILCastExpr : ILExpr
+interface ILCastExpr : ILExpr { }
+
+class ILBoxCastExpr : ILCastExpr
 {
     public ILType Type => throw new NotImplementedException();
 }
-
+class ILUnboxCastExpr : ILCastExpr
+{
+    public ILType Type => throw new NotImplementedException();
+}
+class ILIsInstCastExpr : ILCastExpr
+{
+    public ILType Type => throw new NotImplementedException();
+}
 
 interface ILCallExpr : ILExpr { }
 class ILStaticCall : ILCallExpr
