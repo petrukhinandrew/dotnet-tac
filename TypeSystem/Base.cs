@@ -10,8 +10,12 @@ interface ILEntity
 interface ILExpr : ILEntity { }
 interface ILValue : ILEntity { }
 
-interface ILStmt { }
+interface ILStmt
+{
+    public ILStmtLocation Location { get; }
+}
 class ILStmtLocation;
+
 
 interface ILLValue : ILEntity { }
 class ILLocal : ILEntity

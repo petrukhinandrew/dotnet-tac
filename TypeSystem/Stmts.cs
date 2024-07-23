@@ -7,6 +7,12 @@ interface ILLeaveScopeStmt : ILStmt { }
 
 interface ILBranchStmt : ILStmt { }
 
-class ILGotoStmt : ILBranchStmt { }
+class ILGotoStmt : ILBranchStmt
+{
+    public ILStmtLocation Location => throw new NotImplementedException();
+}
 
-class ILIfStmt : ILBranchStmt { }
+class ILIfStmt : ILBranchStmt
+{
+    public ILStmtLocation Location => throw new NotImplementedException();
+}
