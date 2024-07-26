@@ -1,4 +1,6 @@
+using System.Dynamic;
 using System.Reflection;
+using Microsoft.VisualBasic;
 using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.Parser;
@@ -19,7 +21,7 @@ class SMLiteral<T>(T value, int index) : SMValue
     T Value = value;
     int Index = index;
 
-    public ILExpr AsILExpr => new ILLocal(_type, Value == null ? "" : ToString());
+    public ILExpr AsILExpr => new ILLocal(_type, Value?.ToString() ?? "");
 
     ILType SMValue.Type => _type;
 }
@@ -47,6 +49,7 @@ class StackMachine
     private List<SMVar> _params;
     private List<SMVar> _temps = new List<SMVar>();
     private List<SMValue> _lits = new List<SMValue>();
+    private Dictionary<int, int?> _labels = new Dictionary<int, int?>();
     private int _nextLitIdx = 0;
     private int _nextTacLineIdx = 0;
     private List<ILStmt> _tac = new List<ILStmt>();
@@ -62,6 +65,7 @@ class StackMachine
         _params = _methodInfo.GetParameters().OrderBy(p => p.Position).Select(l => new SMVar(TypeSolver.Resolve(l.ParameterType), SMValueSource.Arg, l.Position)).ToList();
         _locals = locals.OrderBy(l => l.LocalIndex).Select(l => new SMVar(TypeSolver.Resolve(l.LocalType), SMValueSource.Local, l.LocalIndex)).ToList();
         _stack = new Stack<SMValue>(maxDepth);
+        ResolveLabels();
         ProcessIL();
     }
     private void PushLocal(int idx)
@@ -86,9 +90,22 @@ class StackMachine
         _lits.Add(lit);
         _stack.Push(lit);
     }
+    private void ResolveLabels()
+    {
+        ILInstr curInstr = _begin;
+        while (curInstr != _begin.prev)
+        {
+            if (curInstr.arg is ILInstrOperand.Target target)
+            {
+                _labels.Add(target.value.idx, null);
+            }
+            curInstr = curInstr.next;
+        }
+    }
     private void ProcessIL()
     {
         ILInstr curInstr = _begin;
+        List<ILStmtTargetLocation> labelsPool = new List<ILStmtTargetLocation>();
         while (curInstr != _begin.prev)
         {
             ILInstr.Instr instr;
@@ -98,9 +115,11 @@ class StackMachine
             }
             else
             {
+                Console.WriteLine(curInstr.ToString());
                 curInstr = curInstr.next;
                 continue;
             }
+            if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _nextTacLineIdx;
             switch (instr.opCode.Name)
             {
                 case "nop":
@@ -399,9 +418,30 @@ class StackMachine
                         ));
                         break;
                     }
+                case "br.s":
+                    {
+                        ILInstrOperand.Target? target = instr.arg as ILInstrOperand.Target;
+                        if (target == null) throw new Exception("expected non null value for br.s");
+                        int targetILIdx = target.value.idx;
+                        int? targetTACIdx;
+                        _labels.TryGetValue(targetILIdx, out targetTACIdx);
+                        ILStmtTargetLocation to = new ILStmtTargetLocation(targetTACIdx.GetValueOrDefault(0), targetILIdx);
+                        _tac.Add(new ILGotoStmt(new ILStmtLocation(_nextTacLineIdx++), to));
+                        if (_labels[targetILIdx] == null)
+                        {
+                            labelsPool.Add(to);
+                        }
+
+                        break;
+                    }
+
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
             }
             curInstr = curInstr.next;
+        }
+        foreach (var l in labelsPool)
+        {
+            l.Index = _labels[l.ILIndex]!.Value;
         }
     }
     private MethodBase? safeMethodResolve(int target)
@@ -458,7 +498,7 @@ class StackMachine
     {
         foreach (var line in _tac)
         {
-            Console.WriteLine(line);
+            Console.WriteLine(line.ToString());
         }
     }
     public void DumpAll()

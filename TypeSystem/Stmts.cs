@@ -6,9 +6,18 @@ interface ILStmt
     public ILStmtLocation Location { get; }
     public string ToString();
 }
+
 class ILStmtLocation(int index)
 {
-    int Index = index;
+    public int Index = index;
+    public override string ToString()
+    {
+        return "TAC_" + Index.ToString() + " ";
+    }
+}
+class ILStmtTargetLocation(int index, int ilIndex) : ILStmtLocation(index)
+{
+    public int ILIndex = ilIndex;
 }
 
 class ILAssignStmt : ILStmt
@@ -26,7 +35,7 @@ class ILAssignStmt : ILStmt
 
     public override string ToString()
     {
-        return Lhs.ToString() + " = " + Rhs.ToString();
+        return Location.ToString() + Lhs.ToString() + " = " + Rhs.ToString();
     }
 }
 class ILCallStmt : ILStmt
@@ -42,7 +51,7 @@ class ILCallStmt : ILStmt
     public override string ToString()
     {
         // TODO separate into invokespecial invokestatic and so on
-        return "invoke " + Call.ToString();
+        return Location.ToString() + "invoke " + Call.ToString();
     }
 }
 
@@ -55,18 +64,19 @@ class ILReturnStmt(ILStmtLocation location, ILExpr? retVal) : ILLeaveScopeStmt
     public ILStmtLocation Location => location;
     public override string ToString()
     {
-        if (retVal == null) return "return;";
-        return "return " + retVal.ToString() + ";";
+        if (retVal == null) return Location.ToString() + "return;";
+        return Location.ToString() + "return " + retVal.ToString() + ";";
     }
 }
 interface ILBranchStmt : ILStmt { }
 
-class ILGotoStmt : ILBranchStmt
+class ILGotoStmt(ILStmtLocation location, ILStmtTargetLocation target) : ILBranchStmt
 {
-    public ILStmtLocation Location => throw new NotImplementedException();
+    public ILStmtLocation Location => location;
+    public ILStmtTargetLocation Target = target;
     public new string ToString()
     {
-        return "goto ";
+        return Location.ToString() + "goto " + Target.Index.ToString();
     }
 }
 
@@ -75,6 +85,6 @@ class ILIfStmt : ILBranchStmt
     public ILStmtLocation Location => throw new NotImplementedException();
     public new string ToString()
     {
-        return "if ";
+        return Location.ToString() + "if ";
     }
 }
