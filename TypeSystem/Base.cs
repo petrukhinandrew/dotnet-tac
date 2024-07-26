@@ -12,6 +12,18 @@ interface ILExpr
 
 interface ILValue : ILExpr { public string Name { get; } }
 
+class ILNullValue : ILValue
+{
+    public ILType Type => new ILNullRef();
+
+    public string Name => "null";
+
+    public override string ToString()
+    {
+        return "null";
+    }
+}
+
 interface ILLValue : ILValue
 {
     public new string ToString();
@@ -24,5 +36,16 @@ class ILLocal(ILType type, string name) : ILLValue
     public new string ToString()
     {
         return name;
+    }
+}
+
+class ILLiteral(ILType type, string value) : ILValue
+{
+    public ILType Type => type;
+
+    public string Name => value;
+    public new string ToString()
+    {
+        return value;
     }
 }

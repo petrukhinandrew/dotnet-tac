@@ -1,56 +1,16 @@
-using System.Dynamic;
+using System.ComponentModel;
+using System.Net.Http.Headers;
 using System.Reflection;
-using Microsoft.VisualBasic;
 using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.Parser;
-enum SMValueSource
-{
-    Local = 0,
-    Arg = 1,
-    Temp = 2
-}
-interface SMValue
-{
-    public ILExpr AsILExpr { get; }
-    public ILType Type { get; }
-}
-class SMLiteral<T>(T value, int index) : SMValue
-{
-    ILType _type = TypeSolver.Resolve(typeof(T));
-    T Value = value;
-    int Index = index;
-
-    public ILExpr AsILExpr => new ILLocal(_type, Value?.ToString() ?? "");
-
-    ILType SMValue.Type => _type;
-}
-class SMNullLit { }
-class SMVar(ILType type, SMValueSource source, int index) : SMValue
-{
-    ILType SMValue.Type => type;
-    SMValueSource Source = source;
-    int Index = index;
-
-    public ILLValue AsILLValue => new ILLocal(type, Name);
-    public ILExpr AsILExpr => new ILLocal(type, Name);
-    public string Name => Source switch
-    {
-        SMValueSource.Local => Logger.LocalVarName(Index),
-        SMValueSource.Arg => Logger.ArgVarName(Index),
-        SMValueSource.Temp => Logger.TempVarName(Index),
-        _ => throw new NotImplementedException()
-    };
-}
 class StackMachine
 {
-    private Stack<SMValue> _stack;
-    private List<SMVar> _locals;
-    private List<SMVar> _params;
-    private List<SMVar> _temps = new List<SMVar>();
-    private List<SMValue> _lits = new List<SMValue>();
+    private Stack<ILExpr> _stack;
+    private List<ILLocal> _locals;
+    private List<ILLocal> _params;
+    private int _temps = 0;
     private Dictionary<int, int?> _labels = new Dictionary<int, int?>();
-    private int _nextLitIdx = 0;
     private int _nextTacLineIdx = 0;
     private List<ILStmt> _tac = new List<ILStmt>();
     private ILInstr _begin;
@@ -62,9 +22,9 @@ class StackMachine
         _begin = begin;
         _declaringModule = declaringModule;
         _methodInfo = methodInfo;
-        _params = _methodInfo.GetParameters().OrderBy(p => p.Position).Select(l => new SMVar(TypeSolver.Resolve(l.ParameterType), SMValueSource.Arg, l.Position)).ToList();
-        _locals = locals.OrderBy(l => l.LocalIndex).Select(l => new SMVar(TypeSolver.Resolve(l.LocalType), SMValueSource.Local, l.LocalIndex)).ToList();
-        _stack = new Stack<SMValue>(maxDepth);
+        _params = _methodInfo.GetParameters().OrderBy(p => p.Position).Select(l => new ILLocal(TypeSolver.Resolve(l.ParameterType), Logger.ArgVarName(l.Position))).ToList();
+        _locals = locals.OrderBy(l => l.LocalIndex).Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), Logger.LocalVarName(l.LocalIndex))).ToList();
+        _stack = new Stack<ILExpr>(maxDepth);
         ResolveLabels();
         ProcessIL();
     }
@@ -78,16 +38,12 @@ class StackMachine
     }
     private void Dup()
     {
-        _stack.Push(_stack.Peek());
+
     }
-    private void Pop()
-    {
-        _stack.Pop();
-    }
+
     private void PushLiteral<T>(T value)
     {
-        SMLiteral<T> lit = new SMLiteral<T>(value, _nextLitIdx++);
-        _lits.Add(lit);
+        ILLiteral lit = new ILLiteral(TypeSolver.Resolve(typeof(T)), value?.ToString() ?? "");
         _stack.Push(lit);
     }
     private void ResolveLabels()
@@ -97,10 +53,47 @@ class StackMachine
         {
             if (curInstr.arg is ILInstrOperand.Target target)
             {
-                _labels.Add(target.value.idx, null);
+                _labels.TryAdd(target.value.idx, null);
             }
             curInstr = curInstr.next;
         }
+    }
+
+    private ILStmtTargetLocation ResolveTargetLocation(ILInstr instr, List<ILStmtTargetLocation> labelsPool)
+    {
+        ILInstrOperand.Target? target = instr.arg as ILInstrOperand.Target;
+        if (target == null) throw new Exception("expected non null value for br.s");
+        int targetILIdx = target.value.idx;
+        int? targetTACIdx;
+        _labels.TryGetValue(targetILIdx, out targetTACIdx);
+        ILStmtTargetLocation to = new ILStmtTargetLocation(targetTACIdx.GetValueOrDefault(-1), targetILIdx);
+        if (targetTACIdx == null)
+        {
+            labelsPool.Add(to);
+        }
+        return to;
+    }
+    private (ILExpr, ILExpr) MbIntroduceTemp(ILExpr lhs, ILExpr rhs)
+    {
+        if (lhs is ILValue && rhs is ILValue)
+        {
+            return (lhs, rhs);
+        }
+        if (lhs is ILValue)
+        {
+            ILLocal tmp = new ILLocal(lhs.Type, Logger.TempVarName(_temps++));
+            _tac.Add(new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), tmp, rhs));
+            _stack.Push(tmp);
+            return (lhs, tmp);
+        }
+        else
+        {
+            ILLocal tmp = new ILLocal(lhs.Type, Logger.TempVarName(_temps++));
+            _tac.Add(new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), tmp, lhs));
+            _stack.Push(tmp);
+            return (tmp, rhs);
+        }
+        // TODO recursive call?
     }
     private void ProcessIL()
     {
@@ -136,32 +129,32 @@ class StackMachine
                 case "ldloc.s": PushLocal(((ILInstrOperand.Arg8)instr.arg).value); break;
                 case "stloc.0":
                     _tac.Add(
-                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[0].AsILLValue, _stack.Pop().AsILExpr)
+                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[0], _stack.Pop())
                     ); break;
                 case "stloc.1":
                     _tac.Add(
-                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[1].AsILLValue, _stack.Pop().AsILExpr)
+                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[1], _stack.Pop())
                     ); break;
                 case "stloc.2":
                     _tac.Add(
-                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[2].AsILLValue, _stack.Pop().AsILExpr)
+                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[2], _stack.Pop())
                     ); break;
                 case "stloc.3":
                     _tac.Add(
-                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[3].AsILLValue, _stack.Pop().AsILExpr)
+                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[3], _stack.Pop())
                     ); break;
                 case "stloc.s":
                     {
                         int idx = ((ILInstrOperand.Arg8)instr.arg).value;
                         _tac.Add(
-                        new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[idx].AsILLValue, _stack.Pop().AsILExpr)
+                        new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[idx], _stack.Pop())
                         ); break;
                     }
                 case "starg.s":
                     {
                         int idx = ((ILInstrOperand.Arg8)instr.arg).value;
                         _tac.Add(
-                        new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _params[idx].AsILLValue, _stack.Pop().AsILExpr)
+                        new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _params[idx], _stack.Pop())
                         ); break;
                     }
                 // TODO byref
@@ -169,7 +162,7 @@ class StackMachine
                 //     _stack.Push(new SMValue.Arg(((ILInstrOperand.Arg8)instr.arg).value, AsAddr: true)); break;
                 // case "ldloca.s":
                 //     _stack.Push(new SMValue.Local(((ILInstrOperand.Arg8)instr.arg).value, AsAddr: true)); break;
-                case "ldnull": PushLiteral<SMNullLit>(new SMNullLit()); break;
+                case "ldnull": _stack.Push((ILExpr)new ILNullValue()); break;
                 case "ldc.i4.m1":
                 case "ldc.i4.M1": PushLiteral<int>(-1); break;
                 case "ldc.i4.0": PushLiteral<int>(0); break;
@@ -187,8 +180,8 @@ class StackMachine
                 case "ldc.r4": PushLiteral<float>(((ILInstrOperand.Arg32)instr.arg).value); break;
                 case "ldc.r8": PushLiteral<double>(((ILInstrOperand.Arg64)instr.arg).value); break;
                 case "ldstr": PushLiteral<string>(safeStringResolve(((ILInstrOperand.Arg32)instr.arg).value)); break;
-                case "dup": Dup(); break;
-                case "pop": Pop(); break;
+                case "dup": _stack.Push(_stack.Peek()); break;
+                case "pop": _stack.Pop(); break;
                 case "jmp": throw new Exception("jmp occured");
                 // case "call":
                 //     MethodBase? callResolvedMethod = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -214,7 +207,7 @@ class StackMachine
                 //     break;
                 case "ret":
                     {
-                        ILExpr? retVal = _methodInfo.ReturnParameter.ParameterType != typeof(void) ? _stack.Pop().AsILExpr : null;
+                        ILExpr? retVal = _methodInfo.ReturnParameter.ParameterType != typeof(void) ? _stack.Pop() : null;
 
                         _tac.Add(
                             new ILReturnStmt(new ILStmtLocation(_nextTacLineIdx++), retVal)
@@ -223,218 +216,96 @@ class StackMachine
                         break;
                     }
                 case "add":
-                    {
-                        SMValue add2 = _stack.Pop();
-                        SMValue add1 = _stack.Pop();
-                        _temps.Add(new SMVar(add1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILAddOp(add1.AsILExpr, add2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "sub":
-                    {
-                        SMValue sub2 = _stack.Pop();
-                        SMValue sub1 = _stack.Pop();
-                        _temps.Add(new SMVar(sub1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILSubOp(sub1.AsILExpr, sub2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "mul":
-                    {
-                        SMValue mul2 = _stack.Pop();
-                        SMValue mul1 = _stack.Pop();
-                        _temps.Add(new SMVar(mul1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILMulOp(mul1.AsILExpr, mul2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "div.un":
                 case "div":
-                    {
-                        SMValue div2 = _stack.Pop();
-                        SMValue div1 = _stack.Pop();
-                        _temps.Add(new SMVar(div1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILSubOp(div1.AsILExpr, div2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "rem.un":
                 case "rem":
-                    {
-                        SMValue rem2 = _stack.Pop();
-                        SMValue rem1 = _stack.Pop();
-                        _temps.Add(new SMVar(rem1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILRemOp(rem1.AsILExpr, rem2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "and":
-                    {
-                        SMValue and2 = _stack.Pop();
-                        SMValue and1 = _stack.Pop();
-                        _temps.Add(new SMVar(and1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILAndOp(and1.AsILExpr, and2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "or":
-                    {
-                        SMValue or2 = _stack.Pop();
-                        SMValue or1 = _stack.Pop();
-                        _temps.Add(new SMVar(or1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILOrOp(or1.AsILExpr, or2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "xor":
-                    {
-                        SMValue xor2 = _stack.Pop();
-                        SMValue xor1 = _stack.Pop();
-                        _temps.Add(new SMVar(xor1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILXorOp(xor1.AsILExpr, xor2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "shl":
-                    {
-                        SMValue shl2 = _stack.Pop();
-                        SMValue shl1 = _stack.Pop();
-                        _temps.Add(new SMVar(shl1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILShlOp(shl1.AsILExpr, shl2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "shr.un":
                 case "shr":
-                    {
-                        SMValue shr2 = _stack.Pop();
-                        SMValue shr1 = _stack.Pop();
-                        _temps.Add(new SMVar(shr1.Type, SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILShrOp(shr1.AsILExpr, shr2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "ceq":
-                    {
-                        SMValue ceq2 = _stack.Pop();
-                        SMValue ceq1 = _stack.Pop();
-                        _temps.Add(new SMVar(new ILInt32(), SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILCeqOp(ceq1.AsILExpr, ceq2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "cgt.un":
                 case "cgt":
-                    {
-                        SMValue cgt2 = _stack.Pop();
-                        SMValue cgt1 = _stack.Pop();
-                        _temps.Add(new SMVar(new ILInt32(), SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILCgtOp(cgt1.AsILExpr, cgt2.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "clt.un":
                 case "clt":
                     {
-                        SMValue clt2 = _stack.Pop();
-                        SMValue clt1 = _stack.Pop();
-                        _temps.Add(new SMVar(new ILInt32(), SMValueSource.Temp, _temps.Count));
-                        _stack.Push(_temps.Last());
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILShrOp(clt1.AsILExpr, clt2.AsILExpr)
-                        ));
+                        ILExpr rhs = _stack.Pop();
+                        ILExpr lhs = _stack.Pop();
+                        (lhs, rhs) = MbIntroduceTemp(lhs, rhs);
+                        ILBinaryOperation op = new ILBinaryOperation(lhs, rhs);
+                        _stack.Push(op);
                         break;
                     }
                 case "neg":
-                    {
-                        SMValue notVal = _stack.Pop();
-                        _temps.Add(new SMVar(notVal.Type, SMValueSource.Temp, _temps.Count));
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILUnaryMinus(notVal.AsILExpr)
-                        ));
-                        break;
-                    }
                 case "not":
                     {
-                        SMValue notVal = _stack.Pop();
-                        _temps.Add(new SMVar(notVal.Type, SMValueSource.Temp, _temps.Count));
-                        _tac.Add(new ILAssignStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
-                            _temps.Last().AsILLValue,
-                            new ILUnaryNot(notVal.AsILExpr)
-                        ));
+                        ILExpr operand = _stack.Pop();
+                        ILUnaryOperation op = new ILUnaryOperation(operand);
+                        _stack.Push(op);
                         break;
                     }
                 case "br.s":
+                case "br":
                     {
-                        ILInstrOperand.Target? target = instr.arg as ILInstrOperand.Target;
-                        if (target == null) throw new Exception("expected non null value for br.s");
-                        int targetILIdx = target.value.idx;
-                        int? targetTACIdx;
-                        _labels.TryGetValue(targetILIdx, out targetTACIdx);
-                        ILStmtTargetLocation to = new ILStmtTargetLocation(targetTACIdx.GetValueOrDefault(0), targetILIdx);
+                        ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
                         _tac.Add(new ILGotoStmt(new ILStmtLocation(_nextTacLineIdx++), to));
-                        if (_labels[targetILIdx] == null)
-                        {
-                            labelsPool.Add(to);
-                        }
-
                         break;
                     }
+                case "beq.s":
+                case "beq":
+                case "bgt.s":
+                case "bgt":
+                    {
+                        ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
+                        ILExpr lhs = _stack.Pop();
+                        ILExpr rhs = _stack.Pop();
+                        _tac.Add(new ILIfStmt(
+                            new ILStmtLocation(_nextTacLineIdx++),
+                            new ILBinaryOperation(lhs, rhs),
+                            to
+                        ));
+                        break;
+                    }
+                case "brinst":
+                case "brinst.s":
+                case "brtrue.s":
+                case "brtrue":
+                    {
 
+                        ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
+                        PushLiteral<bool>(true);
+                        ILExpr rhs = _stack.Pop();
+                        ILExpr lhs = _stack.Pop();
+                        _tac.Add(new ILIfStmt(
+                            new ILStmtLocation(_nextTacLineIdx++),
+                            new ILBinaryOperation(lhs, rhs),
+                            to
+                        ));
+                        break;
+                    }
+                case "brnull":
+                case "brnull.s":
+                case "brzero":
+                case "brzero.s":
+                case "brfalse.s":
+                case "brfalse":
+                    {
+                        ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
+                        PushLiteral<bool>(false);
+                        ILExpr rhs = _stack.Pop();
+                        ILExpr lhs = _stack.Pop();
+                        _tac.Add(new ILIfStmt(
+                            new ILStmtLocation(_nextTacLineIdx++),
+                            new ILBinaryOperation(lhs, rhs),
+                            to
+                        ));
+                        break;
+                    }
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
             }
             curInstr = curInstr.next;
@@ -472,9 +343,9 @@ class StackMachine
     public List<string> ListLocalVars()
     {
         List<string> res = new List<string>();
-        foreach (var mapping in _locals.ToDictionary(l => (l as SMValue).Type, l => l))
+        foreach (var mapping in _locals)
         {
-            string buf = string.Format("{0} {1};", mapping.Key.ToString(), string.Join(", ", mapping.Value.Name));
+            string buf = string.Format("{0} {1};", mapping.Type.ToString(), string.Join(", ", mapping.Name));
             res.Add(buf);
         }
         return res;

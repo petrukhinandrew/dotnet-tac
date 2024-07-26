@@ -80,11 +80,12 @@ class ILGotoStmt(ILStmtLocation location, ILStmtTargetLocation target) : ILBranc
     }
 }
 
-class ILIfStmt : ILBranchStmt
+class ILIfStmt(ILStmtLocation location, ILExpr cond, ILStmtTargetLocation target) : ILBranchStmt
 {
-    public ILStmtLocation Location => throw new NotImplementedException();
+    public ILStmtLocation Location => location;
+    public ILStmtTargetLocation Target = target;
     public new string ToString()
     {
-        return Location.ToString() + "if ";
+        return Location.ToString() + "if " + cond.ToString() + " goto " + Target.Index.ToString();
     }
 }
