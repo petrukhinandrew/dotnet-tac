@@ -1,6 +1,6 @@
 namespace Usvm.IL.TypeSystem;
 interface ILRefType : ILType { }
-// interface ILInterfaceType : ILRefType { }
+class ILInterfaceType : ILRefType { }
 
 interface ILObjectRefType : ILRefType { }
 class ILObjectRef : ILObjectRefType { }
@@ -9,25 +9,25 @@ class ILThisRef : ILObjectRef { }
 class ILArrayAccessRef : ILObjectRefType, ILLValue
 {
     public ILType Type => throw new NotImplementedException();
+
+    public string Name => throw new NotImplementedException();
 }
 class ILStringRef : ILObjectRefType, ILLValue
 {
     public ILType Type => throw new NotImplementedException();
+
+    public string Name => throw new NotImplementedException();
 }
-class ILTupleRef : ILObjectRef { }
+
 class ILTypeRef : ILObjectRefType { }
 
-interface ILFieldRef : ILRefType, ILLValue { }
+class ILFieldRef : ILRefType, ILLValue
+{
+    public ILType Type => throw new NotImplementedException();
 
-class ILStaticFieldRef : ILFieldRef
-{
-    public ILType Type => throw new NotImplementedException();
-}
-class ILInstanceFieldRef : ILFieldRef
-{
-    public ILType Type => throw new NotImplementedException();
+    public string Name => throw new NotImplementedException();
 }
 
 interface ILRuntimePointerType : ILRefType { }
-interface ILManagedPointerType : ILRuntimePointerType { } // -> ILValue
-interface ILUnmanagedPointerType : ILRuntimePointerType { } // ?? 
+class ILManagedPointerType : ILRuntimePointerType { }
+class ILUnmanagedPointerType : ILRuntimePointerType { }

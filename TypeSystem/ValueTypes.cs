@@ -4,22 +4,20 @@ interface ILValueType : ILType { }
 
 interface ILPrimitiveType : ILValueType { }
 
-class ILBoolean : ILPrimitiveType { }
+class ILBool : ILPrimitiveType { }
 class ILChar : ILPrimitiveType { }
 
 class ILUInt8 : ILPrimitiveType { }
-class UInt16 : ILPrimitiveType { }
+class ILUInt16 : ILPrimitiveType { }
 class ILInt32 : ILPrimitiveType { }
 class ILInt64 : ILPrimitiveType { }
-class ILNativeInt : ILPrimitiveType { }
+
+// TODO find use case 
+// class ILNativeInt : ILPrimitiveType { }
 
 class ILFloat32 : ILPrimitiveType { }
 class ILFloat64 : ILPrimitiveType { }
 
-interface ILEnumType : ILValueType { }
+class ILEnumType : ILValueType { }
 
-interface ILStructType : ILValueType { }
-
-class ILThisValue : ILValueType { }
-class ILTupleValue : ILValueType { }
-
+class ILStructType : ILValueType { }

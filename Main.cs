@@ -11,8 +11,8 @@ class Program
         // ["switchExample", "lambda", "ifExample"]
         // ["addOne", "calculations"]
         // ["ByValue"]
-
-        ParserSettings settings = new ParserSettings("test/resources/dotnet-test.dll", ["Literals"]);
+        // ["Literals"]
+        ParserSettings settings = new ParserSettings("test/resources/dotnet-test.dll", ["addOne", "calculations"]);
         CodeBase codeBase = new CodeBase(settings);
         codeBase.Load();
     }

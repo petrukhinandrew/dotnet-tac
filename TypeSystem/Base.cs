@@ -1,24 +1,28 @@
+using System.Runtime.CompilerServices;
+
 namespace Usvm.IL.TypeSystem;
 
 interface ILType { }
 
-interface ILEntity
+interface ILExpr
 {
     ILType Type { get; }
+    public string ToString();
 }
 
-interface ILExpr : ILEntity { }
-interface ILValue : ILEntity { }
+interface ILValue : ILExpr { public string Name { get; } }
 
-interface ILStmt
+interface ILLValue : ILValue
 {
-    public ILStmtLocation Location { get; }
+    public new string ToString();
 }
-class ILStmtLocation;
-
-
-interface ILLValue : ILEntity { }
-class ILLocal : ILEntity
+class ILLocal(ILType type, string name) : ILLValue
 {
-    public ILType Type => throw new NotImplementedException();
+    public ILType Type => type;
+
+    public string Name => name;
+    public new string ToString()
+    {
+        return name;
+    }
 }
