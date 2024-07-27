@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace Usvm.IL.TypeSystem;
 
 interface ILType { }

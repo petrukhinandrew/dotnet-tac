@@ -25,20 +25,8 @@ class StackMachine
         _params = _methodInfo.GetParameters().OrderBy(p => p.Position).Select(l => new ILLocal(TypeSolver.Resolve(l.ParameterType), Logger.ArgVarName(l.Position))).ToList();
         _locals = locals.OrderBy(l => l.LocalIndex).Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), Logger.LocalVarName(l.LocalIndex))).ToList();
         _stack = new Stack<ILExpr>(maxDepth);
-        ResolveLabels();
+        IntroduceLabels();
         ProcessIL();
-    }
-    private void PushLocal(int idx)
-    {
-        _stack.Push(_locals[idx]);
-    }
-    private void PushArg(int idx)
-    {
-        _stack.Push(_params[idx]);
-    }
-    private void Dup()
-    {
-
     }
 
     private void PushLiteral<T>(T value)
@@ -46,7 +34,7 @@ class StackMachine
         ILLiteral lit = new ILLiteral(TypeSolver.Resolve(typeof(T)), value?.ToString() ?? "");
         _stack.Push(lit);
     }
-    private void ResolveLabels()
+    private void IntroduceLabels()
     {
         ILInstr curInstr = _begin;
         while (curInstr != _begin.prev)
@@ -75,13 +63,14 @@ class StackMachine
     }
     private (ILExpr, ILExpr) MbIntroduceTemp(ILExpr lhs, ILExpr rhs)
     {
+        // TODO recursive call?
         if (lhs is ILValue && rhs is ILValue)
         {
             return (lhs, rhs);
         }
         if (lhs is ILValue)
         {
-            ILLocal tmp = new ILLocal(lhs.Type, Logger.TempVarName(_temps++));
+            ILLocal tmp = new ILLocal(rhs.Type, Logger.TempVarName(_temps++));
             _tac.Add(new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), tmp, rhs));
             _stack.Push(tmp);
             return (lhs, tmp);
@@ -93,7 +82,6 @@ class StackMachine
             _stack.Push(tmp);
             return (tmp, rhs);
         }
-        // TODO recursive call?
     }
     private void ProcessIL()
     {
@@ -117,16 +105,16 @@ class StackMachine
             {
                 case "nop":
                 case "break": break;
-                case "ldarg.0": PushArg(0); break;
-                case "ldarg.1": PushArg(1); break;
-                case "ldarg.2": PushArg(2); break;
-                case "ldarg.3": PushArg(3); break;
-                case "ldarg.s": PushArg(((ILInstrOperand.Arg8)instr.arg).value); break;
-                case "ldloc.0": PushLocal(0); break;
-                case "ldloc.1": PushLocal(1); break;
-                case "ldloc.2": PushLocal(2); break;
-                case "ldloc.3": PushLocal(3); break;
-                case "ldloc.s": PushLocal(((ILInstrOperand.Arg8)instr.arg).value); break;
+                case "ldarg.0": _stack.Push(_params[0]); break;
+                case "ldarg.1": _stack.Push(_params[1]); break;
+                case "ldarg.2": _stack.Push(_params[2]); break;
+                case "ldarg.3": _stack.Push(_params[3]); break;
+                case "ldarg.s": _stack.Push(_params[((ILInstrOperand.Arg8)instr.arg).value]); break;
+                case "ldloc.0": _stack.Push(_locals[0]); break;
+                case "ldloc.1": _stack.Push(_locals[1]); break;
+                case "ldloc.2": _stack.Push(_locals[2]); break;
+                case "ldloc.3": _stack.Push(_locals[3]); break;
+                case "ldloc.s": _stack.Push(_locals[((ILInstrOperand.Arg8)instr.arg).value]); break;
                 case "stloc.0":
                     _tac.Add(
                     new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[0], _stack.Pop())

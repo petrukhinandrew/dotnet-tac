@@ -8,7 +8,7 @@ class ILUnaryOperation(ILExpr operand) : ILExpr
     public ILType Type => operand.Type;
     public new string ToString()
     {
-        return "o " + operand.ToString();
+        return "unOp " + operand.ToString();
     }
 }
 
@@ -18,7 +18,7 @@ class ILBinaryOperation(ILExpr lhs, ILExpr rhs) : ILExpr
 
     public ILExpr Lhs => lhs;
     public ILExpr Rhs => rhs;
-    public new string ToString() => lhs.ToString() + " o " + rhs.ToString();
+    public new string ToString() => lhs.ToString() + " binOp " + rhs.ToString();
 }
 
 class ILNewExpr : ILExpr
