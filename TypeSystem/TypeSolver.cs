@@ -3,6 +3,7 @@ static class TypeSolver
 {
     public static ILType Resolve(Type type)
     {
+        if (type == typeof(void)) return new ILNullRef();
         if (type.IsValueType)
         {
             if (type.IsEnum) return new ILEnumType();

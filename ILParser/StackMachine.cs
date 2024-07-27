@@ -179,28 +179,53 @@ class StackMachine
                 case "dup": _stack.Push(_stack.Peek()); break;
                 case "pop": _stack.Pop(); break;
                 case "jmp": throw new Exception("jmp occured");
-                // case "call":
-                //     MethodBase? callResolvedMethod = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
-                //     if (callResolvedMethod == null) break;
-                //     string callResolvedMethodRetVal = "";
-                //     string callResolvedMethodArgs = " ";
-                //     // TODO handle in out args 
-                //     foreach (var p in callResolvedMethod.GetParameters().Where(p => p.IsRetval))
-                //     {
-                //         callResolvedMethodRetVal += p.ToString() + " ";
-                //     }
-                //     for (int i = 0; i < callResolvedMethod.GetParameters().Where(p => !p.IsRetval).Count(); i++)
-                //     {
-                //         callResolvedMethodArgs += _stack.Pop().Name + " ";
-                //     }
-                //     string callResolvedMethodRetValPref = "";
-                //     if (callResolvedMethodRetVal != "")
-                //     {
-                //         _stack.Push(new SMValue.Temp(_nextTempIdx++));
-                //         callResolvedMethodRetValPref = _stack.Peek().Name + " = ";
-                //     }
-                //     _tac.Add(callResolvedMethodRetValPref + callResolvedMethodRetVal + callResolvedMethod.DeclaringType + " " + callResolvedMethod.Name + callResolvedMethodArgs + ";");
-                //     break;
+                case "ldtoken":
+                    {
+                        MethodBase? mbMethod = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (mbMethod != null)
+                        {
+                            ILLiteral token = new ILLiteral(new ILHandleRef(), mbMethod.Name);
+                            Console.WriteLine("resolved method");
+                            _stack.Push(token);
+                        }
+                        else if (mbField != null)
+                        {
+                            ILLiteral token = new ILLiteral(new ILHandleRef(), mbField.Name);
+                            Console.WriteLine("resolved field");
+                            _stack.Push(token);
+                        }
+                        else if (mbType != null)
+                        {
+                            ILLiteral token = new ILLiteral(new ILHandleRef(), mbType.Name);
+                            Console.WriteLine("resolved type");
+                            _stack.Push(token);
+                        }
+                        else
+                            throw new Exception("cannot resolve token at " + instr.idx);
+                        break;
+                    }
+                case "call":
+                    {
+                        MethodBase? method = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (method == null) throw new Exception("call not resolved at " + instr.idx);
+                        int paramCount = method.GetParameters().Where(p => !p.IsRetval).Count();
+                        Type retType = typeof(void);
+                        if (method is MethodInfo methodInfo)
+                        {
+                            retType = methodInfo.ReturnType;
+                        }
+                        ILType ilRetType = TypeSolver.Resolve(retType);
+                        ILExpr[] args = new ILExpr[paramCount];
+                        for (int i = 0; i < paramCount; i++)
+                        {
+                            args[i] = _stack.Pop();
+                        }
+                        ILMethod ilMethod = new ILMethod(ilRetType, method.Name, args);
+                        _stack.Push(new ILCallExpr(ilMethod));
+                        break;
+                    }
                 case "ret":
                     {
                         ILExpr? retVal = _methodInfo.ReturnParameter.ParameterType != typeof(void) ? _stack.Pop() : null;
@@ -426,6 +451,17 @@ class StackMachine
         foreach (var l in labelsPool)
         {
             l.Index = _labels[l.ILIndex]!.Value;
+        }
+    }
+    private FieldInfo? safeFieldResolve(int target)
+    {
+        try
+        {
+            return _declaringModule.ResolveField(target);
+        }
+        catch (Exception)
+        {
+            return null;
         }
     }
     private Type? safeTypeResolve(int target)

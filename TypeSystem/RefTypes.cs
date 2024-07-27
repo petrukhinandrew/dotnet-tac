@@ -17,21 +17,21 @@ class ILArrayRef(ILType itemType) : ILObjectRefType(itemType) // ?LValue
 }
 class ILArrayAccessRef(ILType itemType) : ILObjectRefType(itemType), ILLValue
 {
+    private ILType _itemType = itemType;
     public override string ToString()
     {
-        return base.ToString();
+        return _itemType?.ToString() ?? "arrAccess ";
     }
 }
 class ILStringRef() : ILObjectRefType(new ILRefTerminator()), ILLValue
 {
     public override string ToString()
     {
-        return base.ToString();
+        return "string";
     }
 }
 
 class ILTypeRef() : ILObjectRefType(new ILRefTerminator()) { }
-
 class ILFieldRef(ILType fType) : ILRefType, ILLValue
 {
     public ILType Type => fType;
@@ -44,3 +44,8 @@ class ILFieldRef(ILType fType) : ILRefType, ILLValue
 interface ILRuntimePointerType : ILRefType { }
 class ILManagedPointerType : ILRuntimePointerType { }
 class ILUnmanagedPointerType : ILRuntimePointerType { }
+
+class ILHandleRef : ILRefType
+{
+
+}

@@ -64,24 +64,12 @@ class ILArrayAccess(ILExpr arr, ILExpr idx) : ILLValue
 }
 interface ILCastExpr : ILExpr { }
 
-// class ILBoxCastExpr : ILCastExpr
-// {
-//     public ILType Type => throw new NotImplementedException();
-// }
-// class ILUnboxCastExpr : ILCastExpr
-// {
-//     public ILType Type => throw new NotImplementedException();
-// }
-// class ILIsInstCastExpr : ILCastExpr
-// {
-//     public ILType Type => throw new NotImplementedException();
-// }
-
-class ILCallExpr : ILExpr
+class ILCallExpr(ILMethod method) : ILExpr
 {
-    public ILType Type => throw new NotImplementedException();
+    private ILMethod _method = method;
+    public ILType Type => _method.ReturnType;
     public override string ToString()
     {
-        return "invoke ";
+        return "invoke " + _method.ToString();
     }
 }
