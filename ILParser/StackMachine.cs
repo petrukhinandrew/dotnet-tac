@@ -63,25 +63,19 @@ class StackMachine
     }
     private (ILExpr, ILExpr) MbIntroduceTemp(ILExpr lhs, ILExpr rhs)
     {
-        // TODO recursive call?
-        if (lhs is ILValue && rhs is ILValue)
-        {
-            return (lhs, rhs);
-        }
-        if (lhs is ILValue)
+        if (rhs is not ILValue)
         {
             ILLocal tmp = GetNewTemp(rhs.Type);
             _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, rhs));
-            _stack.Push(tmp);
-            return (lhs, tmp);
+            rhs = tmp;
         }
-        else
+        if (lhs is not ILValue)
         {
             ILLocal tmp = GetNewTemp(lhs.Type);
             _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, lhs));
-            _stack.Push(tmp);
-            return (tmp, rhs);
+            lhs = tmp;
         }
+        return (lhs, rhs);
     }
     private ILStmtLocation GetNewStmtLoc()
     {
@@ -229,7 +223,6 @@ class StackMachine
                 case "ret":
                     {
                         ILExpr? retVal = _methodInfo.ReturnParameter.ParameterType != typeof(void) ? _stack.Pop() : null;
-
                         _tac.Add(
                             new ILReturnStmt(GetNewStmtLoc(), retVal)
                         );
@@ -452,6 +445,7 @@ class StackMachine
         {
             l.Index = _labels[l.ILIndex]!.Value;
         }
+        // TODO trailing gotos
     }
     private FieldInfo? safeFieldResolve(int target)
     {
