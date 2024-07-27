@@ -70,14 +70,14 @@ class StackMachine
         }
         if (lhs is ILValue)
         {
-            ILLocal tmp = new ILLocal(rhs.Type, Logger.TempVarName(_temps++));
+            ILLocal tmp = GetNewTemp(rhs.Type);
             _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, rhs));
             _stack.Push(tmp);
             return (lhs, tmp);
         }
         else
         {
-            ILLocal tmp = new ILLocal(lhs.Type, Logger.TempVarName(_temps++));
+            ILLocal tmp = GetNewTemp(lhs.Type);
             _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, lhs));
             _stack.Push(tmp);
             return (tmp, rhs);
@@ -86,6 +86,10 @@ class StackMachine
     private ILStmtLocation GetNewStmtLoc()
     {
         return new ILStmtLocation(_nextTacLineIdx++);
+    }
+    private ILLocal GetNewTemp(ILType type)
+    {
+        return new ILLocal(type, Logger.TempVarName(_temps++));
     }
     private void ProcessIL()
     {
@@ -367,9 +371,12 @@ class StackMachine
                         }
                         ILExpr sizeExpr = _stack.Pop();
                         // TODO check Int32 or Literal
-                        _stack.Push(new ILNewArrayExpr(
+                        ILExpr arrExpr = new ILNewArrayExpr(
                         TypeSolver.Resolve(arrType),
-                        sizeExpr));
+                        sizeExpr);
+                        ILLocal arrTmp = GetNewTemp(arrExpr.Type);
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), arrTmp, arrExpr));
+                        _stack.Push(arrTmp);
                         break;
                     }
                 case "ldelem.i1":
@@ -409,10 +416,7 @@ class StackMachine
                         ILExpr value = _stack.Pop();
                         ILExpr index = _stack.Pop();
                         ILExpr arr = _stack.Pop();
-                        _tac.Add(new ILAssignStmt(
-                            GetNewStmtLoc(),
-                            new ILArrayAccess(arr, index),
-                            value));
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), new ILArrayAccess(arr, index), value));
                         break;
                     }
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
@@ -464,7 +468,7 @@ class StackMachine
         List<string> res = new List<string>();
         foreach (var mapping in _locals)
         {
-            string buf = string.Format("{0} {1};", mapping.Type.ToString(), string.Join(", ", mapping.Name));
+            string buf = string.Format("{0} {1};", mapping.Type.ToString(), string.Join(", ", mapping.ToString()));
             res.Add(buf);
         }
         return res;

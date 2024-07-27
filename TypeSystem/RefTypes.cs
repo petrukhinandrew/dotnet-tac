@@ -2,30 +2,43 @@ namespace Usvm.IL.TypeSystem;
 interface ILRefType : ILType { }
 class ILInterfaceType : ILRefType { }
 
-interface ILObjectRefType : ILRefType { }
-class ILObjectRef : ILObjectRefType { }
-class ILNullRef : ILObjectRef { }
-class ILThisRef : ILObjectRef { }
-class ILArrayAccessRef : ILObjectRefType, ILLValue
+abstract class ILObjectRefType(ILType targetType) : ILRefType
 {
-    public ILType Type => throw new NotImplementedException();
-
-    public string Name => throw new NotImplementedException();
+    public ILType Type => targetType;
 }
-class ILStringRef : ILObjectRefType, ILLValue
+class ILObjectRef(ILType targetType) : ILObjectRefType(targetType) { }
+class ILRefTerminator : ILType { }
+class ILNullRef() : ILObjectRef(new ILRefTerminator()) { }
+class ILThisRef(ILType targetType) : ILObjectRef(targetType) { }
+class ILArrayRef(ILType itemType) : ILObjectRefType(itemType) // ?LValue
 {
-    public ILType Type => throw new NotImplementedException();
 
-    public string Name => throw new NotImplementedException();
+
+}
+class ILArrayAccessRef(ILType itemType) : ILObjectRefType(itemType), ILLValue
+{
+    public override string ToString()
+    {
+        return base.ToString();
+    }
+}
+class ILStringRef() : ILObjectRefType(new ILRefTerminator()), ILLValue
+{
+    public override string ToString()
+    {
+        return base.ToString();
+    }
 }
 
-class ILTypeRef : ILObjectRefType { }
+class ILTypeRef() : ILObjectRefType(new ILRefTerminator()) { }
 
-class ILFieldRef : ILRefType, ILLValue
+class ILFieldRef(ILType fType) : ILRefType, ILLValue
 {
-    public ILType Type => throw new NotImplementedException();
-
-    public string Name => throw new NotImplementedException();
+    public ILType Type => fType;
+    public override string ToString()
+    {
+        return Type?.ToString() ?? "null field";
+    }
 }
 
 interface ILRuntimePointerType : ILRefType { }

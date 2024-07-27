@@ -26,7 +26,11 @@ static class TypeSolver
         }
         else if (type.IsArray)
         {
-            return new ILArrayAccessRef();
+            Type? elemType = type.GetElementType();
+            if (elemType != null)
+                return new ILArrayAccessRef(Resolve(elemType));
+            else
+                throw new Exception("bad elem type for " + type.ToString());
         }
         else if (type.IsTypeDefinition)
         {
@@ -38,7 +42,11 @@ static class TypeSolver
         }
         else if (type.IsClass)
         {
-            return new ILObjectRef();
+            Type? elemType = type.GetElementType();
+            if (elemType != null)
+                return new ILObjectRef(Resolve(elemType));
+            else
+                throw new Exception("bad elem type for " + type.ToString());
         }
         else if (type.IsPointer)
         {
