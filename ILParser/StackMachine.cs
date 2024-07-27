@@ -71,17 +71,21 @@ class StackMachine
         if (lhs is ILValue)
         {
             ILLocal tmp = new ILLocal(rhs.Type, Logger.TempVarName(_temps++));
-            _tac.Add(new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), tmp, rhs));
+            _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, rhs));
             _stack.Push(tmp);
             return (lhs, tmp);
         }
         else
         {
             ILLocal tmp = new ILLocal(lhs.Type, Logger.TempVarName(_temps++));
-            _tac.Add(new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), tmp, lhs));
+            _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, lhs));
             _stack.Push(tmp);
             return (tmp, rhs);
         }
+    }
+    private ILStmtLocation GetNewStmtLoc()
+    {
+        return new ILStmtLocation(_nextTacLineIdx++);
     }
     private void ProcessIL()
     {
@@ -117,32 +121,32 @@ class StackMachine
                 case "ldloc.s": _stack.Push(_locals[((ILInstrOperand.Arg8)instr.arg).value]); break;
                 case "stloc.0":
                     _tac.Add(
-                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[0], _stack.Pop())
+                    new ILAssignStmt(GetNewStmtLoc(), _locals[0], _stack.Pop())
                     ); break;
                 case "stloc.1":
                     _tac.Add(
-                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[1], _stack.Pop())
+                    new ILAssignStmt(GetNewStmtLoc(), _locals[1], _stack.Pop())
                     ); break;
                 case "stloc.2":
                     _tac.Add(
-                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[2], _stack.Pop())
+                    new ILAssignStmt(GetNewStmtLoc(), _locals[2], _stack.Pop())
                     ); break;
                 case "stloc.3":
                     _tac.Add(
-                    new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[3], _stack.Pop())
+                    new ILAssignStmt(GetNewStmtLoc(), _locals[3], _stack.Pop())
                     ); break;
                 case "stloc.s":
                     {
                         int idx = ((ILInstrOperand.Arg8)instr.arg).value;
                         _tac.Add(
-                        new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _locals[idx], _stack.Pop())
+                        new ILAssignStmt(GetNewStmtLoc(), _locals[idx], _stack.Pop())
                         ); break;
                     }
                 case "starg.s":
                     {
                         int idx = ((ILInstrOperand.Arg8)instr.arg).value;
                         _tac.Add(
-                        new ILAssignStmt(new ILStmtLocation(_nextTacLineIdx++), _params[idx], _stack.Pop())
+                        new ILAssignStmt(GetNewStmtLoc(), _params[idx], _stack.Pop())
                         ); break;
                     }
                 // TODO byref
@@ -198,27 +202,43 @@ class StackMachine
                         ILExpr? retVal = _methodInfo.ReturnParameter.ParameterType != typeof(void) ? _stack.Pop() : null;
 
                         _tac.Add(
-                            new ILReturnStmt(new ILStmtLocation(_nextTacLineIdx++), retVal)
+                            new ILReturnStmt(GetNewStmtLoc(), retVal)
                         );
 
                         break;
                     }
                 case "add":
+
+                case "sub.ovf":
+                case "sub.ovf.un":
                 case "sub":
+
+                case "mul.ovf":
+                case "mul.ovf.un":
                 case "mul":
+
                 case "div.un":
                 case "div":
+
                 case "rem.un":
                 case "rem":
+
                 case "and":
+
                 case "or":
+
                 case "xor":
+
                 case "shl":
                 case "shr.un":
+
                 case "shr":
+
                 case "ceq":
+
                 case "cgt.un":
                 case "cgt":
+
                 case "clt.un":
                 case "clt":
                     {
@@ -241,19 +261,41 @@ class StackMachine
                 case "br":
                     {
                         ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
-                        _tac.Add(new ILGotoStmt(new ILStmtLocation(_nextTacLineIdx++), to));
+                        _tac.Add(new ILGotoStmt(GetNewStmtLoc(), to));
                         break;
                     }
                 case "beq.s":
                 case "beq":
+
+                case "bne.un":
+                case "bne.un.s":
+
+                case "bge.un":
+                case "bge.un.s":
+                case "bge.s":
+                case "bge":
+
+                case "bgt.un":
+                case "bgt.un.s":
                 case "bgt.s":
                 case "bgt":
+
+                case "ble.un":
+                case "ble.un.s":
+                case "ble.s":
+                case "ble":
+
+                case "blt.un":
+                case "blt.un.s":
+                case "blt.s":
+                case "blt":
+
                     {
                         ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
                         ILExpr lhs = _stack.Pop();
                         ILExpr rhs = _stack.Pop();
                         _tac.Add(new ILIfStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
+                            GetNewStmtLoc(),
                             new ILBinaryOperation(lhs, rhs),
                             to
                         ));
@@ -270,7 +312,7 @@ class StackMachine
                         ILExpr rhs = _stack.Pop();
                         ILExpr lhs = _stack.Pop();
                         _tac.Add(new ILIfStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
+                            GetNewStmtLoc(),
                             new ILBinaryOperation(lhs, rhs),
                             to
                         ));
@@ -288,10 +330,46 @@ class StackMachine
                         ILExpr rhs = _stack.Pop();
                         ILExpr lhs = _stack.Pop();
                         _tac.Add(new ILIfStmt(
-                            new ILStmtLocation(_nextTacLineIdx++),
+                            GetNewStmtLoc(),
                             new ILBinaryOperation(lhs, rhs),
                             to
                         ));
+                        break;
+                    }
+                case "newobj":
+                    {
+                        // TODO require ctor
+                        MethodBase? mb = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (mb == null)
+                        {
+                            Console.WriteLine("error resolving method at " + instr.idx);
+                            break;
+                        }
+                        int arity = mb.GetParameters().Where(p => !p.IsRetval).Count();
+                        Type? objType = mb.DeclaringType ?? typeof(void);
+                        ILExpr[] inParams = new ILExpr[arity];
+                        for (int i = 0; i < arity; i++)
+                        {
+                            inParams[i] = _stack.Pop();
+                        }
+                        _stack.Push(new ILNewExpr(
+                            TypeSolver.Resolve(objType),
+                            inParams));
+                        break;
+                    }
+                case "newarr":
+                    {
+                        Type? arrType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (arrType == null)
+                        {
+                            Console.WriteLine("error resolving method at " + instr.idx);
+                            break;
+                        }
+                        ILExpr sizeExpr = _stack.Pop();
+
+                        _stack.Push(new ILNewArrayExpr(
+                        TypeSolver.Resolve(arrType),
+                        sizeExpr));
                         break;
                     }
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
@@ -303,15 +381,25 @@ class StackMachine
             l.Index = _labels[l.ILIndex]!.Value;
         }
     }
+    private Type? safeTypeResolve(int target)
+    {
+        try
+        {
+            return _declaringModule.ResolveType(target);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+    }
     private MethodBase? safeMethodResolve(int target)
     {
         try
         {
             return _declaringModule.ResolveMethod(target);
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            Console.WriteLine("error resolving method " + e.Message);
             return null;
         }
 
@@ -340,7 +428,7 @@ class StackMachine
     }
     public string ListMethodSignature()
     {
-        return string.Format("{0} {1}({2})", _methodInfo.ReturnType, _methodInfo.Name, string.Join(",", _methodInfo.GetParameters().Select(mi => mi.ToString())));
+        return string.Format("{0} {1}({2})", _methodInfo.ReturnType, _methodInfo.Name, string.Join(", ", _methodInfo.GetParameters().Select(mi => mi.ToString())));
     }
     public void DumpMethodSignature()
     {

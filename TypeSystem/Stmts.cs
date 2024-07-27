@@ -64,8 +64,8 @@ class ILReturnStmt(ILStmtLocation location, ILExpr? retVal) : ILLeaveScopeStmt
     public ILStmtLocation Location => location;
     public override string ToString()
     {
-        if (retVal == null) return Location.ToString() + "return;";
-        return Location.ToString() + "return " + retVal.ToString() + ";";
+        string arg = retVal?.ToString() ?? "";
+        return Location.ToString() + "return " + arg;
     }
 }
 interface ILBranchStmt : ILStmt { }

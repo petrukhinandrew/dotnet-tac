@@ -21,12 +21,13 @@ class ILBinaryOperation(ILExpr lhs, ILExpr rhs) : ILExpr
     public new string ToString() => lhs.ToString() + " binOp " + rhs.ToString();
 }
 
-class ILNewExpr : ILExpr
+class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
 {
-    public ILType Type => throw new NotImplementedException();
+    public ILType Type => type;
+    public ILExpr[] Args = args;
     public override string ToString()
     {
-        return "new ";
+        return "new " + Type.ToString() + " (" + string.Join(", ", Args.Select(a => a.Type)) + ")";
     }
 }
 
@@ -39,12 +40,13 @@ class ILTypeOfExpr : ILExpr
     }
 }
 
-class ILNewArrayExpr : ILExpr
+class ILNewArrayExpr(ILType type, ILExpr size) : ILExpr
 {
-    public ILType Type => throw new NotImplementedException();
+    public ILType Type => type;
+    public ILExpr Size => size;
     public override string ToString()
     {
-        return "new[]";
+        return "new " + Type.ToString() + "[" + Size.ToString() + "]";
     }
 }
 
