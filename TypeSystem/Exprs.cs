@@ -50,6 +50,18 @@ class ILNewArrayExpr(ILType type, ILExpr size) : ILExpr
     }
 }
 
+class ILArrayAccess(ILExpr arr, ILExpr idx) : ILLValue
+{
+    public ILType Type => arr.Type;
+    public ILExpr Index => idx;
+
+    public string Name => ToString();
+
+    public override string ToString()
+    {
+        return arr.ToString() + "[" + Index.ToString() + "]";
+    }
+}
 interface ILCastExpr : ILExpr { }
 
 // class ILBoxCastExpr : ILCastExpr

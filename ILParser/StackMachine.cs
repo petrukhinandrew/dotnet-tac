@@ -366,10 +366,53 @@ class StackMachine
                             break;
                         }
                         ILExpr sizeExpr = _stack.Pop();
-
+                        // TODO check Int32 or Literal
                         _stack.Push(new ILNewArrayExpr(
                         TypeSolver.Resolve(arrType),
                         sizeExpr));
+                        break;
+                    }
+                case "ldelem.i1":
+                case "ldelem.i2":
+                case "ldelem.i4":
+                case "ldelem.i8":
+                case "ldelem.u1":
+                case "ldelem.u2":
+                case "ldelem.u4":
+                case "ldelem.u8":
+                case "ldelem.r4":
+                case "ldelem.r8":
+                case "ldelem.i":
+                case "ldelem.ref":
+                case "ldelem":
+                    {
+                        // TODO separate cases depending on types
+                        ILExpr index = _stack.Pop();
+                        ILExpr arr = _stack.Pop();
+                        _stack.Push(new ILArrayAccess(
+                            arr, index));
+                        break;
+                    }
+                // case "ldelema":
+                // case "ldlen":
+                case "stelem.i1":
+                case "stelem.i2":
+                case "stelem.i4":
+                case "stelem.i8":
+                case "stelem.r4":
+                case "stelem.r8":
+                case "stelem.i":
+                case "stelem.ref":
+                case "stelem":
+                    {
+                        // TODO separate cases depending on types
+                        ILExpr value = _stack.Pop();
+                        ILExpr index = _stack.Pop();
+                        ILExpr arr = _stack.Pop();
+                        _tac.Add(new ILAssignStmt(
+                            GetNewStmtLoc(),
+                            new ILArrayAccess(arr, index),
+                            value));
                         break;
                     }
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
