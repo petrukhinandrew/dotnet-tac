@@ -29,12 +29,25 @@ class ILLocal(ILType type, string name) : ILLValue
 
 }
 
+class ILObjectLiteral(ILType type, object? obj) : ILValue
+{
+    public object? Object = obj;
+
+    public ILType Type => type;
+
+    public override string ToString()
+    {
+        return Type.ToString() + " obj";
+    }
+}
+
 class ILLiteral(ILType type, string value) : ILValue
 {
     public ILType Type => type;
     public new string ToString() => value;
 
 }
+
 class ILRuntimeHandle(ILExpr handle) : ILValue
 {
     public ILType Type => handle.Type;

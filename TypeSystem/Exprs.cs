@@ -40,26 +40,42 @@ class ILTypeOfExpr : ILExpr
     }
 }
 
-class ILNewArrayExpr(ILType type, ILExpr size) : ILExpr
+class ILNewArrayExpr(ILArrayRef type, ILExpr size) : ILExpr
 {
-    public ILType Type => type;
+    public ILType Type => type.ElemType;
     public ILExpr Size => size;
     public override string ToString()
     {
         return "new " + Type.ToString() + "[" + Size.ToString() + "]";
     }
 }
-
-class ILArrayAccess(ILExpr arr, ILExpr idx) : ILLValue
+class ILNewStaticArrayExpr(ILArrayRef type, ILExpr value) : ILExpr
 {
-    public ILType Type => arr.Type;
-    public ILExpr Index => idx;
+    public ILType Type => type.ElemType;
+    public ILExpr Value => value;
+    public override string ToString()
+    {
+        return "new " + Type.ToString() + "[" + Value.ToString() + "]";
+    }
+}
+
+class ILArrayAccess : ILLValue
+{
+    public ILArrayAccess(ILExpr arrRef, ILExpr idx)
+    {
+        _arrRef = arrRef;
+        _idx = idx;
+    }
+    ILExpr _arrRef;
+    ILExpr _idx;
+    public ILType Type => _arrRef.Type;
+    public ILExpr Index => _idx;
 
     public string Name => ToString();
 
     public override string ToString()
     {
-        return arr.ToString() + "[" + Index.ToString() + "]";
+        return _arrRef.ToString() + "[" + _idx.ToString() + "]";
     }
 }
 interface ILCastExpr : ILExpr { }

@@ -1,6 +1,5 @@
-using System.ComponentModel;
-using System.Net.Http.Headers;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.Parser;
@@ -9,7 +8,7 @@ class StackMachine
     private Stack<ILExpr> _stack;
     private List<ILLocal> _locals;
     private List<ILLocal> _params;
-    private int _temps = 0;
+    private List<ILExpr> _temps = new List<ILExpr>();
     private Dictionary<int, int?> _labels = new Dictionary<int, int?>();
     private int _nextTacLineIdx = 0;
     private List<ILStmt> _tac = new List<ILStmt>();
@@ -65,13 +64,13 @@ class StackMachine
     {
         if (rhs is not ILValue)
         {
-            ILLocal tmp = GetNewTemp(rhs.Type);
+            ILLocal tmp = GetNewTemp(rhs.Type, rhs);
             _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, rhs));
             rhs = tmp;
         }
         if (lhs is not ILValue)
         {
-            ILLocal tmp = GetNewTemp(lhs.Type);
+            ILLocal tmp = GetNewTemp(lhs.Type, lhs);
             _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, lhs));
             lhs = tmp;
         }
@@ -81,9 +80,10 @@ class StackMachine
     {
         return new ILStmtLocation(_nextTacLineIdx++);
     }
-    private ILLocal GetNewTemp(ILType type)
+    private ILLocal GetNewTemp(ILType type, ILExpr value)
     {
-        return new ILLocal(type, Logger.TempVarName(_temps++));
+        _temps.Add(value);
+        return new ILLocal(type, Logger.TempVarName(_temps.Count - 1));
     }
     private void ProcessIL()
     {
@@ -177,33 +177,31 @@ class StackMachine
                     {
                         MethodBase? mbMethod = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
                         Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
-                        FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value, _methodInfo.DeclaringType!.GetGenericArguments(), _methodInfo.GetGenericArguments());
+
+                        ILObjectLiteral token;
                         if (mbMethod != null)
                         {
-                            ILLiteral token = new ILLiteral(new ILHandleRef(), mbMethod.Name);
-                            Console.WriteLine("resolved method");
-                            _stack.Push(token);
+                            token = new ILObjectLiteral(new ILHandleRef(), mbMethod.Name);
                         }
                         else if (mbField != null)
                         {
-                            ILLiteral token = new ILLiteral(new ILHandleRef(), mbField.Name);
-                            Console.WriteLine("resolved field");
-                            _stack.Push(token);
+                            token = new ILObjectLiteral(new ILHandleRef(), mbField.GetValue(null));
                         }
                         else if (mbType != null)
                         {
-                            ILLiteral token = new ILLiteral(new ILHandleRef(), mbType.Name);
-                            Console.WriteLine("resolved type");
-                            _stack.Push(token);
+                            token = new ILObjectLiteral(new ILHandleRef(), mbType.Name);
                         }
                         else
                             throw new Exception("cannot resolve token at " + instr.idx);
+                        _stack.Push(token);
                         break;
                     }
                 case "call":
                     {
                         MethodBase? method = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
                         if (method == null) throw new Exception("call not resolved at " + instr.idx);
+
                         int paramCount = method.GetParameters().Where(p => !p.IsRetval).Count();
                         Type retType = typeof(void);
                         if (method is MethodInfo methodInfo)
@@ -216,8 +214,15 @@ class StackMachine
                         {
                             args[i] = _stack.Pop();
                         }
-                        ILMethod ilMethod = new ILMethod(ilRetType, method.Name, args);
-                        _stack.Push(new ILCallExpr(ilMethod));
+                        if (isInitializeArray(method))
+                        {
+                            InlineInitArray(args);
+                        }
+                        else
+                        {
+                            ILMethod ilMethod = new ILMethod(ilRetType, method.Name, args);
+                            _stack.Push(new ILCallExpr(ilMethod));
+                        }
                         break;
                     }
                 case "ret":
@@ -389,12 +394,17 @@ class StackMachine
                         }
                         ILExpr sizeExpr = _stack.Pop();
                         // TODO check Int32 or Literal
+                        ILArrayRef resolvedType = new ILArrayRef(TypeSolver.Resolve(arrType));
                         ILExpr arrExpr = new ILNewArrayExpr(
-                        TypeSolver.Resolve(arrType),
-                        sizeExpr);
-                        ILLocal arrTmp = GetNewTemp(arrExpr.Type);
-                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), arrTmp, arrExpr));
-                        _stack.Push(arrTmp);
+                            resolvedType,
+                            sizeExpr);
+                        ILLocal arrTemp = GetNewTemp(resolvedType, arrExpr);
+                        _tac.Add(new ILAssignStmt(
+                            GetNewStmtLoc(),
+                            arrTemp,
+                            arrExpr
+                        ));
+                        _stack.Push(arrTemp);
                         break;
                     }
                 case "ldelem.i1":
@@ -431,6 +441,7 @@ class StackMachine
                 case "stelem":
                     {
                         // TODO separate cases depending on types
+                        // TODO add mbAddTemp?
                         ILExpr value = _stack.Pop();
                         ILExpr index = _stack.Pop();
                         ILExpr arr = _stack.Pop();
@@ -447,11 +458,52 @@ class StackMachine
         }
         // TODO trailing gotos
     }
-    private FieldInfo? safeFieldResolve(int target)
+    private static bool isInitializeArray(MethodBase? methodBase)
+    {
+        if (methodBase != null && methodBase is MethodInfo body)
+        {
+            return (body.DeclaringType?.FullName ?? "") == "System.Runtime.CompilerServices.RuntimeHelpers" && body.Name == "InitializeArray";
+        }
+        return false;
+    }
+    private void InlineInitArray(ILExpr[] args)
+    {
+        Console.WriteLine(args.Last().GetType().ToString());
+        if (args.First() is ILObjectLiteral ilObj && args.Last() is ILLocal newArr)
+        {
+            try
+            {
+                ILNewArrayExpr expr = (ILNewArrayExpr)_temps[Logger.NameToIndex(newArr.ToString())];
+                int arrSize = int.Parse(expr.Size.ToString());
+                Type arrType = ((ILPrimitiveType)expr.Type).BaseType;
+                var tmp = Array.CreateInstance(arrType, arrSize);
+                GCHandle handle = GCHandle.Alloc(tmp, GCHandleType.Pinned);
+
+                try
+                {
+                    Marshal.StructureToPtr(ilObj.Object!, handle.AddrOfPinnedObject(), false);
+                }
+                finally
+                {
+                    handle.Free();
+                }
+                List<object> list = [.. tmp];
+                ILLiteral arrLit = new ILLiteral(new ILArrayRef(new ILInt32()), "[" + string.Join(", ", list.Select(v => v.ToString())) + "]");
+                _tac.Add(new ILAssignStmt(
+                    GetNewStmtLoc(),
+                    newArr, arrLit
+                ));
+            }
+            catch (Exception e) { Console.WriteLine(e); }
+            return;
+        }
+        throw new Exception("bad static array init");
+    }
+    private FieldInfo? safeFieldResolve(int target, Type[]? gta, Type[]? gpa)
     {
         try
         {
-            return _declaringModule.ResolveField(target);
+            return _declaringModule.ResolveField(target, gta, gpa);
         }
         catch (Exception)
         {

@@ -91,6 +91,7 @@ class CodeBase : AssemblyLoadContext
                             Console.WriteLine("Caught on {0}: ", method.Name);
                             Console.WriteLine(e.Message);
                             Console.WriteLine(e.TargetSite);
+                            Console.WriteLine(e.StackTrace);
                         }
                     }
 

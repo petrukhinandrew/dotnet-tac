@@ -17,4 +17,8 @@ public static class Logger
     {
         return string.Format("arg${0}", idx);
     }
+    public static int NameToIndex(string name)
+    {
+        return int.Parse(name.Split("$")[1]);
+    }
 }

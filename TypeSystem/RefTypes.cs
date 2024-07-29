@@ -10,19 +10,12 @@ class ILObjectRef(ILType targetType) : ILObjectRefType(targetType) { }
 class ILRefTerminator : ILType { }
 class ILNullRef() : ILObjectRef(new ILRefTerminator()) { }
 class ILThisRef(ILType targetType) : ILObjectRef(targetType) { }
-class ILArrayRef(ILType itemType) : ILObjectRefType(itemType) // ?LValue
+class ILArrayRef(ILType elemType) : ILRefType
 {
-
+    public ILType ElemType => elemType;
 
 }
-class ILArrayAccessRef(ILType itemType) : ILObjectRefType(itemType), ILLValue
-{
-    private ILType _itemType = itemType;
-    public override string ToString()
-    {
-        return _itemType?.ToString() ?? "arrAccess ";
-    }
-}
+
 class ILStringRef() : ILObjectRefType(new ILRefTerminator()), ILLValue
 {
     public override string ToString()
