@@ -1,5 +1,3 @@
-using System.Net.Http.Headers;
-
 namespace Usvm.IL.TypeSystem;
 interface ILStmt
 {

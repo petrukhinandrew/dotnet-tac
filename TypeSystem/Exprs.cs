@@ -49,15 +49,6 @@ class ILNewArrayExpr(ILArrayRef type, ILExpr size) : ILExpr
         return "new " + Type.ToString() + "[" + Size.ToString() + "]";
     }
 }
-class ILNewStaticArrayExpr(ILArrayRef type, ILExpr value) : ILExpr
-{
-    public ILType Type => type.ElemType;
-    public ILExpr Value => value;
-    public override string ToString()
-    {
-        return "new " + Type.ToString() + "[" + Value.ToString() + "]";
-    }
-}
 
 class ILArrayAccess : ILLValue
 {
@@ -78,7 +69,26 @@ class ILArrayAccess : ILLValue
         return _arrRef.ToString() + "[" + _idx.ToString() + "]";
     }
 }
-interface ILCastExpr : ILExpr { }
+class ILArrayLength(ILExpr arr) : ILExpr
+{
+    private ILExpr _arr = arr;
+    private ILType _type = new ILInt32();
+    public ILType Type => _type;
+    public override string ToString()
+    {
+        return _arr.ToString() + ".Length";
+    }
+}
+class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
+{
+    private ILType _targetType = targetType;
+    private ILExpr _target = target;
+    public ILType Type => _targetType;
+    public override string ToString()
+    {
+        return string.Format("({0}) {1}", _targetType.ToString(), _target.ToString());
+    }
+}
 
 class ILCallExpr(ILMethod method) : ILExpr
 {

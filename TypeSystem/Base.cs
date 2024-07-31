@@ -48,17 +48,6 @@ class ILLiteral(ILType type, string value) : ILValue
 
 }
 
-class ILRuntimeHandle(ILExpr handle) : ILValue
-{
-    public ILType Type => handle.Type;
-    public override string ToString()
-    {
-        return Type.ToString() + " handle";
-    }
-}
-
-class ILMethodType : ILType { }
-
 class ILMethod(ILType retType, string name, ILExpr[] args) : ILValue
 {
     public ILType ReturnType = retType;

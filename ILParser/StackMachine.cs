@@ -195,7 +195,7 @@ class StackMachine
                         else
                             throw new Exception("cannot resolve token at " + instr.idx);
                         _stack.Push(token);
-                        break;
+                        break; // vsharp interpreter fs ldtoken
                     }
                 case "call":
                     {
@@ -429,7 +429,12 @@ class StackMachine
                         break;
                     }
                 // case "ldelema":
-                // case "ldlen":
+                case "ldlen":
+                    {
+                        ILExpr arr = _stack.Pop();
+                        _stack.Push(new ILArrayLength(arr));
+                        break;
+                    }
                 case "stelem.i1":
                 case "stelem.i2":
                 case "stelem.i4":
@@ -489,10 +494,14 @@ class StackMachine
                 }
                 List<object> list = [.. tmp];
                 ILLiteral arrLit = new ILLiteral(new ILArrayRef(new ILInt32()), "[" + string.Join(", ", list.Select(v => v.ToString())) + "]");
-                _tac.Add(new ILAssignStmt(
+                for (int i = 0; i < list.Count; i++)
+                {
+                    _tac.Add(new ILAssignStmt(
                     GetNewStmtLoc(),
-                    newArr, arrLit
+                    new ILArrayAccess(newArr, new ILLiteral(new ILInt32(), i.ToString())),
+                    new ILLiteral(expr.Type, list[i].ToString()!)
                 ));
+                }
             }
             catch (Exception e) { Console.WriteLine(e); }
             return;
