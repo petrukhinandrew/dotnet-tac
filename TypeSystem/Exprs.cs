@@ -79,7 +79,7 @@ class ILArrayLength(ILExpr arr) : ILExpr
         return _arr.ToString() + ".Length";
     }
 }
-class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
+abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
 {
     private ILType _targetType = targetType;
     private ILExpr _target = target;
@@ -89,7 +89,10 @@ class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
         return string.Format("({0}) {1}", _targetType.ToString(), _target.ToString());
     }
 }
+class ILConvExpr(ILPrimitiveType targetType, ILExpr value) : ILCastExpr(targetType, value)
+{
 
+}
 class ILCallExpr(ILMethod method) : ILExpr
 {
     private ILMethod _method = method;

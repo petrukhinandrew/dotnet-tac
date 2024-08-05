@@ -19,6 +19,8 @@ static class TypeSolver
                 if (type == typeof(float)) return new ILFloat32();
                 if (type == typeof(double)) return new ILInt64();
                 if (type == typeof(int)) return new ILInt32();
+                if (type == typeof(nint)) return new ILNativeInt();
+                if (type == typeof(uint)) return new ILUInt32();
             }
         }
         else if (type == typeof(string))

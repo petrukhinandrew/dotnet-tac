@@ -1,3 +1,4 @@
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Usvm.IL.TypeSystem;
@@ -152,6 +153,13 @@ class StackMachine
                 //     _stack.Push(new SMValue.Arg(((ILInstrOperand.Arg8)instr.arg).value, AsAddr: true)); break;
                 // case "ldloca.s":
                 //     _stack.Push(new SMValue.Local(((ILInstrOperand.Arg8)instr.arg).value, AsAddr: true)); break;
+                case "ldftn":
+                    {
+                        MethodBase? mb = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (mb == null) throw new Exception("method not resolved at " + instr.idx);
+                        _stack.Push(ILMethod.FromMethodBase(mb));
+                        break;
+                    }
                 case "ldnull": _stack.Push((ILExpr)new ILNullValue()); break;
                 case "ldc.i4.m1":
                 case "ldc.i4.M1": PushLiteral<int>(-1); break;
@@ -202,27 +210,25 @@ class StackMachine
                         MethodBase? method = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
                         if (method == null) throw new Exception("call not resolved at " + instr.idx);
 
-                        int paramCount = method.GetParameters().Where(p => !p.IsRetval).Count();
-                        Type retType = typeof(void);
-                        if (method is MethodInfo methodInfo)
+                        ILMethod ilMethod = ILMethod.FromMethodBase(method);
+                        ilMethod.LoadArgs(_stack);
+                        if (ilMethod.IsInitializeArray())
                         {
-                            retType = methodInfo.ReturnType;
-                        }
-                        ILType ilRetType = TypeSolver.Resolve(retType);
-                        ILExpr[] args = new ILExpr[paramCount];
-                        for (int i = 0; i < paramCount; i++)
-                        {
-                            args[i] = _stack.Pop();
-                        }
-                        if (isInitializeArray(method))
-                        {
-                            InlineInitArray(args);
+                            InlineInitArray(ilMethod.Args);
                         }
                         else
                         {
-                            ILMethod ilMethod = new ILMethod(ilRetType, method.Name, args);
                             _stack.Push(new ILCallExpr(ilMethod));
                         }
+                        break;
+                    }
+                case "calli":
+                    {
+                        byte[]? sig = safeSignatureResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (sig == null) throw new Exception("signature not resolved at " + instr.idx);
+                        ILMethod ilMethod = (ILMethod)_stack.Pop();
+                        ilMethod.LoadArgs(_stack);
+                        _stack.Push(new ILCallExpr(ilMethod));
                         break;
                     }
                 case "ret":
@@ -365,9 +371,8 @@ class StackMachine
                     }
                 case "newobj":
                     {
-                        // TODO require ctor
                         MethodBase? mb = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
-                        if (mb == null)
+                        if (mb == null || !mb!.IsConstructor)
                         {
                             Console.WriteLine("error resolving method at " + instr.idx);
                             break;
@@ -453,6 +458,102 @@ class StackMachine
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), new ILArrayAccess(arr, index), value));
                         break;
                     }
+
+                case "conv.i1":
+                case "conv.i2":
+                case "conv.i4":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
+                case "conv.i8":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
+                case "conv.r4":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILFloat32(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
+                case "conv.r8":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILFloat64(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
+                case "conv.u1":
+                case "conv.u2":
+                case "conv.u4":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
+                case "conv.u8":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
+                case "conv.i":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
+                case "conv.u":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
+                case "conv.r.un":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILNativeFloat(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
+                // 
+                case "conv.ovf.i1":
+                case "conv.ovf.i2":
+                case "conv.ovf.i4":
+                case "conv.ovf.i8":
+                case "conv.ovf.u1":
+                case "conv.ovf.u2":
+                case "conv.ovf.u4":
+                case "conv.ovf.u8":
+                case "conv.ovf.i":
+                case "conv.ovf.u":
+                // 
+                case "conv.ovf.i1.un":
+                case "conv.ovf.i2.un":
+                case "conv.ovf.i4.un":
+                case "conv.ovf.i8.un":
+                case "conv.ovf.u1.un":
+                case "conv.ovf.u2.un":
+                case "conv.ovf.u4.un":
+                case "conv.ovf.u8.un":
+                case "conv.ovf.i.un":
+                case "conv.ovf.u.un":
+                    {
+                        ILExpr value = _stack.Pop();
+                        ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
+                        _stack.Push(conv);
+                        break;
+                    }
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
             }
             curInstr = curInstr.next;
@@ -462,14 +563,6 @@ class StackMachine
             l.Index = _labels[l.ILIndex]!.Value;
         }
         // TODO trailing gotos
-    }
-    private static bool isInitializeArray(MethodBase? methodBase)
-    {
-        if (methodBase != null && methodBase is MethodInfo body)
-        {
-            return (body.DeclaringType?.FullName ?? "") == "System.Runtime.CompilerServices.RuntimeHelpers" && body.Name == "InitializeArray";
-        }
-        return false;
     }
     private void InlineInitArray(ILExpr[] args)
     {
@@ -535,6 +628,18 @@ class StackMachine
         try
         {
             return _declaringModule.ResolveMethod(target);
+        }
+        catch (Exception)
+        {
+            return null;
+        }
+
+    }
+    private byte[]? safeSignatureResolve(int target)
+    {
+        try
+        {
+            return _declaringModule.ResolveSignature(target);
         }
         catch (Exception)
         {

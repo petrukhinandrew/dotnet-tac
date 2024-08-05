@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+
 namespace Usvm.IL.TypeSystem;
 
 interface ILValueType : ILType { }
@@ -41,6 +43,14 @@ class ILUInt16 : ILPrimitiveType
         return "uint16";
     }
 }
+class ILUInt32 : ILPrimitiveType
+{
+    public Type BaseType => typeof(ushort);
+    public override string ToString()
+    {
+        return "uint32";
+    }
+}
 class ILInt32 : ILPrimitiveType
 {
     public Type BaseType => typeof(int);
@@ -58,9 +68,16 @@ class ILInt64 : ILPrimitiveType
     }
 }
 
-// TODO find use case 
-// class ILNativeInt : ILPrimitiveType { }
-
+class ILNativeInt : ILPrimitiveType
+{
+    public Type BaseType => typeof(nint);
+    public override string ToString() => "nint";
+}
+class ILNativeFloat : ILPrimitiveType
+{
+    public Type BaseType => typeof(float);
+    public override string ToString() => "nfloat";
+}
 class ILFloat32 : ILPrimitiveType
 {
     public Type BaseType => typeof(float);

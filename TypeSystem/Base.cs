@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Usvm.IL.TypeSystem;
 
 interface ILType { }
@@ -48,10 +50,33 @@ class ILLiteral(ILType type, string value) : ILValue
 
 }
 
-class ILMethod(ILType retType, string name, ILExpr[] args) : ILValue
+class ILMethod(ILType retType, string declType, string name, int argCount, ILExpr[] args) : ILValue
 {
+
+
+    public static ILMethod FromMethodBase(MethodBase mb)
+    {
+        int paramCount = mb.GetParameters().Where(p => !p.IsRetval).Count();
+        Type retType = typeof(void);
+        if (mb is MethodInfo methodInfo)
+        {
+            retType = methodInfo.ReturnType;
+        }
+        ILType ilRetType = TypeSolver.Resolve(retType);
+
+        return new ILMethod(ilRetType, mb.DeclaringType?.FullName ?? "", mb.Name, paramCount, new ILExpr[paramCount]);
+    }
+    public void LoadArgs(Stack<ILExpr> stack)
+    {
+        for (int i = 0; i < _argCount; i++)
+        {
+            Args[i] = stack.Pop();
+        }
+    }
     public ILType ReturnType = retType;
+    public string DeclaringType = declType;
     public string Name = name;
+    private int _argCount = argCount;
     public ILExpr[] Args = args;
 
     public ILType Type => throw new NotImplementedException();
@@ -60,5 +85,9 @@ class ILMethod(ILType retType, string name, ILExpr[] args) : ILValue
     public override string ToString()
     {
         return string.Format("{0} {1}({2})", ReturnType.ToString(), Name, string.Join(", ", Args.Select(p => p.ToString())));
+    }
+    public bool IsInitializeArray()
+    {
+        return DeclaringType == "System.Runtime.CompilerServices.RuntimeHelpers" && Name == "InitializeArray";
     }
 }
