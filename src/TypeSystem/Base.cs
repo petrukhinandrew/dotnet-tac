@@ -16,10 +16,10 @@ interface ILValue : ILExpr { }
 
 class ILNullValue : ILValue
 {
-    public ILType Type => new ILNullRef();
+    private static ILType _instance = new ILNull();
+    public ILType Type => _instance;
 
     public override string ToString() => "null";
-
 }
 
 interface ILLValue : ILValue { }

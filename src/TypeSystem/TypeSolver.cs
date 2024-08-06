@@ -3,7 +3,7 @@ static class TypeSolver
 {
     public static ILType Resolve(Type type)
     {
-        if (type == typeof(void)) return new ILNullRef();
+        if (type == typeof(void)) return new ILNull();
         if (type.IsValueType)
         {
             if (type.IsEnum) return new ILEnumType();
@@ -25,7 +25,7 @@ static class TypeSolver
         }
         else if (type == typeof(string))
         {
-            return new ILStringRef();
+            return new ILString();
         }
         else if (type.IsArray)
         {
@@ -35,29 +35,9 @@ static class TypeSolver
             else
                 throw new Exception("bad elem type for " + type.ToString());
         }
-        else if (type.IsTypeDefinition)
+        else if (type.IsInterface || type.IsClass)
         {
-            return new ILTypeRef();
-        }
-        else if (type.IsInterface)
-        {
-            return new ILInterfaceType();
-        }
-        else if (type.IsClass)
-        {
-            Type? elemType = type.GetElementType();
-            if (elemType != null)
-                return new ILObjectRef(Resolve(elemType));
-            else
-                throw new Exception("bad elem type for " + type.ToString());
-        }
-        else if (type.IsPointer)
-        {
-            return new ILUnmanagedPointerType();
-        }
-        else if (type.IsByRef)
-        {
-            return new ILManagedPointerType();
+            return new ILClassOrInterfaceType(type.FullName ?? type.AssemblyQualifiedName ?? type.Name);
         }
         throw new Exception("unhandled type " + type.ToString());
     }

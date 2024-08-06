@@ -81,17 +81,23 @@ class ILArrayLength(ILExpr arr) : ILExpr
 }
 abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
 {
-    private ILType _targetType = targetType;
-    private ILExpr _target = target;
+    protected ILType _targetType = targetType;
+    protected ILExpr _target = target;
     public ILType Type => _targetType;
     public override string ToString()
     {
         return string.Format("({0}) {1}", _targetType.ToString(), _target.ToString());
     }
 }
-class ILConvExpr(ILPrimitiveType targetType, ILExpr value) : ILCastExpr(targetType, value)
+class ILConvExpr(ILPrimitiveType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
+class ILBoxExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
+class ILCastClassExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
+class ILCondCastExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
 {
-
+    public override string ToString()
+    {
+        return string.Format("{0} as {1}", _target.ToString(), _targetType.ToString());
+    }
 }
 class ILCallExpr(ILMethod method) : ILExpr
 {
