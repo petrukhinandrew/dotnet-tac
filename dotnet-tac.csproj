@@ -7,5 +7,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  
+  <PropertyGroup Condition="'$(Configuration)' == 'BuildTest'">
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>dotnet_test</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputPath>test/resources/</OutputPath>
+  </PropertyGroup>
 
 </Project>
