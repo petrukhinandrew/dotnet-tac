@@ -1,22 +1,24 @@
+#pragma warning disable CS0219
+
 namespace Usvm.IL.Test.Units;
-class ClassTest
-{
-    private int _x;
-    public ClassTest(int x)
-    {
-        _x = x;
-    }
-    public void inc()
-    {
-        _x += 1;
-    }
-}
 public class SampleClass
 {
+    class TestClass
+    {
+        private int _x;
+        public TestClass(int x)
+        {
+            _x = x;
+        }
+        public void inc()
+        {
+            _x += 1;
+        }
+    }
 
     public static void newInstTest()
     {
-        ClassTest ct = new ClassTest(1);
+        TestClass ct = new TestClass(1);
         ct.inc();
     }
 
