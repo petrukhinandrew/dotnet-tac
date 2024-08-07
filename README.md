@@ -7,13 +7,9 @@
 - pointers are values or refs ? 
 
 - (int32) local$1.Length
-
-## Need tests for 
-
-- array len 
-- box/unbox
+- equal by type 
 
 ## Steps 
 
-1. Box unbox
++ 1. Box unbox
 2. fields exprs 

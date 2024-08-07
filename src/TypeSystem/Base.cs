@@ -2,9 +2,9 @@ using System.Reflection;
 
 namespace Usvm.IL.TypeSystem;
 
-interface ILType { }
+public interface ILType { }
 
-interface ILExpr
+public interface ILExpr
 {
     ILType Type { get; }
     public string ToString();

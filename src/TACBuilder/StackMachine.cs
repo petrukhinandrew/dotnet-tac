@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using Usvm.IL.TypeSystem;
 using Usvm.IL.Parser;
+using System.Text.RegularExpressions;
 
 class StackMachine
 {
@@ -62,20 +63,26 @@ class StackMachine
         }
         return to;
     }
+    private ILExpr PopSingleAddr()
+    {
+        return ToSingleAddr(_stack.Pop());
+    }
+    private ILExpr ToSingleAddr(ILExpr val)
+    {
+        if (val is not ILValue)
+        {
+            ILLocal tmp = GetNewTemp(val.Type, val);
+            _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, val));
+            val = tmp;
+        }
+        return val;
+    }
+
+
     private (ILExpr, ILExpr) MbIntroduceTemp(ILExpr lhs, ILExpr rhs)
     {
-        if (rhs is not ILValue)
-        {
-            ILLocal tmp = GetNewTemp(rhs.Type, rhs);
-            _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, rhs));
-            rhs = tmp;
-        }
-        if (lhs is not ILValue)
-        {
-            ILLocal tmp = GetNewTemp(lhs.Type, lhs);
-            _tac.Add(new ILAssignStmt(GetNewStmtLoc(), tmp, lhs));
-            lhs = tmp;
-        }
+        rhs = ToSingleAddr(rhs);
+        lhs = ToSingleAddr(lhs);
         return (lhs, rhs);
     }
     private ILStmtLocation GetNewStmtLoc()
@@ -234,7 +241,7 @@ class StackMachine
                     }
                 case "ret":
                     {
-                        ILExpr? retVal = _methodInfo.ReturnParameter.ParameterType != typeof(void) ? _stack.Pop() : null;
+                        ILExpr? retVal = _methodInfo.ReturnParameter.ParameterType != typeof(void) ? PopSingleAddr() : null;
                         _tac.Add(
                             new ILReturnStmt(GetNewStmtLoc(), retVal)
                         );
@@ -276,9 +283,8 @@ class StackMachine
                 case "clt.un":
                 case "clt":
                     {
-                        ILExpr rhs = _stack.Pop();
-                        ILExpr lhs = _stack.Pop();
-                        (lhs, rhs) = MbIntroduceTemp(lhs, rhs);
+                        ILExpr rhs = PopSingleAddr();
+                        ILExpr lhs = PopSingleAddr();
                         ILBinaryOperation op = new ILBinaryOperation(lhs, rhs);
                         _stack.Push(op);
                         break;
@@ -286,7 +292,7 @@ class StackMachine
                 case "neg":
                 case "not":
                     {
-                        ILExpr operand = _stack.Pop();
+                        ILExpr operand = PopSingleAddr();
                         ILUnaryOperation op = new ILUnaryOperation(operand);
                         _stack.Push(op);
                         break;
@@ -326,8 +332,8 @@ class StackMachine
 
                     {
                         ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
-                        ILExpr lhs = _stack.Pop();
-                        ILExpr rhs = _stack.Pop();
+                        ILExpr lhs = PopSingleAddr();
+                        ILExpr rhs = PopSingleAddr();
                         _tac.Add(new ILIfStmt(
                             GetNewStmtLoc(),
                             new ILBinaryOperation(lhs, rhs),
@@ -464,28 +470,28 @@ class StackMachine
                 case "conv.i2":
                 case "conv.i4":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
                         _stack.Push(conv);
                         break;
                     }
                 case "conv.i8":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
                         _stack.Push(conv);
                         break;
                     }
                 case "conv.r4":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILFloat32(), value);
                         _stack.Push(conv);
                         break;
                     }
                 case "conv.r8":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILFloat64(), value);
                         _stack.Push(conv);
                         break;
@@ -494,35 +500,35 @@ class StackMachine
                 case "conv.u2":
                 case "conv.u4":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
                         _stack.Push(conv);
                         break;
                     }
                 case "conv.u8":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
                         _stack.Push(conv);
                         break;
                     }
                 case "conv.i":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
                         _stack.Push(conv);
                         break;
                     }
                 case "conv.u":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
                         _stack.Push(conv);
                         break;
                     }
                 case "conv.r.un":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILNativeFloat(), value);
                         _stack.Push(conv);
                         break;
@@ -550,7 +556,7 @@ class StackMachine
                 case "conv.ovf.i.un":
                 case "conv.ovf.u.un":
                     {
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
                         _stack.Push(conv);
                         break;
@@ -563,7 +569,7 @@ class StackMachine
                             Console.WriteLine("error resolving method at " + instr.idx);
                             break;
                         }
-                        ILExpr obj = _stack.Pop();
+                        ILExpr obj = PopSingleAddr();
                         ILExpr res = new ILCondCastExpr(TypeSolver.Resolve(mbType), obj);
                         _stack.Push(res);
                         break;
@@ -576,7 +582,7 @@ class StackMachine
                             Console.WriteLine("error resolving method at " + instr.idx);
                             break;
                         }
-                        ILExpr value = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
                         ILExpr casted = new ILCastClassExpr(TypeSolver.Resolve(mbType), value);
                         _stack.Push(casted);
                         break;
@@ -589,7 +595,7 @@ class StackMachine
                             Console.WriteLine("error resolving type at " + instr.idx);
                             break;
                         }
-                        ILValue value = (ILValue)_stack.Pop();
+                        ILValue value = (ILValue)PopSingleAddr();
                         ILExpr boxed = new ILBoxExpr(value);
                         _stack.Push(boxed);
                         break;
@@ -603,7 +609,7 @@ class StackMachine
                             Console.WriteLine("error resolving type at " + instr.idx);
                             break;
                         }
-                        ILValue obj = (ILValue)_stack.Pop();
+                        ILValue obj = (ILValue)PopSingleAddr();
                         ILExpr unboxed = new ILUnboxExpr(TypeSolver.Resolve(mbType), obj);
                         _stack.Push(unboxed);
                         break;
@@ -713,12 +719,25 @@ class StackMachine
             return "";
         }
     }
-    public List<string> ListLocalVars()
+
+    public List<string> LocalVars()
     {
         List<string> res = new List<string>();
-        foreach (var mapping in _locals)
+        foreach (var type in _locals.Select(l => l.Type))
         {
-            string buf = string.Format("{0} {1};", mapping.Type.ToString(), string.Join(", ", mapping.ToString()));
+            string buf = string.Format("{0} {1}", type.ToString(), string.Join(", ", _locals.Where(l => l.Type == type).Select(l => l.ToString())));
+            res.Add(buf);
+        }
+        Dictionary<ILType, List<int>> temps = new Dictionary<ILType, List<int>>();
+        for (int i = 0; i < _temps.Count; i++)
+        {
+            if (!temps.ContainsKey(_temps[i].Type))
+                temps.Add(_temps[i].Type, []);
+            temps[_temps[i].Type].Add(i);
+        }
+        foreach (var mapping in temps)
+        {
+            string buf = string.Format("{0} {1}", mapping.Key.ToString(), string.Join(", ", mapping.Value.Select(v => Logger.TempVarName(v))));
             res.Add(buf);
         }
         return res;
@@ -733,7 +752,7 @@ class StackMachine
     }
     public void DumpLocalVars()
     {
-        foreach (var v in ListLocalVars())
+        foreach (var v in LocalVars())
         {
             Console.WriteLine(v);
         }

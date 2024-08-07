@@ -27,7 +27,7 @@ class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
     public ILExpr[] Args = args;
     public override string ToString()
     {
-        return "new " + Type.ToString() + " (" + string.Join(", ", Args.Select(a => a.Type)) + ")";
+        return "new " + Type.ToString() + " (" + string.Join(", ", Args.Select(a => a.ToString())) + ")";
     }
 }
 
