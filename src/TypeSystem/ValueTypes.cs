@@ -1,17 +1,24 @@
-using System.Runtime.InteropServices;
-
 namespace Usvm.IL.TypeSystem;
 
 interface ILValueType : ILType { }
 
-interface ILPrimitiveType : ILValueType
+abstract class ILPrimitiveType : ILValueType
 {
-    public Type BaseType { get; }
+    public abstract Type BaseType { get; }
+    public override bool Equals(object? obj)
+    {
+        return obj is ILPrimitiveType pt && BaseType == pt.BaseType;
+    }
+
+    public override int GetHashCode()
+    {
+        return BaseType.GetHashCode();
+    }
 }
 
 class ILBool : ILPrimitiveType
 {
-    public Type BaseType => typeof(bool);
+    public override Type BaseType => typeof(bool);
 
     public override string ToString()
     {
@@ -20,7 +27,7 @@ class ILBool : ILPrimitiveType
 }
 class ILChar : ILPrimitiveType
 {
-    public Type BaseType => typeof(char);
+    public override Type BaseType => typeof(char);
     public override string ToString()
     {
         return "char";
@@ -29,7 +36,7 @@ class ILChar : ILPrimitiveType
 
 class ILUInt8 : ILPrimitiveType
 {
-    public Type BaseType => typeof(byte);
+    public override Type BaseType => typeof(byte);
     public override string ToString()
     {
         return "uint8";
@@ -37,7 +44,7 @@ class ILUInt8 : ILPrimitiveType
 }
 class ILUInt16 : ILPrimitiveType
 {
-    public Type BaseType => typeof(ushort);
+    public override Type BaseType => typeof(ushort);
     public override string ToString()
     {
         return "uint16";
@@ -45,7 +52,7 @@ class ILUInt16 : ILPrimitiveType
 }
 class ILUInt32 : ILPrimitiveType
 {
-    public Type BaseType => typeof(ushort);
+    public override Type BaseType => typeof(ushort);
     public override string ToString()
     {
         return "uint32";
@@ -53,7 +60,7 @@ class ILUInt32 : ILPrimitiveType
 }
 class ILInt32 : ILPrimitiveType
 {
-    public Type BaseType => typeof(int);
+    public override Type BaseType => typeof(int);
     public override string ToString()
     {
         return "int32";
@@ -61,7 +68,7 @@ class ILInt32 : ILPrimitiveType
 }
 class ILInt64 : ILPrimitiveType
 {
-    public Type BaseType => typeof(long);
+    public override Type BaseType => typeof(long);
     public override string ToString()
     {
         return "int64";
@@ -70,17 +77,17 @@ class ILInt64 : ILPrimitiveType
 
 class ILNativeInt : ILPrimitiveType
 {
-    public Type BaseType => typeof(nint);
+    public override Type BaseType => typeof(nint);
     public override string ToString() => "nint";
 }
 class ILNativeFloat : ILPrimitiveType
 {
-    public Type BaseType => typeof(float);
+    public override Type BaseType => typeof(float);
     public override string ToString() => "nfloat";
 }
 class ILFloat32 : ILPrimitiveType
 {
-    public Type BaseType => typeof(float);
+    public override Type BaseType => typeof(float);
     public override string ToString()
     {
         return "float32";
@@ -88,7 +95,7 @@ class ILFloat32 : ILPrimitiveType
 }
 class ILFloat64 : ILPrimitiveType
 {
-    public Type BaseType => typeof(double);
+    public override Type BaseType => typeof(double);
     public override string ToString()
     {
         return "float64";

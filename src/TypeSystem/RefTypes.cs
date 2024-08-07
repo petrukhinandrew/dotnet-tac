@@ -24,6 +24,14 @@ class ILArray(ILType elemType) : ILRefType
     {
         return elemType.ToString() + "[]";
     }
+    public override bool Equals(object? obj)
+    {
+        return obj is ILArray arr && ElemType == arr.ElemType;
+    }
+    public override int GetHashCode()
+    {
+        return base.GetHashCode();
+    }
 }
 
 class ILObject : ILRefType
