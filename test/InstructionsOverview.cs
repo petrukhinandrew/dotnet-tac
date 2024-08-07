@@ -1,37 +1,75 @@
 #pragma warning disable CS0219
 
 
-namespace Usvm.IL.Test.Units;
+namespace Usvm.IL.Test.Instructions;
 
-class ClassTest
+public class OpsTest
 {
-    private int _x;
-    public ClassTest(int x)
+    public static int Calculations()
     {
-        _x = x;
+        int x = 1;
+        int y = 2;
+        int z = 3;
+        int res = (x * y) + (y * z);
+        return res;
     }
-    public void inc()
+    public static int AddOne(int x)
     {
-        _x += 1;
+        return x + 1;
+    }
+    public static double AddTwo(double x)
+    {
+        return x + 2;
+    }
+    public static bool Neg(bool v) => !v;
+    public static int Not(int v) => -v;
+}
+
+static class CastTests
+{
+    public static void Conv()
+    {
+        int x = 1;
+        byte y = (byte)x;
+        short z = y;
+        uint yx = (uint)x;
+    }
+    abstract class CastClassA
+    {
+        public string value = "abc";
+    }
+    class CastClassB : CastClassA
+    {
+        public new string value = "123";
+    }
+    class CastClassC : CastClassB { }
+
+    public static void CastClass()
+    {
+        CastClassB b = new();
+        CastClassC c = (CastClassC)b;
+        CastClassC? nc = b as CastClassC;
+        bool bIsA = b is CastClassC;
+    }
+    public static void Boxing()
+    {
+        int a = 1;
+        object b = a;
+        int c = (int)b;
     }
 }
-public class Class1
-{
-    public static void newInstTest()
-    {
-        ClassTest ct = new ClassTest(1);
-        ct.inc();
-    }
 
-    public static string concat(string s1, string s2, string s3)
+static class ConditionsTests
+{
+    public static string Concat(string s1, string s2, string s3)
     {
         string res = s1 + s2;
         res += s3;
         return res;
     }
-    public static int switchExample()
+    public static int SwitchExample()
     {
-        string s = concat("a", "b", "c");
+        string s = Concat("a", "b", "c");
         switch (s)
         {
             case "a": return 1;
@@ -54,62 +92,19 @@ public class Class1
             }
         }
     }
-    public static int ifExample()
+    public static int IfExample()
     {
-        string s = concat("a", "b", "c");
+        string s = Concat("a", "b", "c");
         if (s == "a")
             return 1;
         else if (s == "b")
             return 2;
         return 3;
     }
-    public static void lambda()
-    {
-        Func<int, string, string> x = (int n, string s) =>
-        {
-            string res = "";
-            for (int i = 0; i < n; i++) res += s;
-            return res;
-        };
-        string res = x(3, "abc");
-    }
-    public static int calculations()
-    {
-        int x = 1;
-        int y = 2;
-        int z = 3;
-        int res = (x * y) + (y * z);
-        return res;
-    }
-    public static (int, int) tuple()
-    {
-        return new(0, 0);
-    }
-    public static int addOne(int x)
-    {
-        return x + 1;
-    }
-    public static double addTwo(double x)
-    {
-        return x + 2;
-    }
-    public static void testEHC()
-    {
-        try
-        {
-            int x = 1;
-            x /= 0;
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.StackTrace);
-        }
-        finally
-        {
-            Console.WriteLine("finally");
-        }
-    }
+}
 
+static class NewInstTests
+{
     enum TestEnum
     {
         A = 1,
@@ -123,59 +118,39 @@ public class Class1
         public int B;
         public float C;
     }
-    class NVExp
+    class Instance(int tx = 1)
     {
-        int x;
-        public NVExp(int tx = 1)
+        private int x = tx;
+
+        public void Do()
         {
-            x = tx;
+            x += 1;
         }
     }
     public static void ByValue()
     {
         TestEnum te = TestEnum.A;
-        TestStruct ts = new TestStruct { A = 1, B = 2, C = 3 };
+        TestStruct ts = new() { A = 1, B = 2, C = 3 };
         (int, int) tt = (1, 1);
         ts.A += tt.Item1;
         ts.C += tt.Item2;
-        (int, NVExp) tnv = (1, new NVExp());
+        (int, Instance) tnv = (1, new Instance());
     }
     public static void Literals()
     {
         string lol = "abc";
         int[] kek = { 1, 2, 3 };
 
-        NVExp[] wtf = [new NVExp(), new NVExp(2), new NVExp(kek[1])];
+        Instance[] wtf = [new Instance(), new Instance(2), new Instance(kek[1])];
         int kl = kek.Length;
     }
-    public static void Conv()
+    public static (int, int) Tuple()
     {
-        int x = 1;
-        byte y = (byte)x;
-        short z = y;
-        uint yx = (uint)x;
+        return new(0, 0);
     }
-    abstract class CastClassA
+    public static void NewInstTest()
     {
-        public string value = "abc";
-    }
-    class CastClassB : CastClassA
-    {
-        public new string value = "123";
-    }
-    class CastClassC : CastClassB { }
-
-    public static void CastClass()
-    {
-        CastClassB b = new CastClassB();
-        CastClassC c = (CastClassC)b;
-        CastClassC? nc = b as CastClassC;
-        bool bIsA = b is CastClassC;
-    }
-    public static void Boxing()
-    {
-        int a = 1;
-        object b = a;
-        int c = (int)b;
+        Instance inst = new(1);
+        inst.Do();
     }
 }
