@@ -1,24 +1,25 @@
 #pragma warning disable CS0219
 
-namespace Usvm.IL.Test.Units;
-public class SampleClass
-{
-    class TestClass
-    {
-        private int _x;
-        public TestClass(int x)
-        {
-            _x = x;
-        }
-        public void inc()
-        {
-            _x += 1;
-        }
-    }
 
+namespace Usvm.IL.Test.Units;
+
+class ClassTest
+{
+    private int _x;
+    public ClassTest(int x)
+    {
+        _x = x;
+    }
+    public void inc()
+    {
+        _x += 1;
+    }
+}
+public class Class1
+{
     public static void newInstTest()
     {
-        TestClass ct = new TestClass(1);
+        ClassTest ct = new ClassTest(1);
         ct.inc();
     }
 
@@ -122,7 +123,14 @@ public class SampleClass
         public int B;
         public float C;
     }
-    class NVExp { }
+    class NVExp
+    {
+        int x;
+        public NVExp(int tx = 1)
+        {
+            x = tx;
+        }
+    }
     public static void ByValue()
     {
         TestEnum te = TestEnum.A;
@@ -136,7 +144,9 @@ public class SampleClass
     {
         string lol = "abc";
         int[] kek = { 1, 2, 3 };
-        NVExp[] wtf = [new NVExp(), new NVExp()];
+
+        NVExp[] wtf = [new NVExp(), new NVExp(2), new NVExp(kek[1])];
+        int kl = kek.Length;
     }
     public static void Conv()
     {
@@ -144,5 +154,28 @@ public class SampleClass
         byte y = (byte)x;
         short z = y;
         uint yx = (uint)x;
+    }
+    abstract class CastClassA
+    {
+        public string value = "abc";
+    }
+    class CastClassB : CastClassA
+    {
+        public new string value = "123";
+    }
+    class CastClassC : CastClassB { }
+
+    public static void CastClass()
+    {
+        CastClassB b = new CastClassB();
+        CastClassC c = (CastClassC)b;
+        CastClassC? nc = b as CastClassC;
+        bool bIsA = b is CastClassC;
+    }
+    public static void Boxing()
+    {
+        int a = 1;
+        object b = a;
+        int c = (int)b;
     }
 }

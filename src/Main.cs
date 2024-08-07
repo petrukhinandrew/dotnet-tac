@@ -12,7 +12,7 @@ class Program
         // ["addOne", "calculations"]
         // ["ByValue"]
         // ["Literals"]
-        ParserSettings settings = new ParserSettings("test/resources/dotnet-test.dll", ["ByValue"]);
+        ParserSettings settings = new ParserSettings("bin/Debug/net8.0/dotnet-tac.dll", ["ByValue"]);
         CodeBase codeBase = new CodeBase(settings);
         codeBase.Load();
     }
