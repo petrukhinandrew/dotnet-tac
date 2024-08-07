@@ -568,19 +568,6 @@ class StackMachine
                         _stack.Push(res);
                         break;
                     }
-                case "box":
-                    {
-                        Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
-                        if (mbType == null)
-                        {
-                            Console.WriteLine("error resolving method at " + instr.idx);
-                            break;
-                        }
-                        ILExpr value = _stack.Pop();
-                        ILExpr boxed = new ILBoxExpr(TypeSolver.Resolve(mbType), value);
-                        _stack.Push(boxed);
-                        break;
-                    }
                 case "castclass":
                     {
                         Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -594,9 +581,31 @@ class StackMachine
                         _stack.Push(casted);
                         break;
                     }
+                case "box":
+                    {
+                        Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (mbType == null)
+                        {
+                            Console.WriteLine("error resolving type at " + instr.idx);
+                            break;
+                        }
+                        ILValue value = (ILValue)_stack.Pop();
+                        ILExpr boxed = new ILBoxExpr(value);
+                        _stack.Push(boxed);
+                        break;
+                    }
                 case "unbox":
                 case "unbox.any":
                     {
+                        Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (mbType == null)
+                        {
+                            Console.WriteLine("error resolving type at " + instr.idx);
+                            break;
+                        }
+                        ILValue obj = (ILValue)_stack.Pop();
+                        ILExpr unboxed = new ILUnboxExpr(TypeSolver.Resolve(mbType), obj);
+                        _stack.Push(unboxed);
                         break;
                     }
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;

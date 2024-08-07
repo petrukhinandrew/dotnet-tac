@@ -11,12 +11,18 @@ class ILClassOrInterfaceType(string qName) : ILRefType
     }
 
 }
-
 class ILArrayRef(ILType elemType) : ILRefType
 {
     public ILType ElemType => elemType;
 }
 
+class ILObject : ILRefType
+{
+    public override string ToString()
+    {
+        return "object";
+    }
+}
 class ILNull : ILRefType
 {
     public override string ToString()

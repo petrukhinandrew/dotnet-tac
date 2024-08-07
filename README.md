@@ -6,8 +6,14 @@
 - check null == null 
 - pointers are values or refs ? 
 
+- (int32) local$1.Length
+
 ## Need tests for 
 
 - array len 
 - box/unbox
 
+## Steps 
+
+1. Box unbox
+2. fields exprs 

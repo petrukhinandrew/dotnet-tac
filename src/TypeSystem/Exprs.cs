@@ -90,7 +90,8 @@ abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
     }
 }
 class ILConvExpr(ILPrimitiveType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
-class ILBoxExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
+class ILBoxExpr(ILValue value) : ILCastExpr(new ILObject(), value) { }
+class ILUnboxExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
 class ILCastClassExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
 class ILCondCastExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
 {

@@ -4,6 +4,7 @@ static class TypeSolver
     public static ILType Resolve(Type type)
     {
         if (type == typeof(void)) return new ILNull();
+        if (type == typeof(object)) return new ILObject();
         if (type.IsValueType)
         {
             if (type.IsEnum) return new ILEnumType();
