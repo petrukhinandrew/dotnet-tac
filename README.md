@@ -4,7 +4,5 @@
 
 ## Steps 
 
-- copy test behaviour from vsharp 
-- fix struct solving in TypeSolver
 - fix struct init 
 - fields exprs 

@@ -5,25 +5,30 @@ static class TypeSolver
     {
         if (type == typeof(void)) return new ILNull();
         if (type == typeof(object)) return new ILObject();
-        if (type.IsPrimitive)
+        if (type.IsValueType)
         {
-            if (type == typeof(char)) return new ILChar();
-            if (type == typeof(bool)) return new ILBool();
-            if (type == typeof(byte)) return new ILUInt8();
-            if (type == typeof(short) || type == typeof(ushort)) return new ILUInt16();
-            if (type == typeof(int)) return new ILInt32();
-            if (type == typeof(long)) return new ILInt64();
-            if (type == typeof(float)) return new ILFloat32();
-            if (type == typeof(double)) return new ILInt64();
-            if (type == typeof(int)) return new ILInt32();
-            if (type == typeof(nint)) return new ILNativeInt();
-            if (type == typeof(uint)) return new ILUInt32();
-        }
-        else if (type.IsValueType) return new ILStructType();
-
-        else if (type.IsEnum)
-        {
-            return new ILEnumType();
+            if (type.IsPrimitive)
+            {
+                if (type == typeof(char)) return new ILChar();
+                if (type == typeof(bool)) return new ILBool();
+                if (type == typeof(byte)) return new ILUInt8();
+                if (type == typeof(short) || type == typeof(ushort)) return new ILUInt16();
+                if (type == typeof(int)) return new ILInt32();
+                if (type == typeof(long)) return new ILInt64();
+                if (type == typeof(float)) return new ILFloat32();
+                if (type == typeof(double)) return new ILInt64();
+                if (type == typeof(int)) return new ILInt32();
+                if (type == typeof(nint)) return new ILNativeInt();
+                if (type == typeof(uint)) return new ILUInt32();
+            }
+            else if (type.IsEnum)
+            {
+                return new ILEnumType();
+            }
+            else if (type.IsValueType)
+            {
+                return new ILStructType();
+            }
         }
         else if (type == typeof(string))
         {
