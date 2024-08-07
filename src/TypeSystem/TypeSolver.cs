@@ -32,7 +32,7 @@ static class TypeSolver
         {
             Type? elemType = type.GetElementType();
             if (elemType != null)
-                return new ILArrayRef(Resolve(elemType));
+                return new ILArray(Resolve(elemType));
             else
                 throw new Exception("bad elem type for " + type.ToString());
         }

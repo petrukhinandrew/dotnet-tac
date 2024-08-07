@@ -40,7 +40,7 @@ class ILTypeOfExpr : ILExpr
     }
 }
 
-class ILNewArrayExpr(ILArrayRef type, ILExpr size) : ILExpr
+class ILNewArrayExpr(ILArray type, ILExpr size) : ILExpr
 {
     public ILType Type => type.ElemType;
     public ILExpr Size => size;

@@ -406,7 +406,7 @@ class StackMachine
                         }
                         ILExpr sizeExpr = _stack.Pop();
                         // TODO check Int32 or Literal
-                        ILArrayRef resolvedType = new ILArrayRef(TypeSolver.Resolve(arrType));
+                        ILArray resolvedType = new ILArray(TypeSolver.Resolve(arrType));
                         ILExpr arrExpr = new ILNewArrayExpr(
                             resolvedType,
                             sizeExpr);
@@ -646,7 +646,7 @@ class StackMachine
                     handle.Free();
                 }
                 List<object> list = [.. tmp];
-                ILLiteral arrLit = new ILLiteral(new ILArrayRef(new ILInt32()), "[" + string.Join(", ", list.Select(v => v.ToString())) + "]");
+                ILLiteral arrLit = new ILLiteral(new ILArray(new ILInt32()), "[" + string.Join(", ", list.Select(v => v.ToString())) + "]");
                 for (int i = 0; i < list.Count; i++)
                 {
                     _tac.Add(new ILAssignStmt(

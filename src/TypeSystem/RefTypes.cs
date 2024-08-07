@@ -1,5 +1,3 @@
-using System.Security.Cryptography;
-
 namespace Usvm.IL.TypeSystem;
 interface ILRefType : ILType { }
 class ILClassOrInterfaceType(string qName) : ILRefType
@@ -14,8 +12,12 @@ class ILClassOrInterfaceType(string qName) : ILRefType
         return obj is ILClassOrInterfaceType another && another.QualifiedName == QualifiedName;
     }
 
+    public override int GetHashCode()
+    {
+        return QualifiedName.GetHashCode();
+    }
 }
-class ILArrayRef(ILType elemType) : ILRefType
+class ILArray(ILType elemType) : ILRefType
 {
     public ILType ElemType => elemType;
     public override string ToString()
