@@ -1,6 +1,8 @@
 #pragma warning disable CS0219
 
 
+using System.Runtime.InteropServices;
+
 namespace Usvm.IL.Test.Instructions;
 
 public class OpsTest
@@ -152,5 +154,44 @@ static class NewInstTests
     {
         Instance inst = new(1);
         inst.Do();
+    }
+}
+static class UnsafeTest
+{
+    public static void InitBlk()
+    {
+        Marshal.AllocHGlobal(1123);
+    }
+    struct CpBlkStruct { int a; int b; };
+
+    public static void CpBlk()
+    {
+        CpBlkStruct v = new();
+        CpBlkStruct v_copy = v;
+
+        // unsafe
+        // {
+        //     var c = new ExplicitClass(1, 2);
+        //     byte result;
+        //     fixed (int* ptr = &c.x)
+        //     {
+        //         var ptr2 = (byte*)ptr;
+        //         var ptr3 = ptr2 + i;
+        //         result = *ptr3;
+        //     }
+        //     bool res = (i == -1 && result != 0);
+        // }
+    }
+    public static void Deref()
+    {
+        unsafe
+        {
+
+            int x = 1;
+            int* rx = &x;
+            int y = *rx;
+            ref int kek = ref x;
+            int t = kek;
+        }
     }
 }
