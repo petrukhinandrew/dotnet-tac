@@ -186,10 +186,11 @@ static class UnsafeTest
     {
         unsafe
         {
-
             int x = 1;
             ref int kek = ref x;
             int t = kek;
+            int* x_ptr = &x;
+            (*x_ptr)++;
         }
     }
 }

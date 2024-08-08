@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using Usvm.IL.TypeSystem;
 using Usvm.IL.Parser;
 using System.Text.RegularExpressions;
+using System.Text;
 
 class StackMachine
 {
@@ -198,6 +199,13 @@ class StackMachine
                         break;
                     }
                 // case "stind":
+                case "stind.i4":
+                    {
+                        ILExpr val = _stack.Pop();
+                        ILLValue addr = (ILLValue)_stack.Pop();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), addr, val));
+                        break;
+                    }
                 case "ldarga":
                     {
                         int idx = ((ILInstrOperand.Arg16)instr.arg).value;
