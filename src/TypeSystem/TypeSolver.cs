@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace Usvm.IL.TypeSystem;
 static class TypeSolver
 {
@@ -29,6 +31,13 @@ static class TypeSolver
             {
                 return new ILStructType();
             }
+        }
+        else if (type.IsPointer)
+        {
+            return new ILUnmanagedPointer(Resolve(type.GetElementType()!));
+        }
+        else if (type.IsByRef) {
+            return new ILManagedPointer(Resolve(type.GetElementType()!));
         }
         else if (type == typeof(string))
         {
