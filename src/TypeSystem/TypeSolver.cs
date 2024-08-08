@@ -25,11 +25,11 @@ static class TypeSolver
             }
             else if (type.IsEnum)
             {
-                return new ILEnumType();
+                return new ILEnumType(type.FullName ?? type.AssemblyQualifiedName ?? type.Name);
             }
             else if (type.IsValueType)
             {
-                return new ILStructType();
+                return new ILStructType(type.FullName ?? type.AssemblyQualifiedName ?? type.Name);
             }
         }
         else if (type.IsPointer)

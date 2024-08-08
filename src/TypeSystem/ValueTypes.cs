@@ -102,18 +102,20 @@ class ILFloat64 : ILPrimitiveType
     }
 }
 
-class ILEnumType : ILValueType
+class ILEnumType(string qName) : ILValueType
 {
+    private string QualifiedName = qName;
     public override string ToString()
     {
-        return "enum";
+        return "enum " + QualifiedName;
     }
 }
 
-class ILStructType : ILValueType
+class ILStructType(string qName) : ILValueType
 {
+    private string QualifiedName = qName;
     public override string ToString()
     {
-        return "struct";
+        return "struct " + QualifiedName;
     }
 }
