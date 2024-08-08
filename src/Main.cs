@@ -8,11 +8,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        // ["switchExample", "lambda", "ifExample"]
-        // ["addOne", "calculations"]
-        // ["ByValue"]
-        // ["Literals"]
-        ParserSettings settings = new ParserSettings("bin/Debug/net8.0/dotnet-tac.dll", ["ByValue"]);
+        ParserSettings settings = new ParserSettings("bin/Debug/net8.0/dotnet-tac.dll", ["Deref"]);
         CodeBase codeBase = new CodeBase(settings);
         codeBase.Load();
     }

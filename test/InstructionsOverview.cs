@@ -188,8 +188,6 @@ static class UnsafeTest
         {
 
             int x = 1;
-            int* rx = &x;
-            int y = *rx;
             ref int kek = ref x;
             int t = kek;
         }

@@ -11,9 +11,7 @@ public interface ILExpr
 }
 
 interface ILValue : ILExpr { }
-
-
-
+interface ILLValue : ILValue { }
 class ILNullValue : ILValue
 {
     private static ILType _instance = new ILNull();
@@ -21,8 +19,14 @@ class ILNullValue : ILValue
 
     public override string ToString() => "null";
 }
+class ILVarArgValue(string methodName) : ILValue
+{
+    private static ILType _instance = new ILHandleRef();
+    public ILType Type => _instance;
+    public string Method = methodName;
+    public override string ToString() => Method + ".Vararg";
 
-interface ILLValue : ILValue { }
+}
 class ILLocal(ILType type, string name) : ILLValue
 {
     public ILType Type => type;
@@ -52,8 +56,6 @@ class ILLiteral(ILType type, string value) : ILValue
 
 class ILMethod(ILType retType, string declType, string name, int argCount, ILExpr[] args) : ILValue
 {
-
-
     public static ILMethod FromMethodBase(MethodBase mb)
     {
         int paramCount = mb.GetParameters().Where(p => !p.IsRetval).Count();

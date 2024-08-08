@@ -109,3 +109,52 @@ class ILCallExpr(ILMethod method) : ILExpr
         return "invoke " + _method.ToString();
     }
 }
+interface ILRefExpr : ILExpr
+{
+}
+interface ILDerefExpr : ILExpr
+{
+
+}
+
+class PointerExprTypeResolver
+{
+    public static ILDerefExpr DerefAs(ILExpr instance, ILType type)
+    {
+        switch (instance.Type)
+        {
+            case ILManagedPointer:
+                {
+                    return new ILManagedDeref(instance, type);
+                }
+            case ILUnmanagedPointer:
+                {
+                    throw new Exception("not yet impl");
+                }
+            default:
+                throw new Exception("no way");
+        }
+    }
+}
+
+class ILManagedRef(ILExpr value) : ILRefExpr
+{
+    public ILExpr Value = value;
+
+    public ILType Type => new ILManagedPointer(Value.Type);
+
+    public override string ToString()
+    {
+        return "ref " + Value.ToString();
+    }
+}
+
+class ILManagedDeref(ILExpr byRefVal, ILType resType) : ILDerefExpr
+{
+    private ILExpr Value = byRefVal;
+    public ILType Type => resType;
+    public override string ToString()
+    {
+        return "deref " + Value.ToString();
+    }
+}

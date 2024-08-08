@@ -120,11 +120,13 @@ class StackMachine
                 case "ldarg.1": _stack.Push(_params[1]); break;
                 case "ldarg.2": _stack.Push(_params[2]); break;
                 case "ldarg.3": _stack.Push(_params[3]); break;
+                case "ldarg": _stack.Push(_params[((ILInstrOperand.Arg16)instr.arg).value]); break;
                 case "ldarg.s": _stack.Push(_params[((ILInstrOperand.Arg8)instr.arg).value]); break;
                 case "ldloc.0": _stack.Push(_locals[0]); break;
                 case "ldloc.1": _stack.Push(_locals[1]); break;
                 case "ldloc.2": _stack.Push(_locals[2]); break;
                 case "ldloc.3": _stack.Push(_locals[3]); break;
+                case "ldloc": _stack.Push(_locals[((ILInstrOperand.Arg16)instr.arg).value]); break;
                 case "ldloc.s": _stack.Push(_locals[((ILInstrOperand.Arg8)instr.arg).value]); break;
                 case "stloc.0":
                     _tac.Add(
@@ -156,11 +158,76 @@ class StackMachine
                         new ILAssignStmt(GetNewStmtLoc(), _params[idx], _stack.Pop())
                         ); break;
                     }
-                // TODO byref
-                // case "ldarga.s":
-                //     _stack.Push(new SMValue.Arg(((ILInstrOperand.Arg8)instr.arg).value, AsAddr: true)); break;
-                // case "ldloca.s":
-                //     _stack.Push(new SMValue.Local(((ILInstrOperand.Arg8)instr.arg).value, AsAddr: true)); break;
+                case "arglist":
+                    {
+                        _stack.Push(new ILVarArgValue(_methodInfo.Name));
+                        break;
+                    }
+                case "ckfinite":
+                    {
+                        // TODO throws on intfy or NaN
+                        break;
+                    }
+                // case "initblk":
+                // case "cpblk":
+                // case "localloc":
+                //     {
+                //         // ILPrimitiveType? size = _stack.Pop() as ILPrimitiveType;
+                //         // if (size == null) throw new Exception("primitive expected at " + instr.idx);
+                //         // _stack.Push(new IL);
+                //         break;
+                //     }
+
+                // case "ldind.i1":
+                // case "ldind.i2":
+                case "ldind.i4":
+                    // case "ldind.i8":
+                    // case "ldind.u1":
+                    // case "ldind.u2":
+                    // case "ldind.u4":
+                    // case "ldind.u8":
+                    // case "ldind.r4":
+                    // case "ldind.r8":
+                    // case "ldind.i":
+                    // case "ldind.ref":
+                    // case "ldobj":
+                    {
+                        ILExpr addr = _stack.Pop();
+                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt32());
+                        _stack.Push(deref);
+                        break;
+                    }
+                // case "stind":
+                case "ldarga":
+                    {
+                        int idx = ((ILInstrOperand.Arg16)instr.arg).value;
+                        _stack.Push(new ILManagedRef(_params[idx]));
+                        break;
+                    }
+                case "ldarga.s":
+                    {
+                        int idx = ((ILInstrOperand.Arg8)instr.arg).value;
+                        _stack.Push(new ILManagedRef(_params[idx]));
+                        break;
+                    }
+                case "ldloca":
+                    {
+                        int idx = ((ILInstrOperand.Arg16)instr.arg).value;
+                        _stack.Push(new ILManagedRef(_locals[idx]));
+                        break;
+                    }
+                case "ldloca.s":
+                    {
+                        int idx = ((ILInstrOperand.Arg8)instr.arg).value;
+                        _stack.Push(new ILManagedRef(_locals[idx]));
+                        break;
+                    }
+                // case "endfilter":
+                // case "endfinally":
+                // case "jmp": 
+                // case "leave":
+                // case "leave.s":
+                // case "switch":
                 case "ldftn":
                     {
                         MethodBase? mb = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -168,27 +235,26 @@ class StackMachine
                         _stack.Push(ILMethod.FromMethodBase(mb));
                         break;
                     }
-                case "ldnull": _stack.Push((ILExpr)new ILNullValue()); break;
+                case "ldnull": _stack.Push(new ILNullValue()); break;
                 case "ldc.i4.m1":
-                case "ldc.i4.M1": PushLiteral<int>(-1); break;
-                case "ldc.i4.0": PushLiteral<int>(0); break;
-                case "ldc.i4.1": PushLiteral<int>(1); break;
-                case "ldc.i4.2": PushLiteral<int>(2); break;
-                case "ldc.i4.3": PushLiteral<int>(3); break;
-                case "ldc.i4.4": PushLiteral<int>(4); break;
-                case "ldc.i4.5": PushLiteral<int>(5); break;
-                case "ldc.i4.6": PushLiteral<int>(6); break;
-                case "ldc.i4.7": PushLiteral<int>(7); break;
-                case "ldc.i4.8": PushLiteral<int>(8); break;
+                case "ldc.i4.M1": PushLiteral(-1); break;
+                case "ldc.i4.0": PushLiteral(0); break;
+                case "ldc.i4.1": PushLiteral(1); break;
+                case "ldc.i4.2": PushLiteral(2); break;
+                case "ldc.i4.3": PushLiteral(3); break;
+                case "ldc.i4.4": PushLiteral(4); break;
+                case "ldc.i4.5": PushLiteral(5); break;
+                case "ldc.i4.6": PushLiteral(6); break;
+                case "ldc.i4.7": PushLiteral(7); break;
+                case "ldc.i4.8": PushLiteral(8); break;
                 case "ldc.i4.s": PushLiteral<int>(((ILInstrOperand.Arg8)instr.arg).value); break;
-                case "ldc.i4": PushLiteral<int>(((ILInstrOperand.Arg32)instr.arg).value); break;
-                case "ldc.i8": PushLiteral<long>(((ILInstrOperand.Arg64)instr.arg).value); break;
+                case "ldc.i4": PushLiteral(((ILInstrOperand.Arg32)instr.arg).value); break;
+                case "ldc.i8": PushLiteral(((ILInstrOperand.Arg64)instr.arg).value); break;
                 case "ldc.r4": PushLiteral<float>(((ILInstrOperand.Arg32)instr.arg).value); break;
                 case "ldc.r8": PushLiteral<double>(((ILInstrOperand.Arg64)instr.arg).value); break;
-                case "ldstr": PushLiteral<string>(safeStringResolve(((ILInstrOperand.Arg32)instr.arg).value)); break;
+                case "ldstr": PushLiteral(safeStringResolve(((ILInstrOperand.Arg32)instr.arg).value)); break;
                 case "dup": _stack.Push(_stack.Peek()); break;
                 case "pop": _stack.Pop(); break;
-                case "jmp": throw new Exception("jmp occured");
                 case "ldtoken":
                     {
                         MethodBase? mbMethod = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -211,7 +277,7 @@ class StackMachine
                         else
                             throw new Exception("cannot resolve token at " + instr.idx);
                         _stack.Push(token);
-                        break; // vsharp interpreter fs ldtoken
+                        break;
                     }
                 case "call":
                     {
@@ -732,7 +798,9 @@ class StackMachine
         for (int i = 0; i < _temps.Count; i++)
         {
             if (!temps.ContainsKey(_temps[i].Type))
+            {
                 temps.Add(_temps[i].Type, []);
+            }
             temps[_temps[i].Type].Add(i);
         }
         foreach (var mapping in temps)
