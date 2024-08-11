@@ -48,8 +48,7 @@ class ILCallStmt : ILStmt
     public ILStmtLocation Location => _location;
     public override string ToString()
     {
-        // TODO separate into invokespecial invokestatic and so on
-        return Location.ToString() + "invoke " + Call.ToString();
+        return Location.ToString() + Call.ToString();
     }
 }
 

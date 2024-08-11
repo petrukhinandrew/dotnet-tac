@@ -116,6 +116,7 @@ class StackMachine
             switch (instr.opCode.Name)
             {
                 case "nop":
+                case "jmp": // TODO ensure it is proper behaviour 
                 case "break": break;
                 case "ldarg.0": _stack.Push(_params[0]); break;
                 case "ldarg.1": _stack.Push(_params[1]); break;
@@ -295,10 +296,11 @@ class StackMachine
                     }
                 // case "endfilter":
                 // case "endfinally":
-                // case "jmp": 
                 // case "leave":
                 // case "leave.s":
                 // case "switch":
+
+                // case "ldelema":
                 case "ldftn":
                     {
                         MethodBase? mb = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -363,7 +365,11 @@ class StackMachine
                         }
                         else
                         {
-                            _stack.Push(new ILCallExpr(ilMethod));
+                            var call = new ILCallExpr(ilMethod);
+                            if (ilMethod.Returns())
+                                _stack.Push(call);
+                            else
+                                _tac.Add(new ILCallStmt(GetNewStmtLoc(), call));
                         }
                         break;
                     }
@@ -373,7 +379,27 @@ class StackMachine
                         if (sig == null) throw new Exception("signature not resolved at " + instr.idx);
                         ILMethod ilMethod = (ILMethod)_stack.Pop();
                         ilMethod.LoadArgs(_stack);
-                        _stack.Push(new ILCallExpr(ilMethod));
+                        var call = new ILCallExpr(ilMethod);
+                        if (ilMethod.Returns())
+                            _stack.Push(call);
+                        else
+                            _tac.Add(new ILCallStmt(GetNewStmtLoc(), call));
+                        break;
+                    }
+                case "callvirt":
+                    {
+                        MethodBase? method = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (method == null) throw new Exception("call not resolved at " + instr.idx);
+
+                        ILMethod ilMethod = ILMethod.FromMethodBase(method);
+                        ilMethod.LoadArgs(_stack);
+
+                        var call = new ILInstanceCallExpr(_stack.Pop(), ilMethod);
+                        if (ilMethod.Returns())
+                            _stack.Push(call);
+                        else
+                            _tac.Add(new ILCallStmt(GetNewStmtLoc(), call));
+
                         break;
                     }
                 case "ret":
@@ -577,7 +603,6 @@ class StackMachine
                             arr, index));
                         break;
                     }
-                // case "ldelema":
                 case "ldlen":
                     {
                         ILExpr arr = _stack.Pop();

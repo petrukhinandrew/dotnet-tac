@@ -102,11 +102,20 @@ class ILCondCastExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, v
 }
 class ILCallExpr(ILMethod method) : ILExpr
 {
-    private ILMethod _method = method;
+    protected ILMethod _method = method;
     public ILType Type => _method.ReturnType;
+
     public override string ToString()
     {
         return "invoke " + _method.ToString();
+    }
+}
+class ILInstanceCallExpr(ILExpr instance, ILMethod method) : ILCallExpr(method)
+{
+    private ILExpr _instance = instance;
+    public override string ToString()
+    {
+        return "invoke " + _instance.ToString() + "." + _method.Name + "(" + string.Join(", ", _method.Args.Select(p => p.ToString())) + ")";
     }
 }
 interface ILRefExpr : ILExpr

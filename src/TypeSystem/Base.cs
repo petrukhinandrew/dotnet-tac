@@ -70,7 +70,7 @@ class ILMethod(ILType retType, string declType, string name, int argCount, ILExp
     }
     public void LoadArgs(Stack<ILExpr> stack)
     {
-        for (int i = 0; i < _argCount; i++)
+        for (int i = _argCount - 1; i >= 0; i--)
         {
             Args[i] = stack.Pop();
         }
@@ -91,5 +91,9 @@ class ILMethod(ILType retType, string declType, string name, int argCount, ILExp
     public bool IsInitializeArray()
     {
         return DeclaringType == "System.Runtime.CompilerServices.RuntimeHelpers" && Name == "InitializeArray";
+    }
+    public bool Returns()
+    {
+        return ReturnType is not ILNull;
     }
 }
