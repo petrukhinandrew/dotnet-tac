@@ -191,6 +191,9 @@ static class UnsafeTest
             ref int x_ref = ref x;
             *x_ptr += 1;
             x_ref += 1;
+            Instance i = new Instance();
+            Instance* i_ptr = &i;
+            i_ptr->Do();
         }
     }
 }

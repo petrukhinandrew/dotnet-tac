@@ -220,16 +220,16 @@ class StackMachine
                         _stack.Push(deref);
                         break;
                     }
-                // TODO
-                // case "ldind.ref":
-                // case "ldobj":
-                //     {
-                //         break;
-                //     }
-                // case "stind.ref":
-                //     {
-                //         break;
-                //     }
+
+                case "ldind.ref":
+                case "ldobj":
+                    {
+                        ILExpr addr = _stack.Pop();
+                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILObject());
+                        _stack.Push(deref);
+                        break;
+                    }
+
                 case "stind.i1":
                 case "stind.i2":
                 case "stind.i4":
@@ -259,6 +259,13 @@ class StackMachine
                         ILExpr val = _stack.Pop();
                         ILLValue addr = (ILLValue)_stack.Pop();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILNativeInt()), val));
+                        break;
+                    }
+                case "stind.ref":
+                    {
+                        ILExpr val = _stack.Pop();
+                        ILLValue addr = (ILLValue)_stack.Pop();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILObject()), val));
                         break;
                     }
 
