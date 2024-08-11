@@ -300,7 +300,6 @@ class StackMachine
                 // case "leave.s":
                 // case "switch":
 
-                // case "ldelema":
                 case "ldftn":
                     {
                         MethodBase? mb = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -603,6 +602,13 @@ class StackMachine
                             arr, index));
                         break;
                     }
+                case "ldelema":
+                    {
+                        ILExpr idx = _stack.Pop();
+                        ILExpr arr = _stack.Pop();
+                        _stack.Push(new ILManagedRef(new ILArrayAccess(arr, idx)));
+                        break;
+                    }
                 case "ldlen":
                     {
                         ILExpr arr = _stack.Pop();
@@ -788,8 +794,7 @@ class StackMachine
     }
     private void InlineInitArray(ILExpr[] args)
     {
-        Console.WriteLine(args.Last().GetType().ToString());
-        if (args.First() is ILObjectLiteral ilObj && args.Last() is ILLocal newArr)
+        if (args.First() is ILLocal newArr && args.Last() is ILObjectLiteral ilObj)
         {
             try
             {

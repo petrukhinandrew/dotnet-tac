@@ -196,4 +196,13 @@ static class UnsafeTest
             i_ptr->Do();
         }
     }
+    public static void ArrayRef()
+    {
+        unsafe
+        {
+            int[] arr = { 1, 2, 3 };
+            ref int fst = ref arr[0];
+            fst += 1;
+        }
+    }
 }
