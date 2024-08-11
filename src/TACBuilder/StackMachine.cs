@@ -179,33 +179,89 @@ class StackMachine
                 //         break;
                 //     }
 
-                // case "ldind.i1":
-                // case "ldind.i2":
+                case "ldind.i1":
+                case "ldind.i2":
                 case "ldind.i4":
-                    // case "ldind.i8":
-                    // case "ldind.u1":
-                    // case "ldind.u2":
-                    // case "ldind.u4":
-                    // case "ldind.u8":
-                    // case "ldind.r4":
-                    // case "ldind.r8":
-                    // case "ldind.i":
-                    // case "ldind.ref":
-                    // case "ldobj":
+                case "ldind.u1":
+                case "ldind.u2":
+                case "ldind.u4":
                     {
                         ILExpr addr = _stack.Pop();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt32());
                         _stack.Push(deref);
                         break;
                     }
-                // case "stind":
+                case "ldind.u8":
+                case "ldind.i8":
+                    {
+                        ILExpr addr = _stack.Pop();
+                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt64());
+                        _stack.Push(deref);
+                        break;
+                    }
+                case "ldind.r4":
+                    {
+                        ILExpr addr = _stack.Pop();
+                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
+                        _stack.Push(deref);
+                        break;
+                    }
+                case "ldind.r8":
+                    {
+                        ILExpr addr = _stack.Pop();
+                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
+                        _stack.Push(deref);
+                        break;
+                    }
+                case "ldind.i":
+                    {
+                        ILExpr addr = _stack.Pop();
+                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeInt());
+                        _stack.Push(deref);
+                        break;
+                    }
+                // TODO
+                // case "ldind.ref":
+                // case "ldobj":
+                //     {
+                //         break;
+                //     }
+                // case "stind.ref":
+                //     {
+                //         break;
+                //     }
+                case "stind.i1":
+                case "stind.i2":
                 case "stind.i4":
+                case "stind.i8":
                     {
                         ILExpr val = _stack.Pop();
                         ILLValue addr = (ILLValue)_stack.Pop();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILInt32()), val));
                         break;
                     }
+                case "stind.r4":
+                    {
+                        ILExpr val = _stack.Pop();
+                        ILLValue addr = (ILLValue)_stack.Pop();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILFloat32()), val));
+                        break;
+                    }
+                case "stind.r8":
+                    {
+                        ILExpr val = _stack.Pop();
+                        ILLValue addr = (ILLValue)_stack.Pop();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILFloat64()), val));
+                        break;
+                    }
+                case "stind.i":
+                    {
+                        ILExpr val = _stack.Pop();
+                        ILLValue addr = (ILLValue)_stack.Pop();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILNativeInt()), val));
+                        break;
+                    }
+
                 case "ldarga":
                     {
                         int idx = ((ILInstrOperand.Arg16)instr.arg).value;
