@@ -105,30 +105,30 @@ static class ConditionsTests
     }
 }
 
+enum TestEnum
+{
+    A = 1,
+    B = 2,
+    C = 3
+}
+struct TestStruct
+{
+
+    public int A;
+    public int B;
+    public float C;
+}
+class Instance(int tx = 1)
+{
+    private int x = tx;
+
+    public void Do()
+    {
+        x += 1;
+    }
+}
 static class NewInstTests
 {
-    enum TestEnum
-    {
-        A = 1,
-        B = 2,
-        C = 3
-    }
-    struct TestStruct
-    {
-
-        public int A;
-        public int B;
-        public float C;
-    }
-    class Instance(int tx = 1)
-    {
-        private int x = tx;
-
-        public void Do()
-        {
-            x += 1;
-        }
-    }
     public static void ByValue()
     {
         TestEnum te = TestEnum.A;
@@ -182,15 +182,15 @@ static class UnsafeTest
         //     bool res = (i == -1 && result != 0);
         // }
     }
-    public static void Deref()
+    public static void PointerAndRef()
     {
         unsafe
         {
             int x = 1;
-            ref int kek = ref x;
-            int t = kek;
             int* x_ptr = &x;
-            (*x_ptr)++;
+            ref int x_ref = ref x;
+            *x_ptr += 1;
+            x_ref += 1;
         }
     }
 }

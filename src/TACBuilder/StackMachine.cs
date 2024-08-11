@@ -203,7 +203,7 @@ class StackMachine
                     {
                         ILExpr val = _stack.Pop();
                         ILLValue addr = (ILLValue)_stack.Pop();
-                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), addr, val));
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILInt32()), val));
                         break;
                     }
                 case "ldarga":
