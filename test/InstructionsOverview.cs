@@ -1,4 +1,5 @@
 #pragma warning disable CS0219
+#pragma warning disable CS8500
 
 
 using System.Runtime.InteropServices;
@@ -192,6 +193,7 @@ static class UnsafeTest
             *x_ptr += 1;
             x_ref += 1;
             Instance i = new Instance();
+
             Instance* i_ptr = &i;
             i_ptr->Do();
         }
@@ -215,7 +217,7 @@ static class TryBlockTests
         {
             if (1 + 2 == 3) return;
         }
-        catch (NullReferenceException e)
+        catch (NullReferenceException)
         {
             try
             {
@@ -228,7 +230,7 @@ static class TryBlockTests
             }
             return;
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return;
         }

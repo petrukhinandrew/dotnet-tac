@@ -14,7 +14,7 @@ class ILRewriter
     ILInstr[]? offsetToInstr;
     bool branch = false;
     ILInstr back = new ILInstr.Back();
-    ehClause[] ehs;
+    ehClause[] ehs = [];
     public void ImportEH(MethodBody methodBody)
     {
         ehClause parseEH(exceptionHandlingClause c)
