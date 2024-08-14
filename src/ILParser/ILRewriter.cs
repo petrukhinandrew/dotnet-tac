@@ -11,10 +11,11 @@ class ILRewriter
     }
     int offset = 0;
     byte[]? il;
-    ILInstr[]? offsetToInstr;
+    ILInstr[] offsetToInstr = [];
     bool branch = false;
     ILInstr back = new ILInstr.Back();
     ehClause[] ehs = [];
+    // Dictionary<int, List<>>
     public void ImportEH(MethodBody methodBody)
     {
         ehClause parseEH(exceptionHandlingClause c)
@@ -346,21 +347,21 @@ public abstract record ILInstr
     {
         public override string ToString()
         {
-            return idx.ToString() + " " + opCode.ToString() ?? "null opcode";
+            return opCode.ToString() ?? "null opcode";
         }
     }
     public record SwitchArg() : ILInstr
     {
         public override string ToString()
         {
-            return idx.ToString() + " SwitchArg";
+            return "SwitchArg";
         }
     }
     public record Back() : ILInstr
     {
         public override string ToString()
         {
-            return idx.ToString() + " Back";
+            return "Back";
         }
     }
 

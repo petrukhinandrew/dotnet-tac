@@ -72,12 +72,14 @@ static class ConditionsTests
     }
     public static int SwitchExample()
     {
-        string s = Concat("a", "b", "c");
-        switch (s)
+        int x = 1 + 2 + 4;
+        switch (x + 1)
         {
-            case "a": return 1;
-            case "b": return 2;
-            default: return 3;
+            case 7:
+            case 8: return 1;
+            case 10: return 2;
+            case 13: return 3;
+            default: return x;
         }
     }
     public static void Comps()

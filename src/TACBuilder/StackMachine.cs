@@ -282,16 +282,10 @@ class StackMachine
                         // TODO throws on intfy or NaN
                         break;
                     }
+                // case "endfilter":
                 // case "initblk":
                 // case "cpblk":
                 // case "localloc":
-                //     {
-                //         // ILPrimitiveType? size = _stack.Pop() as ILPrimitiveType;
-                //         // if (size == null) throw new Exception("primitive expected at " + instr.idx);
-                //         // _stack.Push(new IL);
-                //         break;
-                //     }
-
                 case "ldind.i1":
                 case "ldind.i2":
                 case "ldind.i4":
@@ -406,7 +400,6 @@ class StackMachine
                         _stack.Push(new ILManagedRef(_locals[idx]));
                         break;
                     }
-                // case "endfilter":
                 case "leave":
                 case "leave.s":
                     {
@@ -414,7 +407,23 @@ class StackMachine
                         _tac.Add(new ILGotoStmt(GetNewStmtLoc(), to));
                         break;
                     }
-                // case "switch":
+                case "switch":
+                    {
+                        int branchCnt = ((ILInstrOperand.Arg32)instr.arg).value;
+                        ILExpr compVal = PopSingleAddr();
+                        for (int branch = 0; branch < branchCnt; branch++)
+                        {
+                            curInstr = curInstr.next;
+                            ILInstr.SwitchArg target = (ILInstr.SwitchArg)curInstr;
+                            ILStmtTargetLocation to = ResolveTargetLocation(curInstr, labelsPool);
+                            _tac.Add(new ILIfStmt(
+                                GetNewStmtLoc(),
+                                new ILBinaryOperation(compVal, new ILLiteral(new ILInt32(), branch.ToString())),
+                                to
+                            ));
+                        }
+                        break;
+                    }
 
                 case "ldftn":
                     {
