@@ -51,6 +51,23 @@ class CatchScope(int b, int e, Type type) : ExceptionHandlingScope(b, e)
     }
 
 }
+
+class FaultScope(int b, int e) : ExceptionHandlingScope(b, e)
+{
+    public static FaultScope FromClause(ehClause clause)
+    {
+        return new FaultScope(clause.handlerBegin.idx, clause.handlerEnd.idx);
+    }
+    public override bool Equals(object? obj)
+    {
+        return obj != null && obj is TryScope ts && Begin == ts.Begin && End == ts.End;
+    }
+    public override int GetHashCode()
+    {
+        return (Begin, End).GetHashCode();
+    }
+}
+
 class FinallyScope(int b, int e) : ExceptionHandlingScope(b, e)
 {
     public static FinallyScope FromClause(ehClause clause)
@@ -81,6 +98,7 @@ class StackMachine
     private List<TryScope> _tryBlocks = [];
     private List<CatchScope> _catchBlocks = [];
     private List<FinallyScope> _finallyBlocks = [];
+    private List<FaultScope> _faultBlocks = [];
     private Module _declaringModule;
     private MethodInfo _methodInfo;
 
@@ -121,6 +139,14 @@ class StackMachine
                 if (!_finallyBlocks.Contains(finallyBlock))
                 {
                     _finallyBlocks.Add(finallyBlock);
+                }
+            }
+            if (ehc.ehcType is rewriterEhcType.FaultEH)
+            {
+                var faultBlock = FaultScope.FromClause(ehc);
+                if (!_faultBlocks.Contains(faultBlock))
+                {
+                    _faultBlocks.Add(faultBlock);
                 }
             }
         }
@@ -218,7 +244,10 @@ class StackMachine
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(catchBlock.Type), "err"));
                 _tac.Add(new ILEHStmt("catch"));
             }
-
+            foreach (var block in _faultBlocks.Where(b => b.Begin == curInstr.idx))
+            {
+                _tac.Add(new ILEHStmt("fault"));
+            }
             foreach (var block in _finallyBlocks.Where(b => b.Begin == curInstr.idx))
             {
                 _tac.Add(new ILEHStmt("finally"));
@@ -908,6 +937,10 @@ class StackMachine
                         break;
                     }
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
+            }
+            foreach (var block in _faultBlocks.Where(b => b.End == curInstr.idx))
+            {
+                _tac.Add(new ILEHStmt("endfault"));
             }
             foreach (var block in _finallyBlocks.Where(b => b.End == curInstr.idx))
             {
