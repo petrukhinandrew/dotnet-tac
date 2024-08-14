@@ -14,7 +14,7 @@ class ILRewriter
     ILInstr[]? offsetToInstr;
     bool branch = false;
     ILInstr back = new ILInstr.Back();
-    ehClause[]? ehs;
+    ehClause[] ehs;
     public void ImportEH(MethodBody methodBody)
     {
         ehClause parseEH(exceptionHandlingClause c)
@@ -40,6 +40,10 @@ class ILRewriter
     public ILInstr GetBeginning()
     {
         return back.next;
+    }
+    public ehClause[] GetEHs()
+    {
+        return ehs;
     }
     public void ImportIL(MethodBody methodBody)
     {
@@ -342,21 +346,21 @@ public abstract record ILInstr
     {
         public override string ToString()
         {
-            return opCode.ToString() ?? "null opcode";
+            return idx.ToString() + " " + opCode.ToString() ?? "null opcode";
         }
     }
     public record SwitchArg() : ILInstr
     {
         public override string ToString()
         {
-            return "SwitchArg";
+            return idx.ToString() + " SwitchArg";
         }
     }
     public record Back() : ILInstr
     {
         public override string ToString()
         {
-            return "Back";
+            return idx.ToString() + " Back";
         }
     }
 

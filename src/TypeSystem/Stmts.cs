@@ -1,3 +1,6 @@
+using System.Data;
+using Usvm.IL.Parser;
+
 namespace Usvm.IL.TypeSystem;
 interface ILStmt
 {
@@ -11,6 +14,13 @@ class ILStmtLocation(int index)
     public override string ToString()
     {
         return "TAC_" + Index.ToString() + " ";
+    }
+}
+class ILStmtEHLocation() : ILStmtLocation(-1)
+{
+    public override string ToString()
+    {
+        return "";
     }
 }
 class ILStmtTargetLocation(int index, int ilIndex) : ILStmtLocation(index)
@@ -84,5 +94,15 @@ class ILIfStmt(ILStmtLocation location, ILExpr cond, ILStmtTargetLocation target
     public new string ToString()
     {
         return Location.ToString() + "if " + cond.ToString() + " goto " + Target.Index.ToString();
+    }
+}
+
+class ILEHStmt(string value) : ILStmt
+{
+    private string _value = value;
+    public ILStmtLocation Location => new ILStmtEHLocation();
+    public new string ToString()
+    {
+        return _value;
     }
 }

@@ -206,3 +206,35 @@ static class UnsafeTest
         }
     }
 }
+
+static class TryBlockTests
+{
+    public static void Leave()
+    {
+        try
+        {
+            if (1 + 2 == 3) return;
+        }
+        catch (NullReferenceException e)
+        {
+            try
+            {
+                int zero = 0;
+                float x = 7 / zero;
+            }
+            catch (DivideByZeroException)
+            {
+
+            }
+            return;
+        }
+        catch (Exception e)
+        {
+            return;
+        }
+        finally
+        {
+
+        }
+    }
+}
