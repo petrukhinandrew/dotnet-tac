@@ -36,8 +36,14 @@ static class TypeSolver
         {
             return new ILUnmanagedPointer(Resolve(type.GetElementType()!));
         }
-        else if (type.IsByRef) {
+        else if (type.IsByRef)
+        {
             return new ILManagedPointer(Resolve(type.GetElementType()!));
+        }
+        else if (type.IsByRefLike)
+        {
+            // always on stack
+            // no casts provided
         }
         else if (type == typeof(string))
         {
