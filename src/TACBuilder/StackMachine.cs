@@ -321,6 +321,7 @@ class StackMachine
                         new ILAssignStmt(GetNewStmtLoc(), _locals[idx], _stack.Pop())
                         ); break;
                     }
+                case "starg":
                 case "starg.s":
                     {
                         int idx = ((ILInstrOperand.Arg8)instr.arg).value;
@@ -597,7 +598,10 @@ class StackMachine
 
                         break;
                     }
+                
                 case "add":
+                case "add.ovf":
+                case "add.ovf.un":
 
                 case "sub.ovf":
                 case "sub.ovf.un":
@@ -620,9 +624,9 @@ class StackMachine
                 case "xor":
 
                 case "shl":
-                case "shr.un":
 
                 case "shr":
+                case "shr.un":
 
                 case "ceq":
 
