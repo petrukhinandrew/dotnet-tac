@@ -46,6 +46,18 @@ class ILObject : ILRefType
         return "object";
     }
 }
+class ILVoid : ILRefType
+{
+    public bool Equals(ILType? other)
+    {
+        return other is ILVoid;
+    }
+
+    public override string ToString()
+    {
+        return "void";
+    }
+}
 class ILNull : ILRefType
 {
     public bool Equals(ILType? other)

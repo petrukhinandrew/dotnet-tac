@@ -187,3 +187,15 @@ class ILUnmanagedDeref(ILExpr pointedVal, ILType resType) : ILDerefExpr
         return "*" + Value.ToString();
     }
 }
+
+class ILStackAlloc(ILExpr size) : ILExpr
+{
+    public ILType Type => new ILUnmanagedPointer(new ILNull());
+
+    public ILExpr Size = size;
+
+    public override string ToString()
+    {
+        return "stackalloc " + Size.ToString();
+    }
+}
