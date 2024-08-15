@@ -44,6 +44,7 @@ static class TypeSolver
         {
             // always on stack
             // no casts provided
+            // TODO introduce new type
         }
         else if (type == typeof(string))
         {
