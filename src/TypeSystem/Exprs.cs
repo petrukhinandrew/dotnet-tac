@@ -122,10 +122,7 @@ interface ILRefExpr : ILExpr
 {
     public ILExpr Value { get; }
 }
-interface ILDerefExpr : ILLValue
-{
-
-}
+interface ILDerefExpr : ILLValue { }
 
 class PointerExprTypeResolver
 {
@@ -155,7 +152,7 @@ class ILManagedRef(ILExpr value) : ILRefExpr
 
     public override string ToString()
     {
-        return "ref " + Value.ToString();
+        return "&" + Value.ToString();
     }
 }
 
@@ -177,7 +174,7 @@ class ILManagedDeref(ILExpr byRefVal, ILType resType) : ILDerefExpr
     public ILType Type => resType;
     public override string ToString()
     {
-        return "deref " + Value.ToString();
+        return "*" + Value.ToString();
     }
 }
 
