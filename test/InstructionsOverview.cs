@@ -121,6 +121,7 @@ struct TestStruct
     public int A;
     public int B;
     public float C;
+    public TestEnum E;
 }
 class Instance(int tx = 1)
 {
@@ -136,7 +137,7 @@ static class NewInstTests
     public static void ByValue()
     {
         TestEnum te = TestEnum.A;
-        TestStruct ts = new() { A = 1, B = 2, C = 3 };
+        TestStruct ts = new() { A = 1, B = 2, C = 3, E = te };
         (int, int) tt = (1, 1);
         ts.A += tt.Item1;
         ts.C += tt.Item2;
@@ -213,6 +214,15 @@ static unsafe class UnsafeTest
             fst += 1;
         }
     }
+    public static void StackAlloc()
+    {
+        int length = 10;
+        Span<byte> bytes;
+        byte* tmp = stackalloc byte[length];
+        bytes = new Span<byte>(tmp, length);
+        Span<byte> arg = stackalloc byte[8];
+        void* arg1 = stackalloc byte[8];
+    }
 }
 
 static class TryBlockTests
@@ -253,7 +263,7 @@ static class TryBlockTests
         {
             int x = 1;
         }
-        catch (DivideByZeroException) when (a + 1 == 2)
+        catch (DivideByZeroException)
         {
             int y = 1;
         }
