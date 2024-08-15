@@ -118,4 +118,13 @@ class ILStructType(string qName) : ILValueType
     {
         return "struct " + QualifiedName;
     }
+    public override bool Equals(object? obj)
+    {
+        return obj != null && obj is ILStructType s && QualifiedName == s.QualifiedName;
+    }
+
+    public override int GetHashCode()
+    {
+        return QualifiedName.GetHashCode();
+    }
 }

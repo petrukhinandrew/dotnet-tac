@@ -1101,11 +1101,22 @@ class StackMachine
     public List<string> LocalVars()
     {
         List<string> res = new List<string>();
-        foreach (var type in _locals.Select(l => l.Type))
+
+        Dictionary<ILType, List<int>> locals = new Dictionary<ILType, List<int>>();
+        for (int i = 0; i < _locals.Count; i++)
         {
-            string buf = string.Format("{0} {1}", type.ToString(), string.Join(", ", _locals.Where(l => l.Type == type).Select(l => l.ToString())));
+            if (!locals.ContainsKey(_locals[i].Type))
+            {
+                locals.Add(_locals[i].Type, []);
+            }
+            locals[_locals[i].Type].Add(i);
+        }
+        foreach (var mapping in locals)
+        {
+            string buf = string.Format("{0} {1}", mapping.Key.ToString(), string.Join(", ", mapping.Value.Select(v => Logger.LocalVarName(v))));
             res.Add(buf);
         }
+
         Dictionary<ILType, List<int>> temps = new Dictionary<ILType, List<int>>();
         for (int i = 0; i < _temps.Count; i++)
         {
