@@ -1,37 +1,14 @@
-## TODO
+## Check
 
-- ensure all base instrs handled 
-- unify approach in handling "instance expected"
-- fields exprs 
-- refactor naming for types and exprs 
+- every instruction producing tac line use `PopSingleAddr()` instead of `Pop()`
 
 ## Test
 
 - arglist
+- fault block
 
+## Decide
 
-## Ask
-
-
-try
-    try
-    catch
-catch
-    try 
-    catch
-    endcatch
-catch 
-finally 
-endfinally 
-
-try
-catch ()
-endcatch | finally 
-endfinally
-
-## for 15/08 call 
-
-- ..blk
-- try-catch
-- filter 
-- endfilter 
+- ptr / ref need target type
+- ptr / deref ops are diffrent for managed / unmanaged
+- native int implements unmanaged ptr
