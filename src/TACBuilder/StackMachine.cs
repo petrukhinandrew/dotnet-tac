@@ -1,14 +1,10 @@
-namespace Usvm.IL.TACBuilder;
 
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Usvm.IL.TypeSystem;
 using Usvm.IL.Parser;
-using System.Text.RegularExpressions;
-using System.Text;
-using System.Dynamic;
-using System.Diagnostics;
 
+namespace Usvm.IL.TACBuilder;
 abstract class ExceptionHandlingScope
 {
     public ExceptionHandlingScope(int b, int e)
@@ -52,6 +48,24 @@ class CatchScope(int b, int e, Type type) : ExceptionHandlingScope(b, e)
 
 }
 
+class FilterScope(int b, int cb, int e) : ExceptionHandlingScope(b, e)
+{
+    public int CatchBegin = cb;
+
+    public static FilterScope FromClause(ehClause clause)
+    {
+        return new FilterScope((clause.ehcType as rewriterEhcType.FilterEH)!.instr.idx, clause.handlerBegin.idx, clause.handlerEnd.idx);
+    }
+    public override bool Equals(object? obj)
+    {
+        return obj != null && obj is FilterScope ts && Begin == ts.Begin && End == ts.End && CatchBegin == ts.CatchBegin;
+    }
+    public override int GetHashCode()
+    {
+        return (Begin, End).GetHashCode();
+    }
+}
+
 class FaultScope(int b, int e) : ExceptionHandlingScope(b, e)
 {
     public static FaultScope FromClause(ehClause clause)
@@ -60,7 +74,7 @@ class FaultScope(int b, int e) : ExceptionHandlingScope(b, e)
     }
     public override bool Equals(object? obj)
     {
-        return obj != null && obj is TryScope ts && Begin == ts.Begin && End == ts.End;
+        return obj != null && obj is FaultScope ts && Begin == ts.Begin && End == ts.End;
     }
     public override int GetHashCode()
     {
@@ -76,7 +90,7 @@ class FinallyScope(int b, int e) : ExceptionHandlingScope(b, e)
     }
     public override bool Equals(object? obj)
     {
-        return obj != null && obj is TryScope ts && Begin == ts.Begin && End == ts.End;
+        return obj != null && obj is FinallyScope ts && Begin == ts.Begin && End == ts.End;
     }
     public override int GetHashCode()
     {
@@ -97,6 +111,7 @@ class StackMachine
     private ehClause[] _ehs;
     private List<TryScope> _tryBlocks = [];
     private List<CatchScope> _catchBlocks = [];
+    private List<FilterScope> _filterBlocks = [];
     private List<FinallyScope> _finallyBlocks = [];
     private List<FaultScope> _faultBlocks = [];
     private Module _declaringModule;
@@ -131,6 +146,15 @@ class StackMachine
                 if (!_catchBlocks.Contains(catchBlock))
                 {
                     _catchBlocks.Add(catchBlock);
+                }
+            }
+            if (ehc.ehcType is rewriterEhcType.FilterEH)
+            {
+                var filterBlock = FilterScope.FromClause(ehc);
+                if (!_filterBlocks.Contains(filterBlock))
+                {
+                    _filterBlocks.Add(filterBlock);
+                    Console.WriteLine("filter {0} {1} {2}", filterBlock.Begin, filterBlock.CatchBegin, filterBlock.End);
                 }
             }
             if (ehc.ehcType is rewriterEhcType.FinallyEH)
@@ -172,7 +196,7 @@ class StackMachine
     private ILStmtTargetLocation ResolveTargetLocation(ILInstr instr, List<ILStmtTargetLocation> labelsPool)
     {
         ILInstrOperand.Target? target = instr.arg as ILInstrOperand.Target;
-        if (target == null) throw new Exception("expected non null value for br.s");
+        if (target == null) throw new Exception("expected target");
         int targetILIdx = target.value.idx;
         int? targetTACIdx;
         _labels.TryGetValue(targetILIdx, out targetTACIdx);
@@ -198,13 +222,6 @@ class StackMachine
         return val;
     }
 
-
-    private (ILExpr, ILExpr) MbIntroduceTemp(ILExpr lhs, ILExpr rhs)
-    {
-        rhs = ToSingleAddr(rhs);
-        lhs = ToSingleAddr(lhs);
-        return (lhs, rhs);
-    }
     private ILStmtLocation GetNewStmtLoc()
     {
         return new ILStmtLocation(_nextTacLineIdx++);
@@ -232,7 +249,6 @@ class StackMachine
                 curInstr = curInstr.next;
                 continue;
             }
-            if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _nextTacLineIdx;
 
             foreach (var block in _tryBlocks.Where(b => b.Begin == curInstr.idx))
             {
@@ -243,6 +259,11 @@ class StackMachine
             {
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(catchBlock.Type), "err"));
                 _tac.Add(new ILEHStmt("catch"));
+            }
+            foreach (var block in _filterBlocks.Where(b => b.Begin == curInstr.idx))
+            {
+                _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(System.Exception)), "err"));
+                _tac.Add(new ILEHStmt("filter"));
             }
             foreach (var block in _faultBlocks.Where(b => b.Begin == curInstr.idx))
             {
@@ -259,6 +280,12 @@ class StackMachine
                 case "jmp": // TODO ensure it is proper behaviour 
                 case "endfinally":
                 case "break": break;
+                case "endfilter":
+                    {
+                        ILExpr cond = ToSingleAddr(_stack.Peek());
+                        _tac.Add(new ILEHStmt("catchif " + cond.ToString()));
+                        break;
+                    }
                 case "ldarg.0": _stack.Push(_params[0]); break;
                 case "ldarg.1": _stack.Push(_params[1]); break;
                 case "ldarg.2": _stack.Push(_params[2]); break;
@@ -311,7 +338,6 @@ class StackMachine
                         // TODO throws on intfy or NaN
                         break;
                     }
-                // case "endfilter":
                 // case "initblk":
                 // case "cpblk":
                 // case "localloc":
@@ -434,6 +460,7 @@ class StackMachine
                     {
                         ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
                         _tac.Add(new ILGotoStmt(GetNewStmtLoc(), to));
+                        _stack.Clear();
                         break;
                     }
                 case "switch":
@@ -479,7 +506,13 @@ class StackMachine
                 case "ldc.r4": PushLiteral<float>(((ILInstrOperand.Arg32)instr.arg).value); break;
                 case "ldc.r8": PushLiteral<double>(((ILInstrOperand.Arg64)instr.arg).value); break;
                 case "ldstr": PushLiteral(safeStringResolve(((ILInstrOperand.Arg32)instr.arg).value)); break;
-                case "dup": _stack.Push(_stack.Peek()); break;
+                case "dup":
+                    {
+                        ILExpr dup = ToSingleAddr(_stack.Pop());
+                        _stack.Push(dup);
+                        _stack.Push(dup);
+                        break;
+                    }
                 case "pop": _stack.Pop(); break;
                 case "ldtoken":
                     {
@@ -946,6 +979,10 @@ class StackMachine
             {
                 _tac.Add(new ILEHStmt("endfinally"));
             }
+            foreach (var block in _filterBlocks.Where(b => b.End == curInstr.idx))
+            {
+                _tac.Add(new ILEHStmt("endfiltercatch"));
+            }
             foreach (var block in _catchBlocks.Where(b => b.End == curInstr.idx))
             {
                 _tac.Add(new ILEHStmt("endcatch"));
@@ -957,6 +994,7 @@ class StackMachine
             }
 
 
+            if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _nextTacLineIdx;
             curInstr = curInstr.next;
         }
         foreach (var l in labelsPool)
@@ -1119,5 +1157,13 @@ class StackMachine
         DumpMethodSignature();
         DumpLocalVars();
         DumpTAC();
+        // DumpLabels();
+    }
+    public void DumpLabels()
+    {
+        foreach (var (i, j) in _labels)
+        {
+            Console.WriteLine("{0} -> {1}", i, j);
+        }
     }
 }

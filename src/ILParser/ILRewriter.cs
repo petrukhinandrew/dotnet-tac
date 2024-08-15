@@ -191,6 +191,7 @@ class ILRewriter
                 switch (ilinstr.opCode.Name)
                 {
                     case "newarr":
+                    case "isinst":
                         arg = (ILInstrOperand.Arg32)ilinstr.arg;
                         tryResolveType(arg.value);
                         break;

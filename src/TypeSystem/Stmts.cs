@@ -103,6 +103,6 @@ class ILEHStmt(string value) : ILStmt
     public ILStmtLocation Location => new ILStmtEHLocation();
     public new string ToString()
     {
-        return _value;
+        return Location.ToString() + _value;
     }
 }

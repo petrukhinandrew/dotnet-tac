@@ -3,6 +3,7 @@
 
 
 using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Usvm.IL.Test.Instructions;
 
@@ -215,6 +216,7 @@ static class TryBlockTests
 {
     public static void Leave()
     {
+        int t = 1;
         try
         {
             if (1 + 2 == 3) return;
@@ -232,11 +234,27 @@ static class TryBlockTests
             }
             return;
         }
-        catch (Exception)
+        catch (Exception) when (t == 1)
         {
             return;
         }
         finally
+        {
+
+        }
+    }
+    public static void Filter()
+    {
+        int a = 1;
+        try
+        {
+            int x = 1;
+        }
+        catch (DivideByZeroException) when (a + 1 == 2)
+        {
+            int y = 1;
+        }
+        catch (Exception)
         {
 
         }
