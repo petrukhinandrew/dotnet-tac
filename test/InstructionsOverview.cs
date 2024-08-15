@@ -227,7 +227,7 @@ static unsafe class UnsafeTest
 
 static class TryBlockTests
 {
-    public static void Leave()
+    public static void NestedTryCatch()
     {
         int t = 1;
         try
