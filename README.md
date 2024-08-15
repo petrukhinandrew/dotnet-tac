@@ -12,9 +12,6 @@
 
 ## Ask
 
-Need logging? 
-F type in IL?
-
 
 try
     try
@@ -31,3 +28,10 @@ try
 catch ()
 endcatch | finally 
 endfinally
+
+## for 15/08 call 
+
+- ..blk
+- try-catch
+- filter 
+- endfilter 
