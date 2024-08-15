@@ -339,9 +339,25 @@ class StackMachine
                         // TODO throws on intfy or NaN
                         break;
                     }
+                // base
                 // case "initblk":
                 // case "cpblk":
                 // case "localloc":
+                // obj model
+                // cpobj
+                // initobj
+                // ldsfld
+                // stsfld
+                // stfld
+                // ldsflda
+                // ldvirtftn
+                // mkrefany
+                // refanytype
+                // refanyval
+                // throw
+                // rethrow
+                // sizeof
+                // stobj
                 case "ldind.i1":
                 case "ldind.i2":
                 case "ldind.i4":
@@ -772,6 +788,7 @@ class StackMachine
                         _stack.Push(arrTemp);
                         break;
                     }
+                // TODO rework
                 case "ldelem.i1":
                 case "ldelem.i2":
                 case "ldelem.i4":
@@ -806,6 +823,7 @@ class StackMachine
                         _stack.Push(new ILArrayLength(arr));
                         break;
                     }
+                // TODO rework
                 case "stelem.i1":
                 case "stelem.i2":
                 case "stelem.i4":
