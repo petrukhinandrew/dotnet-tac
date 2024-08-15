@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -9,10 +10,8 @@ class ILRewriter
     {
         _module = mod;
     }
-    int offset = 0;
     byte[]? il;
     ILInstr[] offsetToInstr = [];
-    bool branch = false;
     ILInstr back = new ILInstr.Back();
     ehClause[] ehs = [];
     // Dictionary<int, List<>>
@@ -55,35 +54,34 @@ class ILRewriter
         {
             Console.WriteLine("Local {0}", v.ToString());
         }
-
+        int offset = 0;
+        bool branch = false;
         while (offset < il.Length)
         {
             int opOffset = offset;
-            (OpCode op, int delta) = OpCodeOp.GetOpCode(il, offset);
-            offset += delta;
-            int size;
-            switch (op.OperandType)
+            (OpCode op, int d) = OpCodeOp.GetOpCode(il, offset);
+            offset += op.Size;
+            int size =
+            op.OperandType switch
             {
-                case OperandType.InlineNone:
-                case OperandType.InlineSwitch: size = 0; break;
-                case OperandType.ShortInlineVar:
-                case OperandType.ShortInlineI:
-                case OperandType.ShortInlineBrTarget: size = 1; break;
-                case OperandType.InlineVar: size = 2; break;
-                case OperandType.InlineI:
-                case OperandType.InlineMethod:
-                case OperandType.InlineType:
-                case OperandType.InlineString:
-                case OperandType.InlineSig:
-                case OperandType.InlineTok:
-                case OperandType.ShortInlineR:
-                case OperandType.InlineField:
-                case OperandType.InlineBrTarget: size = 4; break;
-                case OperandType.InlineI8:
-                case OperandType.InlineR: size = 8; break;
-                default:
-                    string exc = op.OperandType.ToString();
-                    throw new Exception("unreachable " + exc);
+                OperandType.InlineNone or
+                OperandType.InlineSwitch => 0,
+                OperandType.ShortInlineVar or
+                OperandType.ShortInlineI or
+                OperandType.ShortInlineBrTarget => 1,
+                OperandType.InlineVar => 2,
+                OperandType.InlineMethod or
+                OperandType.InlineI or
+                OperandType.InlineType or
+                OperandType.InlineString or
+                OperandType.InlineSig or
+                OperandType.InlineTok or
+                OperandType.ShortInlineR or
+                OperandType.InlineField or
+                OperandType.InlineBrTarget => 4,
+                OperandType.InlineI8 or
+                OperandType.InlineR => 8,
+                _ => throw new Exception("unreachable " + op.OperandType.ToString())
 
             };
             if (offset + size > il.Length) throw new Exception("IL stream unexpectedly ended!");
@@ -93,16 +91,21 @@ class ILRewriter
             switch (op.OperandType)
             {
                 case OperandType.InlineNone:
-                    instr.arg = new ILInstrOperand.NoArg();
-                    break;
+                    {
+                        instr.arg = new ILInstrOperand.NoArg();
+                        break;
+                    }
                 case OperandType.ShortInlineVar:
                 case OperandType.ShortInlineI:
-                    instr.arg = new ILInstrOperand.Arg8(il[offset]);
-                    break;
+                    {
+                        instr.arg = new ILInstrOperand.Arg8(il[offset]);
+                        break;
+                    }
                 case OperandType.InlineVar:
-                    instr.arg = new ILInstrOperand.Arg16(BitConverter.ToInt16(il, offset));
-                    break;
-
+                    {
+                        instr.arg = new ILInstrOperand.Arg16(BitConverter.ToInt16(il, offset));
+                        break;
+                    }
                 case OperandType.InlineI:
                 case OperandType.InlineMethod:
                 case OperandType.InlineType:
@@ -111,21 +114,31 @@ class ILRewriter
                 case OperandType.InlineTok:
                 case OperandType.ShortInlineR:
                 case OperandType.InlineField:
-                    instr.arg = new ILInstrOperand.Arg32(BitConverter.ToInt32(il, offset));
-                    break;
+                    {
+                        instr.arg = new ILInstrOperand.Arg32(BitConverter.ToInt32(il, offset));
+                        break;
+                    }
                 case OperandType.InlineI8:
                 case OperandType.InlineR:
-                    instr.arg = new ILInstrOperand.Arg64(BitConverter.ToInt64(il, offset));
-                    break;
+                    {
+                        instr.arg = new ILInstrOperand.Arg64(BitConverter.ToInt64(il, offset));
+                        break;
+                    }
                 case OperandType.ShortInlineBrTarget:
-                    instr.arg = new ILInstrOperand.Arg32(il[offset] + offset + sizeof(byte));
-                    branch = true;
-                    break;
+                    {
+                        int delta = Convert.ToInt32((sbyte)il[offset]);
+
+                        instr.arg = new ILInstrOperand.Arg32(offset + delta + sizeof(sbyte));
+                        branch = true;
+                        break;
+                    }
                 case OperandType.InlineBrTarget:
-                    int d = BitConverter.ToInt32(il, offset);
-                    instr.arg = new ILInstrOperand.Arg32(d + sizeof(int) + offset);
-                    branch = true;
-                    break;
+                    {
+                        int delta = BitConverter.ToInt32(il, offset);
+                        instr.arg = new ILInstrOperand.Arg32(delta + sizeof(int) + offset);
+                        branch = true;
+                        break;
+                    }
                 case OperandType.InlineSwitch:
                     int sizeOfInt = sizeof(int);
                     if (offset + sizeOfInt > il.Length)
@@ -157,7 +170,6 @@ class ILRewriter
 
             }
             offset += size;
-
         }
         if (offset != il.Length)
         {
