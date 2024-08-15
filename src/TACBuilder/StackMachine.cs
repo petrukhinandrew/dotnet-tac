@@ -273,22 +273,7 @@ class StackMachine
 
                 case "nop":
                 case "break": break;
-                case "endfault":
-                    {
-                        _tac.Add(new ILEHStmt("endfault"));
-                        break;
-                    }
-                case "endfinally":
-                    {
-                        _tac.Add(new ILEHStmt("endfinally"));
-                        break;
-                    }
-                case "endfilter":
-                    {
-                        _stack.Pop();
-                        _tac.Add(new ILEHStmt("endfilter"));
-                        break;
-                    }
+
                 case "ldarg.0": _stack.Push(_params[0]); break;
                 case "ldarg.1": _stack.Push(_params[1]); break;
                 case "ldarg.2": _stack.Push(_params[2]); break;
@@ -337,7 +322,28 @@ class StackMachine
                         _stack.Push(new ILVarArgValue(_methodInfo.Name));
                         break;
                     }
-                // case "localloc":
+                case "endfault":
+                    {
+                        _tac.Add(new ILEHStmt("endfault"));
+                        break;
+                    }
+                case "endfinally":
+                    {
+                        _tac.Add(new ILEHStmt("endfinally"));
+                        break;
+                    }
+                case "endfilter":
+                    {
+                        _stack.Pop();
+                        _tac.Add(new ILEHStmt("endfilter"));
+                        break;
+                    }
+                case "localloc":
+                    {
+                        ILExpr size = PopSingleAddr();
+                        _stack.Push(new ILStackAlloc(size));
+                        break;
+                    }
                 // obj model
                 // cpobj
                 // initobj
