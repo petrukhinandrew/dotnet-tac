@@ -276,10 +276,17 @@ class StackMachine
 
             switch (instr.opCode.Name)
             {
+                case "ckfinite":
+                case "mkrefany":
+                case "refanytype":
+                case "refanyval":
+                case "jmp":
+                case "initblk":
+                case "cpblk": throw new Exception("not implemented");
+
                 case "nop":
-                case "jmp": // TODO ensure it is proper behaviour 
-                case "endfinally":
                 case "break": break;
+
                 case "endfilter":
                     {
                         ILExpr cond = ToSingleAddr(_stack.Peek());
@@ -334,15 +341,9 @@ class StackMachine
                         _stack.Push(new ILVarArgValue(_methodInfo.Name));
                         break;
                     }
-                case "ckfinite":
-                    {
-                        // TODO throws on intfy or NaN
-                        break;
-                    }
-                // base
-                // case "initblk":
-                // case "cpblk":
                 // case "localloc":
+                // case "endfault":
+                // case "endfinally":
                 // obj model
                 // cpobj
                 // initobj
@@ -415,7 +416,7 @@ class StackMachine
                 case "stind.i8":
                     {
                         ILExpr val = _stack.Pop();
-                        ILLValue addr = (ILLValue)_stack.Pop();
+                        ILLValue addr = (ILLValue)PopSingleAddr();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILInt32()), val));
                         break;
                     }
@@ -614,7 +615,7 @@ class StackMachine
 
                         break;
                     }
-                
+
                 case "add":
                 case "add.ovf":
                 case "add.ovf.un":
@@ -910,7 +911,7 @@ class StackMachine
                         _stack.Push(conv);
                         break;
                     }
-                // 
+
                 case "conv.ovf.i1":
                 case "conv.ovf.i2":
                 case "conv.ovf.i4":
@@ -921,7 +922,7 @@ class StackMachine
                 case "conv.ovf.u8":
                 case "conv.ovf.i":
                 case "conv.ovf.u":
-                // 
+
                 case "conv.ovf.i1.un":
                 case "conv.ovf.i2.un":
                 case "conv.ovf.i4.un":
@@ -1179,7 +1180,6 @@ class StackMachine
         DumpMethodSignature();
         DumpLocalVars();
         DumpTAC();
-        // DumpLabels();
     }
     public void DumpLabels()
     {
