@@ -1,4 +1,5 @@
 using System.Reflection;
+using Usvm.IL.Utils;
 
 namespace Usvm.IL.TypeSystem;
 static class TypeSolver
@@ -29,7 +30,7 @@ static class TypeSolver
             }
             else if (type.IsValueType)
             {
-                return new ILStructType(type.FullName ?? type.AssemblyQualifiedName ?? type.Name);
+                return new ILStructType(FormatStructName(type));
             }
         }
         else if (type.IsPointer)
@@ -63,5 +64,18 @@ static class TypeSolver
             return new ILClassOrInterfaceType(type.FullName ?? type.AssemblyQualifiedName ?? type.Name);
         }
         throw new Exception("unhandled type " + type.ToString());
+    }
+    private static string FormatStructName(Type type)
+    {
+        string nsName = type.Namespace ?? "ns";
+        string rawName = type.Name;
+        string[] tokens = rawName.Split('`');
+        if (tokens.Count() == 1)
+        {
+            return string.Format("{0}.{1}", nsName, rawName);
+        }
+        string name = tokens[0];
+        int paramsCnt = int.Parse(tokens[1]);
+        return string.Format("{0}.{1}<{2}>", nsName, name, string.Join(",", type.GenericTypeArguments.Select(t => Resolve(t).ToString())));
     }
 }
