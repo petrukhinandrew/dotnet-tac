@@ -160,31 +160,34 @@ static class NewInstTests
         inst.Do();
     }
 }
-static class UnsafeTest
+static unsafe class UnsafeTest
 {
-    public static void InitBlk()
+    public static void SafeCopy(int[] source, int sourceOffset, int[] target,
+            int targetOffset, int count)
     {
-        Marshal.AllocHGlobal(1123);
+        for (int i = 0; i < count; i++)
+        {
+            target[targetOffset + i] = source[sourceOffset + i];
+        }
     }
-    struct CpBlkStruct { int a; int b; };
 
-    public static void CpBlk()
+    public static void UnsafeCopy(int[] source, int sourceOffset, int[] target,
+        int targetOffset, int count)
     {
-        CpBlkStruct v = new();
-        CpBlkStruct v_copy = v;
 
-        // unsafe
-        // {
-        //     var c = new ExplicitClass(1, 2);
-        //     byte result;
-        //     fixed (int* ptr = &c.x)
-        //     {
-        //         var ptr2 = (byte*)ptr;
-        //         var ptr3 = ptr2 + i;
-        //         result = *ptr3;
-        //     }
-        //     bool res = (i == -1 && result != 0);
-        // }
+        fixed (int* pSource = source, pTarget = target)
+        {
+            byte* pSourceByte = (byte*)pSource;
+            byte* pTargetByte = (byte*)pTarget;
+            var sourceOffsetByte = sourceOffset * sizeof(int);
+            var targetOffsetByte = targetOffset * sizeof(int);
+            // Copy the specified number of bytes from source to target.
+            for (int i = 0; i < count * sizeof(int); i++)
+            {
+                pTargetByte[targetOffsetByte + i] = pSourceByte[sourceOffsetByte + i];
+            }
+        }
+
     }
     public static void PointerAndRef()
     {
