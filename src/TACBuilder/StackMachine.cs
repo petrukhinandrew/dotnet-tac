@@ -285,7 +285,7 @@ class StackMachine
                     }
                 case "endfilter":
                     {
-                        // TODO check _stack.Pop();
+                        _stack.Pop();
                         _tac.Add(new ILEHStmt("endfilter"));
                         break;
                     }
