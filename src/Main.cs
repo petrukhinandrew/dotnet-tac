@@ -8,7 +8,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        ParserSettings settings = new ParserSettings("bin/Debug/net8.0/dotnet-tac.dll", ["Filter"]);
+        ParserSettings settings = new ParserSettings("bin/Debug/net8.0/dotnet-tac.dll", ["NestedTryCatch"]);
         CodeBase codeBase = new CodeBase(settings);
         codeBase.Load();
     }

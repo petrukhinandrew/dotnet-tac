@@ -250,28 +250,15 @@ class StackMachine
                 continue;
             }
 
-            foreach (var block in _tryBlocks.Where(b => b.Begin == curInstr.idx))
-            {
-                _tac.Add(new ILEHStmt("try"));
-            }
-
             foreach (var catchBlock in _catchBlocks.Where(b => b.Begin == curInstr.idx))
             {
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(catchBlock.Type), "err"));
                 _tac.Add(new ILEHStmt("catch"));
             }
-            foreach (var block in _filterBlocks.Where(b => b.Begin == curInstr.idx))
+            foreach (var catchBlock in _filterBlocks.Where(b => b.Begin == curInstr.idx))
             {
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(System.Exception)), "err"));
-                _tac.Add(new ILEHStmt("filter"));
-            }
-            foreach (var block in _faultBlocks.Where(b => b.Begin == curInstr.idx))
-            {
-                _tac.Add(new ILEHStmt("fault"));
-            }
-            foreach (var block in _finallyBlocks.Where(b => b.Begin == curInstr.idx))
-            {
-                _tac.Add(new ILEHStmt("finally"));
+                _tac.Add(new ILEHStmt("catch"));
             }
 
             switch (instr.opCode.Name)
@@ -286,11 +273,20 @@ class StackMachine
 
                 case "nop":
                 case "break": break;
-
+                case "endfault":
+                    {
+                        _tac.Add(new ILEHStmt("endfault"));
+                        break;
+                    }
+                case "endfinally":
+                    {
+                        _tac.Add(new ILEHStmt("endfinally"));
+                        break;
+                    }
                 case "endfilter":
                     {
-                        ILExpr cond = ToSingleAddr(_stack.Peek());
-                        _tac.Add(new ILEHStmt("catchif " + cond.ToString()));
+                        // TODO check _stack.Pop();
+                        _tac.Add(new ILEHStmt("endfilter"));
                         break;
                     }
                 case "ldarg.0": _stack.Push(_params[0]); break;
@@ -342,8 +338,6 @@ class StackMachine
                         break;
                     }
                 // case "localloc":
-                // case "endfault":
-                // case "endfinally":
                 // obj model
                 // cpobj
                 // initobj
@@ -994,28 +988,6 @@ class StackMachine
                     }
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
             }
-            foreach (var block in _faultBlocks.Where(b => b.End == curInstr.idx))
-            {
-                _tac.Add(new ILEHStmt("endfault"));
-            }
-            foreach (var block in _finallyBlocks.Where(b => b.End == curInstr.idx))
-            {
-                _tac.Add(new ILEHStmt("endfinally"));
-            }
-            foreach (var block in _filterBlocks.Where(b => b.End == curInstr.idx))
-            {
-                _tac.Add(new ILEHStmt("endfiltercatch"));
-            }
-            foreach (var block in _catchBlocks.Where(b => b.End == curInstr.idx))
-            {
-                _tac.Add(new ILEHStmt("endcatch"));
-            }
-
-            foreach (var block in _tryBlocks.Where(b => b.End == curInstr.idx))
-            {
-                _tac.Add(new ILEHStmt("endtry"));
-            }
-
 
             if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _nextTacLineIdx;
             curInstr = curInstr.next;
