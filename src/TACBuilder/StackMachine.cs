@@ -250,6 +250,8 @@ class StackMachine
                 continue;
             }
 
+            if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _nextTacLineIdx;
+
             foreach (var catchBlock in _catchBlocks.Where(b => b.Begin == curInstr.idx))
             {
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(catchBlock.Type), "err"));
@@ -258,9 +260,7 @@ class StackMachine
             foreach (var catchBlock in _filterBlocks.Where(b => b.Begin == curInstr.idx))
             {
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(System.Exception)), "err"));
-                _tac.Add(new ILEHStmt("catch"));
             }
-
             switch (instr.opCode.Name)
             {
                 case "ckfinite":
@@ -989,7 +989,6 @@ class StackMachine
                 default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
             }
 
-            if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _nextTacLineIdx;
             curInstr = curInstr.next;
         }
         foreach (var l in labelsPool)
