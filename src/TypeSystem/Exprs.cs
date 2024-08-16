@@ -136,6 +136,7 @@ class PointerExprTypeResolver
                 {
                     return new ILManagedDeref(instance, type);
                 }
+            case ILNativeInt:
             case ILUnmanagedPointer:
                 {
                     return new ILUnmanagedDeref(instance, type);
