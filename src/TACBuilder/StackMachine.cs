@@ -354,7 +354,6 @@ class StackMachine
                 // ldvirtftn
                 // throw
                 // rethrow
-                // stobj
                 case "sizeof":
                     {
                         Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -405,10 +404,18 @@ class StackMachine
                     }
 
                 case "ldind.ref":
-                case "ldobj":
                     {
                         ILExpr addr = _stack.Pop();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILObject());
+                        _stack.Push(deref);
+                        break;
+                    }
+                case "ldobj":
+                    {
+                        Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (mbType == null) throw new Exception("type not resolved for ldobj");
+                        ILExpr addr = _stack.Pop();
+                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypeSolver.Resolve(mbType));
                         _stack.Push(deref);
                         break;
                     }
@@ -451,7 +458,15 @@ class StackMachine
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILObject()), val));
                         break;
                     }
-
+                case "stobj":
+                    {
+                        Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (mbType == null) throw new Exception("type not resolved for sizeof");
+                        ILExpr val = _stack.Pop();
+                        ILLValue addr = (ILLValue)_stack.Pop();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, TypeSolver.Resolve(mbType)), val));
+                        break;
+                    }
                 case "ldarga":
                     {
                         int idx = ((ILInstrOperand.Arg16)instr.arg).value;

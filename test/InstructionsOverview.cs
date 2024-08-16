@@ -132,6 +132,10 @@ class Instance(int tx = 1)
         x += 1;
     }
 }
+class InstanceChild() : Instance(2)
+{
+
+}
 static class NewInstTests
 {
     public static void ByValue()
@@ -163,6 +167,16 @@ static class NewInstTests
 }
 static unsafe class UnsafeTest
 {
+    unsafe struct LocalUnsafeStruct { }
+    public static void LdStObj()
+    {
+        LocalUnsafeStruct a, b;
+        LocalUnsafeStruct* ptr;
+        ptr = &b;
+        *ptr = a;
+        ref LocalUnsafeStruct r = ref a;
+        b = r;
+    }
     public static void SafeCopy(int[] source, int sourceOffset, int[] target,
             int targetOffset, int count)
     {
@@ -282,5 +296,9 @@ static unsafe class Misc
         int d = sizeof(double);
         int b = sizeof(bool);
         int s = sizeof(TestStruct);
+    }
+    public static void Copy()
+    {
+
     }
 }
