@@ -84,6 +84,7 @@ class ILMethod(ILType retType, string declType, string name, int argCount, ILExp
     public ILType Type => throw new NotImplementedException();
 
     // TODO declaringClass
+    // TODO handle constructors 
     public override string ToString()
     {
         return string.Format("{0} {1}({2})", ReturnType.ToString(), Name, string.Join(", ", Args.Select(p => p.ToString())));
@@ -94,6 +95,6 @@ class ILMethod(ILType retType, string declType, string name, int argCount, ILExp
     }
     public bool Returns()
     {
-        return ReturnType is not ILNull;
+        return ReturnType is not ILVoid && ReturnType is not ILNull;
     }
 }
