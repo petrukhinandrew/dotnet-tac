@@ -1168,6 +1168,7 @@ class StackMachine
         DumpMethodSignature();
         DumpLocalVars();
         DumpTAC();
+        Console.WriteLine("Left on stack: {0}", _stack.Count);
     }
     public void DumpLabels()
     {
