@@ -31,14 +31,16 @@ class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
     }
 }
 
-class ILTypeOfExpr : ILExpr
+class ILSizeOfExpr(ILType type) : ILExpr
 {
-    public ILType Type => throw new NotImplementedException();
+    public ILType Type => new ILUInt32();
+    public ILType Arg => type;
     public override string ToString()
     {
-        return "typeof ";
+        return "sizeof " + Arg.ToString();
     }
 }
+
 
 class ILNewArrayExpr(ILArray type, ILExpr size) : ILExpr
 {

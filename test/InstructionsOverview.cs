@@ -273,3 +273,14 @@ static class TryBlockTests
         }
     }
 }
+
+static unsafe class Misc
+{
+    public static void SizeOf()
+    {
+        int i = sizeof(Instance);
+        int d = sizeof(double);
+        int b = sizeof(bool);
+        int s = sizeof(TestStruct);
+    }
+}

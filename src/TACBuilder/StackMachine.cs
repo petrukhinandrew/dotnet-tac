@@ -352,13 +352,16 @@ class StackMachine
                 // stfld
                 // ldsflda
                 // ldvirtftn
-                // mkrefany
-                // refanytype
-                // refanyval
                 // throw
                 // rethrow
-                // sizeof
                 // stobj
+                case "sizeof":
+                    {
+                        Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (mbType == null) throw new Exception("type not resolved for sizeof");
+                        _stack.Push(new ILSizeOfExpr(TypeSolver.Resolve(mbType)));
+                        break;
+                    }
                 case "ldind.i1":
                 case "ldind.i2":
                 case "ldind.i4":
