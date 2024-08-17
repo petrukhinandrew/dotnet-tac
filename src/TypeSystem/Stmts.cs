@@ -1,6 +1,3 @@
-using System.Data;
-using Usvm.IL.Parser;
-
 namespace Usvm.IL.TypeSystem;
 interface ILStmt
 {

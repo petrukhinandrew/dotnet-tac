@@ -320,7 +320,6 @@ class StackMachine
                         new ILAssignStmt(GetNewStmtLoc(), _params[idx], _stack.Pop())
                         ); break;
                     }
-                // TODO add test
                 case "arglist":
                     {
                         _stack.Push(new ILVarArgValue(_methodInfo.Name));
@@ -348,9 +347,6 @@ class StackMachine
                         _stack.Push(new ILStackAlloc(size));
                         break;
                     }
-                // obj model
-                // initobj
-
                 // ldfld
                 // ldflda
 
@@ -815,6 +811,15 @@ class StackMachine
                             arrExpr
                         ));
                         _stack.Push(arrTemp);
+                        break;
+                    }
+                case "initobj":
+                    {
+                        Type? type = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (type == null) throw new Exception("type not resolved at " + instr.idx);
+                        ILExpr addr = PopSingleAddr();
+                        ILType ilType = TypeSolver.Resolve(type);
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, ilType), new ILNewDefaultExpr(ilType)));
                         break;
                     }
                 // TODO rework

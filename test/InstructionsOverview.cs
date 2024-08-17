@@ -1,11 +1,6 @@
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 
-
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography.X509Certificates;
-
 namespace Usvm.IL.Test.Instructions;
 
 public class OpsTest
@@ -61,6 +56,12 @@ static class CastTests
         int a = 1;
         object b = a;
         int c = (int)b;
+    }
+
+    public static void InitObj()
+    {
+        CastClassC c = new();
+        TestStruct t = new();
     }
 }
 

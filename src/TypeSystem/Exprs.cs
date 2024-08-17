@@ -21,6 +21,14 @@ class ILBinaryOperation(ILExpr lhs, ILExpr rhs) : ILExpr
     public new string ToString() => lhs.ToString() + " binOp " + rhs.ToString();
 }
 
+class ILNewDefaultExpr(ILType type) : ILExpr
+{
+    public ILType Type => type;
+    public override string ToString()
+    {
+        return string.Format("new {0}(default)", Type.ToString());
+    }
+}
 class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
 {
     public ILType Type => type;
