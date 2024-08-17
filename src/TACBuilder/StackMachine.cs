@@ -268,8 +268,11 @@ class StackMachine
                 case "refanytype":
                 case "refanyval":
                 case "jmp":
+                case "stelem.i":
+                case "ldelem.i":
                 case "initblk":
-                case "cpblk": throw new Exception("not implemented");
+                case "cpobj":
+                case "cpblk": throw new Exception("not implemented " + instr.opCode.Name);
 
                 case "nop":
                 case "break": break;
@@ -317,6 +320,7 @@ class StackMachine
                         new ILAssignStmt(GetNewStmtLoc(), _params[idx], _stack.Pop())
                         ); break;
                     }
+                // TODO add test
                 case "arglist":
                     {
                         _stack.Push(new ILVarArgValue(_methodInfo.Name));
@@ -345,13 +349,18 @@ class StackMachine
                         break;
                     }
                 // obj model
-                // cpobj
                 // initobj
+
+                // ldfld
+                // ldflda
+
                 // ldsfld
-                // stsfld
-                // stfld
                 // ldsflda
+
+                // stfld
+                // stsfld
                 // ldvirtftn
+
                 // throw
                 // rethrow
                 case "sizeof":
@@ -595,6 +604,7 @@ class StackMachine
                         }
                         break;
                     }
+                // TODO add special test 
                 case "calli":
                     {
                         byte[]? sig = safeSignatureResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -818,7 +828,6 @@ class StackMachine
                 case "ldelem.u8":
                 case "ldelem.r4":
                 case "ldelem.r8":
-                case "ldelem.i":
                 case "ldelem.ref":
                 case "ldelem":
                     {
@@ -849,7 +858,6 @@ class StackMachine
                 case "stelem.i8":
                 case "stelem.r4":
                 case "stelem.r8":
-                case "stelem.i":
                 case "stelem.ref":
                 case "stelem":
                     {
