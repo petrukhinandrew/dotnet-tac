@@ -129,14 +129,17 @@ class Instance(int tx = 1)
 {
     private int x = tx;
 
-    public void Do()
+    public virtual void Do()
     {
         x += 1;
     }
 }
 class InstanceChild() : Instance(2)
 {
+    public override void Do()
+    {
 
+    }
 }
 static class NewInstTests
 {
@@ -303,5 +306,13 @@ static unsafe class Misc
     public static void ArgList(__arglist)
     {
         ArgIterator args = new ArgIterator(__arglist);
+    }
+
+    public delegate void TestDelegate();
+    public static void Ldvirtftn()
+    {
+        InstanceChild child = new();
+        TestDelegate testDelegate = child.Do;
+        testDelegate();
     }
 }
