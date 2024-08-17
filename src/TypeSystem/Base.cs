@@ -33,7 +33,7 @@ class ILVarArgValue(string methodName) : ILValue
     private static ILType _instance = new ILHandleRef();
     public ILType Type => _instance;
     public string Method = methodName;
-    public override string ToString() => Method + ".Vararg";
+    public override string ToString() => Method + ".__arglist";
 
 }
 class ILLocal(ILType type, string name) : ILLValue

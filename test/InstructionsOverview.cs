@@ -2,6 +2,7 @@
 #pragma warning disable CS8500
 
 
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography.X509Certificates;
 
@@ -177,6 +178,7 @@ static unsafe class UnsafeTest
         ref LocalUnsafeStruct r = ref a;
         b = r;
     }
+
     public static void SafeCopy(int[] source, int sourceOffset, int[] target,
             int targetOffset, int count)
     {
@@ -297,8 +299,8 @@ static unsafe class Misc
         int b = sizeof(bool);
         int s = sizeof(TestStruct);
     }
-    public static void Copy()
+    public static void ArgList(__arglist)
     {
-
+        ArgIterator args = new ArgIterator(__arglist);
     }
 }
