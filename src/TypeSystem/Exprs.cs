@@ -120,14 +120,6 @@ class ILCallExpr(ILMethod method) : ILExpr
         return "invoke " + _method.ToString();
     }
 }
-class ILInstanceCallExpr(ILExpr instance, ILMethod method) : ILCallExpr(method)
-{
-    private ILExpr _instance = instance;
-    public override string ToString()
-    {
-        return "invoke " + _instance.ToString() + "." + _method.Name + "(" + string.Join(", ", _method.Args.Select(p => p.ToString())) + ")";
-    }
-}
 interface ILRefExpr : ILExpr
 {
     public ILExpr Value { get; }

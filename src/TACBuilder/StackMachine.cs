@@ -355,7 +355,7 @@ class StackMachine
 
                 // stfld
                 // stsfld
-                // ldvirtftn
+
 
                 // throw
                 // rethrow
@@ -529,6 +529,15 @@ class StackMachine
                         _stack.Push(ILMethod.FromMethodBase(mb));
                         break;
                     }
+                case "ldvirtftn":
+                    {
+                        MethodBase? mb = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
+                        if (mb == null) throw new Exception("method not resolved at " + instr.idx);
+                        ILMethod ilMethod = ILMethod.FromMethodBase(mb);
+                        ilMethod.Receiver = PopSingleAddr();
+                        _stack.Push(ilMethod);
+                        break;
+                    }
                 case "ldnull": _stack.Push(new ILNullValue()); break;
                 case "ldc.i4.m1":
                 case "ldc.i4.M1": PushLiteral(-1); break;
@@ -618,11 +627,9 @@ class StackMachine
                     {
                         MethodBase? method = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
                         if (method == null) throw new Exception("call not resolved at " + instr.idx);
-
                         ILMethod ilMethod = ILMethod.FromMethodBase(method);
                         ilMethod.LoadArgs(_stack);
-
-                        var call = new ILInstanceCallExpr(_stack.Pop(), ilMethod);
+                        var call = new ILCallExpr(ilMethod);
                         if (ilMethod.Returns())
                             _stack.Push(call);
                         else
