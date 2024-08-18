@@ -347,10 +347,23 @@ class StackMachine
                         _stack.Push(new ILStackAlloc(size));
                         break;
                     }
-                // ldfld
+                case "ldfld":
+                    {
+                        FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value, _methodInfo.DeclaringType!.GetGenericArguments(), _methodInfo.GetGenericArguments());
+                        if (mbField == null) throw new Exception("field not resolved at " + instr.idx);
+                        ILExpr inst = PopSingleAddr();
+                        _stack.Push(ILFieldRef.Instance(mbField, inst));
+                        break;
+                    }
                 // ldflda
 
-                // ldsfld
+                case "ldsfld":
+                    {
+                        FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value, _methodInfo.DeclaringType!.GetGenericArguments(), _methodInfo.GetGenericArguments());
+                        if (mbField == null) throw new Exception("field not resolved at " + instr.idx);
+                        _stack.Push(ILFieldRef.Static(mbField));
+                        break;
+                    }
                 // ldsflda
 
                 // stfld

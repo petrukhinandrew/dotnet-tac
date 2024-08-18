@@ -316,3 +316,22 @@ static unsafe class Misc
         testDelegate();
     }
 }
+
+static class Fields
+{
+    class Sample
+    {
+        public static int A = 1;
+        public int B = 1;
+    }
+    static void StaticField()
+    {
+        int x = Sample.A + 1;
+
+    }
+    static void InstanceField()
+    {
+        Sample s = new Sample();
+        int x = s.B + 1;
+    }
+}

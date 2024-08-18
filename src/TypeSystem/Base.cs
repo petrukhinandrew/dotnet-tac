@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Runtime.Versioning;
+using System.Security.Cryptography;
 
 namespace Usvm.IL.TypeSystem;
 
@@ -63,7 +64,7 @@ class ILLiteral(ILType type, string value) : ILValue
 
 }
 
-class ILMethod(ILType retType, string declType, string name, int argCount, ILExpr[] args) : ILValue
+class ILMethod(ILType retType, string declType, string name, int argCount, ILExpr[] args) : ILExpr
 {
     public static ILMethod FromMethodBase(MethodBase mb)
     {
@@ -113,5 +114,35 @@ class ILMethod(ILType retType, string declType, string name, int argCount, ILExp
     public bool Returns()
     {
         return ReturnType is not ILVoid && ReturnType is not ILNull;
+    }
+}
+
+class ILFieldRef(ILType type, string declType, string name, bool isStatic) : ILValue
+{
+    public static ILFieldRef Static(FieldInfo f)
+    {
+        return new ILFieldRef(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, true);
+    }
+    public static ILFieldRef Instance(FieldInfo f, ILExpr inst)
+    {
+        ILFieldRef field = new ILFieldRef(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, false)
+        {
+            Receiver = inst
+        };
+        return field;
+    }
+    public string DeclaringType = declType;
+    public string Name = name;
+    public bool IsStatic = isStatic;
+    public ILExpr? Receiver;
+    public ILType Type => type;
+    public override string ToString()
+    {
+        if (!IsStatic && Receiver == null) throw new Exception("instance field with null receiver");
+        return IsStatic switch
+        {
+            true => string.Format("{0}.{1}", DeclaringType, Name),
+            false => string.Format("{0}.{1}", Receiver!.ToString(), Name)
+        };
     }
 }
