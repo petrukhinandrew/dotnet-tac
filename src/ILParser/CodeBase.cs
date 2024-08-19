@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Runtime.Loader;
 using Usvm.IL.TACBuilder;
+using Usvm.IL.TypeSystem;
 using Usvm.IL.Utils;
 
 
@@ -57,16 +58,16 @@ class CodeBase : AssemblyLoadContext
     {
         Assembly asm = LoadFromAssemblyPath(_settings.DllPath);
 
-        Console.WriteLine("asm: {0}", asm.GetName().ToString());
-        Logger.PrintSeparator();
-        foreach (var mod in asm.GetModules().Where(m => m != null))
-        {
-            Console.WriteLine("module {0}", mod.ScopeName);
-        }
-        foreach (var mod in asm.GetLoadedModules().Where(m => m != null))
-        {
-            Console.WriteLine("loaded {0}", mod.Name);
-        }
+        // Console.WriteLine("asm: {0}", asm.GetName().ToString());
+        // Logger.PrintSeparator();
+        // foreach (var mod in asm.GetModules().Where(m => m != null))
+        // {
+        //     Console.WriteLine("module {0}", mod.ScopeName);
+        // }
+        // foreach (var mod in asm.GetLoadedModules().Where(m => m != null))
+        // {
+        //     Console.WriteLine("loaded {0}", mod.Name);
+        // }
 
         foreach (Module module in asm.GetLoadedModules())
         {
@@ -77,10 +78,11 @@ class CodeBase : AssemblyLoadContext
                     MethodBody? methodBody;
                     if ((methodBody = method.GetMethodBody()) != null)
                     {
-                        Console.WriteLine(type.FullName + ":" + method.Name);
+                        ILType ilType = TypeSolver.Resolve(type);
+                        Console.WriteLine(ilType.ToString());
                         try
                         {
-                            ILRewriter r = new ILRewriter(module);
+                            ILRewriter r = new ILRewriter(module, ILRewriterDumpMode.None);
 
                             r.ImportIL(methodBody);
                             r.ImportEH(methodBody);

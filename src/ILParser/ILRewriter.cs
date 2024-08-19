@@ -3,12 +3,22 @@ using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Usvm.IL.Parser;
+
+enum ILRewriterDumpMode
+{
+    None = 0,
+    ILOnly = 1,
+    ILAndEHS = 2
+}
+
 class ILRewriter
 {
     private Module _module;
-    public ILRewriter(Module mod)
+    private ILRewriterDumpMode _mode;
+    public ILRewriter(Module mod, ILRewriterDumpMode mode)
     {
         _module = mod;
+        _mode = mode;
     }
     byte[]? il;
     ILInstr[] offsetToInstr = [];
@@ -34,7 +44,7 @@ class ILRewriter
             return new ehClause(tryBegin, tryEnd, handlerBegin, handlerEnd, type);
         }
         exceptionHandlingClause[] clauses = methodBody.ExceptionHandlingClauses.Select(ehc => new exceptionHandlingClause(ehc)).ToArray();
-        Console.WriteLine("found {0} ehcs", clauses.Length);
+        if (_mode == ILRewriterDumpMode.ILAndEHS) Console.WriteLine("found {0} ehcs", clauses.Length);
         ehs = clauses.Select(parseEH).ToArray();
     }
     public ILInstr GetBeginning()
@@ -48,11 +58,11 @@ class ILRewriter
     public void ImportIL(MethodBody methodBody)
     {
         il = methodBody.GetILAsByteArray() ?? [];
-        Console.WriteLine("Importing IL with size of {0}", il.Length);
+        if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Importing IL with size of {0}", il.Length);
         offsetToInstr = new ILInstr[il.Length + 1];
         foreach (var v in methodBody.LocalVariables)
         {
-            Console.WriteLine("Local {0}", v.ToString());
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Local {0}", v.ToString());
         }
         int offset = 0;
         bool branch = false;
@@ -196,7 +206,7 @@ class ILRewriter
 
         foreach (var instr in ILInstrs())
         {
-            Console.WriteLine("IL_{0} {1} {2}", instr.idx, instr.ToString(), instr.arg.ToString());
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("IL_{0} {1} {2}", instr.idx, instr.ToString(), instr.arg.ToString());
             if (instr is ILInstr.Instr ilinstr)
             {
                 ILInstrOperand.Arg32 arg;
@@ -243,11 +253,11 @@ class ILRewriter
         try
         {
             Type t = _module.ResolveType(arg);
-            Console.WriteLine(" ∟--resolved {0}", t);
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {0}", t);
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving type " + e.Message);
         }
     }
     private void tryResolveMethod(int arg)
@@ -257,12 +267,12 @@ class ILRewriter
             MethodBase? mb = _module.ResolveMethod(arg);
             if (mb != null)
             {
-                Console.WriteLine(" ∟--resolved {1} {0}", mb.Name, mb.DeclaringType);
+                if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", mb.Name, mb.DeclaringType);
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving method " + e.Message);
         }
     }
     private void tryResolveField(int arg)
@@ -272,12 +282,12 @@ class ILRewriter
             FieldInfo? fi = _module.ResolveField(arg);
             if (fi != null)
             {
-                Console.WriteLine(" ∟--resolved {1} {0}", fi.Name, fi.DeclaringType);
+                if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", fi.Name, fi.DeclaringType);
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving field " + e.Message);
         }
     }
     private void tryResolveString(int arg)
@@ -285,11 +295,11 @@ class ILRewriter
         try
         {
             string res = _module.ResolveString(arg);
-            Console.WriteLine(" ∟--resolved `{0}`", res);
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving string " + e.Message);
         }
     }
     private void tryResolveToken(int arg)
@@ -298,11 +308,11 @@ class ILRewriter
         {
             MemberInfo? res = _module.ResolveMember(arg);
             if (res == null) return;
-            Console.WriteLine(" ∟--resolved `{0}`", res);
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving token " + e.Message);
         }
     }
 

@@ -1,6 +1,8 @@
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 
+using System.Diagnostics;
+
 namespace Usvm.IL.Test.Instructions;
 
 public class OpsTest
@@ -311,6 +313,18 @@ static class TryBlockTests
 
 static unsafe class Misc
 {
+    public static void Calli()
+    {
+        Instance i = new();
+        Instance* ptr = &i;
+        Action a = i.Do;
+        CalliTarget(&a);
+    }
+    public static void CalliTarget(Action* a)
+    {
+        (*a)();
+    }
+
     public static void SizeOf()
     {
         int i = sizeof(Instance);
