@@ -254,8 +254,9 @@ class StackMachine
 
             foreach (var catchBlock in _catchBlocks.Where(b => b.Begin == curInstr.idx))
             {
-                _stack.Push(new ILLiteral(TypeSolver.Resolve(catchBlock.Type), "err"));
-                _tac.Add(new ILEHStmt("catch"));
+                ILType type = TypeSolver.Resolve(catchBlock.Type);
+                _stack.Push(new ILLiteral(type, "err"));
+                _tac.Add(new ILCatchStmt(GetNewStmtLoc(), type));
             }
             foreach (var catchBlock in _filterBlocks.Where(b => b.Begin == curInstr.idx))
             {
@@ -325,20 +326,32 @@ class StackMachine
                         _stack.Push(new ILVarArgValue(_methodInfo.Name));
                         break;
                     }
+                case "throw":
+                    {
+                        ILExpr obj = PopSingleAddr();
+                        _stack.Clear();
+                        _tac.Add(new ILEHStmt(GetNewStmtLoc(), "throw", obj));
+                        break;
+                    }
+                case "rethrow":
+                    {
+                        _tac.Add(new ILEHStmt(GetNewStmtLoc(), "rethrow"));
+                        break;
+                    }
                 case "endfault":
                     {
-                        _tac.Add(new ILEHStmt("endfault"));
+                        _tac.Add(new ILEHStmt(GetNewStmtLoc(), "endfault"));
                         break;
                     }
                 case "endfinally":
                     {
-                        _tac.Add(new ILEHStmt("endfinally"));
+                        _tac.Add(new ILEHStmt(GetNewStmtLoc(), "endfinally"));
                         break;
                     }
                 case "endfilter":
                     {
-                        _stack.Pop();
-                        _tac.Add(new ILEHStmt("endfilter"));
+                        ILExpr value = PopSingleAddr();
+                        _tac.Add(new ILEHStmt(GetNewStmtLoc(), "endfilter", value));
                         break;
                     }
                 case "localloc":
@@ -414,9 +427,6 @@ class StackMachine
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), field, value));
                         break;
                     }
-
-                // throw
-                // rethrow
                 case "sizeof":
                     {
                         Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);

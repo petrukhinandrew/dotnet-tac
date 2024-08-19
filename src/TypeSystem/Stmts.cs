@@ -94,12 +94,26 @@ class ILIfStmt(ILStmtLocation location, ILExpr cond, ILStmtTargetLocation target
     }
 }
 
-class ILEHStmt(string value) : ILStmt
+class ILEHStmt(ILStmtLocation location, string value, ILExpr thrown) : ILStmt
 {
+    public ILEHStmt(ILStmtLocation location, string value) : this(location, value, new ILNullValue()) { }
     private string _value = value;
-    public ILStmtLocation Location => new ILStmtEHLocation();
+    private ILExpr _thrown = thrown;
+    public ILStmtLocation Location => location;
     public new string ToString()
     {
-        return Location.ToString() + _value;
+        if (_thrown is ILNullValue)
+            return string.Format("{0} {1}", Location.ToString(), _value);
+        else
+            return string.Format("{0} {1} {2}", Location.ToString(), _value, _thrown.ToString());
+    }
+}
+class ILCatchStmt(ILStmtLocation location, ILType thrown) : ILStmt
+{
+    public ILStmtLocation Location => location;
+    private ILType _thrown = thrown;
+    public override string ToString()
+    {
+        return string.Format("{0} catch {1}", Location.ToString(), _thrown.ToString());
     }
 }
