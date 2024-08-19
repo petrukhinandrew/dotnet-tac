@@ -395,9 +395,25 @@ class StackMachine
                         break;
                     }
 
-                // stfld
-                // stsfld
-
+                case "stfld":
+                    {
+                        FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value, _methodInfo.DeclaringType!.GetGenericArguments(), _methodInfo.GetGenericArguments());
+                        if (mbField == null) throw new Exception("field not resolved at " + instr.idx);
+                        ILExpr value = PopSingleAddr();
+                        ILExpr obj = PopSingleAddr();
+                        ILField field = ILField.Instance(mbField, obj);
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), field, value));
+                        break;
+                    }
+                case "stsfld":
+                    {
+                        FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value, _methodInfo.DeclaringType!.GetGenericArguments(), _methodInfo.GetGenericArguments());
+                        if (mbField == null) throw new Exception("field not resolved at " + instr.idx);
+                        ILExpr value = PopSingleAddr();
+                        ILField field = ILField.Static(mbField);
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), field, value));
+                        break;
+                    }
 
                 // throw
                 // rethrow

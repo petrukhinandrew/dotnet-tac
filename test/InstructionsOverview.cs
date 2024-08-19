@@ -324,13 +324,14 @@ static unsafe class Fields
         public static int A = 1;
         public int B = 1;
     }
-    static void StaticField()
+    static void StaticFieldLoad()
     {
         int x = Sample.A + 1;
         ref int Aref = ref Sample.A;
         Aref += 1;
     }
-    static void InstanceField()
+
+    static void InstanceFieldLoad()
     {
         Sample s = new Sample();
         int x = 1;
@@ -340,5 +341,11 @@ static unsafe class Fields
         }
         ref int r = ref s.B;
         x += r;
+    }
+    static void FieldStore()
+    {
+        Sample s = new Sample();
+        s.B += 1;
+        Sample.A += 2;
     }
 }

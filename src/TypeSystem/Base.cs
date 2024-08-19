@@ -117,7 +117,7 @@ class ILMethod(ILType retType, string declType, string name, int argCount, ILExp
     }
 }
 
-class ILField(ILType type, string declType, string name, bool isStatic) : ILValue
+class ILField(ILType type, string declType, string name, bool isStatic) : ILLValue
 {
     public static ILField Static(FieldInfo f)
     {
