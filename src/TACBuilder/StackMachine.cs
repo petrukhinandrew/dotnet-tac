@@ -361,7 +361,7 @@ class StackMachine
                         if (mbField == null) throw new Exception("field not resolved at " + instr.idx);
                         ILExpr inst = PopSingleAddr();
                         ILField field = ILField.Instance(mbField, inst);
-                        if (mbField.FieldType.IsUnmanaged())
+                        if (inst.Type is ILUnmanagedPointer)
                         {
                             _stack.Push(new ILUnmanagedRef(field));
                         }

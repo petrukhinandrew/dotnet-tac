@@ -338,5 +338,7 @@ static unsafe class Fields
         {
             x += *ptr;
         }
+        ref int r = ref s.B;
+        x += r;
     }
 }
