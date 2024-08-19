@@ -269,6 +269,7 @@ class StackMachine
                 case "refanytype":
                 case "refanyval":
                 case "jmp":
+                case "calli":
                 case "stelem.i":
                 case "ldelem.i":
                 case "initblk":
@@ -676,21 +677,7 @@ class StackMachine
                                 _tac.Add(new ILCallStmt(GetNewStmtLoc(), call));
                         }
                         break;
-                    }
-                // TODO add special test 
-                case "calli":
-                    {
-                        byte[]? sig = safeSignatureResolve(((ILInstrOperand.Arg32)instr.arg).value);
-                        if (sig == null) throw new Exception("signature not resolved at " + instr.idx);
-                        ILMethod ilMethod = (ILMethod)_stack.Pop();
-                        ilMethod.LoadArgs(_stack);
-                        var call = new ILCallExpr(ilMethod);
-                        if (ilMethod.Returns())
-                            _stack.Push(call);
-                        else
-                            _tac.Add(new ILCallStmt(GetNewStmtLoc(), call));
-                        break;
-                    }
+                    }                    
                 case "callvirt":
                     {
                         MethodBase? method = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -1110,7 +1097,6 @@ class StackMachine
         {
             l.Index = _labels[l.ILIndex]!.Value;
         }
-        // TODO trailing gotos
     }
     private void InlineInitArray(ILExpr[] args)
     {
@@ -1244,7 +1230,8 @@ class StackMachine
     }
     public string ListMethodSignature()
     {
-        return string.Format("{0} {1}({2})", _methodInfo.ReturnType, _methodInfo.Name, string.Join(", ", _methodInfo.GetParameters().Select(mi => mi.ToString())));
+        ILType retType = TypeSolver.Resolve(_methodInfo.ReturnType);
+        return string.Format("{0} {1}({2})", retType.ToString(), _methodInfo.Name, string.Join(", ", _methodInfo.GetParameters().Select(mi => TypeSolver.Resolve(mi.ParameterType).ToString())));
     }
     public void DumpMethodSignature()
     {
@@ -1277,8 +1264,9 @@ class StackMachine
         DumpMethodSignature();
         DumpLocalVars();
         DumpTAC();
-        Console.WriteLine("Left on stack: {0}", _stack.Count);
+        if (_stack.Count != 0) throw new Exception(_stack.Count.ToString() + " left on stack");
     }
+
     public void DumpLabels()
     {
         foreach (var (i, j) in _labels)
