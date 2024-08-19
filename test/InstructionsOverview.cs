@@ -247,6 +247,21 @@ static unsafe class UnsafeTest
 
 static class TryBlockTests
 {
+    public static void ThrowRethrow()
+    {
+        try
+        {
+            throw new NullReferenceException("text");
+        }
+        catch (NullReferenceException)
+        {
+            throw;
+        }
+        catch (Exception)
+        {
+
+        }
+    }
     public static void NestedTryCatch()
     {
         int t = 1;
