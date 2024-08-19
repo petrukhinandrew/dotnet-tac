@@ -874,7 +874,10 @@ class StackMachine
                             break;
                         }
                         ILExpr sizeExpr = _stack.Pop();
-                        // TODO check Int32 or Literal
+                        if (sizeExpr is not ILInt32 && sizeExpr is not ILNativeInt)
+                        {
+                            throw new Exception("expected arr size of type int32 or native int");
+                        }
                         ILArray resolvedType = new ILArray(TypeSolver.Resolve(arrType));
                         ILExpr arrExpr = new ILNewArrayExpr(
                             resolvedType,
