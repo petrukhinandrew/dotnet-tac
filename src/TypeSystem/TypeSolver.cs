@@ -78,4 +78,11 @@ static class TypeSolver
         int paramsCnt = int.Parse(tokens[1]);
         return string.Format("{0}.{1}<{2}>", nsName, name, string.Join(",", type.GenericTypeArguments.Select(t => Resolve(t).ToString())));
     }
+
+    class UnmanagedCheck<T> where T : unmanaged { }
+    public static bool IsUnmanaged(this Type t)
+    {
+        try { typeof(UnmanagedCheck<>).MakeGenericType(t); return true; }
+        catch (Exception) { return false; }
+    }
 }

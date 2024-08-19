@@ -317,7 +317,7 @@ static unsafe class Misc
     }
 }
 
-static class Fields
+static unsafe class Fields
 {
     class Sample
     {
@@ -327,11 +327,16 @@ static class Fields
     static void StaticField()
     {
         int x = Sample.A + 1;
-
+        ref int Aref = ref Sample.A;
+        Aref += 1;
     }
     static void InstanceField()
     {
         Sample s = new Sample();
-        int x = s.B + 1;
+        int x = 1;
+        fixed (int* ptr = &s.B)
+        {
+            x += *ptr;
+        }
     }
 }

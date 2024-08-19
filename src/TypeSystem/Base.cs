@@ -117,15 +117,15 @@ class ILMethod(ILType retType, string declType, string name, int argCount, ILExp
     }
 }
 
-class ILFieldRef(ILType type, string declType, string name, bool isStatic) : ILValue
+class ILField(ILType type, string declType, string name, bool isStatic) : ILValue
 {
-    public static ILFieldRef Static(FieldInfo f)
+    public static ILField Static(FieldInfo f)
     {
-        return new ILFieldRef(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, true);
+        return new ILField(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, true);
     }
-    public static ILFieldRef Instance(FieldInfo f, ILExpr inst)
+    public static ILField Instance(FieldInfo f, ILExpr inst)
     {
-        ILFieldRef field = new ILFieldRef(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, false)
+        ILField field = new ILField(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, false)
         {
             Receiver = inst
         };

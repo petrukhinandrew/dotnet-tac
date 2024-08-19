@@ -352,19 +352,48 @@ class StackMachine
                         FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value, _methodInfo.DeclaringType!.GetGenericArguments(), _methodInfo.GetGenericArguments());
                         if (mbField == null) throw new Exception("field not resolved at " + instr.idx);
                         ILExpr inst = PopSingleAddr();
-                        _stack.Push(ILFieldRef.Instance(mbField, inst));
+                        _stack.Push(ILField.Instance(mbField, inst));
                         break;
                     }
-                // ldflda
+                case "ldflda":
+                    {
+                        FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value, _methodInfo.DeclaringType!.GetGenericArguments(), _methodInfo.GetGenericArguments());
+                        if (mbField == null) throw new Exception("field not resolved at " + instr.idx);
+                        ILExpr inst = PopSingleAddr();
+                        ILField field = ILField.Instance(mbField, inst);
+                        if (mbField.FieldType.IsUnmanaged())
+                        {
+                            _stack.Push(new ILUnmanagedRef(field));
+                        }
+                        else
+                        {
+                            _stack.Push(new ILManagedRef(field));
+                        }
+                        break;
+                    }
 
                 case "ldsfld":
                     {
                         FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value, _methodInfo.DeclaringType!.GetGenericArguments(), _methodInfo.GetGenericArguments());
                         if (mbField == null) throw new Exception("field not resolved at " + instr.idx);
-                        _stack.Push(ILFieldRef.Static(mbField));
+                        _stack.Push(ILField.Static(mbField));
                         break;
                     }
-                // ldsflda
+                case "ldsflda":
+                    {
+                        FieldInfo? mbField = safeFieldResolve(((ILInstrOperand.Arg32)instr.arg).value, _methodInfo.DeclaringType!.GetGenericArguments(), _methodInfo.GetGenericArguments());
+                        if (mbField == null) throw new Exception("field not resolved at " + instr.idx);
+                        ILField field = ILField.Static(mbField);
+                        if (mbField.FieldType.IsUnmanaged())
+                        {
+                            _stack.Push(new ILUnmanagedRef(field));
+                        }
+                        else
+                        {
+                            _stack.Push(new ILManagedRef(field));
+                        }
+                        break;
+                    }
 
                 // stfld
                 // stsfld
