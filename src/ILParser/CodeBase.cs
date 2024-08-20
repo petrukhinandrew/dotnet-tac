@@ -82,7 +82,7 @@ class CodeBase : AssemblyLoadContext
                         Console.WriteLine(ilType.ToString());
                         try
                         {
-                            ILRewriter r = new ILRewriter(module, ILRewriterDumpMode.None);
+                            ILRewriter r = new ILRewriter(module, ILRewriterDumpMode.ILAndEHS);
 
                             r.ImportIL(methodBody);
                             r.ImportEH(methodBody);

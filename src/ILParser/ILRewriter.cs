@@ -45,6 +45,7 @@ class ILRewriter
         exceptionHandlingClause[] clauses = methodBody.ExceptionHandlingClauses.Select(ehc => new exceptionHandlingClause(ehc)).ToArray();
         if (_mode == ILRewriterDumpMode.ILAndEHS) Console.WriteLine("found {0} ehcs", clauses.Length);
         ehs = clauses.Select(parseEH).ToArray();
+        if (_mode == ILRewriterDumpMode.ILAndEHS) foreach(var ehc in ehs) Console.WriteLine(ehc);
     }
     public ILInstr GetBeginning()
     {
