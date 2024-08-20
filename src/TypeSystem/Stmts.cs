@@ -114,6 +114,6 @@ class ILCatchStmt(ILStmtLocation location, ILType thrown) : ILStmt
     private ILType _thrown = thrown;
     public override string ToString()
     {
-        return string.Format("{0} catch {1}", Location.ToString(), _thrown.ToString());
+        return string.Format("{0}catch {1}", Location.ToString(), _thrown.ToString());
     }
 }
