@@ -35,7 +35,7 @@ abstract class EHScope
         }
         public override string ToString()
         {
-            return string.Join(" ", new List<int>[tb, te, hb, he]);
+            return string.Join(" ", new int[] { tb, te, hb, he });
         }
         public override bool Equals(object? obj)
         {

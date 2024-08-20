@@ -146,7 +146,7 @@ class StackMachine
                 _stack.Push(new ILLiteral(type, "err"));
                 _tac.Add(new ILCatchStmt(GetNewStmtLoc(), type));
             }
-            foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.ilLoc.te == curInstr.idx))
+            foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.ilLoc.tb == curInstr.idx))
             {
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(System.Exception)), "err"));
             }
@@ -925,7 +925,7 @@ class StackMachine
                             Console.WriteLine("error resolving method at " + instr.idx);
                             break;
                         }
-                        ILExpr obj = PopSingleAddr();
+                        ILExpr obj = _stack.Pop(); // TODO
                         ILExpr res = new ILCondCastExpr(TypeSolver.Resolve(mbType), obj);
                         _stack.Push(res);
                         break;
