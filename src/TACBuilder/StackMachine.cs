@@ -146,9 +146,9 @@ class StackMachine
                 _stack.Push(new ILLiteral(type, "err"));
                 _tac.Add(new ILCatchStmt(GetNewStmtLoc(), type));
             }
-            foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.ilLoc.tb == curInstr.idx))
+            foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.other == curInstr.idx))
             {
-                _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(System.Exception)), "err"));
+                _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(Exception)), "err"));
             }
 
             switch (instr.opCode.Name)
@@ -240,7 +240,7 @@ class StackMachine
                     }
                 case "endfilter":
                     {
-                        ILExpr value = PopSingleAddr();
+                        ILExpr value = _stack.Peek();
                         _tac.Add(new ILEHStmt(GetNewStmtLoc(), "endfilter", value));
                         break;
                     }
@@ -925,7 +925,7 @@ class StackMachine
                             Console.WriteLine("error resolving method at " + instr.idx);
                             break;
                         }
-                        ILExpr obj = _stack.Pop(); // TODO
+                        ILExpr obj = PopSingleAddr();
                         ILExpr res = new ILCondCastExpr(TypeSolver.Resolve(mbType), obj);
                         _stack.Push(res);
                         break;

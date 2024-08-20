@@ -300,7 +300,7 @@ static class TryBlockTests
         {
             int x = 1;
         }
-        catch (DivideByZeroException)
+        catch (DivideByZeroException) 
         {
             int y = 1;
         }
