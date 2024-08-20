@@ -5,98 +5,6 @@ using Usvm.IL.TypeSystem;
 using Usvm.IL.Parser;
 
 namespace Usvm.IL.TACBuilder;
-abstract class ExceptionHandlingScope
-{
-    public ExceptionHandlingScope(int b, int e)
-    {
-        this.Begin = b;
-        this.End = e;
-    }
-    public int Begin, End;
-}
-class TryScope(int b, int e) : ExceptionHandlingScope(b, e)
-{
-    public static TryScope FromClause(ehClause clause)
-    {
-        return new TryScope(clause.tryBegin.idx, clause.tryEnd.idx);
-    }
-    public override bool Equals(object? obj)
-    {
-        return obj != null && obj is TryScope ts && Begin == ts.Begin && End == ts.End;
-    }
-    public override int GetHashCode()
-    {
-        return (Begin, End).GetHashCode();
-    }
-
-}
-class CatchScope(int b, int e, Type type) : ExceptionHandlingScope(b, e)
-{
-    public Type Type = type;
-    public static CatchScope FromClause(ehClause clause)
-    {
-        return new CatchScope(clause.handlerBegin.idx, clause.handlerEnd.idx, (clause.ehcType as rewriterEhcType.CatchEH)!.type);
-    }
-    public override bool Equals(object? obj)
-    {
-        return obj != null && obj is TryScope ts && Begin == ts.Begin && End == ts.End;
-    }
-    public override int GetHashCode()
-    {
-        return (Begin, End).GetHashCode();
-    }
-
-}
-
-class FilterScope(int b, int cb, int e) : ExceptionHandlingScope(b, e)
-{
-    public int CatchBegin = cb;
-
-    public static FilterScope FromClause(ehClause clause)
-    {
-        return new FilterScope((clause.ehcType as rewriterEhcType.FilterEH)!.instr.idx, clause.handlerBegin.idx, clause.handlerEnd.idx);
-    }
-    public override bool Equals(object? obj)
-    {
-        return obj != null && obj is FilterScope ts && Begin == ts.Begin && End == ts.End && CatchBegin == ts.CatchBegin;
-    }
-    public override int GetHashCode()
-    {
-        return (Begin, End).GetHashCode();
-    }
-}
-
-class FaultScope(int b, int e) : ExceptionHandlingScope(b, e)
-{
-    public static FaultScope FromClause(ehClause clause)
-    {
-        return new FaultScope(clause.handlerBegin.idx, clause.handlerEnd.idx);
-    }
-    public override bool Equals(object? obj)
-    {
-        return obj != null && obj is FaultScope ts && Begin == ts.Begin && End == ts.End;
-    }
-    public override int GetHashCode()
-    {
-        return (Begin, End).GetHashCode();
-    }
-}
-
-class FinallyScope(int b, int e) : ExceptionHandlingScope(b, e)
-{
-    public static FinallyScope FromClause(ehClause clause)
-    {
-        return new FinallyScope(clause.handlerBegin.idx, clause.handlerEnd.idx);
-    }
-    public override bool Equals(object? obj)
-    {
-        return obj != null && obj is FinallyScope ts && Begin == ts.Begin && End == ts.End;
-    }
-    public override int GetHashCode()
-    {
-        return (Begin, End).GetHashCode();
-    }
-}
 
 class StackMachine
 {
@@ -109,11 +17,7 @@ class StackMachine
     private List<ILStmt> _tac = new List<ILStmt>();
     private ILInstr _begin;
     private ehClause[] _ehs;
-    private List<TryScope> _tryBlocks = [];
-    private List<CatchScope> _catchBlocks = [];
-    private List<FilterScope> _filterBlocks = [];
-    private List<FinallyScope> _finallyBlocks = [];
-    private List<FaultScope> _faultBlocks = [];
+    private List<EHScope> _scopes = [];
     private Module _declaringModule;
     private MethodInfo _methodInfo;
 
@@ -126,53 +30,29 @@ class StackMachine
         _params = _methodInfo.GetParameters().OrderBy(p => p.Position).Select(l => new ILLocal(TypeSolver.Resolve(l.ParameterType), Logger.ArgVarName(l.Position))).ToList();
         _locals = locals.OrderBy(l => l.LocalIndex).Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), Logger.LocalVarName(l.LocalIndex))).ToList();
         _stack = new Stack<ILExpr>(maxDepth);
-        InitEHBlocs();
+        InitEHScopes();
         IntroduceLabels();
         ProcessIL();
+        UpdateEHScopes();
     }
 
-    private void InitEHBlocs()
+    private void InitEHScopes()
     {
         foreach (var ehc in _ehs)
         {
-            var tryBlock = TryScope.FromClause(ehc);
-            if (!_tryBlocks.Contains(tryBlock))
-            {
-                _tryBlocks.Add(tryBlock);
-            }
-            if (ehc.ehcType is rewriterEhcType.CatchEH)
-            {
-                var catchBlock = CatchScope.FromClause(ehc);
-                if (!_catchBlocks.Contains(catchBlock))
-                {
-                    _catchBlocks.Add(catchBlock);
-                }
-            }
-            if (ehc.ehcType is rewriterEhcType.FilterEH)
-            {
-                var filterBlock = FilterScope.FromClause(ehc);
-                if (!_filterBlocks.Contains(filterBlock))
-                {
-                    _filterBlocks.Add(filterBlock);
-                    Console.WriteLine("filter {0} {1} {2}", filterBlock.Begin, filterBlock.CatchBegin, filterBlock.End);
-                }
-            }
-            if (ehc.ehcType is rewriterEhcType.FinallyEH)
-            {
-                var finallyBlock = FinallyScope.FromClause(ehc);
-                if (!_finallyBlocks.Contains(finallyBlock))
-                {
-                    _finallyBlocks.Add(finallyBlock);
-                }
-            }
-            if (ehc.ehcType is rewriterEhcType.FaultEH)
-            {
-                var faultBlock = FaultScope.FromClause(ehc);
-                if (!_faultBlocks.Contains(faultBlock))
-                {
-                    _faultBlocks.Add(faultBlock);
-                }
-            }
+            EHScope scope = EHScope.FromClause(ehc);
+            if (!_scopes.Contains(scope))
+                _scopes.Add(scope);
+        }
+    }
+    private void UpdateEHScopes()
+    {
+        foreach (var scope in _scopes)
+        {
+            scope.tacLoc.tb = (int)_labels[scope.ilLoc.tb]!;
+            scope.tacLoc.te = (int)_labels[scope.ilLoc.te]!;
+            scope.tacLoc.hb = (int)_labels[scope.ilLoc.hb]!;
+            scope.tacLoc.he = (int)_labels[scope.ilLoc.he]!;
         }
     }
     private void PushLiteral<T>(T value)
@@ -190,6 +70,14 @@ class StackMachine
                 _labels.TryAdd(target.value.idx, null);
             }
             curInstr = curInstr.next;
+        }
+
+        foreach (var scope in _scopes)
+        {
+            foreach (int idx in scope.ilLoc.Indices())
+            {
+                _labels.TryAdd(idx, null);
+            }
         }
     }
 
@@ -252,16 +140,17 @@ class StackMachine
 
             if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _nextTacLineIdx;
 
-            foreach (var catchBlock in _catchBlocks.Where(b => b.Begin == curInstr.idx))
+            foreach (CatchScope scope in _scopes.Where(s => s is CatchScope cs && cs.ilLoc.hb == curInstr.idx))
             {
-                ILType type = TypeSolver.Resolve(catchBlock.Type);
+                ILType type = TypeSolver.Resolve(scope.Type);
                 _stack.Push(new ILLiteral(type, "err"));
                 _tac.Add(new ILCatchStmt(GetNewStmtLoc(), type));
             }
-            foreach (var catchBlock in _filterBlocks.Where(b => b.Begin == curInstr.idx))
+            foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.ilLoc.te == curInstr.idx))
             {
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(System.Exception)), "err"));
             }
+
             switch (instr.opCode.Name)
             {
                 case "ckfinite":
@@ -1221,14 +1110,14 @@ class StackMachine
         }
         return res;
     }
-    public string ListMethodSignature()
+    public string FormatMethodSignature()
     {
         ILType retType = TypeSolver.Resolve(_methodInfo.ReturnType);
         return string.Format("{0} {1}({2})", retType.ToString(), _methodInfo.Name, string.Join(", ", _methodInfo.GetParameters().Select(mi => TypeSolver.Resolve(mi.ParameterType).ToString())));
     }
     public void DumpMethodSignature()
     {
-        Console.WriteLine(ListMethodSignature());
+        Console.WriteLine(FormatMethodSignature());
     }
     public void DumpLocalVars()
     {
@@ -1244,17 +1133,17 @@ class StackMachine
             Console.WriteLine(line.ToString());
         }
     }
-    public void DumpEHs()
+    public void DumpEHS()
     {
-        foreach (var ehc in _ehs)
+        foreach (var scope in _scopes)
         {
-            Console.WriteLine(ehc);
+            Console.WriteLine(scope.ToString());
         }
     }
     public void DumpAll()
     {
-        DumpEHs();
         DumpMethodSignature();
+        DumpEHS();
         DumpLocalVars();
         DumpTAC();
         if (_stack.Count != 0) throw new Exception(_stack.Count.ToString() + " left on stack");

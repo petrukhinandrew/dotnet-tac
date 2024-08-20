@@ -24,7 +24,6 @@ class ILRewriter
     ILInstr[] offsetToInstr = [];
     ILInstr back = new ILInstr.Back();
     ehClause[] ehs = [];
-    // Dictionary<int, List<>>
     public void ImportEH(MethodBody methodBody)
     {
         ehClause parseEH(exceptionHandlingClause c)
