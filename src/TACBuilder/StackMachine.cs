@@ -150,6 +150,10 @@ class StackMachine
             {
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(Exception)), "err"));
             }
+            foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.ilLoc.hb == curInstr.idx))
+            {
+                _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(Exception)), "err"));
+            }
 
             switch (instr.opCode.Name)
             {
@@ -240,7 +244,7 @@ class StackMachine
                     }
                 case "endfilter":
                     {
-                        ILExpr value = _stack.Peek();
+                        ILExpr value = PopSingleAddr();
                         _tac.Add(new ILEHStmt(GetNewStmtLoc(), "endfilter", value));
                         break;
                     }
@@ -521,7 +525,7 @@ class StackMachine
                         _stack.Push(dup);
                         break;
                     }
-                case "pop": _stack.Pop(); break;
+                case "pop": PopSingleAddr(); break;
                 case "ldtoken":
                     {
                         MethodBase? mbMethod = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -734,7 +738,7 @@ class StackMachine
                         ILExpr[] inParams = new ILExpr[arity];
                         for (int i = 0; i < arity; i++)
                         {
-                            inParams[i] = _stack.Pop();
+                            inParams[i] = PopSingleAddr();
                         }
                         _stack.Push(new ILNewExpr(
                             TypeSolver.Resolve(objType),

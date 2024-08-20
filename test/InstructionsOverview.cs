@@ -298,15 +298,9 @@ static class TryBlockTests
         int a = 1;
         try
         {
-            int x = 1;
         }
-        catch (DivideByZeroException) 
+        catch (DivideByZeroException) when (a == 1)
         {
-            int y = 1;
-        }
-        catch (Exception)
-        {
-
         }
     }
 }
