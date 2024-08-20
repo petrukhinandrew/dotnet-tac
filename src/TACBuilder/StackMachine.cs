@@ -293,25 +293,25 @@ class StackMachine
                 case "ldloc.s": _stack.Push(_locals[((ILInstrOperand.Arg8)instr.arg).value]); break;
                 case "stloc.0":
                     _tac.Add(
-                    new ILAssignStmt(GetNewStmtLoc(), _locals[0], _stack.Pop())
+                    new ILAssignStmt(GetNewStmtLoc(), _locals[0], PopSingleAddr())
                     ); break;
                 case "stloc.1":
                     _tac.Add(
-                    new ILAssignStmt(GetNewStmtLoc(), _locals[1], _stack.Pop())
+                    new ILAssignStmt(GetNewStmtLoc(), _locals[1], PopSingleAddr())
                     ); break;
                 case "stloc.2":
                     _tac.Add(
-                    new ILAssignStmt(GetNewStmtLoc(), _locals[2], _stack.Pop())
+                    new ILAssignStmt(GetNewStmtLoc(), _locals[2], PopSingleAddr())
                     ); break;
                 case "stloc.3":
                     _tac.Add(
-                    new ILAssignStmt(GetNewStmtLoc(), _locals[3], _stack.Pop())
+                    new ILAssignStmt(GetNewStmtLoc(), _locals[3], PopSingleAddr())
                     ); break;
                 case "stloc.s":
                     {
                         int idx = ((ILInstrOperand.Arg8)instr.arg).value;
                         _tac.Add(
-                        new ILAssignStmt(GetNewStmtLoc(), _locals[idx], _stack.Pop())
+                        new ILAssignStmt(GetNewStmtLoc(), _locals[idx], PopSingleAddr())
                         ); break;
                     }
                 case "starg":
@@ -319,7 +319,7 @@ class StackMachine
                     {
                         int idx = ((ILInstrOperand.Arg8)instr.arg).value;
                         _tac.Add(
-                        new ILAssignStmt(GetNewStmtLoc(), _params[idx], _stack.Pop())
+                        new ILAssignStmt(GetNewStmtLoc(), _params[idx], PopSingleAddr())
                         ); break;
                     }
                 case "arglist":
@@ -442,7 +442,7 @@ class StackMachine
                 case "ldind.u2":
                 case "ldind.u4":
                     {
-                        ILExpr addr = _stack.Pop();
+                        ILExpr addr = PopSingleAddr();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt32());
                         _stack.Push(deref);
                         break;
@@ -450,28 +450,28 @@ class StackMachine
                 case "ldind.u8":
                 case "ldind.i8":
                     {
-                        ILExpr addr = _stack.Pop();
+                        ILExpr addr = PopSingleAddr();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt64());
                         _stack.Push(deref);
                         break;
                     }
                 case "ldind.r4":
                     {
-                        ILExpr addr = _stack.Pop();
+                        ILExpr addr = PopSingleAddr();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
                         _stack.Push(deref);
                         break;
                     }
                 case "ldind.r8":
                     {
-                        ILExpr addr = _stack.Pop();
+                        ILExpr addr = PopSingleAddr();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
                         _stack.Push(deref);
                         break;
                     }
                 case "ldind.i":
                     {
-                        ILExpr addr = _stack.Pop();
+                        ILExpr addr = PopSingleAddr();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeInt());
                         _stack.Push(deref);
                         break;
@@ -479,7 +479,7 @@ class StackMachine
 
                 case "ldind.ref":
                     {
-                        ILExpr addr = _stack.Pop();
+                        ILExpr addr = PopSingleAddr();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILObject());
                         _stack.Push(deref);
                         break;
@@ -488,7 +488,7 @@ class StackMachine
                     {
                         Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
                         if (mbType == null) throw new Exception("type not resolved for ldobj");
-                        ILExpr addr = _stack.Pop();
+                        ILExpr addr = PopSingleAddr();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypeSolver.Resolve(mbType));
                         _stack.Push(deref);
                         break;
@@ -499,36 +499,36 @@ class StackMachine
                 case "stind.i4":
                 case "stind.i8":
                     {
-                        ILExpr val = _stack.Pop();
+                        ILExpr val = PopSingleAddr();
                         ILLValue addr = (ILLValue)PopSingleAddr();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILInt32()), val));
                         break;
                     }
                 case "stind.r4":
                     {
-                        ILExpr val = _stack.Pop();
-                        ILLValue addr = (ILLValue)_stack.Pop();
+                        ILExpr val = PopSingleAddr();
+                        ILLValue addr = (ILLValue)PopSingleAddr();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILFloat32()), val));
                         break;
                     }
                 case "stind.r8":
                     {
-                        ILExpr val = _stack.Pop();
-                        ILLValue addr = (ILLValue)_stack.Pop();
+                        ILExpr val = PopSingleAddr();
+                        ILLValue addr = (ILLValue)PopSingleAddr();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILFloat64()), val));
                         break;
                     }
                 case "stind.i":
                     {
-                        ILExpr val = _stack.Pop();
-                        ILLValue addr = (ILLValue)_stack.Pop();
+                        ILExpr val = PopSingleAddr();
+                        ILLValue addr = (ILLValue)PopSingleAddr();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILNativeInt()), val));
                         break;
                     }
                 case "stind.ref":
                     {
-                        ILExpr val = _stack.Pop();
-                        ILLValue addr = (ILLValue)_stack.Pop();
+                        ILExpr val = PopSingleAddr();
+                        ILLValue addr = (ILLValue)PopSingleAddr();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, new ILObject()), val));
                         break;
                     }
@@ -536,8 +536,8 @@ class StackMachine
                     {
                         Type? mbType = safeTypeResolve(((ILInstrOperand.Arg32)instr.arg).value);
                         if (mbType == null) throw new Exception("type not resolved for sizeof");
-                        ILExpr val = _stack.Pop();
-                        ILLValue addr = (ILLValue)_stack.Pop();
+                        ILExpr val = PopSingleAddr();
+                        ILLValue addr = (ILLValue)PopSingleAddr();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, TypeSolver.Resolve(mbType)), val));
                         break;
                     }
@@ -627,7 +627,7 @@ class StackMachine
                 case "ldstr": PushLiteral(safeStringResolve(((ILInstrOperand.Arg32)instr.arg).value)); break;
                 case "dup":
                     {
-                        ILExpr dup = ToSingleAddr(_stack.Pop());
+                        ILExpr dup = PopSingleAddr();
                         _stack.Push(dup);
                         _stack.Push(dup);
                         break;
@@ -677,7 +677,7 @@ class StackMachine
                                 _tac.Add(new ILCallStmt(GetNewStmtLoc(), call));
                         }
                         break;
-                    }                    
+                    }
                 case "callvirt":
                     {
                         MethodBase? method = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
@@ -805,8 +805,8 @@ class StackMachine
 
                         ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
                         PushLiteral<bool>(true);
-                        ILExpr rhs = _stack.Pop();
-                        ILExpr lhs = _stack.Pop();
+                        ILExpr rhs = PopSingleAddr();
+                        ILExpr lhs = PopSingleAddr();
                         _tac.Add(new ILIfStmt(
                             GetNewStmtLoc(),
                             new ILBinaryOperation(lhs, rhs),
@@ -823,8 +823,8 @@ class StackMachine
                     {
                         ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
                         PushLiteral<bool>(false);
-                        ILExpr rhs = _stack.Pop();
-                        ILExpr lhs = _stack.Pop();
+                        ILExpr rhs = PopSingleAddr();
+                        ILExpr lhs = PopSingleAddr();
                         _tac.Add(new ILIfStmt(
                             GetNewStmtLoc(),
                             new ILBinaryOperation(lhs, rhs),
@@ -860,7 +860,7 @@ class StackMachine
                             Console.WriteLine("error resolving method at " + instr.idx);
                             break;
                         }
-                        ILExpr sizeExpr = _stack.Pop();
+                        ILExpr sizeExpr = PopSingleAddr();
                         if (sizeExpr is not ILInt32 && sizeExpr is not ILNativeInt)
                         {
                             throw new Exception("expected arr size of type int32 or native int");
@@ -887,7 +887,6 @@ class StackMachine
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), PointerExprTypeResolver.DerefAs(addr, ilType), new ILNewDefaultExpr(ilType)));
                         break;
                     }
-                // TODO rework
                 case "ldelem.i1":
                 case "ldelem.i2":
                 case "ldelem.i4":
@@ -901,27 +900,24 @@ class StackMachine
                 case "ldelem.ref":
                 case "ldelem":
                     {
-                        // TODO separate cases depending on types
-                        ILExpr index = _stack.Pop();
-                        ILExpr arr = _stack.Pop();
-                        _stack.Push(new ILArrayAccess(
-                            arr, index));
+                        ILExpr index = PopSingleAddr();
+                        ILExpr arr = PopSingleAddr();
+                        _stack.Push(new ILArrayAccess(arr, index));
                         break;
                     }
                 case "ldelema":
                     {
-                        ILExpr idx = _stack.Pop();
-                        ILExpr arr = _stack.Pop();
+                        ILExpr idx = PopSingleAddr();
+                        ILExpr arr = PopSingleAddr();
                         _stack.Push(new ILManagedRef(new ILArrayAccess(arr, idx)));
                         break;
                     }
                 case "ldlen":
                     {
-                        ILExpr arr = _stack.Pop();
+                        ILExpr arr = PopSingleAddr();
                         _stack.Push(new ILArrayLength(arr));
                         break;
                     }
-                // TODO rework
                 case "stelem.i1":
                 case "stelem.i2":
                 case "stelem.i4":
@@ -931,15 +927,12 @@ class StackMachine
                 case "stelem.ref":
                 case "stelem":
                     {
-                        // TODO separate cases depending on types
-                        // TODO add mbAddTemp?
-                        ILExpr value = _stack.Pop();
-                        ILExpr index = _stack.Pop();
-                        ILExpr arr = _stack.Pop();
+                        ILExpr value = PopSingleAddr();
+                        ILExpr index = PopSingleAddr();
+                        ILExpr arr = PopSingleAddr();
                         _tac.Add(new ILAssignStmt(GetNewStmtLoc(), new ILArrayAccess(arr, index), value));
                         break;
                     }
-
                 case "conv.i1":
                 case "conv.i2":
                 case "conv.i4":
@@ -1088,7 +1081,7 @@ class StackMachine
                         _stack.Push(unboxed);
                         break;
                     }
-                default: Console.WriteLine("unhandled instr " + instr.ToString()); break;
+                default: throw new Exception("unhandled instr " + instr.ToString());
             }
 
             curInstr = curInstr.next;
