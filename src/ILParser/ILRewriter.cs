@@ -1,20 +1,29 @@
+using System.ComponentModel;
 using System.Reflection;
 using System.Reflection.Emit;
 
 namespace Usvm.IL.Parser;
+
+enum ILRewriterDumpMode
+{
+    None = 0,
+    ILOnly = 1,
+    ILAndEHS = 2
+}
+
 class ILRewriter
 {
     private Module _module;
-    public ILRewriter(Module mod)
+    private ILRewriterDumpMode _mode;
+    public ILRewriter(Module mod, ILRewriterDumpMode mode)
     {
         _module = mod;
+        _mode = mode;
     }
-    int offset = 0;
     byte[]? il;
-    ILInstr[]? offsetToInstr;
-    bool branch = false;
+    ILInstr[] offsetToInstr = [];
     ILInstr back = new ILInstr.Back();
-    ehClause[]? ehs;
+    ehClause[] ehs = [];
     public void ImportEH(MethodBody methodBody)
     {
         ehClause parseEH(exceptionHandlingClause c)
@@ -34,51 +43,55 @@ class ILRewriter
             return new ehClause(tryBegin, tryEnd, handlerBegin, handlerEnd, type);
         }
         exceptionHandlingClause[] clauses = methodBody.ExceptionHandlingClauses.Select(ehc => new exceptionHandlingClause(ehc)).ToArray();
-        Console.WriteLine("found {0} ehcs", clauses.Length);
+        if (_mode == ILRewriterDumpMode.ILAndEHS) Console.WriteLine("found {0} ehcs", clauses.Length);
         ehs = clauses.Select(parseEH).ToArray();
+        if (_mode == ILRewriterDumpMode.ILAndEHS) foreach(var ehc in ehs) Console.WriteLine(ehc);
     }
     public ILInstr GetBeginning()
     {
         return back.next;
     }
+    public ehClause[] GetEHs()
+    {
+        return ehs;
+    }
     public void ImportIL(MethodBody methodBody)
     {
         il = methodBody.GetILAsByteArray() ?? [];
-        Console.WriteLine("Importing IL with size of {0}", il.Length);
+        if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Importing IL with size of {0}", il.Length);
         offsetToInstr = new ILInstr[il.Length + 1];
         foreach (var v in methodBody.LocalVariables)
         {
-            Console.WriteLine("Local {0}", v.ToString());
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Local {0}", v.ToString());
         }
-
+        int offset = 0;
+        bool branch = false;
         while (offset < il.Length)
         {
             int opOffset = offset;
-            (OpCode op, int delta) = OpCodeOp.GetOpCode(il, offset);
-            offset += delta;
-            int size;
-            switch (op.OperandType)
+            (OpCode op, int d) = OpCodeOp.GetOpCode(il, offset);
+            offset += op.Size;
+            int size =
+            op.OperandType switch
             {
-                case OperandType.InlineNone:
-                case OperandType.InlineSwitch: size = 0; break;
-                case OperandType.ShortInlineVar:
-                case OperandType.ShortInlineI:
-                case OperandType.ShortInlineBrTarget: size = 1; break;
-                case OperandType.InlineVar: size = 2; break;
-                case OperandType.InlineI:
-                case OperandType.InlineMethod:
-                case OperandType.InlineType:
-                case OperandType.InlineString:
-                case OperandType.InlineSig:
-                case OperandType.InlineTok:
-                case OperandType.ShortInlineR:
-                case OperandType.InlineField:
-                case OperandType.InlineBrTarget: size = 4; break;
-                case OperandType.InlineI8:
-                case OperandType.InlineR: size = 8; break;
-                default:
-                    string exc = op.OperandType.ToString();
-                    throw new Exception("unreachable " + exc);
+                OperandType.InlineNone or
+                OperandType.InlineSwitch => 0,
+                OperandType.ShortInlineVar or
+                OperandType.ShortInlineI or
+                OperandType.ShortInlineBrTarget => 1,
+                OperandType.InlineVar => 2,
+                OperandType.InlineMethod or
+                OperandType.InlineI or
+                OperandType.InlineType or
+                OperandType.InlineString or
+                OperandType.InlineSig or
+                OperandType.InlineTok or
+                OperandType.ShortInlineR or
+                OperandType.InlineField or
+                OperandType.InlineBrTarget => 4,
+                OperandType.InlineI8 or
+                OperandType.InlineR => 8,
+                _ => throw new Exception("unreachable " + op.OperandType.ToString())
 
             };
             if (offset + size > il.Length) throw new Exception("IL stream unexpectedly ended!");
@@ -88,16 +101,21 @@ class ILRewriter
             switch (op.OperandType)
             {
                 case OperandType.InlineNone:
-                    instr.arg = new ILInstrOperand.NoArg();
-                    break;
+                    {
+                        instr.arg = new ILInstrOperand.NoArg();
+                        break;
+                    }
                 case OperandType.ShortInlineVar:
                 case OperandType.ShortInlineI:
-                    instr.arg = new ILInstrOperand.Arg8(il[offset]);
-                    break;
+                    {
+                        instr.arg = new ILInstrOperand.Arg8(il[offset]);
+                        break;
+                    }
                 case OperandType.InlineVar:
-                    instr.arg = new ILInstrOperand.Arg16(BitConverter.ToInt16(il, offset));
-                    break;
-
+                    {
+                        instr.arg = new ILInstrOperand.Arg16(BitConverter.ToInt16(il, offset));
+                        break;
+                    }
                 case OperandType.InlineI:
                 case OperandType.InlineMethod:
                 case OperandType.InlineType:
@@ -106,21 +124,31 @@ class ILRewriter
                 case OperandType.InlineTok:
                 case OperandType.ShortInlineR:
                 case OperandType.InlineField:
-                    instr.arg = new ILInstrOperand.Arg32(BitConverter.ToInt32(il, offset));
-                    break;
+                    {
+                        instr.arg = new ILInstrOperand.Arg32(BitConverter.ToInt32(il, offset));
+                        break;
+                    }
                 case OperandType.InlineI8:
                 case OperandType.InlineR:
-                    instr.arg = new ILInstrOperand.Arg64(BitConverter.ToInt64(il, offset));
-                    break;
+                    {
+                        instr.arg = new ILInstrOperand.Arg64(BitConverter.ToInt64(il, offset));
+                        break;
+                    }
                 case OperandType.ShortInlineBrTarget:
-                    instr.arg = new ILInstrOperand.Arg32(il[offset] + offset + sizeof(byte));
-                    branch = true;
-                    break;
+                    {
+                        int delta = Convert.ToInt32((sbyte)il[offset]);
+
+                        instr.arg = new ILInstrOperand.Arg32(offset + delta + sizeof(sbyte));
+                        branch = true;
+                        break;
+                    }
                 case OperandType.InlineBrTarget:
-                    int d = BitConverter.ToInt32(il, offset);
-                    instr.arg = new ILInstrOperand.Arg32(d + sizeof(int) + offset);
-                    branch = true;
-                    break;
+                    {
+                        int delta = BitConverter.ToInt32(il, offset);
+                        instr.arg = new ILInstrOperand.Arg32(delta + sizeof(int) + offset);
+                        branch = true;
+                        break;
+                    }
                 case OperandType.InlineSwitch:
                     int sizeOfInt = sizeof(int);
                     if (offset + sizeOfInt > il.Length)
@@ -152,7 +180,6 @@ class ILRewriter
 
             }
             offset += size;
-
         }
         if (offset != il.Length)
         {
@@ -179,13 +206,14 @@ class ILRewriter
 
         foreach (var instr in ILInstrs())
         {
-            Console.WriteLine("IL_{0} {1} {2}", instr.idx, instr.ToString(), instr.arg.ToString());
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("IL_{0} {1} {2}", instr.idx, instr.ToString(), instr.arg.ToString());
             if (instr is ILInstr.Instr ilinstr)
             {
                 ILInstrOperand.Arg32 arg;
                 switch (ilinstr.opCode.Name)
                 {
                     case "newarr":
+                    case "isinst":
                         arg = (ILInstrOperand.Arg32)ilinstr.arg;
                         tryResolveType(arg.value);
                         break;
@@ -225,11 +253,11 @@ class ILRewriter
         try
         {
             Type t = _module.ResolveType(arg);
-            Console.WriteLine(" ∟--resolved {0}", t);
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {0}", t);
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving type " + e.Message);
         }
     }
     private void tryResolveMethod(int arg)
@@ -239,12 +267,12 @@ class ILRewriter
             MethodBase? mb = _module.ResolveMethod(arg);
             if (mb != null)
             {
-                Console.WriteLine(" ∟--resolved {1} {0}", mb.Name, mb.DeclaringType);
+                if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", mb.Name, mb.DeclaringType);
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving method " + e.Message);
         }
     }
     private void tryResolveField(int arg)
@@ -254,12 +282,12 @@ class ILRewriter
             FieldInfo? fi = _module.ResolveField(arg);
             if (fi != null)
             {
-                Console.WriteLine(" ∟--resolved {1} {0}", fi.Name, fi.DeclaringType);
+                if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", fi.Name, fi.DeclaringType);
             }
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving field " + e.Message);
         }
     }
     private void tryResolveString(int arg)
@@ -267,11 +295,11 @@ class ILRewriter
         try
         {
             string res = _module.ResolveString(arg);
-            Console.WriteLine(" ∟--resolved `{0}`", res);
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving string " + e.Message);
         }
     }
     private void tryResolveToken(int arg)
@@ -280,11 +308,11 @@ class ILRewriter
         {
             MemberInfo? res = _module.ResolveMember(arg);
             if (res == null) return;
-            Console.WriteLine(" ∟--resolved `{0}`", res);
+            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
         }
         catch (Exception e)
         {
-            Console.WriteLine("error resolving {0}", e.Message);
+            throw new Exception("error resolving token " + e.Message);
         }
     }
 

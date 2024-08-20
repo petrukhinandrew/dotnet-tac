@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Usvm.IL.Parser;
+namespace Usvm.IL.Utils;
 
 public static class ReflectionUtils
 {
