@@ -62,7 +62,7 @@ class CatchScope(Type type) : EHScope
     }
     public override string ToString()
     {
-        return string.Format("catch {0}", tacLoc);
+        return string.Format("catch {0}", tacLoc.ToString());
     }
     public override bool Equals(object? obj)
     {
@@ -89,7 +89,7 @@ class FilterScope : EHScope
     }
     public override string ToString()
     {
-        return string.Format("filter {0} {1}", tacLoc, other);
+        return string.Format("filter {0} {1}", tacLoc.ToString(), other);
     }
     public override bool Equals(object? obj)
     {
@@ -112,7 +112,7 @@ class FaultScope : EHScope
     }
     public override string ToString()
     {
-        return string.Format("fault {0}", tacLoc);
+        return string.Format("fault {0}", tacLoc.ToString());
     }
     public override bool Equals(object? obj)
     {
@@ -135,7 +135,7 @@ class FinallyScope : EHScope
     }
     public override string ToString()
     {
-        return string.Format("finally {0}", tacLoc);
+        return string.Format("finally {0}", tacLoc.ToString());
     }
     public override bool Equals(object? obj)
     {
