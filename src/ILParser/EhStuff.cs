@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Reflection.Emit;
+using Microsoft.VisualBasic;
 
 namespace Usvm.IL.Parser;
 public abstract record ehcType
@@ -61,6 +63,10 @@ class ehClause
     public rewriterEhcType ehcType;
     public override string ToString()
     {
-        return string.Format("{0} {1} {2} {3} {4}", ehcType.ToString(), tryBegin.ToString(), tryEnd.ToString(), handlerBegin.ToString(), handlerEnd.ToString());
+        string extra = ehcType switch {
+            rewriterEhcType.FilterEH f => f.instr.idx.ToString(),
+            _ => ""
+        };
+        return string.Format("{0} {1} {2} {3} {4} {5}", ehcType.ToString(), tryBegin.idx.ToString(), tryEnd.idx.ToString(), handlerBegin.idx.ToString(), handlerEnd.idx.ToString(), extra);
     }
 }
