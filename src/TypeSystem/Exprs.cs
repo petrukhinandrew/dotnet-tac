@@ -12,13 +12,13 @@ class ILUnaryOperation(ILExpr operand) : ILExpr
     }
 }
 
-class ILBinaryOperation(ILExpr lhs, ILExpr rhs) : ILExpr
+class ILBinaryOperation(ILExpr lhs, ILExpr rhs, string op = " binop ") : ILExpr
 {
     public ILType Type => lhs.Type;
 
     public ILExpr Lhs => lhs;
     public ILExpr Rhs => rhs;
-    public new string ToString() => lhs.ToString() + " binOp " + rhs.ToString();
+    public new string ToString() => lhs.ToString() + op + rhs.ToString();
 }
 
 class ILNewDefaultExpr(ILType type) : ILExpr
