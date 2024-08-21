@@ -62,7 +62,7 @@ class StackMachine
             scope.tacLoc.he = (int)_labels[scope.ilLoc.he]!;
             if (scope is FilterScope filterScope)
             {
-                filterScope.other = (int)_labels[filterScope.other]!;
+                filterScope.fb = (int)_labels[filterScope.fb]!;
             }
         }
     }
@@ -89,7 +89,7 @@ class StackMachine
             {
                 _labels.TryAdd(idx, null);
             }
-            if (scope is FilterScope filterScope) _labels.TryAdd(filterScope.other, null);
+            if (scope is FilterScope filterScope) _labels.TryAdd(filterScope.fb, null);
         }
     }
 
@@ -157,7 +157,7 @@ class StackMachine
                 _stack.Push(_errs[scope.ErrIdx]);
                 _tac.Add(new ILCatchStmt(GetNewStmtLoc(), _errs[scope.ErrIdx]));
             }
-            foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.other == curInstr.idx))
+            foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.fb == curInstr.idx))
             {
                 _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(Exception)), "err"));
             }
@@ -585,6 +585,7 @@ class StackMachine
                         if (method == null) throw new Exception("call not resolved at " + instr.idx);
 
                         ILMethod ilMethod = ILMethod.FromMethodBase(method);
+                        // TODO it use raw stack.Pop inside, must be using PopSingle-like
                         ilMethod.LoadArgs(_stack);
                         if (ilMethod.IsInitializeArray())
                         {
