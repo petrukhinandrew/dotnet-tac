@@ -53,6 +53,7 @@ abstract class EHScope
 class CatchScope(Type type) : EHScope
 {
     public Type Type = type;
+    public int ErrIdx = 0;
     public static new CatchScope FromClause(ehClause clause)
     {
         return new CatchScope((clause.ehcType as rewriterEhcType.CatchEH)!.type)

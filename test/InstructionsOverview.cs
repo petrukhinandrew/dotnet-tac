@@ -302,6 +302,20 @@ static class TryBlockTests
         {
         }
     }
+    public static void CatchExceptionUsage()
+    {
+        try
+        {
+            int zero = 0;
+            int res = 7 / zero;
+        }
+        catch (DivideByZeroException e)
+        {
+            Console.WriteLine(e.Message);
+        } catch (Exception e) {
+            Console.WriteLine(e.StackTrace);
+        }
+    }
 }
 
 static unsafe class Misc

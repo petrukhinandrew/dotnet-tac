@@ -12,6 +12,7 @@ class StackMachine
     private List<ILLocal> _locals;
     private List<ILLocal> _params;
     private List<ILExpr> _temps = new List<ILExpr>();
+    private List<ILExpr> _errs = new List<ILExpr>();
     private Dictionary<int, int?> _labels = new Dictionary<int, int?>();
     private List<ILStmt> _tac = new List<ILStmt>();
     private ILInstr _begin;
@@ -30,7 +31,7 @@ class StackMachine
         _locals = locals.OrderBy(l => l.LocalIndex).Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), Logger.LocalVarName(l.LocalIndex))).ToList();
         _stack = new Stack<ILExpr>(maxDepth);
         InitEHScopes();
-        IntroduceLabels();
+        InitLabels();
         ProcessIL();
         UpdateEHScopes();
     }
@@ -41,7 +42,14 @@ class StackMachine
         {
             EHScope scope = EHScope.FromClause(ehc);
             if (!_scopes.Contains(scope))
+            {
+                if (scope is CatchScope cs)
+                {
+                    cs.ErrIdx = _errs.Count;
+                    _errs.Add(new ILLocal(TypeSolver.Resolve(cs.Type), Logger.ErrVarName(cs.ErrIdx)));
+                }
                 _scopes.Add(scope);
+            }
         }
     }
     private void UpdateEHScopes()
@@ -63,7 +71,7 @@ class StackMachine
         ILLiteral lit = new ILLiteral(TypeSolver.Resolve(typeof(T)), value?.ToString() ?? "");
         _stack.Push(lit);
     }
-    private void IntroduceLabels()
+    private void InitLabels()
     {
         ILInstr curInstr = _begin;
         while (curInstr != _begin.prev)
@@ -146,9 +154,8 @@ class StackMachine
 
             foreach (CatchScope scope in _scopes.Where(s => s is CatchScope cs && cs.ilLoc.hb == curInstr.idx))
             {
-                ILType type = TypeSolver.Resolve(scope.Type);
-                _stack.Push(new ILLiteral(type, "err"));
-                _tac.Add(new ILCatchStmt(GetNewStmtLoc(), type));
+                _stack.Push(_errs[scope.ErrIdx]);
+                _tac.Add(new ILCatchStmt(GetNewStmtLoc(), _errs[scope.ErrIdx]));
             }
             foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.other == curInstr.idx))
             {
@@ -1101,40 +1108,36 @@ class StackMachine
         }
     }
 
-    public List<string> FormatLocalVars()
+    private List<string> FormatAnyVars(List<ILExpr> vars, Func<int, string> nameGen)
     {
         List<string> res = new List<string>();
-
-        Dictionary<ILType, List<int>> locals = new Dictionary<ILType, List<int>>();
-        for (int i = 0; i < _locals.Count; i++)
+        Dictionary<ILType, List<int>> typeGroupping = new Dictionary<ILType, List<int>>();
+        for (int i = 0; i < vars.Count; i++)
         {
-            if (!locals.ContainsKey(_locals[i].Type))
+            if (!typeGroupping.ContainsKey(vars[i].Type))
             {
-                locals.Add(_locals[i].Type, []);
+                typeGroupping.Add(vars[i].Type, []);
             }
-            locals[_locals[i].Type].Add(i);
+            typeGroupping[vars[i].Type].Add(i);
         }
-        foreach (var mapping in locals)
+        foreach (var mapping in typeGroupping)
         {
-            string buf = string.Format("{0} {1}", mapping.Key.ToString(), string.Join(", ", mapping.Value.Select(v => Logger.LocalVarName(v))));
-            res.Add(buf);
-        }
-
-        Dictionary<ILType, List<int>> temps = new Dictionary<ILType, List<int>>();
-        for (int i = 0; i < _temps.Count; i++)
-        {
-            if (!temps.ContainsKey(_temps[i].Type))
-            {
-                temps.Add(_temps[i].Type, []);
-            }
-            temps[_temps[i].Type].Add(i);
-        }
-        foreach (var mapping in temps)
-        {
-            string buf = string.Format("{0} {1}", mapping.Key.ToString(), string.Join(", ", mapping.Value.Select(v => Logger.TempVarName(v))));
+            string buf = string.Format("{0} {1}", mapping.Key.ToString(), string.Join(", ", mapping.Value.Select(v => nameGen(v))));
             res.Add(buf);
         }
         return res;
+    }
+    private List<string> FormatTempVars()
+    {
+        return FormatAnyVars(_temps, Logger.TempVarName);
+    }
+    private List<string> FormatLocalVars()
+    {
+        return FormatAnyVars(_locals.Select(v => (ILExpr)v).ToList(), Logger.LocalVarName);
+    }
+    private List<string> FormatErrVars()
+    {
+        return FormatAnyVars(_errs, Logger.ErrVarName);
     }
     public string FormatMethodSignature()
     {
@@ -1152,9 +1155,9 @@ class StackMachine
             Console.WriteLine(scope.ToString());
         }
     }
-    public void DumpLocalVars()
+    public void DumpVars()
     {
-        foreach (var v in FormatLocalVars())
+        foreach (var v in FormatLocalVars().Concat(FormatTempVars()).Concat(FormatErrVars()))
         {
             Console.WriteLine(v);
         }
@@ -1170,7 +1173,7 @@ class StackMachine
     {
         DumpMethodSignature();
         DumpEHS();
-        DumpLocalVars();
+        DumpVars();
         DumpTAC();
         if (_stack.Count != 0) throw new Exception(_stack.Count.ToString() + " left on stack");
     }

@@ -108,12 +108,12 @@ class ILEHStmt(ILStmtLocation location, string value, ILExpr thrown) : ILStmt
             return string.Format("{0}{1} {2}", Location.ToString(), _value, _thrown.ToString());
     }
 }
-class ILCatchStmt(ILStmtLocation location, ILType thrown) : ILStmt
+class ILCatchStmt(ILStmtLocation location, ILExpr err) : ILStmt
 {
     public ILStmtLocation Location => location;
-    private ILType _thrown = thrown;
+    private ILExpr _err = err;
     public override string ToString()
     {
-        return string.Format("{0}catch {1}", Location.ToString(), _thrown.ToString());
+        return string.Format("{0}catch {1}", Location.ToString(), _err.ToString());
     }
 }
