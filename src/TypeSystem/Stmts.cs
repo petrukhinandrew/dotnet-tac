@@ -103,9 +103,9 @@ class ILEHStmt(ILStmtLocation location, string value, ILExpr thrown) : ILStmt
     public new string ToString()
     {
         if (_thrown is ILNullValue)
-            return string.Format("{0} {1}", Location.ToString(), _value);
+            return string.Format("{0}{1}", Location.ToString(), _value);
         else
-            return string.Format("{0} {1} {2}", Location.ToString(), _value, _thrown.ToString());
+            return string.Format("{0}{1} {2}", Location.ToString(), _value, _thrown.ToString());
     }
 }
 class ILCatchStmt(ILStmtLocation location, ILType thrown) : ILStmt
