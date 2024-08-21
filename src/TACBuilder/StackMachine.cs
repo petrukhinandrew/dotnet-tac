@@ -1101,7 +1101,7 @@ class StackMachine
         }
     }
 
-    public List<string> LocalVars()
+    public List<string> FormatLocalVars()
     {
         List<string> res = new List<string>();
 
@@ -1145,9 +1145,16 @@ class StackMachine
     {
         Console.WriteLine(FormatMethodSignature());
     }
+    public void DumpEHS()
+    {
+        foreach (var scope in _scopes)
+        {
+            Console.WriteLine(scope.ToString());
+        }
+    }
     public void DumpLocalVars()
     {
-        foreach (var v in LocalVars())
+        foreach (var v in FormatLocalVars())
         {
             Console.WriteLine(v);
         }
@@ -1157,13 +1164,6 @@ class StackMachine
         foreach (var line in _tac)
         {
             Console.WriteLine(line.ToString());
-        }
-    }
-    public void DumpEHS()
-    {
-        foreach (var scope in _scopes)
-        {
-            Console.WriteLine(scope.ToString());
         }
     }
     public void DumpAll()
