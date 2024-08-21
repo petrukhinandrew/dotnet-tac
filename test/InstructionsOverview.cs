@@ -297,9 +297,12 @@ static class TryBlockTests
         int a = 1;
         try
         {
+            int zero = 0;
+            int res = 7 / zero;
         }
-        catch (DivideByZeroException) when (a == 1)
+        catch (DivideByZeroException e) when (a == 1)
         {
+            Console.WriteLine(e.Message);
         }
     }
     public static void CatchExceptionUsage()
@@ -312,7 +315,9 @@ static class TryBlockTests
         catch (DivideByZeroException e)
         {
             Console.WriteLine(e.Message);
-        } catch (Exception e) {
+        }
+        catch (Exception e)
+        {
             Console.WriteLine(e.StackTrace);
         }
     }

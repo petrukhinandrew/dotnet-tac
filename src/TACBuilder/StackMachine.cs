@@ -43,10 +43,10 @@ class StackMachine
             EHScope scope = EHScope.FromClause(ehc);
             if (!_scopes.Contains(scope))
             {
-                if (scope is CatchScope cs)
+                if (scope is EHScopeWithVarIdx s)
                 {
-                    cs.ErrIdx = _errs.Count;
-                    _errs.Add(new ILLocal(TypeSolver.Resolve(cs.Type), Logger.ErrVarName(cs.ErrIdx)));
+                    s.ErrIdx = _errs.Count;
+                    _errs.Add(new ILLocal(TypeSolver.Resolve(s.Type), Logger.ErrVarName(s.ErrIdx)));
                 }
                 _scopes.Add(scope);
             }
@@ -159,7 +159,7 @@ class StackMachine
             }
             foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.fb == curInstr.idx))
             {
-                _stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(Exception)), "err"));
+                _stack.Push(_errs[scope.ErrIdx]);
             }
             foreach (FilterScope scope in _scopes.Where(b => b is FilterScope fs && fs.ilLoc.hb == curInstr.idx))
             {

@@ -1,7 +1,5 @@
-using System.Security.Claims;
 using Usvm.IL.Parser;
 namespace Usvm.IL.TACBuilder;
-
 
 abstract class EHScope
 {
@@ -49,11 +47,15 @@ abstract class EHScope
     }
     public ScopeLocation ilLoc = new(), tacLoc = new();
 }
-
-class CatchScope(Type type) : EHScope
+abstract class EHScopeWithVarIdx : EHScope
 {
-    public Type Type = type;
-    public int ErrIdx = 0;
+    public int ErrIdx;
+    public Type Type = typeof(Exception);
+}
+class CatchScope(Type type) : EHScopeWithVarIdx
+{
+    public new Type Type = type;
+    public new int ErrIdx = 0;
     public static new CatchScope FromClause(ehClause clause)
     {
         return new CatchScope((clause.ehcType as rewriterEhcType.CatchEH)!.type)
@@ -76,9 +78,10 @@ class CatchScope(Type type) : EHScope
 
 }
 
-class FilterScope : EHScope
+class FilterScope : EHScopeWithVarIdx
 {
     public int fb = -1;
+    public new int ErrIdx = 0;
     public static new FilterScope FromClause(ehClause clause)
     {
         FilterScope scope = new FilterScope
@@ -90,7 +93,7 @@ class FilterScope : EHScope
     }
     public override string ToString()
     {
-        return string.Format("filter {0} {1} {2} {3} {4} {5}", tacLoc.tb, tacLoc.te, fb, tacLoc.hb, tacLoc.he);
+        return string.Format("filter {5} {0} {1} {2} {3} {4}", tacLoc.tb, tacLoc.te, fb, tacLoc.hb, tacLoc.he, Logger.ErrVarName(ErrIdx));
     }
     public override bool Equals(object? obj)
     {

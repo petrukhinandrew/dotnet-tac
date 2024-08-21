@@ -81,6 +81,7 @@ class ILMethod(ILType retType, string declType, string name, int argCount, ILExp
             _methodBase = mb
         };
     }
+
     public void LoadArgs(Stack<ILExpr> stack)
     {
         for (int i = _argCount - 1; i >= 0; i--)
