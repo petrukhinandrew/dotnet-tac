@@ -1,7 +1,6 @@
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 
-using System.Diagnostics;
 
 namespace Usvm.IL.Test.Instructions;
 
