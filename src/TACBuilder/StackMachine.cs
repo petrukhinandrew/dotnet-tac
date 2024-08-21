@@ -150,7 +150,7 @@ class StackMachine
                 continue;
             }
 
-            if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _tac.Count;
+            if (_labels.ContainsKey(curInstr.idx) && instr.opCode.Name != "endfilter") _labels[curInstr.idx] = _tac.Count;
 
             foreach (CatchScope scope in _scopes.Where(s => s is CatchScope cs && cs.ilLoc.hb == curInstr.idx))
             {
@@ -1006,7 +1006,7 @@ class StackMachine
                     }
                 default: throw new Exception("unhandled instr " + instr.ToString());
             }
-
+            if (_labels.ContainsKey(curInstr.idx) && instr.opCode.Name == "endfilter") _labels[curInstr.idx] = _tac.Count - 1;
             curInstr = curInstr.next;
         }
         foreach (var l in labelsPool)
@@ -1177,6 +1177,7 @@ class StackMachine
         DumpVars();
         DumpTAC();
         if (_stack.Count != 0) throw new Exception(_stack.Count.ToString() + " left on stack");
+        DumpLabels();
     }
 
     public void DumpLabels()
