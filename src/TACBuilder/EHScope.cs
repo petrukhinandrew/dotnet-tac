@@ -78,19 +78,19 @@ class CatchScope(Type type) : EHScope
 
 class FilterScope : EHScope
 {
-    public int other = -1;
+    public int fb = -1;
     public static new FilterScope FromClause(ehClause clause)
     {
         FilterScope scope = new FilterScope
         {
             ilLoc = ScopeLocation.FromClause(clause),
-            other = (clause.ehcType as rewriterEhcType.FilterEH)!.instr.idx
+            fb = (clause.ehcType as rewriterEhcType.FilterEH)!.instr.idx
         };
         return scope;
     }
     public override string ToString()
     {
-        return string.Format("filter {0} {1}", tacLoc.ToString(), other);
+        return string.Format("filter {0} {1} {2} {3} {4} {5}", tacLoc.tb, tacLoc.te, fb, tacLoc.hb, tacLoc.he);
     }
     public override bool Equals(object? obj)
     {
