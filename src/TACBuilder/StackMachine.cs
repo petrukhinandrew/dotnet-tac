@@ -53,6 +53,10 @@ class StackMachine
             scope.tacLoc.te = (int)_labels[scope.ilLoc.te]!;
             scope.tacLoc.hb = (int)_labels[scope.ilLoc.hb]!;
             scope.tacLoc.he = (int)_labels[scope.ilLoc.he]!;
+            if (scope is FilterScope filterScope)
+            {
+                filterScope.other = (int)_labels[filterScope.other]!;
+            }
         }
     }
     private void PushLiteral<T>(T value)
@@ -78,6 +82,7 @@ class StackMachine
             {
                 _labels.TryAdd(idx, null);
             }
+            if (scope is FilterScope filterScope) _labels.TryAdd(filterScope.other, null);
         }
     }
 
