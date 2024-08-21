@@ -13,7 +13,6 @@ class StackMachine
     private List<ILLocal> _params;
     private List<ILExpr> _temps = new List<ILExpr>();
     private Dictionary<int, int?> _labels = new Dictionary<int, int?>();
-    private int _nextTacLineIdx = 0;
     private List<ILStmt> _tac = new List<ILStmt>();
     private ILInstr _begin;
     private ehClause[] _ehs;
@@ -117,7 +116,7 @@ class StackMachine
 
     private ILStmtLocation GetNewStmtLoc()
     {
-        return new ILStmtLocation(_nextTacLineIdx++);
+        return new ILStmtLocation(_tac.Count);
     }
     private ILLocal GetNewTemp(ILType type, ILExpr value)
     {
@@ -143,7 +142,7 @@ class StackMachine
                 continue;
             }
 
-            if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _nextTacLineIdx;
+            if (_labels.ContainsKey(curInstr.idx)) _labels[curInstr.idx] = _tac.Count;
 
             foreach (CatchScope scope in _scopes.Where(s => s is CatchScope cs && cs.ilLoc.hb == curInstr.idx))
             {
@@ -190,35 +189,53 @@ class StackMachine
                 case "ldloc": _stack.Push(_locals[((ILInstrOperand.Arg16)instr.arg).value]); break;
                 case "ldloc.s": _stack.Push(_locals[((ILInstrOperand.Arg8)instr.arg).value]); break;
                 case "stloc.0":
-                    _tac.Add(
-                    new ILAssignStmt(GetNewStmtLoc(), _locals[0], PopSingleAddr())
-                    ); break;
+                    {
+                        ILExpr value = PopSingleAddr();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), _locals[0], value));
+                        break;
+
+                    }
                 case "stloc.1":
-                    _tac.Add(
-                    new ILAssignStmt(GetNewStmtLoc(), _locals[1], PopSingleAddr())
-                    ); break;
+                    {
+                        ILExpr value = PopSingleAddr();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), _locals[1], value));
+                        break;
+
+                    }
                 case "stloc.2":
-                    _tac.Add(
-                    new ILAssignStmt(GetNewStmtLoc(), _locals[2], PopSingleAddr())
-                    ); break;
+                    {
+                        ILExpr value = PopSingleAddr();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), _locals[2], value));
+                        break;
+
+                    }
                 case "stloc.3":
-                    _tac.Add(
-                    new ILAssignStmt(GetNewStmtLoc(), _locals[3], PopSingleAddr())
-                    ); break;
+                    {
+                        ILExpr value = PopSingleAddr();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), _locals[3], value));
+                        break;
+
+                    }
                 case "stloc.s":
                     {
                         int idx = ((ILInstrOperand.Arg8)instr.arg).value;
-                        _tac.Add(
-                        new ILAssignStmt(GetNewStmtLoc(), _locals[idx], PopSingleAddr())
-                        ); break;
+                        ILExpr value = PopSingleAddr();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), _locals[idx], value));
+                        break;
                     }
                 case "starg":
+                    {
+                        int idx = ((ILInstrOperand.Arg16)instr.arg).value;
+                        ILExpr value = PopSingleAddr();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), _params[idx], value));
+                        break;
+                    }
                 case "starg.s":
                     {
                         int idx = ((ILInstrOperand.Arg8)instr.arg).value;
-                        _tac.Add(
-                        new ILAssignStmt(GetNewStmtLoc(), _params[idx], PopSingleAddr())
-                        ); break;
+                        ILExpr value = PopSingleAddr();
+                        _tac.Add(new ILAssignStmt(GetNewStmtLoc(), _params[idx], value));
+                        break;
                     }
                 case "arglist":
                     {
