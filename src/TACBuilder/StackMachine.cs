@@ -517,7 +517,8 @@ class StackMachine
                     {
                         MethodBase? mb = safeMethodResolve(((ILInstrOperand.Arg32)instr.arg).value);
                         if (mb == null) throw new Exception("method not resolved at " + instr.idx);
-                        _stack.Push(ILMethod.FromMethodBase(mb));
+                        ILMethod method = ILMethod.FromMethodBase(mb);
+                        _stack.Push(method);
                         break;
                     }
                 case "ldvirtftn":
@@ -1014,9 +1015,9 @@ class StackMachine
             l.Index = _labels[l.ILIndex]!.Value;
         }
     }
-    private void InlineInitArray(ILExpr[] args)
+    private void InlineInitArray(List<ILExpr> args)
     {
-        if (args.First() is ILLocal newArr && args.Last() is ILObjectLiteral ilObj)
+        if (args.Last() is ILLocal newArr && args.First() is ILObjectLiteral ilObj)
         {
             try
             {

@@ -1,3 +1,4 @@
+using System.CodeDom.Compiler;
 using System.Reflection;
 using System.Runtime.Versioning;
 using System.Security.Cryptography;
@@ -64,7 +65,7 @@ class ILLiteral(ILType type, string value) : ILValue
 
 }
 
-class ILMethod(ILType retType, string declType, string name, int argCount, ILExpr[] args) : ILExpr
+class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount) : ILExpr
 {
     public static ILMethod FromMethodBase(MethodBase mb)
     {
@@ -76,37 +77,40 @@ class ILMethod(ILType retType, string declType, string name, int argCount, ILExp
             retType = methodInfo.ReturnType;
         }
         ILType ilRetType = TypeSolver.Resolve(retType);
-        return new ILMethod(ilRetType, mb.DeclaringType?.FullName ?? "", mb.Name, paramCount, new ILExpr[paramCount])
-        {
-            _methodBase = mb
-        };
-    }
+        ILMethod method = new ILMethod(mb, ilRetType, mb.DeclaringType?.FullName ?? "", mb.Name, paramCount);
 
+        foreach (var t in mb.GetGenericArguments())
+        {
+            method.GenericArgs.Add(TypeSolver.Resolve(t));
+        }
+        return method;
+    }
     public void LoadArgs(Stack<ILExpr> stack)
     {
         for (int i = _argCount - 1; i >= 0; i--)
         {
-            Args[i] = stack.Pop();
+            Args.Add(stack.Pop());
         }
         if (_methodBase.CallingConvention.HasFlag(CallingConventions.HasThis))
             Receiver = stack.Pop();
     }
+    public bool IsGeneric => GenericArgs.Count > 0;
+    public List<ILType> GenericArgs = new List<ILType>();
     public ILType ReturnType = retType;
     public ILExpr Receiver = new ILNullValue();
     public string DeclaringType = declType;
     public string Name = name;
     private int _argCount = argCount;
-    public ILExpr[] Args = args;
-    private MethodBase _methodBase;
-    public ILType Type => throw new NotImplementedException();
+    public List<ILExpr> Args = new List<ILExpr>();
+    private MethodBase _methodBase = mb;
+    public ILType Type => ReturnType;
 
-    // TODO declaringClass
-    // TODO handle constructors 
     public override string ToString()
     {
+        string genericExtra = IsGeneric ? string.Format("<{0}>", string.Join(", ", GenericArgs.Select(a => a.ToString()))) : "";
         if (Receiver is ILNullValue)
-            return string.Format("{0} {1}({2})", ReturnType.ToString(), Name, string.Join(", ", Args.Select(p => p.ToString())));
-        return string.Format("{0} {1}.{2}({3})", ReturnType.ToString(), Receiver.ToString(), Name, string.Join(", ", Args.Select(p => p.ToString())));
+            return string.Format("{0} {1}{3}({2})", ReturnType.ToString(), Name, string.Join(", ", Args.Select(p => p.ToString())), genericExtra);
+        return string.Format("{0} {1}.{2}{4}({3})", ReturnType.ToString(), Receiver.ToString(), Name, string.Join(", ", Args.Select(p => p.ToString())), genericExtra);
     }
     public bool IsInitializeArray()
     {

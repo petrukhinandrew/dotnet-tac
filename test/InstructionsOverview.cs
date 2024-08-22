@@ -2,6 +2,11 @@
 #pragma warning disable CS8500
 
 
+using System.Formats.Asn1;
+using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
+using Usvm.IL.TACBuilder;
+
 namespace Usvm.IL.Test.Instructions;
 
 public class OpsTest
@@ -321,22 +326,43 @@ static class TryBlockTests
             Console.WriteLine(e.StackTrace);
         }
     }
+    public static void MultipleFinally()
+    {
+        try
+        {
+            try
+            {
+
+            }
+            finally
+            {
+
+            }
+        }
+        finally
+        {
+
+        }
+    }
+
 }
 
 static unsafe class Misc
 {
-    public static void Calli()
+    public static void Lambda()
     {
-        Instance i = new();
-        Instance* ptr = &i;
-        Action a = i.Do;
-        CalliTarget(&a);
+        int[] arr = { 1, 2, 3 };
+        string[] arr_s = arr.Select(e => e > 2 ? e.ToString() : "0").ToArray();
     }
-    public static void CalliTarget(Action* a)
+    public static void FuncPtrs()
     {
-        (*a)();
-    }
 
+    }
+    public static int SampleFunc()
+    {
+        return 1;
+
+    }
     public static void SizeOf()
     {
         int i = sizeof(Instance);

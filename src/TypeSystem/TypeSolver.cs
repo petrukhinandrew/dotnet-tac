@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Reflection;
 using Usvm.IL.Utils;
 
@@ -30,8 +31,11 @@ static class TypeSolver
             }
             else if (type.IsValueType)
             {
-                return new ILStructType(FormatStructName(type));
+                return new ILStructType(FormatObjectName(type));
             }
+        }
+        else if (type.IsFunctionPointer) {
+            throw new Exception("funcptr");
         }
         else if (type.IsPointer)
         {
@@ -61,11 +65,12 @@ static class TypeSolver
         }
         else if (type.IsInterface || type.IsClass)
         {
-            return new ILClassOrInterfaceType(type.FullName ?? type.AssemblyQualifiedName ?? type.Name);
+            return new ILClassOrInterfaceType(FormatObjectName(type));
         }
         throw new Exception("unhandled type " + type.ToString());
     }
-    private static string FormatStructName(Type type)
+
+    private static string FormatObjectName(Type type)
     {
         string nsName = type.Namespace ?? "ns";
         string rawName = type.Name;
