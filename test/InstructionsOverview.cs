@@ -253,6 +253,24 @@ static unsafe class UnsafeTest
 
 static class TryBlockTests
 {
+    public static void LeaveFromTry()
+    {
+        try
+        {
+            throw new Exception("Lolkek");
+        }
+        catch (Exception)
+        {
+            int a = 1;
+            return;
+        }
+        finally
+        {
+            Console.WriteLine("finally");
+        }
+    Kek:
+        return;
+    }
     public static void ThrowRethrow()
     {
         try

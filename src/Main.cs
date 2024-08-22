@@ -6,7 +6,7 @@ class Program
 {
     static void Main(string[] _)
     {
-        ParserSettings settings = new ParserSettings("bin/Debug/net8.0/dotnet-tac.dll", ["Lambda"]);
+        ParserSettings settings = new ParserSettings("bin/Debug/net8.0/dotnet-tac.dll", ["LeaveFromTry"]);
         CodeBase codeBase = new CodeBase(settings);
         codeBase.Load();
     }
