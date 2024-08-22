@@ -784,9 +784,9 @@ class StackMachine
                             break;
                         }
                         ILExpr sizeExpr = PopSingleAddr();
-                        if (sizeExpr is not ILInt32 && sizeExpr is not ILNativeInt)
+                        if (sizeExpr.Type is not ILInt32 && sizeExpr.Type is not ILNativeInt)
                         {
-                            throw new Exception("expected arr size of type int32 or native int");
+                            throw new Exception("expected arr size of type int32 or native int, got " + sizeExpr.Type.ToString());
                         }
                         ILArray resolvedType = new ILArray(TypeSolver.Resolve(arrType));
                         ILExpr arrExpr = new ILNewArrayExpr(
