@@ -150,4 +150,3 @@ class FinallyScope : EHScope
         return ilLoc.GetHashCode();
     }
 }
-

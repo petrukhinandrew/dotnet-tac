@@ -490,6 +490,7 @@ class StackMachine
                 case "leave":
                 case "leave.s":
                     {
+                        // leaves everything except, does not skip finally block only
                         ILStmtTargetLocation to = ResolveTargetLocation(instr, labelsPool);
                         _tac.Add(new ILGotoStmt(GetNewStmtLoc(), to));
                         _stack.Clear();
