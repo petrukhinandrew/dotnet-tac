@@ -1,119 +1,74 @@
 namespace Usvm.IL.TypeSystem;
-interface ILStmt
-{
-    public ILStmtLocation Location { get; }
-    public string ToString();
-}
-
-class ILStmtLocation(int index)
+abstract class ILStmt(int index)
 {
     public int Index = index;
-    public override string ToString()
+    public abstract new string ToString();
+    public override bool Equals(object? obj)
     {
-        return "TAC_" + Index.ToString() + " ";
+        return obj != null && obj is ILStmt stmt && stmt.Index == Index;
     }
-}
-class ILStmtEHLocation() : ILStmtLocation(-1)
-{
-    public override string ToString()
+    public override int GetHashCode()
     {
-        return "";
-    }
-}
-class ILStmtTargetLocation(int index, int ilIndex) : ILStmtLocation(index)
-{
-    public int ILIndex = ilIndex;
-}
-
-class ILAssignStmt : ILStmt
-{
-    public readonly ILLValue Lhs;
-    public readonly ILExpr Rhs;
-    public ILStmtLocation Location => _location;
-    private ILStmtLocation _location;
-    public ILAssignStmt(ILStmtLocation location, ILLValue lhs, ILExpr rhs)
-    {
-        Lhs = lhs;
-        Rhs = rhs;
-        _location = location;
-    }
-
-    public override string ToString()
-    {
-        return Location.ToString() + Lhs.ToString() + " = " + Rhs.ToString();
-    }
-}
-class ILCallStmt : ILStmt
-{
-    private ILStmtLocation _location;
-    public readonly ILCallExpr Call;
-    public ILCallStmt(ILStmtLocation location, ILCallExpr expr)
-    {
-        _location = location;
-        Call = expr;
-    }
-    public ILStmtLocation Location => _location;
-    public override string ToString()
-    {
-        return Location.ToString() + Call.ToString();
+        return Index;
     }
 }
 
-// return, leave, endfinally
-interface ILLeaveScopeStmt : ILStmt { }
+class ILAssignStmt(int index, ILLValue lhs, ILExpr rhs) : ILStmt(index)
+{
 
-class ILReturnStmt(ILStmtLocation location, ILExpr? retVal) : ILLeaveScopeStmt
+    public readonly ILLValue Lhs = lhs;
+    public readonly ILExpr Rhs = rhs;
+    public override string ToString()
+    {
+        return Lhs.ToString() + " = " + Rhs.ToString();
+    }
+}
+class ILCallStmt(int index, ILCallExpr expr) : ILStmt(index)
+{
+    public ILCallExpr Call = expr;
+    public override string ToString()
+    {
+        return Call.ToString();
+    }
+}
+
+class ILReturnStmt(int index, ILExpr? retVal) : ILStmt(index)
 {
     public ILExpr? RetVal => retVal;
-    public ILStmtLocation Location => location;
     public override string ToString()
     {
         string arg = retVal?.ToString() ?? "";
-        return Location.ToString() + "return " + arg;
+        return "return " + arg;
     }
 }
-interface ILBranchStmt : ILStmt { }
+abstract class ILBranchStmt(int index) : ILStmt(index) { }
 
-class ILGotoStmt(ILStmtLocation location, ILStmtTargetLocation target) : ILBranchStmt
+class ILGotoStmt(int index) : ILBranchStmt(index)
 {
-    public ILStmtLocation Location => location;
-    public ILStmtTargetLocation Target = target;
-    public new string ToString()
-    {
-        return Location.ToString() + "goto " + Target.Index.ToString();
-    }
-}
-
-class ILIfStmt(ILStmtLocation location, ILExpr cond, ILStmtTargetLocation target) : ILBranchStmt
-{
-    public ILStmtLocation Location => location;
-    public ILStmtTargetLocation Target = target;
-    public new string ToString()
-    {
-        return Location.ToString() + "if " + cond.ToString() + " goto " + Target.Index.ToString();
-    }
-}
-
-class ILEHStmt(ILStmtLocation location, string value, ILExpr thrown) : ILStmt
-{
-    public ILEHStmt(ILStmtLocation location, string value) : this(location, value, new ILNullValue()) { }
-    private string _value = value;
-    private ILExpr _thrown = thrown;
-    public ILStmtLocation Location => location;
-    public new string ToString()
-    {
-        if (_thrown is ILNullValue)
-            return string.Format("{0}{1}", Location.ToString(), _value);
-        else
-            return string.Format("{0}{1} {2}", Location.ToString(), _value, _thrown.ToString());
-    }
-}
-class ILCatchStmt(ILStmtLocation location, ILExpr err) : ILStmt
-{
-    public ILStmtLocation Location => location;
-    private ILExpr _err = err;
     public override string ToString()
     {
-        return string.Format("{0}catch {1}", Location.ToString(), _err.ToString());
+        return "goto";
+    }
+}
+
+class ILIfStmt(int index, ILExpr cond) : ILBranchStmt(index)
+{
+    public override string ToString()
+    {
+        return string.Format("if {0} goto ", cond.ToString());
+    }
+}
+
+class ILEHStmt(int index, string value, ILExpr thrown) : ILStmt(index)
+{
+    public ILEHStmt(int index, string value) : this(index, value, new ILNullValue()) { }
+    private string _value = value;
+    private ILExpr _thrown = thrown;
+    public override string ToString()
+    {
+        if (_thrown is ILNullValue)
+            return _value;
+        else
+            return string.Format("{0} {1}", _value, _thrown.ToString());
     }
 }
