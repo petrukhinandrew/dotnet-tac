@@ -4,12 +4,22 @@ using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
+class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr, ILStmt pred)
 {
-    private ILStmt _pred;
+    public (int, int) ilRange = (instr.idx, instr.idx);
+    private ILStmt _pred = pred;
     public Stack<ILExpr> Stack = stack;
+    public List<ILStmt> TacLines = new List<ILStmt>();
     public ILInstr.Instr CurInstr = instr;
     private MethodProcessor _mp = proc;
+    public static SMFrame CreateInitial(MethodProcessor mp)
+    {
+        return new SMFrame(mp, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr(), new ILStmtMark("entry"));
+    }
+    public void AdvanceILRange()
+    {
+        ilRange.Item2 += 1;
+    }
     public int StmtIndex
     {
         get
@@ -71,9 +81,7 @@ class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
     }
     public void NewLine(ILStmt line)
     {
-        _mp.Successors.Add(line, new List<ILStmt>());
-        _mp.Successors[_pred].Add(line);
-        _pred = line;
+        TacLines.Add(line);
     }
     public FieldInfo ResolveField(int target)
     {

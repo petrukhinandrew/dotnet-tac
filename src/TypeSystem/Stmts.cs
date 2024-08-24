@@ -12,7 +12,13 @@ abstract class ILStmt(int index)
         return Index;
     }
 }
-
+class ILStmtMark(string mark) : ILStmt(-1)
+{
+    public override string ToString()
+    {
+        return mark;
+    }
+}
 class ILAssignStmt(int index, ILLValue lhs, ILExpr rhs) : ILStmt(index)
 {
 

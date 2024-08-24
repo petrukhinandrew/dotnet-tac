@@ -15,6 +15,11 @@ static class TACLineBuilder
             tmp = tmp.next;
         return (ILInstr.Instr)tmp;
     }
+    // TODO return List<SMFrame> 
+    public static List<SMFrame> Branch(this SMFrame frame)
+    {
+        return [];
+    }
     public static void BuildNextLine(this SMFrame frame)
     {
         while (true)

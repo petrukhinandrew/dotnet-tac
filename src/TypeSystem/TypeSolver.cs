@@ -1,7 +1,3 @@
-using System.Globalization;
-using System.Reflection;
-using Usvm.IL.Utils;
-
 namespace Usvm.IL.TypeSystem;
 static class TypeSolver
 {
@@ -34,7 +30,8 @@ static class TypeSolver
                 return new ILStructType(FormatObjectName(type));
             }
         }
-        else if (type.IsFunctionPointer) {
+        else if (type.IsFunctionPointer)
+        {
             throw new Exception("funcptr");
         }
         else if (type.IsPointer)

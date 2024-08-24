@@ -2,6 +2,7 @@
 using System.Reflection;
 using Usvm.IL.TypeSystem;
 using Usvm.IL.Parser;
+using Microsoft.VisualBasic;
 
 namespace Usvm.IL.TACBuilder;
 
@@ -14,7 +15,7 @@ class MethodProcessor
     public List<ILLocal> Params;
     public List<ILExpr> Temps = new List<ILExpr>();
     public List<ILExpr> Errs = new List<ILExpr>();
-    public Dictionary<ILStmt, List<ILStmt>> Successors = new Dictionary<ILStmt, List<ILStmt>>();
+    public Dictionary<SMFrame, List<SMFrame>> Successors = new Dictionary<SMFrame, List<SMFrame>>();
     private ILInstr _begin;
     public List<EHScope> Scopes = [];
 
@@ -36,8 +37,24 @@ class MethodProcessor
         Params = methodInfo.GetParameters().OrderBy(p => p.Position).Select(l => new ILLocal(TypeSolver.Resolve(l.ParameterType), Logger.ArgVarName(l.Position))).ToList();
         Locals = locals.OrderBy(l => l.LocalIndex).Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), Logger.LocalVarName(l.LocalIndex))).ToList();
         InitEHScopes();
+        ProcessIL();
     }
-
+    public ILInstr GetBeginInstr()
+    {
+        return _begin;
+    }
+    private void ProcessIL()
+    {
+        SMFrame initial = SMFrame.CreateInitial(this);
+        List<SMFrame> branches = [initial];
+        while (branches.Count > 0)
+        {
+            var newBranches = branches.First().Branch();
+            Successors.GetValueOrDefault(branches.First(), []).AddRange(newBranches);
+            branches.AddRange(newBranches);
+            branches.RemoveAt(0);
+        }
+    }
     private void InitEHScopes()
     {
         foreach (var ehc in _ehs)

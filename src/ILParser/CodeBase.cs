@@ -86,8 +86,8 @@ class CodeBase : AssemblyLoadContext
 
                             r.ImportIL(methodBody);
                             r.ImportEH(methodBody);
-                            StackMachine sm = new StackMachine(module, method, methodBody.LocalVariables, methodBody.MaxStackSize, r.GetBeginning(), r.GetEHs());
-                            sm.DumpAll();
+                            MethodProcessor mp = new MethodProcessor(module, method, methodBody.LocalVariables, methodBody.MaxStackSize, r.GetBeginning(), r.GetEHs());
+                            mp.DumpAll();
 
                         }
                         catch (Exception e)
