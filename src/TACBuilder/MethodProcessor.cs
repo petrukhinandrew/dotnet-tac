@@ -3,6 +3,8 @@ using System.Reflection;
 using Usvm.IL.TypeSystem;
 using Usvm.IL.Parser;
 using Microsoft.VisualBasic;
+using System.Linq.Expressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Usvm.IL.TACBuilder;
 
@@ -15,7 +17,9 @@ class MethodProcessor
     public List<ILLocal> Params;
     public List<ILExpr> Temps = new List<ILExpr>();
     public List<ILExpr> Errs = new List<ILExpr>();
-    public Dictionary<SMFrame, List<SMFrame>> Successors = new Dictionary<SMFrame, List<SMFrame>>();
+    public List<ILStmt> Tac = new List<ILStmt>();
+    public Dictionary<SMFrame, List<int>> Successors = new Dictionary<SMFrame, List<int>>();
+    private Dictionary<int, SMFrame?> _blocks;
     private ILInstr _begin;
     public List<EHScope> Scopes = [];
 
@@ -27,10 +31,20 @@ class MethodProcessor
             return _stmtIndex++;
         }
     }
-
-    public MethodProcessor(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals, int maxDepth, ILInstr begin, ehClause[] ehs)
+    private Dictionary<int, ILInstr> _ilBlocks;
+    public ILInstr GetILInstr(int idx)
+    {
+        return _ilBlocks[idx];
+    }
+    public MethodProcessor(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals, Dictionary<int, ILInstr> blocks, ILInstr begin, ehClause[] ehs)
     {
         _begin = begin;
+        _blocks = new Dictionary<int, SMFrame?>();
+        _ilBlocks = blocks;
+        foreach (var b in blocks)
+        {
+            _blocks.Add(b.Key, null);
+        }
         _ehs = ehs;
         DeclaringModule = declaringModule;
         MethodInfo = methodInfo;
@@ -38,6 +52,7 @@ class MethodProcessor
         Locals = locals.OrderBy(l => l.LocalIndex).Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), Logger.LocalVarName(l.LocalIndex))).ToList();
         InitEHScopes();
         ProcessIL();
+        ComposeTac(0);
     }
     public ILInstr GetBeginInstr()
     {
@@ -45,14 +60,31 @@ class MethodProcessor
     }
     private void ProcessIL()
     {
-        SMFrame initial = SMFrame.CreateInitial(this);
-        List<SMFrame> branches = [initial];
-        while (branches.Count > 0)
+        _blocks[0] = SMFrame.CreateInitial(this);
+        List<int> queue = [0];
+        while (queue.Count > 0)
         {
-            var newBranches = branches.First().Branch();
-            Successors.GetValueOrDefault(branches.First(), []).AddRange(newBranches);
-            branches.AddRange(newBranches);
-            branches.RemoveAt(0);
+            var cur = queue.First();
+            queue.RemoveAt(0);
+            var branches = _blocks[cur]!.Branch();
+            Successors.TryAdd(_blocks[cur]!, []);
+            Successors.GetValueOrDefault(_blocks[cur]!, []).AddRange(branches);
+            foreach (var b in branches)
+            {
+                if (_blocks[b] == null)
+                {
+                    _blocks[b] = SMFrame.ContinueFrom(_blocks[cur]!, b);
+                    queue.Add(b);
+                }
+            }
+        }
+    }
+    private void ComposeTac(int idx)
+    {
+        Tac.AddRange(_blocks[idx]!.TacLines);
+        foreach (var t in Successors[_blocks[idx]!])
+        {
+            ComposeTac(t);
         }
     }
     private void InitEHScopes()

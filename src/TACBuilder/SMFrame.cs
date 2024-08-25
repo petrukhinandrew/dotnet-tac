@@ -4,17 +4,22 @@ using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr, ILStmt pred)
+class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
 {
     public (int, int) ilRange = (instr.idx, instr.idx);
-    private ILStmt _pred = pred;
     public Stack<ILExpr> Stack = stack;
     public List<ILStmt> TacLines = new List<ILStmt>();
     public ILInstr.Instr CurInstr = instr;
     private MethodProcessor _mp = proc;
     public static SMFrame CreateInitial(MethodProcessor mp)
     {
-        return new SMFrame(mp, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr(), new ILStmtMark("entry"));
+        return new SMFrame(mp, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
+    }
+    public static SMFrame ContinueFrom(SMFrame frame, int target)
+    {
+        ILExpr[] copy = new ILExpr[frame.Stack.Count];
+        frame.Stack.CopyTo(copy, 0);
+        return new SMFrame(frame._mp, new Stack<ILExpr>(copy), (ILInstr.Instr)frame._mp.GetILInstr(target));
     }
     public void AdvanceILRange()
     {
@@ -55,6 +60,14 @@ class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr, IL
             return _mp.Errs;
         }
     }
+    public string GetMethodName()
+    {
+        return _mp.MethodInfo.Name;
+    }
+    public Type GetMethodReturnType()
+    {
+        return _mp.MethodInfo.ReturnParameter.ParameterType;
+    }
     public ILExpr PopSingleAddr()
     {
         return ToSingleAddr(Stack.Pop());
@@ -83,6 +96,7 @@ class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr, IL
     {
         TacLines.Add(line);
     }
+    // public void 
     public FieldInfo ResolveField(int target)
     {
         return _mp.ResolveField(target);

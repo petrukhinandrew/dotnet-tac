@@ -21,6 +21,7 @@ class ILRewriter
         _mode = mode;
     }
     byte[]? il;
+    public Dictionary<int, ILInstr> Blocks = new Dictionary<int, ILInstr>();
     ILInstr[] offsetToInstr = [];
     ILInstr back = new ILInstr.Back();
     ehClause[] ehs = [];
@@ -45,7 +46,7 @@ class ILRewriter
         exceptionHandlingClause[] clauses = methodBody.ExceptionHandlingClauses.Select(ehc => new exceptionHandlingClause(ehc)).ToArray();
         if (_mode == ILRewriterDumpMode.ILAndEHS) Console.WriteLine("found {0} ehcs", clauses.Length);
         ehs = clauses.Select(parseEH).ToArray();
-        if (_mode == ILRewriterDumpMode.ILAndEHS) foreach(var ehc in ehs) Console.WriteLine(ehc.ToString());
+        if (_mode == ILRewriterDumpMode.ILAndEHS) foreach (var ehc in ehs) Console.WriteLine(ehc.ToString());
     }
     public ILInstr GetBeginning()
     {
@@ -66,6 +67,7 @@ class ILRewriter
         }
         int offset = 0;
         bool branch = false;
+        Blocks.Add(0, GetBeginning());
         while (offset < il.Length)
         {
             int opOffset = offset;
@@ -194,6 +196,8 @@ class ILRewriter
                     if (cur.arg is ILInstrOperand.Arg32 a32)
                     {
                         cur.arg = new ILInstrOperand.Target(offsetToInstr[a32.value]);
+                        Blocks.TryAdd(cur.next.idx, cur.next);
+                        Blocks.TryAdd(((ILInstrOperand.Target)cur.arg).value.idx, ((ILInstrOperand.Target)cur.arg).value);
                     }
                     else
                     {
@@ -366,7 +370,8 @@ public abstract record ILInstr
         what.prev.next = what;
         what.idx = what.prev.idx + 1;
     }
-    public record Instr(OpCode opCode, int offset) : ILInstr
+    public record
+    Instr(OpCode opCode, int offset) : ILInstr
     {
         public override string ToString()
         {

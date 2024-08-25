@@ -15,12 +15,7 @@ static class TACLineBuilder
             tmp = tmp.next;
         return (ILInstr.Instr)tmp;
     }
-    // TODO return List<SMFrame> 
-    public static List<SMFrame> Branch(this SMFrame frame)
-    {
-        return [];
-    }
-    public static void BuildNextLine(this SMFrame frame)
+    public static List<int> Branch(this SMFrame frame)
     {
         while (true)
         {
@@ -29,8 +24,6 @@ static class TACLineBuilder
                 frame.CurInstr = AdvanceIP(frame.CurInstr);
                 continue;
             }
-
-            // if (_labels.ContainsKey(frame.CurInstr.idx) && frame.CurInstr.opCode.Name != "endfilter") _labels[frame.CurInstr.idx] = _tac.Count;
 
             // foreach (CatchScope scope in _scopes.Where(s => s is CatchScope cs && cs.ilLoc.hb == frame.CurInstr.idx))
             // {
@@ -124,12 +117,11 @@ static class TACLineBuilder
                         frame.NewLine(new ILAssignStmt(frame.StmtIndex, frame.Params[idx], value));
                         break;
                     }
-                // TODO
-                // case "arglist":
-                //     {
-                //         frame.Stack.Push(new ILVarArgValue(.Name));
-                //         break;
-                //     }
+                case "arglist":
+                    {
+                        frame.Stack.Push(new ILVarArgValue(frame.GetMethodName()));
+                        break;
+                    }
                 case "throw":
                     {
                         ILExpr obj = frame.PopSingleAddr();
@@ -496,18 +488,15 @@ static class TACLineBuilder
 
                         break;
                     }
-
-                // TODO
-                // case "ret":
-                //     {
-                //         ILExpr? retVal = _methodInfo.ReturnParameter.ParameterType != typeof(void) ? frame.PopSingleAddr() : null;
-                //         frame.NewLine(
-                //             new ILReturnStmt(frame.StmtIndex, retVal)
-                //         );
-
-                //         break;
-                //     }
-
+                // TODO add multiple return test
+                case "ret":
+                    {
+                        ILExpr? retVal = frame.GetMethodReturnType() != typeof(void) ? frame.PopSingleAddr() : null;
+                        frame.NewLine(
+                            new ILReturnStmt(frame.StmtIndex, retVal)
+                        );
+                        return [];
+                    }
                 case "add":
                 case "add.ovf":
                 case "add.ovf.un":
@@ -559,86 +548,74 @@ static class TACLineBuilder
                         frame.Stack.Push(op);
                         break;
                     }
-                // TODO
-                // case "br.s":
-                // case "br":
-                //     {
-                //         ILStmtTargetLocation to = ResolveTargetLocation(frame.CurInstr, labelsPool);
-                //         frame.NewLine(new ILGotoStmt(frame.StmtIndex, to));
-                //         break;
-                //     }
-                // case "beq.s":
-                // case "beq":
 
-                // case "bne.un":
-                // case "bne.un.s":
+                case "br.s":
+                case "br":
+                    {
+                        return [((ILInstrOperand.Target)frame.CurInstr.arg).value.idx];
+                    }
+                case "beq.s":
+                case "beq":
 
-                // case "bge.un":
-                // case "bge.un.s":
-                // case "bge.s":
-                // case "bge":
+                case "bne.un":
+                case "bne.un.s":
 
-                // case "bgt.un":
-                // case "bgt.un.s":
-                // case "bgt.s":
-                // case "bgt":
+                case "bge.un":
+                case "bge.un.s":
+                case "bge.s":
+                case "bge":
 
-                // case "ble.un":
-                // case "ble.un.s":
-                // case "ble.s":
-                // case "ble":
+                case "bgt.un":
+                case "bgt.un.s":
+                case "bgt.s":
+                case "bgt":
 
-                // case "blt.un":
-                // case "blt.un.s":
-                // case "blt.s":
-                // case "blt":
+                case "ble.un":
+                case "ble.un.s":
+                case "ble.s":
+                case "ble":
 
-                //     {
-                //         ILStmtTargetLocation to = ResolveTargetLocation(frame.CurInstr, labelsPool);
-                //         ILExpr lhs = frame.PopSingleAddr();
-                //         ILExpr rhs = frame.PopSingleAddr();
-                //         frame.NewLine(new ILIfStmt(
-                //             frame.StmtIndex,
-                //             new ILBinaryOperation(lhs, rhs),
-                //             to
-                //         ));
-                //         break;
-                //     }
-                // case "brinst":
-                // case "brinst.s":
-                // case "brtrue.s":
-                // case "brtrue":
-                //     {
+                case "blt.un":
+                case "blt.un.s":
+                case "blt.s":
+                case "blt":
 
-                //         ILStmtTargetLocation to = ResolveTargetLocation(frame.CurInstr, labelsPool);
-                //         frame.PushLiteral<bool>(true);
-                //         ILExpr rhs = frame.PopSingleAddr();
-                //         ILExpr lhs = frame.PopSingleAddr();
-                //         frame.NewLine(new ILIfStmt(
-                //             frame.StmtIndex,
-                //             new ILBinaryOperation(lhs, rhs),
-                //             to
-                //         ));
-                //         break;
-                //     }
-                // case "brnull":
-                // case "brnull.s":
-                // case "brzero":
-                // case "brzero.s":
-                // case "brfalse.s":
-                // case "brfalse":
-                //     {
-                //         ILStmtTargetLocation to = ResolveTargetLocation(frame.CurInstr, labelsPool);
-                //         frame.PushLiteral<bool>(false);
-                //         ILExpr rhs = frame.PopSingleAddr();
-                //         ILExpr lhs = frame.PopSingleAddr();
-                //         frame.NewLine(new ILIfStmt(
-                //             frame.StmtIndex,
-                //             new ILBinaryOperation(lhs, rhs),
-                //             to
-                //         ));
-                //         break;
-                //     }
+                    {
+                        ILExpr lhs = frame.PopSingleAddr();
+                        ILExpr rhs = frame.PopSingleAddr();
+                        frame.NewLine(new ILIfStmt(
+                            frame.StmtIndex,
+                            new ILBinaryOperation(lhs, rhs)));
+                        return [((ILInstrOperand.Target)frame.CurInstr.arg).value.idx, frame.CurInstr.next.idx];
+                    }
+                case "brinst":
+                case "brinst.s":
+                case "brtrue.s":
+                case "brtrue":
+                    {
+                        frame.PushLiteral<bool>(true);
+                        ILExpr rhs = frame.PopSingleAddr();
+                        ILExpr lhs = frame.PopSingleAddr();
+                        frame.NewLine(new ILIfStmt(
+                            frame.StmtIndex,
+                            new ILBinaryOperation(lhs, rhs)));
+                        return [((ILInstrOperand.Target)frame.CurInstr.arg).value.idx, frame.CurInstr.next.idx];
+                    }
+                case "brnull":
+                case "brnull.s":
+                case "brzero":
+                case "brzero.s":
+                case "brfalse.s":
+                case "brfalse":
+                    {
+                        frame.PushLiteral<bool>(false);
+                        ILExpr rhs = frame.PopSingleAddr();
+                        ILExpr lhs = frame.PopSingleAddr();
+                        frame.NewLine(new ILIfStmt(
+                            frame.StmtIndex,
+                            new ILBinaryOperation(lhs, rhs)));
+                        return [((ILInstrOperand.Target)frame.CurInstr.arg).value.idx, frame.CurInstr.next.idx];
+                    }
                 case "newobj":
                     {
                         MethodBase mb = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);

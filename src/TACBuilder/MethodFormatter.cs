@@ -60,10 +60,18 @@ static class MethodFormatter
         }
     }
 
+    public static void DumpTAC(this MethodProcessor mp)
+    {
+        foreach (var l in mp.Tac)
+        {
+            Console.WriteLine(l.ToString());
+        }
+    }
     public static void DumpAll(this MethodProcessor mp)
     {
         mp.DumpMethodSignature();
         mp.DumpEHS();
         mp.DumpVars();
+        mp.DumpTAC();
     }
 }

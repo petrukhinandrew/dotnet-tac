@@ -1,12 +1,6 @@
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 
-
-using System.Formats.Asn1;
-using System.Reflection.Emit;
-using System.Runtime.CompilerServices;
-using Usvm.IL.TACBuilder;
-
 namespace Usvm.IL.Test.Instructions;
 
 public class OpsTest
@@ -268,8 +262,6 @@ static class TryBlockTests
         {
             Console.WriteLine("finally");
         }
-    Kek:
-        return;
     }
     public static void ThrowRethrow()
     {
