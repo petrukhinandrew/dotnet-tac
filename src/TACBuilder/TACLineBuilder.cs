@@ -8,20 +8,22 @@ namespace Usvm.IL.TACBuilder;
 
 static class TACLineBuilder
 {
-    private static ILInstr.Instr AdvanceIP(ILInstr.Instr ip)
+    private static ILInstr.Instr? AdvanceIP(ILInstr.Instr ip)
     {
         ILInstr tmp = ip.next;
         while (tmp is not ILInstr.Instr)
             tmp = tmp.next;
         return (ILInstr.Instr)tmp;
     }
-    public static List<int> Branch(this SMFrame frame)
+    public static void Branch(this SMFrame frame)
     {
         while (true)
         {
             if (frame.CurInstr is not ILInstr.Instr)
             {
-                frame.CurInstr = AdvanceIP(frame.CurInstr);
+                var next = AdvanceIP(frame.CurInstr!);
+                if (next == null) return;
+                frame.CurInstr = next;
                 continue;
             }
 
@@ -495,7 +497,7 @@ static class TACLineBuilder
                         frame.NewLine(
                             new ILReturnStmt(frame.StmtIndex, retVal)
                         );
-                        return [];
+                        return;
                     }
                 case "add":
                 case "add.ovf":
@@ -552,7 +554,8 @@ static class TACLineBuilder
                 case "br.s":
                 case "br":
                     {
-                        return [((ILInstrOperand.Target)frame.CurInstr.arg).value.idx];
+                        frame.ContinueTo(((ILInstrOperand.Target)frame.CurInstr.arg).value);
+                        return;
                     }
                 case "beq.s":
                 case "beq":
@@ -583,10 +586,14 @@ static class TACLineBuilder
                     {
                         ILExpr lhs = frame.PopSingleAddr();
                         ILExpr rhs = frame.PopSingleAddr();
+                        ILInstr tb = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
+                        ILInstr fb = frame.CurInstr.next;
                         frame.NewLine(new ILIfStmt(
                             frame.StmtIndex,
-                            new ILBinaryOperation(lhs, rhs)));
-                        return [((ILInstrOperand.Target)frame.CurInstr.arg).value.idx, frame.CurInstr.next.idx];
+                            new ILBinaryOperation(lhs, rhs),
+                            tb.idx));
+                        frame.ContinueTo(tb); frame.ContinueTo(fb);
+                        return;
                     }
                 case "brinst":
                 case "brinst.s":
@@ -596,10 +603,13 @@ static class TACLineBuilder
                         frame.PushLiteral<bool>(true);
                         ILExpr rhs = frame.PopSingleAddr();
                         ILExpr lhs = frame.PopSingleAddr();
+                        ILInstr tb = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
+                        ILInstr fb = frame.CurInstr.next;
                         frame.NewLine(new ILIfStmt(
                             frame.StmtIndex,
-                            new ILBinaryOperation(lhs, rhs)));
-                        return [((ILInstrOperand.Target)frame.CurInstr.arg).value.idx, frame.CurInstr.next.idx];
+                            new ILBinaryOperation(lhs, rhs), tb.idx));
+                        frame.ContinueTo(tb); frame.ContinueTo(fb);
+                        return;
                     }
                 case "brnull":
                 case "brnull.s":
@@ -611,10 +621,13 @@ static class TACLineBuilder
                         frame.PushLiteral<bool>(false);
                         ILExpr rhs = frame.PopSingleAddr();
                         ILExpr lhs = frame.PopSingleAddr();
+                        ILInstr tb = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
+                        ILInstr fb = frame.CurInstr.next;
                         frame.NewLine(new ILIfStmt(
                             frame.StmtIndex,
-                            new ILBinaryOperation(lhs, rhs)));
-                        return [((ILInstrOperand.Target)frame.CurInstr.arg).value.idx, frame.CurInstr.next.idx];
+                            new ILBinaryOperation(lhs, rhs), tb.idx));
+                        frame.ContinueTo(tb); frame.ContinueTo(fb);
+                        return;
                     }
                 case "newobj":
                     {
@@ -857,7 +870,9 @@ static class TACLineBuilder
                     }
                 default: throw new Exception("unhandled frame.CurInstr " + frame.CurInstr.ToString());
             }
-            frame.CurInstr = AdvanceIP(frame.CurInstr);
+            var adv = AdvanceIP(frame.CurInstr!);
+            if (adv == null) return;
+            frame.CurInstr = adv;
         }
     }
     private static void InlineInitArray(this SMFrame frame, List<ILExpr> args)

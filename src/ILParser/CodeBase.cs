@@ -86,7 +86,7 @@ class CodeBase : AssemblyLoadContext
 
                             r.ImportIL(methodBody);
                             r.ImportEH(methodBody);
-                            MethodProcessor mp = new MethodProcessor(module, method, methodBody.LocalVariables, r.Blocks, r.GetBeginning(), r.GetEHs());
+                            MethodProcessor mp = new MethodProcessor(module, method, methodBody.LocalVariables, r.GetBeginning(), r.GetEHs());
                             mp.DumpAll();
 
                         }

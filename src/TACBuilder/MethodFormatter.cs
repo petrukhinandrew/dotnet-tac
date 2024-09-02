@@ -67,11 +67,19 @@ static class MethodFormatter
             Console.WriteLine(l.ToString());
         }
     }
+    public static void DumpPredcessors(this MethodProcessor mp)
+    {
+        foreach (var s in mp.Successors)
+        {
+            Console.WriteLine("{0}: {1}", s.Key, string.Join(" ", s.Value));
+        }
+    }
     public static void DumpAll(this MethodProcessor mp)
     {
         mp.DumpMethodSignature();
-        mp.DumpEHS();
-        mp.DumpVars();
+        // mp.DumpEHS();
+        // mp.DumpVars();
+        mp.DumpPredcessors();
         mp.DumpTAC();
     }
 }

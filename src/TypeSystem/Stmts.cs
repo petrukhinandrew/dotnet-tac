@@ -57,11 +57,12 @@ class ILGotoStmt(int index) : ILBranchStmt(index)
     }
 }
 
-class ILIfStmt(int index, ILExpr cond) : ILBranchStmt(index)
+class ILIfStmt(int index, ILExpr cond, int t) : ILBranchStmt(index)
 {
+    private int _t = t;
     public override string ToString()
     {
-        return string.Format("if {0} goto ", cond.ToString());
+        return string.Format("if {0} goto {1}", cond.ToString(), _t);
     }
 }
 

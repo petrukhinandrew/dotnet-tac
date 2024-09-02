@@ -1,29 +1,30 @@
+using System.Formats.Tar;
+using System.Net.Http.Headers;
 using System.Reflection;
 using Usvm.IL.Parser;
 using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
+class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Instr instr)
 {
-    public (int, int) ilRange = (instr.idx, instr.idx);
     public Stack<ILExpr> Stack = stack;
+    public int Initl = initl;
     public List<ILStmt> TacLines = new List<ILStmt>();
     public ILInstr.Instr CurInstr = instr;
     private MethodProcessor _mp = proc;
+
     public static SMFrame CreateInitial(MethodProcessor mp)
     {
-        return new SMFrame(mp, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
+        return new SMFrame(mp, 0, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
     }
-    public static SMFrame ContinueFrom(SMFrame frame, int target)
+    public void ContinueTo(ILInstr instr)
     {
-        ILExpr[] copy = new ILExpr[frame.Stack.Count];
-        frame.Stack.CopyTo(copy, 0);
-        return new SMFrame(frame._mp, new Stack<ILExpr>(copy), (ILInstr.Instr)frame._mp.GetILInstr(target));
-    }
-    public void AdvanceILRange()
-    {
-        ilRange.Item2 += 1;
+        if (_mp.TacBlocks.ContainsKey(instr.idx)) return;
+        ILExpr[] stackCopy = new ILExpr[Stack.Count];
+        Stack.CopyTo(stackCopy, 0);
+        _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, instr.idx, new Stack<ILExpr>(stackCopy), (ILInstr.Instr)instr));
+        _mp.TacBlocks[instr.idx].Branch();
     }
     public int StmtIndex
     {
@@ -96,7 +97,7 @@ class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
     {
         TacLines.Add(line);
     }
-    // public void 
+
     public FieldInfo ResolveField(int target)
     {
         return _mp.ResolveField(target);
@@ -117,5 +118,17 @@ class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
     public string ResolveString(int target)
     {
         return _mp.ResolveString(target);
+    }
+    public override bool Equals(object? obj)
+    {
+        return obj != null && obj is SMFrame f && Initl == f.Initl;
+    }
+    public override int GetHashCode()
+    {
+        return Initl;
+    }
+    public override string ToString()
+    {
+        return Initl.ToString();
     }
 }

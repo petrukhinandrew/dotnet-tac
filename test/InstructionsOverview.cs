@@ -1,6 +1,8 @@
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 
+using System.Runtime.InteropServices;
+
 namespace Usvm.IL.Test.Instructions;
 
 public class OpsTest
@@ -85,7 +87,7 @@ static class ConditionsTests
             default: return x;
         }
     }
-    public static void Comps()
+    public static int Comps()
     {
         int a = 1;
         a = a + 1 + 2;
@@ -97,8 +99,11 @@ static class ConditionsTests
             if (a == c)
             {
                 a += 1;
+                return a;
             }
+            return b;
         }
+        return c;
     }
     public static int IfExample()
     {
