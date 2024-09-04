@@ -19,14 +19,6 @@ static class TACLineBuilder
     {
         while (true)
         {
-            if (frame.CurInstr is not ILInstr.Instr)
-            {
-                var next = AdvanceIP(frame.CurInstr!);
-                if (next == null) return;
-                frame.CurInstr = next;
-                continue;
-            }
-
             // foreach (CatchScope scope in _scopes.Where(s => s is CatchScope cs && cs.ilLoc.hb == frame.CurInstr.idx))
             // {
             //     frame.Stack.Push(frame.Errs[scope.ErrIdx]);
@@ -487,7 +479,6 @@ static class TACLineBuilder
                             frame.Stack.Push(call);
                         else
                             frame.NewLine(new ILCallStmt(frame.StmtIndex, call));
-
                         break;
                     }
                 // TODO add multiple return test
@@ -497,7 +488,7 @@ static class TACLineBuilder
                         frame.NewLine(
                             new ILReturnStmt(frame.StmtIndex, retVal)
                         );
-                        return;
+                        break;
                     }
                 case "add":
                 case "add.ovf":
@@ -554,7 +545,10 @@ static class TACLineBuilder
                 case "br.s":
                 case "br":
                     {
-                        frame.ContinueTo(((ILInstrOperand.Target)frame.CurInstr.arg).value);
+                        ILInstr target = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
+                        frame.ContinueTo(target);
+                        frame.NewLine(new ILGotoStmt(frame.StmtIndex, target.idx));
+                        frame.StopBranching();
                         return;
                     }
                 case "beq.s":
@@ -593,6 +587,8 @@ static class TACLineBuilder
                             new ILBinaryOperation(lhs, rhs),
                             tb.idx));
                         frame.ContinueTo(tb); frame.ContinueTo(fb);
+                        frame.NewLine(new ILGotoStmt(frame.StmtIndex, fb.idx));
+                        frame.StopBranching();
                         return;
                     }
                 case "brinst":
@@ -609,6 +605,9 @@ static class TACLineBuilder
                             frame.StmtIndex,
                             new ILBinaryOperation(lhs, rhs), tb.idx));
                         frame.ContinueTo(tb); frame.ContinueTo(fb);
+                        frame.NewLine(new ILGotoStmt(frame.StmtIndex, fb.idx));
+                        frame.StopBranching();
+
                         return;
                     }
                 case "brnull":
@@ -627,6 +626,8 @@ static class TACLineBuilder
                             frame.StmtIndex,
                             new ILBinaryOperation(lhs, rhs), tb.idx));
                         frame.ContinueTo(tb); frame.ContinueTo(fb);
+                        frame.NewLine(new ILGotoStmt(frame.StmtIndex, fb.idx));
+                        frame.StopBranching();
                         return;
                     }
                 case "newobj":
@@ -871,7 +872,7 @@ static class TACLineBuilder
                 default: throw new Exception("unhandled frame.CurInstr " + frame.CurInstr.ToString());
             }
             var adv = AdvanceIP(frame.CurInstr!);
-            if (adv == null) return;
+            if (adv == null || frame.IsLeader(adv)) return;
             frame.CurInstr = adv;
         }
     }

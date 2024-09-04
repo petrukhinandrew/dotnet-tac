@@ -1,5 +1,3 @@
-using System.Formats.Tar;
-using System.Net.Http.Headers;
 using System.Reflection;
 using Usvm.IL.Parser;
 using Usvm.IL.TypeSystem;
@@ -20,11 +18,22 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
     }
     public void ContinueTo(ILInstr instr)
     {
+        // TODO update successors
         if (_mp.TacBlocks.ContainsKey(instr.idx)) return;
         ILExpr[] stackCopy = new ILExpr[Stack.Count];
         Stack.CopyTo(stackCopy, 0);
         _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, instr.idx, new Stack<ILExpr>(stackCopy), (ILInstr.Instr)instr));
+        _mp.Successors.TryAdd(Initl, []);
+        _mp.Successors[Initl].Add(instr.idx);
         _mp.TacBlocks[instr.idx].Branch();
+    }
+    public void StopBranching()
+    {
+
+    }
+    public bool IsLeader(ILInstr instr)
+    {
+        return _mp.Leaders.Select(l => l.idx).Contains(instr.idx);
     }
     public int StmtIndex
     {

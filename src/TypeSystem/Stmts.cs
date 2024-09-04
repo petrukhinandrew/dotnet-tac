@@ -49,11 +49,11 @@ class ILReturnStmt(int index, ILExpr? retVal) : ILStmt(index)
 }
 abstract class ILBranchStmt(int index) : ILStmt(index) { }
 
-class ILGotoStmt(int index) : ILBranchStmt(index)
+class ILGotoStmt(int index, int target) : ILBranchStmt(index)
 {
     public override string ToString()
     {
-        return "goto";
+        return "goto " + target;
     }
 }
 

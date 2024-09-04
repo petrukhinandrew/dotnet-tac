@@ -6,6 +6,7 @@ using Microsoft.VisualBasic;
 using System.Linq.Expressions;
 using System.Diagnostics.CodeAnalysis;
 using System.Collections.Immutable;
+using System.ComponentModel.Design.Serialization;
 
 namespace Usvm.IL.TACBuilder;
 
@@ -19,6 +20,7 @@ class MethodProcessor
     public List<ILExpr> Temps = new List<ILExpr>();
     public List<ILExpr> Errs = new List<ILExpr>();
     public List<ILStmt> Tac = new List<ILStmt>();
+    public List<ILInstr> Leaders;
     public Dictionary<int, List<int>> Successors = new Dictionary<int, List<int>>();
     public Dictionary<int, SMFrame> TacBlocks;
     private ILInstr _begin;
@@ -43,6 +45,7 @@ class MethodProcessor
         Params = methodInfo.GetParameters().OrderBy(p => p.Position).Select(l => new ILLocal(TypeSolver.Resolve(l.ParameterType), Logger.ArgVarName(l.Position))).ToList();
         Locals = locals.OrderBy(l => l.LocalIndex).Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), Logger.LocalVarName(l.LocalIndex))).ToList();
         InitEHScopes();
+        Leaders = CollectLeaders();
         ProcessIL();
         ComposeTac(0);
     }
@@ -50,6 +53,31 @@ class MethodProcessor
     {
         return _begin;
     }
+    private List<ILInstr> CollectLeaders()
+    {
+        ILInstr cur = _begin;
+        HashSet<ILInstr> leaders = [cur];
+        while (cur is not ILInstr.Back)
+        {
+            if (!cur.isJump())
+            {
+                cur = cur.next;
+                continue;
+            }
+            if (cur is ILInstr.SwitchArg)
+            {
+                // TODO handle switch tables 
+            }
+            else
+            {
+                leaders.Add(((ILInstrOperand.Target)cur.arg).value);
+                leaders.Add(cur.next);
+            }
+            cur = cur.next;
+        }
+        return [.. leaders.OrderBy(l => l.idx)];
+    }
+
     private void ProcessIL()
     {
         TacBlocks[0] = SMFrame.CreateInitial(this);
@@ -59,7 +87,7 @@ class MethodProcessor
     private void ComposeTac(int idx)
     {
         Tac.AddRange(TacBlocks[idx].TacLines);
-        foreach (var t in Successors[idx].Order())
+        foreach (var t in Successors.GetValueOrDefault(idx, []).Order())
         {
             ComposeTac(t);
         }

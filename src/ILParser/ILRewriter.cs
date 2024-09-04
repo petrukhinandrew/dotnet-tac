@@ -388,7 +388,10 @@ public abstract record ILInstr
             return "Back";
         }
     }
-
+    public override int GetHashCode()
+    {
+        return idx;
+    }
 }
 
 public abstract record ILInstrOperand

@@ -62,16 +62,25 @@ static class MethodFormatter
 
     public static void DumpTAC(this MethodProcessor mp)
     {
-        foreach (var l in mp.Tac)
+        foreach (var e in mp.TacBlocks.OrderBy(b => b.Key))
         {
-            Console.WriteLine(l.ToString());
+            Console.WriteLine("BB#" + e.Key);
+            foreach (var l in e.Value.TacLines)
+            {
+                Console.WriteLine(l.ToString());
+            }
+            Console.WriteLine();
         }
+        // foreach (var l in mp.Tac)
+        // {
+        //     Console.WriteLine(l.ToString());
+        // }
     }
-    public static void DumpPredcessors(this MethodProcessor mp)
+    public static void DumpSuccessors(this MethodProcessor mp)
     {
-        foreach (var s in mp.Successors)
+        foreach (var s in mp.Successors.OrderBy(e => e.Key))
         {
-            Console.WriteLine("{0}: {1}", s.Key, string.Join(" ", s.Value));
+            Console.WriteLine("{0}: {1}", s.Key, string.Join(" ", s.Value.Order()));
         }
     }
     public static void DumpAll(this MethodProcessor mp)
@@ -79,7 +88,7 @@ static class MethodFormatter
         mp.DumpMethodSignature();
         // mp.DumpEHS();
         // mp.DumpVars();
-        mp.DumpPredcessors();
+        mp.DumpSuccessors();
         mp.DumpTAC();
     }
 }
