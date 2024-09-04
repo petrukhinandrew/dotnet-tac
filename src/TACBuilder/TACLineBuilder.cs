@@ -12,7 +12,10 @@ static class TACLineBuilder
     {
         ILInstr tmp = ip.next;
         while (tmp is not ILInstr.Instr)
+        {
+            if (tmp is ILInstr.Back) return null;
             tmp = tmp.next;
+        }
         return (ILInstr.Instr)tmp;
     }
     public static void Branch(this SMFrame frame)
