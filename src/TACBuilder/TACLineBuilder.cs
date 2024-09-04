@@ -872,7 +872,12 @@ static class TACLineBuilder
                 default: throw new Exception("unhandled frame.CurInstr " + frame.CurInstr.ToString());
             }
             var adv = AdvanceIP(frame.CurInstr!);
-            if (adv == null || frame.IsLeader(adv)) return;
+            if (adv == null) return;
+            if (frame.IsLeader(adv))
+            {
+                frame.NewLine(new ILGotoStmt(frame.StmtIndex, adv.idx));
+                return;
+            }
             frame.CurInstr = adv;
         }
     }

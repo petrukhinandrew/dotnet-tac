@@ -75,6 +75,19 @@ static class ConditionsTests
         res += s3;
         return res;
     }
+    public static void Loops()
+    {
+        int i = 1 + 4;
+        int n = i + 2;
+        while (++i < 5)
+        {
+            n += i;
+        }
+        for (int j = 0; j < n; j++)
+        {
+            i--;
+        }
+    }
     public static int SwitchExample()
     {
         int x = 1 + 2 + 4;
