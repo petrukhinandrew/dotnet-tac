@@ -2,6 +2,7 @@
 #pragma warning disable CS8500
 
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace Usvm.IL.Test.Instructions;
 
@@ -87,6 +88,23 @@ static class ConditionsTests
         {
             i--;
         }
+    }
+    public static int MultipleReturnsWithLoops()
+    {
+        int i = 1 + 4;
+        int n = i + 2;
+        while (++i < 5)
+        {
+            n += i;
+            if (n == -1) return 0;
+        }
+        if (n > 30) return 2;
+        for (int j = 0; j < n; j++)
+        {
+            i--;
+            if (i < 0) return -1;
+        }
+        return 1;
     }
     public static int SwitchExample()
     {
