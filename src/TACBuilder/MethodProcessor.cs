@@ -26,15 +26,6 @@ class MethodProcessor
     private ILInstr _begin;
     public List<EHScope> Scopes = [];
 
-    private int _stmtIndex = 0;
-    public int StmtIndex
-    {
-        get
-        {
-            return _stmtIndex++;
-        }
-    }
-
     public MethodProcessor(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals, ILInstr begin, ehClause[] ehs)
     {
         _begin = begin;
@@ -86,7 +77,16 @@ class MethodProcessor
     }
     private void ComposeTac()
     {
-        
+        int lineNum = 0;
+        var ilToTacMapping = new Dictionary<int, int?>();
+        foreach (var m in Successors)
+        {
+            ilToTacMapping.Add(m.Key, null);
+        }
+        foreach (var bb in TacBlocks.OrderBy(b => b.Key))
+        {
+
+        }
     }
     private void InitEHScopes()
     {

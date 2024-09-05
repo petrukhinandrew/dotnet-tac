@@ -11,12 +11,15 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
     public List<ILStmt> TacLines = new List<ILStmt>();
     public ILInstr.Instr CurInstr = instr;
     private MethodProcessor _mp = proc;
-    private ILInstr? condSucc;
-    private ILInstr? uncondSucc;
 
     public static SMFrame CreateInitial(MethodProcessor mp)
     {
         return new SMFrame(mp, 0, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
+    }
+    public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
+    {
+        ContinueTo(uncond);
+        if (cond != null) ContinueTo(cond);
     }
     private void ContinueTo(ILInstr instr)
     {
@@ -28,27 +31,9 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
         _mp.Successors[Initl].Add(instr.idx);
         _mp.TacBlocks[instr.idx].Branch();
     }
-    public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
-    {
-        uncondSucc = uncond;
-        condSucc = cond;
-        ContinueTo(uncond);
-        if (cond != null) ContinueTo(cond);
-    }
-    // public void StopBranching(ILInstr target)
-    // {
-    //     NewLine(new ILGotoStmt(StmtIndex, target.idx));
-    // }
     public bool IsLeader(ILInstr instr)
     {
         return _mp.Leaders.Select(l => l.idx).Contains(instr.idx);
-    }
-    public int StmtIndex
-    {
-        get
-        {
-            return _mp.StmtIndex;
-        }
     }
     public List<ILLocal> Locals
     {
@@ -100,7 +85,7 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
         if (val is not ILValue)
         {
             ILLocal tmp = GetNewTemp(val.Type, val);
-            NewLine(new ILAssignStmt(StmtIndex, tmp, val));
+            NewLine(new ILAssignStmt(tmp, val));
             val = tmp;
         }
         return val;
