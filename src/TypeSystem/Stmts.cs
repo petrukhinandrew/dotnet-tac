@@ -1,7 +1,8 @@
 namespace Usvm.IL.TypeSystem;
-abstract class ILStmt(int index)
+abstract class ILStmt()
 {
-    public int Index = index;
+    private int Index = Indexer++;
+    private static int Indexer = 0;
     public abstract new string ToString();
     public override bool Equals(object? obj)
     {
@@ -14,19 +15,21 @@ abstract class ILStmt(int index)
 }
 class ILIndexedStmt(int index, ILStmt stmt)
 {
+    public ILIndexedStmt(ILStmt stmt) : this(-1, stmt) { }
+    public int Index = index;
     public override string ToString()
     {
-        return index + " " + stmt.ToString();
+        return Index + " " + stmt.ToString();
     }
 }
-class ILStmtMark(string mark) : ILStmt(-1)
+class ILStmtMark(string mark) : ILStmt()
 {
     public override string ToString()
     {
         return mark;
     }
 }
-class ILAssignStmt(int index, ILLValue lhs, ILExpr rhs) : ILStmt(index)
+class ILAssignStmt(ILLValue lhs, ILExpr rhs) : ILStmt()
 {
 
     public readonly ILLValue Lhs = lhs;
@@ -36,7 +39,7 @@ class ILAssignStmt(int index, ILLValue lhs, ILExpr rhs) : ILStmt(index)
         return Lhs.ToString() + " = " + Rhs.ToString();
     }
 }
-class ILCallStmt(int index, ILCallExpr expr) : ILStmt(index)
+class ILCallStmt(ILCallExpr expr) : ILStmt()
 {
     public ILCallExpr Call = expr;
     public override string ToString()
@@ -45,7 +48,7 @@ class ILCallStmt(int index, ILCallExpr expr) : ILStmt(index)
     }
 }
 
-class ILReturnStmt(int index, ILExpr? retVal) : ILStmt(index)
+class ILReturnStmt(ILExpr? retVal) : ILStmt()
 {
     public ILExpr? RetVal => retVal;
     public override string ToString()
@@ -54,28 +57,30 @@ class ILReturnStmt(int index, ILExpr? retVal) : ILStmt(index)
         return "return " + arg;
     }
 }
-abstract class ILBranchStmt(int index) : ILStmt(index) { }
+abstract class ILBranchStmt(int target) : ILStmt()
+{
+    public int Target = target;
+}
 
-class ILGotoStmt(int index, int target) : ILBranchStmt(index)
+class ILGotoStmt(int target) : ILBranchStmt(target)
 {
     public override string ToString()
     {
-        return "goto " + target;
+        return "goto " + Target;
     }
 }
 
-class ILIfStmt(int index, ILExpr cond, int t) : ILBranchStmt(index)
+class ILIfStmt(ILExpr cond, int target) : ILBranchStmt(target)
 {
-    private int _t = t;
     public override string ToString()
     {
-        return string.Format("if {0} goto {1}", cond.ToString(), _t);
+        return string.Format("if {0} goto {1}", cond.ToString(), Target);
     }
 }
 
-class ILEHStmt(int index, string value, ILExpr thrown) : ILStmt(index)
+class ILEHStmt(string value, ILExpr thrown) : ILStmt()
 {
-    public ILEHStmt(int index, string value) : this(index, value, new ILNullValue()) { }
+    public ILEHStmt(int index, string value) : this(value, new ILNullValue()) { }
     private string _value = value;
     private ILExpr _thrown = thrown;
     public override string ToString()
