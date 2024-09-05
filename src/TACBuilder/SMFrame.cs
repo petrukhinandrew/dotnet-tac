@@ -18,8 +18,15 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
     }
     public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
     {
-        ContinueTo(uncond);
         if (cond != null) ContinueTo(cond);
+        ContinueTo(uncond);
+    }
+    public void ContinueBranchingToMultiple(List<ILInstr> targets)
+    {
+        foreach (var target in targets)
+        {
+            ContinueTo(target);
+        }
     }
     public void StopBranching()
     {
@@ -28,7 +35,7 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
     private void ContinueTo(ILInstr instr)
     {
         StopBranching();
-        _mp.Successors[ILFirst].Add(instr.idx);
+        _mp.Successors[ILFirst].Insert(0, instr.idx);
         if (_mp.TacBlocks.ContainsKey(instr.idx)) return;
         ILExpr[] stackCopy = new ILExpr[Stack.Count];
         Stack.CopyTo(stackCopy, 0);

@@ -350,6 +350,7 @@ static class TACLineBuilder
                         frame.Stack.Push(new ILManagedRef(frame.Locals[idx]));
                         break;
                     }
+                // TODO leave (simple) -> ehs -> leave with endfinally
                 // case "leave":
                 // case "leave.s":
                 //     {
@@ -359,23 +360,25 @@ static class TACLineBuilder
                 //         frame.Stack.Clear();
                 //         break;
                 //     }
-                // case "switch":
-                //     {
-                //         int branchCnt = ((ILInstrOperand.Arg32)frame.CurInstr.arg).value;
-                //         ILExpr compVal = frame.PopSingleAddr();
-                //         for (int branch = 0; branch < branchCnt; branch++)
-                //         {
-                //             frame.CurInstr = frame.CurInstr.next;
-                //             ILInstr.SwitchArg target = (ILInstr.SwitchArg)frame.CurInstr;
-                //             ILStmtTargetLocation to = ResolveTargetLocation(frame.CurInstr, labelsPool);
-                //             frame.NewLine(new ILIfStmt(
-                //                 frame.StmtIndex,
-                //                 new ILBinaryOperation(compVal, new ILLiteral(new ILInt32(), branch.ToString())),
-                //                 to
-                //             ));
-                //         }
-                //         break;
-                //     }
+                case "switch":
+                    {
+                        int branchCnt = ((ILInstrOperand.Arg32)frame.CurInstr.arg).value;
+                        ILExpr compVal = frame.PopSingleAddr();
+                        ILInstr switchBranch = frame.CurInstr;
+                        List<ILInstr> targets = [];
+                        for (int branch = 0; branch < branchCnt; branch++)
+                        {
+                            switchBranch = switchBranch.next;
+                            ILInstrOperand.Target target = (ILInstrOperand.Target)((ILInstr.SwitchArg)switchBranch).arg;
+                            targets.Add(target.value);
+                            frame.NewLine(new ILIfStmt(
+                                new ILBinaryOperation(compVal, new ILLiteral(new ILInt32(), branch.ToString())),
+                                target.value.idx
+                            ));
+                        }
+                        frame.ContinueBranchingToMultiple(targets);
+                        break;
+                    }
 
                 case "ldftn":
                     {
@@ -484,7 +487,6 @@ static class TACLineBuilder
                             frame.NewLine(new ILCallStmt(call));
                         break;
                     }
-                // TODO add multiple return test
                 case "ret":
                     {
                         ILExpr? retVal = frame.GetMethodReturnType() != typeof(void) ? frame.PopSingleAddr() : null;

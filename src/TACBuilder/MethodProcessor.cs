@@ -2,11 +2,6 @@
 using System.Reflection;
 using Usvm.IL.TypeSystem;
 using Usvm.IL.Parser;
-using Microsoft.VisualBasic;
-using System.Linq.Expressions;
-using System.Diagnostics.CodeAnalysis;
-using System.Collections.Immutable;
-using System.ComponentModel.Design.Serialization;
 
 namespace Usvm.IL.TACBuilder;
 
@@ -55,10 +50,6 @@ class MethodProcessor
                 cur = cur.next;
                 continue;
             }
-            if (cur is ILInstr.SwitchArg)
-            {
-                // TODO handle switch tables 
-            }
             else
             {
                 leaders.Add(((ILInstrOperand.Target)cur.arg).value);
@@ -95,8 +86,10 @@ class MethodProcessor
                 Tac.Add(new ILIndexedStmt(lineNum++, new ILGotoStmt(Successors[bb.ILFirst][0])));
             }
         }
-        foreach (var stmt in Tac) {
-            if (stmt.Stmt is ILBranchStmt branch) {
+        foreach (var stmt in Tac)
+        {
+            if (stmt.Stmt is ILBranchStmt branch)
+            {
                 branch.Target = (int)ilToTacMapping[branch.Target]!;
             }
         }
