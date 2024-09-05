@@ -12,6 +12,13 @@ abstract class ILStmt(int index)
         return Index;
     }
 }
+class ILIndexedStmt(int index, ILStmt stmt)
+{
+    public override string ToString()
+    {
+        return index + " " + stmt.ToString();
+    }
+}
 class ILStmtMark(string mark) : ILStmt(-1)
 {
     public override string ToString()
