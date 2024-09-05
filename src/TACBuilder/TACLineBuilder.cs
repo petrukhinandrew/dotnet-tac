@@ -586,7 +586,7 @@ static class TACLineBuilder
                         frame.NewLine(new ILIfStmt(
                             new ILBinaryOperation(lhs, rhs),
                             tb.idx));
-                        frame.ContinueBranchingTo(tb, fb);
+                        frame.ContinueBranchingTo(fb, tb);
                         return;
                     }
                 case "brinst":
@@ -601,7 +601,7 @@ static class TACLineBuilder
                         ILInstr fb = frame.CurInstr.next;
                         frame.NewLine(new ILIfStmt(
                             new ILBinaryOperation(lhs, rhs), tb.idx));
-                        frame.ContinueBranchingTo(tb, fb);
+                        frame.ContinueBranchingTo(fb, tb);
                         return;
                     }
                 case "brnull":
@@ -618,7 +618,7 @@ static class TACLineBuilder
                         ILInstr fb = frame.CurInstr.next;
                         frame.NewLine(new ILIfStmt(
                             new ILBinaryOperation(lhs, rhs), tb.idx));
-                        frame.ContinueBranchingTo(tb, fb);
+                        frame.ContinueBranchingTo(fb, tb);
                         return;
                     }
                 case "newobj":
@@ -862,7 +862,11 @@ static class TACLineBuilder
                 default: throw new Exception("unhandled frame.CurInstr " + frame.CurInstr.ToString());
             }
             var adv = AdvanceIP(frame.CurInstr!);
-            if (adv == null) return;
+            if (adv == null)
+            {
+                frame.StopBranching();
+                return;
+            }
             if (frame.IsLeader(adv))
             {
                 frame.ContinueBranchingTo(adv, null);

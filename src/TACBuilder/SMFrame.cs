@@ -21,14 +21,18 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
         ContinueTo(uncond);
         if (cond != null) ContinueTo(cond);
     }
+    public void StopBranching()
+    {
+        _mp.Successors.TryAdd(Initl, []);
+    }
     private void ContinueTo(ILInstr instr)
     {
+        _mp.Successors.TryAdd(Initl, []);
+        _mp.Successors[Initl].Add(instr.idx);
         if (_mp.TacBlocks.ContainsKey(instr.idx)) return;
         ILExpr[] stackCopy = new ILExpr[Stack.Count];
         Stack.CopyTo(stackCopy, 0);
         _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, instr.idx, new Stack<ILExpr>(stackCopy), (ILInstr.Instr)instr));
-        _mp.Successors.TryAdd(Initl, []);
-        _mp.Successors[Initl].Add(instr.idx);
         _mp.TacBlocks[instr.idx].Branch();
     }
     public bool IsLeader(ILInstr instr)
