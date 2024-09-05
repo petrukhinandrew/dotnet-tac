@@ -1,3 +1,5 @@
+using System.Runtime;
+
 namespace Usvm.IL.TypeSystem;
 abstract class ILStmt()
 {
@@ -15,11 +17,11 @@ abstract class ILStmt()
 }
 class ILIndexedStmt(int index, ILStmt stmt)
 {
-    public ILIndexedStmt(ILStmt stmt) : this(-1, stmt) { }
     public int Index = index;
+    public ILStmt Stmt = stmt;
     public override string ToString()
     {
-        return Index + " " + stmt.ToString();
+        return Index + " " + Stmt.ToString();
     }
 }
 class ILStmtMark(string mark) : ILStmt()

@@ -7,7 +7,7 @@ namespace Usvm.IL.TACBuilder;
 class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Instr instr)
 {
     public Stack<ILExpr> Stack = stack;
-    public int Initl = initl;
+    public int ILFirst = initl;
     public List<ILStmt> TacLines = new List<ILStmt>();
     public ILInstr.Instr CurInstr = instr;
     private MethodProcessor _mp = proc;
@@ -23,12 +23,12 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
     }
     public void StopBranching()
     {
-        _mp.Successors.TryAdd(Initl, []);
+        _mp.Successors.TryAdd(ILFirst, []);
     }
     private void ContinueTo(ILInstr instr)
     {
-        _mp.Successors.TryAdd(Initl, []);
-        _mp.Successors[Initl].Add(instr.idx);
+        StopBranching();
+        _mp.Successors[ILFirst].Add(instr.idx);
         if (_mp.TacBlocks.ContainsKey(instr.idx)) return;
         ILExpr[] stackCopy = new ILExpr[Stack.Count];
         Stack.CopyTo(stackCopy, 0);
@@ -127,14 +127,14 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
     }
     public override bool Equals(object? obj)
     {
-        return obj != null && obj is SMFrame f && Initl == f.Initl;
+        return obj != null && obj is SMFrame f && ILFirst == f.ILFirst;
     }
     public override int GetHashCode()
     {
-        return Initl;
+        return ILFirst;
     }
     public override string ToString()
     {
-        return Initl.ToString();
+        return ILFirst.ToString();
     }
 }

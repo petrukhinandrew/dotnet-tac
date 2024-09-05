@@ -60,7 +60,7 @@ static class MethodFormatter
         }
     }
 
-    public static void DumpTAC(this MethodProcessor mp)
+    public static void DumpBBs(this MethodProcessor mp)
     {
         foreach (var e in mp.TacBlocks.OrderBy(b => b.Key))
         {
@@ -80,15 +80,23 @@ static class MethodFormatter
     {
         foreach (var s in mp.Successors.OrderBy(e => e.Key))
         {
-            Console.WriteLine("{0}: {1}", s.Key, string.Join(" ", s.Value.Order()));
+            Console.WriteLine("[{0} -> {2}]: {1}", s.Key, string.Join(" ", s.Value.Select(il => string.Format("[{0} -> {1}]", il, mp.ilToTacMapping[il]))), mp.ilToTacMapping[s.Key]);
+        }
+    }
+    public static void DumpTAC(this MethodProcessor mp)
+    {
+        foreach (var line in mp.Tac)
+        {
+            Console.WriteLine(line.ToString());
         }
     }
     public static void DumpAll(this MethodProcessor mp)
     {
+        mp.DumpSuccessors();
         mp.DumpMethodSignature();
         // mp.DumpEHS();
         // mp.DumpVars();
-        mp.DumpSuccessors();
+        // mp.DumpBBs();
         mp.DumpTAC();
     }
 }
