@@ -19,13 +19,13 @@ class MethodProcessor
     public List<ILLocal> Params;
     public List<ILExpr> Temps = new List<ILExpr>();
     public List<ILExpr> Errs = new List<ILExpr>();
-    public List<ILStmt> Tac = new List<ILStmt>();
+    public List<ILIndexedStmt> Tac = new List<ILIndexedStmt>();
     public List<ILInstr> Leaders;
     public Dictionary<int, List<int>> Successors = new Dictionary<int, List<int>>();
     public Dictionary<int, SMFrame> TacBlocks;
     private ILInstr _begin;
     public List<EHScope> Scopes = [];
-
+    public Dictionary<int, int?> ilToTacMapping = new Dictionary<int, int?>();
     public MethodProcessor(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals, ILInstr begin, ehClause[] ehs)
     {
         _begin = begin;
@@ -78,14 +78,27 @@ class MethodProcessor
     private void ComposeTac()
     {
         int lineNum = 0;
-        var ilToTacMapping = new Dictionary<int, int?>();
         foreach (var m in Successors)
         {
             ilToTacMapping.Add(m.Key, null);
         }
-        foreach (var bb in TacBlocks.OrderBy(b => b.Key))
+        var tacBlocksIndexed = TacBlocks.OrderBy(b => b.Key).ToList();
+        foreach (var (i, bb) in tacBlocksIndexed.Select((e, i) => (i, e.Value)))
         {
-
+            ilToTacMapping[bb.ILFirst] = lineNum;
+            foreach (var line in bb.TacLines)
+            {
+                Tac.Add(new ILIndexedStmt(lineNum++, line));
+            }
+            if (tacBlocksIndexed.Count > i + 1 && Successors[bb.ILFirst][0] != tacBlocksIndexed[i + 1].Key)
+            {
+                Tac.Add(new ILIndexedStmt(lineNum++, new ILGotoStmt(Successors[bb.ILFirst][0])));
+            }
+        }
+        foreach (var stmt in Tac) {
+            if (stmt.Stmt is ILBranchStmt branch) {
+                branch.Target = (int)ilToTacMapping[branch.Target]!;
+            }
         }
     }
     private void InitEHScopes()
