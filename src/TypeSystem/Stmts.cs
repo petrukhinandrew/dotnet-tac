@@ -80,7 +80,7 @@ class ILIfStmt(ILExpr cond, int target) : ILBranchStmt(target)
 
 class ILEHStmt(string value, ILExpr thrown) : ILStmt()
 {
-    public ILEHStmt(int index, string value) : this(value, new ILNullValue()) { }
+    public ILEHStmt(string value) : this(value, new ILNullValue()) { }
     private string _value = value;
     private ILExpr _thrown = thrown;
     public override string ToString()
