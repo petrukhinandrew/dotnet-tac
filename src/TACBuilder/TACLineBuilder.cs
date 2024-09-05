@@ -549,9 +549,7 @@ static class TACLineBuilder
                 case "br":
                     {
                         ILInstr target = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
-                        frame.ContinueTo(target);
-                        frame.NewLine(new ILGotoStmt(frame.StmtIndex, target.idx));
-                        frame.StopBranching();
+                        frame.ContinueBranchingTo(target, null);
                         return;
                     }
                 case "beq.s":
@@ -589,9 +587,7 @@ static class TACLineBuilder
                             frame.StmtIndex,
                             new ILBinaryOperation(lhs, rhs),
                             tb.idx));
-                        frame.ContinueTo(tb); frame.ContinueTo(fb);
-                        frame.NewLine(new ILGotoStmt(frame.StmtIndex, fb.idx));
-                        frame.StopBranching();
+                        frame.ContinueBranchingTo(tb, fb);
                         return;
                     }
                 case "brinst":
@@ -607,10 +603,7 @@ static class TACLineBuilder
                         frame.NewLine(new ILIfStmt(
                             frame.StmtIndex,
                             new ILBinaryOperation(lhs, rhs), tb.idx));
-                        frame.ContinueTo(tb); frame.ContinueTo(fb);
-                        frame.NewLine(new ILGotoStmt(frame.StmtIndex, fb.idx));
-                        frame.StopBranching();
-
+                        frame.ContinueBranchingTo(tb, fb);
                         return;
                     }
                 case "brnull":
@@ -628,9 +621,7 @@ static class TACLineBuilder
                         frame.NewLine(new ILIfStmt(
                             frame.StmtIndex,
                             new ILBinaryOperation(lhs, rhs), tb.idx));
-                        frame.ContinueTo(tb); frame.ContinueTo(fb);
-                        frame.NewLine(new ILGotoStmt(frame.StmtIndex, fb.idx));
-                        frame.StopBranching();
+                        frame.ContinueBranchingTo(tb, fb);
                         return;
                     }
                 case "newobj":
@@ -878,7 +869,7 @@ static class TACLineBuilder
             if (adv == null) return;
             if (frame.IsLeader(adv))
             {
-                frame.NewLine(new ILGotoStmt(frame.StmtIndex, adv.idx));
+                frame.ContinueBranchingTo(adv, null);
                 return;
             }
             frame.CurInstr = adv;

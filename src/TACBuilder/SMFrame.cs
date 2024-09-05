@@ -11,14 +11,15 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
     public List<ILStmt> TacLines = new List<ILStmt>();
     public ILInstr.Instr CurInstr = instr;
     private MethodProcessor _mp = proc;
+    private ILInstr? condSucc;
+    private ILInstr? uncondSucc;
 
     public static SMFrame CreateInitial(MethodProcessor mp)
     {
         return new SMFrame(mp, 0, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
     }
-    public void ContinueTo(ILInstr instr)
+    private void ContinueTo(ILInstr instr)
     {
-        // TODO update successors
         if (_mp.TacBlocks.ContainsKey(instr.idx)) return;
         ILExpr[] stackCopy = new ILExpr[Stack.Count];
         Stack.CopyTo(stackCopy, 0);
@@ -27,10 +28,17 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
         _mp.Successors[Initl].Add(instr.idx);
         _mp.TacBlocks[instr.idx].Branch();
     }
-    public void StopBranching()
+    public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
     {
-
+        uncondSucc = uncond;
+        condSucc = cond;
+        ContinueTo(uncond);
+        if (cond != null) ContinueTo(cond);
     }
+    // public void StopBranching(ILInstr target)
+    // {
+    //     NewLine(new ILGotoStmt(StmtIndex, target.idx));
+    // }
     public bool IsLeader(ILInstr instr)
     {
         return _mp.Leaders.Select(l => l.idx).Contains(instr.idx);

@@ -47,7 +47,7 @@ class MethodProcessor
         InitEHScopes();
         Leaders = CollectLeaders();
         ProcessIL();
-        ComposeTac(0);
+        ComposeTac();
     }
     public ILInstr GetBeginInstr()
     {
@@ -84,13 +84,9 @@ class MethodProcessor
         Successors.Add(0, []);
         TacBlocks[0].Branch();
     }
-    private void ComposeTac(int idx)
+    private void ComposeTac()
     {
-        Tac.AddRange(TacBlocks[idx].TacLines);
-        foreach (var t in Successors.GetValueOrDefault(idx, []).Order())
-        {
-            ComposeTac(t);
-        }
+        
     }
     private void InitEHScopes()
     {
