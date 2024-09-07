@@ -373,6 +373,18 @@ static class TryBlockTests
             Console.WriteLine(e.Message);
         }
     }
+
+    public static void NoCatch()
+    {
+        try
+        {
+
+        }
+        finally
+        {
+
+        }
+    }
     public static void CatchExceptionUsage()
     {
         try
