@@ -1,7 +1,9 @@
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 
+using System.Collections;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace Usvm.IL.Test.Instructions;
@@ -106,7 +108,7 @@ static class ConditionsTests
         }
         return 1;
     }
-    public static int SwitchExample()
+    public static int SwitchTable()
     {
         int x = 1 + 2 + 4;
         switch (x + 1)
@@ -117,6 +119,17 @@ static class ConditionsTests
             case 13: return 3;
             default: return x;
         }
+    }
+    public static string SwitchExpr()
+    {
+        string s = "abc";
+        string caps = s switch
+        {
+            "cde" => "EDC",
+            "cba" => "ABC",
+            _ => "OTHER"
+        };
+        return caps;
     }
     public static int Comps()
     {
@@ -319,28 +332,32 @@ static class TryBlockTests
         int t = 1;
         try
         {
-            if (1 + 2 == 3) return;
+            string s = "try";
+            if (s != "try") throw new Exception("e");
         }
         catch (NullReferenceException)
         {
+            string s = "catch 1";
             try
             {
+                string ss = "try in catch";
                 int zero = 0;
                 float x = 7 / zero;
             }
             catch (DivideByZeroException)
             {
-
+                string ss = "catch in catch";
+                int x = 1;
             }
             return;
         }
         catch (Exception) when (t == 1)
         {
-            return;
+            string s = "filter";
         }
         finally
         {
-
+            string s = "finally";
         }
     }
     public static void Filter()
