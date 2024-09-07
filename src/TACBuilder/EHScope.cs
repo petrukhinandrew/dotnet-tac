@@ -1,4 +1,6 @@
+using System.Runtime.InteropServices;
 using Usvm.IL.Parser;
+
 namespace Usvm.IL.TACBuilder;
 
 abstract class EHScope
@@ -14,30 +16,28 @@ abstract class EHScope
             _ => throw new Exception("unexpected clause type " + clause.ToString())
         };
     }
-    public struct ScopeLocation
+
+    public struct ILScopeLocation
     {
-        public int tb, te, hb, he;
-        public static ScopeLocation FromClause(ehClause clause)
+        public ILInstr tb, te, hb, he;
+
+        public static ILScopeLocation FromClause(ehClause clause)
         {
             return new()
             {
-                tb = clause.tryBegin.idx,
-                te = clause.tryEnd.idx,
-                hb = clause.handlerBegin.idx,
-                he = clause.handlerEnd.idx,
+                tb = clause.tryBegin,
+                te = clause.tryEnd,
+                hb = clause.handlerBegin,
+                he = clause.handlerEnd,
             };
         }
-        public List<int> Indices()
-        {
-            return [tb, te, hb, he];
-        }
-        public override string ToString()
-        {
-            return string.Join(" ", new int[] { tb, te, hb, he });
-        }
+
+        public override string ToString() => string.Join(" ", new int[tb.idx, te.idx, hb.idx, he.idx]);
+
         public override bool Equals(object? obj)
         {
-            return obj != null && obj is ScopeLocation l && tb == l.tb && te == l.te && hb == l.hb && he == l.he;
+            return obj != null && obj is ILScopeLocation l && tb.idx == l.tb.idx && te.idx == l.te.idx &&
+                   hb.idx == l.hb.idx && he.idx == l.he.idx;
         }
 
         public override int GetHashCode()
@@ -45,60 +45,67 @@ abstract class EHScope
             return (tb, te, hb, he).GetHashCode();
         }
     }
-    public ScopeLocation ilLoc = new(), tacLoc = new();
+
+    public ILScopeLocation ilLoc, tacLoc = new();
 }
-abstract class EHScopeWithVarIdx : EHScope
+
+abstract class EHScopeWithVarIdx(Type type) : EHScope
 {
     public int ErrIdx;
-    public Type Type = typeof(Exception);
+    public Type Type = type;
 }
-class CatchScope(Type type) : EHScopeWithVarIdx
+
+class CatchScope(Type type) : EHScopeWithVarIdx(type)
 {
-    public new Type Type = type;
-    public new int ErrIdx = 0;
-    public static new CatchScope FromClause(ehClause clause)
+    public new static CatchScope FromClause(ehClause clause)
     {
         return new CatchScope((clause.ehcType as rewriterEhcType.CatchEH)!.type)
         {
-            ilLoc = ScopeLocation.FromClause(clause)
+            ilLoc = ILScopeLocation.FromClause(clause)
         };
     }
+
     public override string ToString()
     {
-        return string.Format("catch {0}", tacLoc.ToString());
+        return $"catch {tacLoc.ToString()}";
     }
+
     public override bool Equals(object? obj)
     {
-        return obj != null && obj is CatchScope cs && ilLoc.Equals(cs.ilLoc);
+        return obj is CatchScope cs && ilLoc.Equals(cs.ilLoc);
     }
+
     public override int GetHashCode()
     {
         return ilLoc.GetHashCode();
     }
-
 }
 
-class FilterScope : EHScopeWithVarIdx
+class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
 {
-    public int fb = -1;
-    public new int ErrIdx = 0;
-    public static new FilterScope FromClause(ehClause clause)
+    public ILInstr fb;
+
+    public new static FilterScope FromClause(ehClause clause)
     {
         FilterScope scope = new FilterScope
         {
-            ilLoc = ScopeLocation.FromClause(clause),
-            fb = (clause.ehcType as rewriterEhcType.FilterEH)!.instr.idx
+            ilLoc = ILScopeLocation.FromClause(clause),
+            fb = (clause.ehcType as rewriterEhcType.FilterEH)!.instr
         };
         return scope;
     }
+
     public override string ToString()
     {
-        return string.Format("filter {5} {0} {1} {2} {3} {4}", tacLoc.tb, tacLoc.te, fb, tacLoc.hb, tacLoc.he, Logger.ErrVarName(ErrIdx));
+        return string.Format("filter {5} {0} {1} {2} {3} {4}", tacLoc.tb, tacLoc.te, fb, tacLoc.hb, tacLoc.he,
+            Logger.ErrVarName(ErrIdx));
     }
+
     public override bool Equals(object? obj)
     {
-        return obj != null && obj is FilterScope fs && ilLoc.Equals(fs.ilLoc);
+        return obj is FilterScope fs && ilLoc.Equals(fs.ilLoc);
     }
+
     public override int GetHashCode()
     {
         return ilLoc.GetHashCode();
@@ -107,21 +114,24 @@ class FilterScope : EHScopeWithVarIdx
 
 class FaultScope : EHScope
 {
-    public static new FaultScope FromClause(ehClause clause)
+    public new static FaultScope FromClause(ehClause clause)
     {
         return new FaultScope()
         {
-            ilLoc = ScopeLocation.FromClause(clause)
+            ilLoc = ILScopeLocation.FromClause(clause)
         };
     }
+
     public override string ToString()
     {
-        return string.Format("fault {0}", tacLoc.ToString());
+        return $"fault {tacLoc.ToString()}";
     }
+
     public override bool Equals(object? obj)
     {
-        return obj != null && obj is FaultScope fs && ilLoc.Equals(fs.ilLoc);
+        return obj is FaultScope fs && ilLoc.Equals(fs.ilLoc);
     }
+
     public override int GetHashCode()
     {
         return ilLoc.GetHashCode();
@@ -130,21 +140,24 @@ class FaultScope : EHScope
 
 class FinallyScope : EHScope
 {
-    public static new FinallyScope FromClause(ehClause clause)
+    public new static FinallyScope FromClause(ehClause clause)
     {
         return new FinallyScope()
         {
-            ilLoc = ScopeLocation.FromClause(clause)
+            ilLoc = ILScopeLocation.FromClause(clause)
         };
     }
+
     public override string ToString()
     {
-        return string.Format("finally {0}", tacLoc.ToString());
+        return $"finally {tacLoc.ToString()}";
     }
+
     public override bool Equals(object? obj)
     {
-        return obj != null && obj is FinallyScope fs && ilLoc.Equals(fs.ilLoc);
+        return obj is FinallyScope fs && ilLoc.Equals(fs.ilLoc);
     }
+
     public override int GetHashCode()
     {
         return ilLoc.GetHashCode();
