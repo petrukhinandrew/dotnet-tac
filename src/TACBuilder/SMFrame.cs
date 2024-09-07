@@ -16,11 +16,13 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
     {
         return new SMFrame(mp, 0, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
     }
+
     public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
     {
         if (cond != null) ContinueTo(cond);
         ContinueTo(uncond);
     }
+
     public void ContinueBranchingToMultiple(List<ILInstr> targets)
     {
         foreach (var target in targets)
@@ -28,10 +30,12 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
             ContinueTo(target);
         }
     }
+
     public void StopBranching()
     {
         _mp.Successors.TryAdd(ILFirst, []);
     }
+
     private void ContinueTo(ILInstr instr)
     {
         StopBranching();
@@ -42,55 +46,43 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
         _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, instr.idx, new Stack<ILExpr>(stackCopy), (ILInstr.Instr)instr));
         _mp.TacBlocks[instr.idx].Branch();
     }
+
     public bool IsLeader(ILInstr instr)
     {
         return _mp.Leaders.Select(l => l.idx).Contains(instr.idx);
     }
-    public List<ILLocal> Locals
-    {
-        get
-        {
-            return _mp.Locals;
-        }
-    }
-    public List<ILLocal> Params
-    {
-        get
-        {
-            return _mp.Params;
-        }
-    }
-    public List<ILExpr> Temps
-    {
-        get
-        {
-            return _mp.Temps;
-        }
-    }
-    public List<ILExpr> Errs
-    {
-        get
-        {
-            return _mp.Errs;
-        }
-    }
+
+    public List<ILLocal> Locals => _mp.Locals;
+
+    public List<EHScope> Scopes => _mp.Scopes;
+
+    public List<ILLocal> Params => _mp.Params;
+
+    public List<ILExpr> Temps => _mp.Temps;
+
+    public List<ILExpr> Errs => _mp.Errs;
+
     public string GetMethodName()
     {
         return _mp.MethodInfo.Name;
     }
+
     public Type GetMethodReturnType()
     {
         return _mp.MethodInfo.ReturnParameter.ParameterType;
     }
+
     public ILExpr PopSingleAddr()
     {
         return ToSingleAddr(Stack.Pop());
     }
+
     public void PushLiteral<T>(T value)
     {
         ILLiteral lit = new ILLiteral(TypeSolver.Resolve(typeof(T)), value?.ToString() ?? "");
         Stack.Push(lit);
     }
+
     private ILExpr ToSingleAddr(ILExpr val)
     {
         if (val is not ILValue)
@@ -99,13 +91,16 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
             NewLine(new ILAssignStmt(tmp, val));
             val = tmp;
         }
+
         return val;
     }
+
     public ILLocal GetNewTemp(ILType type, ILExpr value)
     {
         Temps.Add(value);
         return new ILLocal(type, Logger.TempVarName(Temps.Count - 1));
     }
+
     public void NewLine(ILStmt line)
     {
         TacLines.Add(line);
@@ -114,32 +109,38 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
     public FieldInfo ResolveField(int target)
     {
         return _mp.ResolveField(target);
-
     }
+
     public Type ResolveType(int target)
     {
         return _mp.ResolveType(target);
     }
+
     public MethodBase ResolveMethod(int target)
     {
         return _mp.ResolveMethod(target);
     }
+
     public byte[] ResolveSignature(int target)
     {
         return _mp.ResolveSignature(target);
     }
+
     public string ResolveString(int target)
     {
         return _mp.ResolveString(target);
     }
+
     public override bool Equals(object? obj)
     {
         return obj != null && obj is SMFrame f && ILFirst == f.ILFirst;
     }
+
     public override int GetHashCode()
     {
         return ILFirst;
     }
+
     public override string ToString()
     {
         return ILFirst.ToString();
