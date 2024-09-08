@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using Usvm.IL.Parser;
+using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
@@ -52,7 +53,7 @@ abstract class EHScope
 abstract class EHScopeWithVarIdx(Type type) : EHScope
 {
     public int ErrIdx;
-    public Type Type = type;
+    public readonly Type Type = type;
 }
 
 class CatchScope(Type type) : EHScopeWithVarIdx(type)

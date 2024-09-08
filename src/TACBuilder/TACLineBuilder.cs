@@ -24,23 +24,23 @@ static class TACLineBuilder
     {
         while (true)
         {
-            foreach (CatchScope scope in frame.Scopes.Where(s =>
-                         s is CatchScope cs && cs.ilLoc.hb.idx == frame.CurInstr.idx))
-            {
-                frame.Stack.Push(frame.Errs[scope.ErrIdx]);
-                frame.NewLine(new ILEHStmt("catch", frame.Errs[scope.ErrIdx]));
-            }
-
-            foreach (FilterScope scope in frame.Scopes.Where(b => b is FilterScope fs && fs.fb.idx == frame.CurInstr.idx))
-            {
-                frame.Stack.Push(frame.Errs[scope.ErrIdx]);
-            }
-
-            foreach (FilterScope scope in frame.Scopes.Where(b =>
-                         b is FilterScope fs && fs.ilLoc.hb.idx == frame.CurInstr.idx))
-            {
-                frame.Stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(Exception)), "err"));
-            }
+            // foreach (CatchScope scope in frame.Scopes.Where(s =>
+            //              s is CatchScope cs && cs.ilLoc.hb.idx == frame.CurInstr.idx))
+            // {
+            //     // frame.Stack.Push(frame.Errs[scope.ErrIdx]);
+            //     frame.NewLine(new ILEHStmt("catch", frame.Errs[scope.ErrIdx]));
+            // }
+            //
+            // foreach (FilterScope scope in frame.Scopes.Where(b => b is FilterScope fs && fs.fb.idx == frame.CurInstr.idx))
+            // {
+            //     frame.Stack.Push(frame.Errs[scope.ErrIdx]);
+            // }
+            //
+            // foreach (FilterScope scope in frame.Scopes.Where(b =>
+            //              b is FilterScope fs && fs.ilLoc.hb.idx == frame.CurInstr.idx))
+            // {
+            //     frame.Stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(Exception)), "err"));
+            // }
 
             switch (frame.CurInstr.opCode.Name)
             {
