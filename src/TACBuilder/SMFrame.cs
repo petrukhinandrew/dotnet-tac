@@ -4,17 +4,17 @@ using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Instr instr)
+class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
 {
     public Stack<ILExpr> Stack = stack;
-    public int ILFirst = initl;
-    public List<ILStmt> TacLines = new List<ILStmt>();
+    public int ILFirst = instr.idx;
+    public List<ILStmt> TacLines = new();
     public ILInstr.Instr CurInstr = instr;
     private MethodProcessor _mp = proc;
 
     public static SMFrame CreateInitial(MethodProcessor mp)
     {
-        return new SMFrame(mp, 0, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
+        return new SMFrame(mp, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
     }
 
     public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
@@ -43,7 +43,7 @@ class SMFrame(MethodProcessor proc, int initl, Stack<ILExpr> stack, ILInstr.Inst
         if (_mp.TacBlocks.ContainsKey(instr.idx)) return;
         ILExpr[] stackCopy = new ILExpr[Stack.Count];
         Stack.CopyTo(stackCopy, 0);
-        _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, instr.idx, new Stack<ILExpr>(stackCopy), (ILInstr.Instr)instr));
+        _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, new Stack<ILExpr>(stackCopy), (ILInstr.Instr)instr));
         _mp.TacBlocks[instr.idx].Branch();
     }
 
