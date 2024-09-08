@@ -18,14 +18,17 @@ public class OpsTest
         int res = (x * y) + (y * z);
         return res;
     }
+
     public static int AddOne(int x)
     {
         return x + 1;
     }
+
     public static double AddTwo(double x)
     {
         return x + 2;
     }
+
     public static bool Neg(bool v) => !v;
     public static int Not(int v) => -v;
 }
@@ -39,15 +42,20 @@ static class CastTests
         short z = y;
         uint yx = (uint)x;
     }
+
     abstract class CastClassA
     {
         public string value = "abc";
     }
+
     class CastClassB : CastClassA
     {
         public new string value = "123";
     }
-    class CastClassC : CastClassB { }
+
+    class CastClassC : CastClassB
+    {
+    }
 
     public static void CastClass()
     {
@@ -56,6 +64,7 @@ static class CastTests
         CastClassC? nc = b as CastClassC;
         bool bIsA = b is CastClassC;
     }
+
     public static void Boxing()
     {
         int a = 1;
@@ -78,6 +87,7 @@ static class ConditionsTests
         res += s3;
         return res;
     }
+
     public static void Loops()
     {
         int i = 1 + 4;
@@ -86,11 +96,13 @@ static class ConditionsTests
         {
             n += i;
         }
+
         for (int j = 0; j < n; j++)
         {
             i--;
         }
     }
+
     public static int MultipleReturnsWithLoops()
     {
         int i = 1 + 4;
@@ -100,14 +112,17 @@ static class ConditionsTests
             n += i;
             if (n == -1) return 0;
         }
+
         if (n > 30) return 2;
         for (int j = 0; j < n; j++)
         {
             i--;
             if (i < 0) return -1;
         }
+
         return 1;
     }
+
     public static int SwitchTable()
     {
         int x = 1 + 2 + 4;
@@ -120,6 +135,7 @@ static class ConditionsTests
             default: return x;
         }
     }
+
     public static string SwitchExpr()
     {
         string s = "abc";
@@ -131,6 +147,7 @@ static class ConditionsTests
         };
         return caps;
     }
+
     public static int Comps()
     {
         int a = 1;
@@ -145,10 +162,13 @@ static class ConditionsTests
                 a += 1;
                 return a;
             }
+
             return b;
         }
+
         return c;
     }
+
     public static int IfExample()
     {
         string s = Concat("a", "b", "c");
@@ -166,14 +186,15 @@ enum TestEnum
     B = 2,
     C = 3
 }
+
 struct TestStruct
 {
-
     public int A;
     public int B;
     public float C;
     public TestEnum E;
 }
+
 class Instance(int tx = 1)
 {
     private int x = tx;
@@ -183,13 +204,14 @@ class Instance(int tx = 1)
         x += 1;
     }
 }
+
 class InstanceChild() : Instance(2)
 {
     public override void Do()
     {
-
     }
 }
+
 static class NewInstTests
 {
     public static void ByValue()
@@ -201,6 +223,7 @@ static class NewInstTests
         ts.C += tt.Item2;
         (int, Instance) tnv = (1, new Instance());
     }
+
     public static void Literals()
     {
         string lol = "abc";
@@ -209,19 +232,25 @@ static class NewInstTests
         Instance[] wtf = [new Instance(), new Instance(2), new Instance(kek[1])];
         int kl = kek.Length;
     }
+
     public static (int, int) Tuple()
     {
         return new(0, 0);
     }
+
     public static void NewInstTest()
     {
         Instance inst = new(1);
         inst.Do();
     }
 }
+
 static unsafe class UnsafeTest
 {
-    unsafe struct LocalUnsafeStruct { }
+    unsafe struct LocalUnsafeStruct
+    {
+    }
+
     public static void LdStObj()
     {
         LocalUnsafeStruct a, b;
@@ -233,7 +262,7 @@ static unsafe class UnsafeTest
     }
 
     public static void SafeCopy(int[] source, int sourceOffset, int[] target,
-            int targetOffset, int count)
+        int targetOffset, int count)
     {
         for (int i = 0; i < count; i++)
         {
@@ -244,7 +273,6 @@ static unsafe class UnsafeTest
     public static void UnsafeCopy(int[] source, int sourceOffset, int[] target,
         int targetOffset, int count)
     {
-
         fixed (int* pSource = source, pTarget = target)
         {
             byte* pSourceByte = (byte*)pSource;
@@ -257,8 +285,8 @@ static unsafe class UnsafeTest
                 pTargetByte[targetOffsetByte + i] = pSourceByte[sourceOffsetByte + i];
             }
         }
-
     }
+
     public static void PointerAndRef()
     {
         unsafe
@@ -274,6 +302,7 @@ static unsafe class UnsafeTest
             i_ptr->Do();
         }
     }
+
     public static void ArrayRef()
     {
         unsafe
@@ -283,6 +312,7 @@ static unsafe class UnsafeTest
             fst += 1;
         }
     }
+
     public static void StackAlloc()
     {
         int length = 10;
@@ -312,6 +342,7 @@ static class TryBlockTests
             Console.WriteLine("finally");
         }
     }
+
     public static void ThrowRethrow()
     {
         try
@@ -324,9 +355,9 @@ static class TryBlockTests
         }
         catch (Exception)
         {
-
         }
     }
+
     public static void NestedTryCatch()
     {
         int t = 1;
@@ -349,6 +380,7 @@ static class TryBlockTests
                 string ss = "catch in catch";
                 int x = 1;
             }
+
             return;
         }
         catch (Exception) when (t == 1)
@@ -360,6 +392,7 @@ static class TryBlockTests
             string s = "finally";
         }
     }
+
     public static void Filter()
     {
         int a = 1;
@@ -378,13 +411,12 @@ static class TryBlockTests
     {
         try
         {
-
         }
         finally
         {
-
         }
     }
+
     public static void CatchExceptionUsage()
     {
         try
@@ -401,25 +433,26 @@ static class TryBlockTests
             Console.WriteLine(e.StackTrace);
         }
     }
+
     public static void MultipleFinally()
     {
         try
         {
             try
             {
-
+                return;
+                string dc = "dead code";
             }
             finally
             {
-
+                string ff = "first finally";
             }
         }
         finally
         {
-
+            string sf = "second finally";
         }
     }
-
 }
 
 static unsafe class Misc
@@ -429,15 +462,16 @@ static unsafe class Misc
         int[] arr = { 1, 2, 3 };
         string[] arr_s = arr.Select(e => e > 2 ? e.ToString() : "0").ToArray();
     }
+
     public static void FuncPtrs()
     {
-
     }
+
     public static int SampleFunc()
     {
         return 1;
-
     }
+
     public static void SizeOf()
     {
         int i = sizeof(Instance);
@@ -445,12 +479,14 @@ static unsafe class Misc
         int b = sizeof(bool);
         int s = sizeof(TestStruct);
     }
+
     public static void ArgList(__arglist)
     {
         ArgIterator args = new ArgIterator(__arglist);
     }
 
     public delegate void TestDelegate();
+
     public static void Ldvirtftn()
     {
         InstanceChild child = new();
@@ -466,6 +502,7 @@ static unsafe class Fields
         public static int A = 1;
         public int B = 1;
     }
+
     static void StaticFieldLoad()
     {
         int x = Sample.A + 1;
@@ -481,9 +518,11 @@ static unsafe class Fields
         {
             x += *ptr;
         }
+
         ref int r = ref s.B;
         x += r;
     }
+
     static void FieldStore()
     {
         Sample s = new Sample();

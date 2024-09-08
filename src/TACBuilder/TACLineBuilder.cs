@@ -384,21 +384,19 @@ static class TACLineBuilder
                 {
                     ILInstr target = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
                     frame.Stack.Clear();
-                    // TODO separate cases for different scopes to leave from 
-                    var handlerScopes = frame.Scopes.Where(s =>
-                        s is not FilterScope && s.ilLoc.te.idx == frame.CurInstr.idx).Select(s => s.ilLoc.hb).ToList();
-                    var filterScopes = frame.Scopes.Where(s => s is FilterScope fs && fs.fb.idx == frame.CurInstr.idx)
-                        .Select(s =>
-                            ((FilterScope)s).fb).ToList();
-                    if (handlerScopes.Count > 0)
-                    {
-                        frame.ContinueBranchingToMultiple(handlerScopes);
-                    }
-
-                    if (filterScopes.Count > 0)
-                    {
-                        frame.ContinueBranchingToMultiple(filterScopes);
-                    }
+                    // var succScopes = frame.Scopes.Where(s =>
+                    //     s.ilLoc.te.idx == frame.CurInstr.idx);
+                    // var handlerScopes = succScopes.Select(s => s.ilLoc.hb).ToList();
+                    // var filterScopes = succScopes.Where(s => s is FilterScope).Select(s => (s as FilterScope).fb).ToList();
+                    // if (handlerScopes.Count > 0)
+                    // {
+                    //     frame.ContinueBranchingToMultiple(handlerScopes);
+                    // }
+                    //
+                    // if (filterScopes.Count > 0)
+                    // {
+                    //     frame.ContinueBranchingToMultiple(filterScopes);
+                    // }
 
                     frame.ContinueBranchingTo(target, null);
                     return;
