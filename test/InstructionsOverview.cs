@@ -440,6 +440,7 @@ static class TryBlockTests
         {
             try
             {
+                string tt = "try in try";
                 return;
                 string dc = "dead code";
             }
