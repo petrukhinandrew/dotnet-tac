@@ -88,6 +88,13 @@ static class ConditionsTests
         return res;
     }
 
+    public static void TernaryOp()
+    {
+        int a = 1;
+        int b = 2;
+        string s = (a > b) ? "true" : "false";
+        int c = s.Length < a + b ? b - a : a - b;
+    }
     public static void Loops()
     {
         int i = 1 + 4;
