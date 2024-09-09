@@ -444,6 +444,11 @@ static class TryBlockTests
                 return;
                 string dc = "dead code";
             }
+            catch (Exception)
+            {
+                string c = "catch";
+                return;
+            }
             finally
             {
                 string ff = "first finally";
@@ -452,6 +457,55 @@ static class TryBlockTests
         finally
         {
             string sf = "second finally";
+        }
+    }
+
+    public static void TryEndingWithCatch()
+    {
+        try
+        {
+            int a = 1;
+            try
+            {
+                int b = 2;
+            }
+            catch (Exception)
+            {
+                int c = 3;
+            }
+        }
+        finally
+        {
+        }
+    }
+
+    public static void Fault()
+    {
+        try
+        {
+            string s = "try";
+        }
+        catch (Exception e)
+        {
+            string c = "catch";
+        }
+        catch
+        {
+            string f = "fault";
+        }
+    }
+
+    public static void BranchInFinally()
+    {
+        try
+        {
+        }
+        catch
+        {
+            return;
+        }
+        finally
+        {
         }
     }
 }
