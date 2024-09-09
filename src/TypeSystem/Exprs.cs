@@ -6,6 +6,7 @@ class ILUnaryOperation(ILExpr operand) : ILExpr
     public ILExpr Operand => operand;
 
     public ILType Type => operand.Type;
+
     public new string ToString()
     {
         return "unOp " + operand.ToString();
@@ -24,15 +25,18 @@ class ILBinaryOperation(ILExpr lhs, ILExpr rhs, string op = " binop ") : ILExpr
 class ILNewDefaultExpr(ILType type) : ILExpr
 {
     public ILType Type => type;
+
     public override string ToString()
     {
         return string.Format("new {0}(default)", Type.ToString());
     }
 }
+
 class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
 {
     public ILType Type => type;
     public ILExpr[] Args = args;
+
     public override string ToString()
     {
         return "new " + Type.ToString() + " (" + string.Join(", ", Args.Select(a => a.ToString())) + ")";
@@ -43,17 +47,28 @@ class ILSizeOfExpr(ILType type) : ILExpr
 {
     public ILType Type => new ILUInt32();
     public ILType Arg => type;
+
     public override string ToString()
     {
         return "sizeof " + Arg.ToString();
     }
 }
 
+class ILMergedValueExpr(ILType type) : ILExpr
+{
+    public ILType Type => type;
+
+    public override string ToString()
+    {
+        return "merged";
+    }
+}
 
 class ILNewArrayExpr(ILArray type, ILExpr size) : ILExpr
 {
     public ILType Type => type.ElemType;
     public ILExpr Size => size;
+
     public override string ToString()
     {
         return "new " + Type.ToString() + "[" + Size.ToString() + "]";
@@ -67,6 +82,7 @@ class ILArrayAccess : ILLValue
         _arrRef = arrRef;
         _idx = idx;
     }
+
     ILExpr _arrRef;
     ILExpr _idx;
     public ILType Type => _arrRef.Type;
@@ -79,30 +95,47 @@ class ILArrayAccess : ILLValue
         return _arrRef.ToString() + "[" + _idx.ToString() + "]";
     }
 }
+
 class ILArrayLength(ILExpr arr) : ILExpr
 {
     private ILExpr _arr = arr;
     private ILType _type = new ILInt32();
     public ILType Type => _type;
+
     public override string ToString()
     {
         return _arr.ToString() + ".Length";
     }
 }
+
 abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
 {
     protected ILType _targetType = targetType;
     protected ILExpr _target = target;
     public ILType Type => _targetType;
+
     public override string ToString()
     {
         return string.Format("({0}) {1}", _targetType.ToString(), _target.ToString());
     }
 }
-class ILConvExpr(ILPrimitiveType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
-class ILBoxExpr(ILValue value) : ILCastExpr(new ILObject(), value) { }
-class ILUnboxExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
-class ILCastClassExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value) { }
+
+class ILConvExpr(ILPrimitiveType targetType, ILExpr value) : ILCastExpr(targetType, value)
+{
+}
+
+class ILBoxExpr(ILValue value) : ILCastExpr(new ILObject(), value)
+{
+}
+
+class ILUnboxExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
+{
+}
+
+class ILCastClassExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
+{
+}
+
 class ILCondCastExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
 {
     public override string ToString()
@@ -110,6 +143,7 @@ class ILCondCastExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, v
         return string.Format("{0} as {1}", _target.ToString(), _targetType.ToString());
     }
 }
+
 class ILCallExpr(ILMethod method) : ILExpr
 {
     protected ILMethod _method = method;
@@ -120,11 +154,15 @@ class ILCallExpr(ILMethod method) : ILExpr
         return "invoke " + _method.ToString();
     }
 }
+
 interface ILRefExpr : ILExpr
 {
     public ILExpr Value { get; }
 }
-interface ILDerefExpr : ILLValue { }
+
+interface ILDerefExpr : ILLValue
+{
+}
 
 class PointerExprTypeResolver
 {
@@ -133,14 +171,14 @@ class PointerExprTypeResolver
         switch (instance.Type)
         {
             case ILManagedPointer:
-                {
-                    return new ILManagedDeref(instance, type);
-                }
+            {
+                return new ILManagedDeref(instance, type);
+            }
             case ILNativeInt:
             case ILUnmanagedPointer:
-                {
-                    return new ILUnmanagedDeref(instance, type);
-                }
+            {
+                return new ILUnmanagedDeref(instance, type);
+            }
             default:
                 throw new Exception("no way");
         }
@@ -175,6 +213,7 @@ class ILManagedDeref(ILExpr byRefVal, ILType resType) : ILDerefExpr
 {
     private ILExpr Value = byRefVal;
     public ILType Type => resType;
+
     public override string ToString()
     {
         return "*" + Value.ToString();
@@ -185,6 +224,7 @@ class ILUnmanagedDeref(ILExpr pointedVal, ILType resType) : ILDerefExpr
 {
     private ILExpr Value = pointedVal;
     public ILType Type => resType;
+
     public override string ToString()
     {
         return "*" + Value.ToString();

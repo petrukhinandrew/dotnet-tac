@@ -46,11 +46,21 @@ class ILVarArgValue(string methodName) : ILValue
     public override string ToString() => Method + ".__arglist";
 }
 
-class ILLocal(ILType type, string name) : ILLValue
+class ILLocal(ILType type, string name, bool merged = false) : ILLValue
 {
     public ILType Type => type;
 
     public new string ToString() => name;
+
+    public override int GetHashCode()
+    {
+        return ToString().GetHashCode();
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ILLocal loc && loc.ToString() == ToString();
+    }
 }
 
 class ILObjectLiteral(ILType type, object? obj) : ILValue
@@ -74,6 +84,16 @@ class ILLiteral(ILType type, string value) : ILValue
         ILString => $"\"{value}\"",
         _ => value
     };
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ILLiteral literal && literal.ToString() == ToString();
+    }
+
+    public override int GetHashCode()
+    {
+        return ToString().GetHashCode();
+    }
 }
 
 class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount) : ILExpr

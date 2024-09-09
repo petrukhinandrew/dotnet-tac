@@ -1,20 +1,32 @@
+using System.Collections;
 using System.Reflection;
 using Usvm.IL.Parser;
 using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
+class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.Instr instr)
 {
-    public Stack<ILExpr> Stack = stack;
+    public readonly Stack<ILExpr> Stack = stack;
     public int ILFirst = instr.idx;
-    public List<ILStmt> TacLines = new();
+    private ILInstr.Instr _firstInstr = instr;
+    public readonly List<ILStmt> TacLines = new();
     public ILInstr.Instr CurInstr = instr;
     private MethodProcessor _mp = proc;
+    private bool _isMerging = false;
+    private Dictionary<SMFrame, Stack<ILExpr>> _preds = new();
+    public List<ILStmt> ExtraAssignments = new();
+
+    private static Stack<ILExpr> stackCopy(Stack<ILExpr> stack)
+    {
+        ILExpr[] newStack = new ILExpr[stack.Count];
+        stack.CopyTo(newStack, 0);
+        return new Stack<ILExpr>(newStack);
+    }
 
     public static SMFrame CreateInitial(MethodProcessor mp)
     {
-        return new SMFrame(mp, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
+        return new SMFrame(mp, null, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
     }
 
     public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
@@ -41,9 +53,7 @@ class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
         StopBranching();
         _mp.Successors[ILFirst].Insert(0, instr.idx);
         if (_mp.TacBlocks.ContainsKey(instr.idx)) return;
-        ILExpr[] stackCopy = new ILExpr[Stack.Count];
-        Stack.CopyTo(stackCopy, 0);
-        _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, new Stack<ILExpr>(stackCopy), (ILInstr.Instr)instr));
+        _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, this, stackCopy(Stack), (ILInstr.Instr)instr));
         _mp.TacBlocks[instr.idx].Branch();
     }
 
@@ -53,13 +63,9 @@ class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
     }
 
     public List<ILLocal> Locals => _mp.Locals;
-
     public List<EHScope> Scopes => _mp.Scopes;
-
     public List<ILLocal> Params => _mp.Params;
-
     public List<ILExpr> Temps => _mp.Temps;
-
     public List<ILExpr> Errs => _mp.Errs;
 
     public string GetMethodName()
@@ -74,7 +80,48 @@ class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
 
     public ILExpr PopSingleAddr()
     {
+        if (_isMerging) return MergeStacksValues();
         return ToSingleAddr(Stack.Pop());
+    }
+
+    public void InsertExtraAssignments()
+    {
+        var pos = TacLines.FindIndex(l => l is ILBranchStmt);
+        pos = pos == -1 ? TacLines.Count : pos;
+        TacLines.AddRange(ExtraAssignments);
+    }
+
+    public bool MergeStacksFrom(List<SMFrame> frames)
+    {
+        _preds = frames.ToDictionary(f => f, f => stackCopy(f.Stack));
+        ILStmt[] copy = new ILStmt[TacLines.Count];
+        TacLines.CopyTo(copy, 0);
+        _isMerging = true;
+        TacLines.Clear();
+        CurInstr = _firstInstr;
+        this.Branch();
+        _preds.Clear();
+        _isMerging = false;
+        foreach (var (line, i) in copy.Select((l, i) => (l, i)))
+        {
+            if (line != TacLines[i]) return false;
+        }
+
+        return true;
+    }
+
+    private ILExpr MergeStacksValues()
+    {
+        List<(SMFrame, ILExpr)> values = _preds.Keys.Select(s => (s, ToSingleAddr(s.Stack.Pop()))).ToList();
+        Console.WriteLine("SUKA {0}", string.Join(", ", values.Select(v => v.Item2.ToString())));
+        // if (values.Select(p => p.Item2).Distinct().Count() == 1) return values.Select(p => p.Item2).First();
+        ILLocal tmp = GetNewTemp(values[0].Item2.Type, new ILMergedValueExpr(values[0].Item2.Type));
+        for (int i = 0; i < values.Count; i++)
+        {
+            values[i].Item1.ExtraAssignments.Add(new ILAssignStmt(tmp, values[i].Item2));
+        }
+
+        return tmp;
     }
 
     public void PushLiteral<T>(T value)
@@ -133,7 +180,7 @@ class SMFrame(MethodProcessor proc, Stack<ILExpr> stack, ILInstr.Instr instr)
 
     public override bool Equals(object? obj)
     {
-        return obj != null && obj is SMFrame f && ILFirst == f.ILFirst;
+        return obj is SMFrame f && ILFirst == f.ILFirst;
     }
 
     public override int GetHashCode()

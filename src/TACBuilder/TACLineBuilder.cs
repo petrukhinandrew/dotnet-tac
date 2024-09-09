@@ -20,28 +20,19 @@ static class TACLineBuilder
         return (ILInstr.Instr)tmp;
     }
 
+    private static ILInstr DecideLeaveTarget(this SMFrame frame, ILInstr initialTarget)
+    {
+        foreach (var scope in frame.Scopes)
+        {
+            
+        }
+        return initialTarget;
+    }
+
     public static void Branch(this SMFrame frame)
     {
         while (true)
         {
-            // foreach (CatchScope scope in frame.Scopes.Where(s =>
-            //              s is CatchScope cs && cs.ilLoc.hb.idx == frame.CurInstr.idx))
-            // {
-            //     // frame.Stack.Push(frame.Errs[scope.ErrIdx]);
-            //     frame.NewLine(new ILEHStmt("catch", frame.Errs[scope.ErrIdx]));
-            // }
-            //
-            // foreach (FilterScope scope in frame.Scopes.Where(b => b is FilterScope fs && fs.fb.idx == frame.CurInstr.idx))
-            // {
-            //     frame.Stack.Push(frame.Errs[scope.ErrIdx]);
-            // }
-            //
-            // foreach (FilterScope scope in frame.Scopes.Where(b =>
-            //              b is FilterScope fs && fs.ilLoc.hb.idx == frame.CurInstr.idx))
-            // {
-            //     frame.Stack.Push(new ILLiteral(TypeSolver.Resolve(typeof(Exception)), "err"));
-            // }
-
             switch (frame.CurInstr.opCode.Name)
             {
                 case "ckfinite":
@@ -384,21 +375,7 @@ static class TACLineBuilder
                 {
                     ILInstr target = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
                     frame.Stack.Clear();
-                    // var succScopes = frame.Scopes.Where(s =>
-                    //     s.ilLoc.te.idx == frame.CurInstr.idx);
-                    // var handlerScopes = succScopes.Select(s => s.ilLoc.hb).ToList();
-                    // var filterScopes = succScopes.Where(s => s is FilterScope).Select(s => (s as FilterScope).fb).ToList();
-                    // if (handlerScopes.Count > 0)
-                    // {
-                    //     frame.ContinueBranchingToMultiple(handlerScopes);
-                    // }
-                    //
-                    // if (filterScopes.Count > 0)
-                    // {
-                    //     frame.ContinueBranchingToMultiple(filterScopes);
-                    // }
-
-                    frame.ContinueBranchingTo(target, null);
+                    frame.ContinueBranchingTo(DecideLeaveTarget(frame, target), null);
                     return;
                 }
                 case "switch":

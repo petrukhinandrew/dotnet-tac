@@ -14,7 +14,7 @@ abstract class EHScope
             rewriterEhcType.FilterEH => FilterScope.FromClause(clause),
             rewriterEhcType.FinallyEH => FinallyScope.FromClause(clause),
             rewriterEhcType.FaultEH => FaultScope.FromClause(clause),
-            _ => throw new Exception("unexpected clause type " + clause.ToString())
+            _ => throw new Exception("unexpected clause type " + clause)
         };
     }
 
@@ -32,12 +32,16 @@ abstract class EHScope
                 he = clause.handlerEnd,
             };
         }
-
+        
+        // TODO
+        // public bool TryContains(int idx) => tb.idx < idx && te.idx > idx;
+        // public bool HandlerContains(int idx) => hb.idx < idx && he.idx > idx;
+        
         public override string ToString() => string.Join(" ", new int[tb.idx, te.idx, hb.idx, he.idx]);
 
         public override bool Equals(object? obj)
         {
-            return obj != null && obj is ILScopeLocation l && tb.idx == l.tb.idx && te.idx == l.te.idx &&
+            return obj is ILScopeLocation l && tb.idx == l.tb.idx && te.idx == l.te.idx &&
                    hb.idx == l.hb.idx && he.idx == l.he.idx;
         }
 

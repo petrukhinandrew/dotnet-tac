@@ -36,7 +36,12 @@ class MethodProcessor
         InitEHScopes();
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
-        ProcessEHScopesIL();
+        MergeStacks();
+        // ProcessEHScopesIL();
+        foreach (var bb in TacBlocks)
+        {
+            bb.Value.InsertExtraAssignments();
+        }
         ComposeTac();
     }
 
@@ -70,6 +75,31 @@ class MethodProcessor
         TacBlocks[0].Branch();
     }
 
+    private void MergeStacks()
+    {
+        Queue<KeyValuePair<int, SMFrame>> q = new();
+        foreach (var bb in TacBlocks.OrderByDescending(b1 => b1.Key))
+        {
+            if (GetPredecessorsOf(bb.Key).Count > 1)
+            {
+                q.Enqueue(bb);
+            }
+        }
+
+        while (q.Count > 0)
+        {
+            var bb = q.Dequeue();
+            if (bb.Value.MergeStacksFrom(GetPredecessorsOf(bb.Key)))
+            {
+                foreach (var sb in TacBlocks.Where(p => Successors[bb.Key].Contains(p.Key)))
+                {
+                    q.Enqueue(sb);
+                }
+            }
+        }
+        
+    }
+
     private void ProcessEHScopesIL()
     {
         foreach (var scope in Scopes)
@@ -78,7 +108,7 @@ class MethodProcessor
             Leaders.Add(scope.ilLoc.hb);
             if (scope is CatchScope catchScope)
             {
-                TacBlocks[hbIndex] = new SMFrame(this, new Stack<ILExpr>([Errs[catchScope.ErrIdx]]),
+                TacBlocks[hbIndex] = new SMFrame(this, null, new Stack<ILExpr>([Errs[catchScope.ErrIdx]]),
                     (ILInstr.Instr)catchScope.ilLoc.hb);
                 TacBlocks[hbIndex].Branch();
             }
@@ -86,16 +116,16 @@ class MethodProcessor
             {
                 int fbIndex = filterScope.fb.idx;
                 Leaders.Add(filterScope.fb);
-                TacBlocks[fbIndex] = new SMFrame(this, new Stack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                TacBlocks[fbIndex] = new SMFrame(this, null, new Stack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.fb);
                 TacBlocks[fbIndex].Branch();
-                TacBlocks[hbIndex] = new SMFrame(this, new Stack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                TacBlocks[hbIndex] = new SMFrame(this, null, new Stack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.ilLoc.hb);
                 TacBlocks[hbIndex].Branch();
             }
             else
             {
-                TacBlocks[hbIndex] = new SMFrame(this, new Stack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
+                TacBlocks[hbIndex] = new SMFrame(this, null, new Stack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
                 TacBlocks[hbIndex].Branch();
             }
         }
@@ -149,6 +179,12 @@ class MethodProcessor
                 Scopes.Add(scope);
             }
         }
+    }
+
+    public List<SMFrame> GetPredecessorsOf(int idx)
+    {
+        List<int> indices = Successors.Where((p) => p.Value.Contains(idx)).Select(p => p.Key).ToList();
+        return TacBlocks.Where(p => indices.Contains(p.Key)).Select(p => p.Value).ToList();
     }
 
     public FieldInfo ResolveField(int target)
