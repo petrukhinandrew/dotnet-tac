@@ -327,11 +327,10 @@ namespace IntegrationTests
             return res;
         }
 
-        public class Disposable : IDisposable
+        private class Disposable : IDisposable
         {
             public void Dispose()
             {
-                // TODO release managed resources here
             }
         }
 
