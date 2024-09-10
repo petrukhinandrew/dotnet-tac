@@ -102,14 +102,7 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
         Stack.Clear();
         CurInstr = _firstInstr;
         this.Branch();
-        _preds.Clear();
-        _isMerging = false;
-        foreach (var (line, i) in copy.Select((l, i) => (l, i)))
-        {
-            if (line != TacLines[i]) return false;
-        }
-
-        return true;
+        return copy.SequenceEqual(TacLines);
     }
 
     private ILExpr MergeStacksValues()
