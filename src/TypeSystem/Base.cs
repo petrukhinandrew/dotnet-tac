@@ -96,12 +96,11 @@ class ILLiteral(ILType type, string value) : ILValue
     }
 }
 
-class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount) : ILExpr
+class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount, int token) : ILExpr
 {
     public static ILMethod FromMethodBase(MethodBase mb)
     {
         int paramCount = mb.GetParameters().Count(p => !p.IsRetval);
-
         Type retType = typeof(void);
         if (mb is MethodInfo methodInfo)
         {
@@ -109,7 +108,8 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
         }
 
         ILType ilRetType = TypeSolver.Resolve(retType);
-        ILMethod method = new ILMethod(mb, ilRetType, mb.DeclaringType?.FullName ?? "", mb.Name, paramCount);
+        ILMethod method = new ILMethod(mb, ilRetType, mb.DeclaringType?.FullName ?? "", mb.Name, paramCount,
+            mb.GetMetadataToken());
 
         foreach (var t in mb.GetGenericArguments())
         {
@@ -118,6 +118,8 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
 
         return method;
     }
+
+    private int _metadataToken = token;
 
     public void LoadArgs(Stack<ILExpr> stack)
     {
@@ -138,7 +140,7 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
     public string Name = name;
     private int _argCount = argCount;
     public List<ILExpr> Args = new List<ILExpr>();
-    private readonly MethodBase _methodBase = mb;
+    private MethodBase _methodBase = mb;
     public ILType Type => ReturnType;
 
     public override string ToString()
@@ -161,18 +163,30 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
     {
         return ReturnType is not ILVoid && ReturnType is not ILNull;
     }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ILMethod m && m._metadataToken == _metadataToken;
+    }
+
+    public override int GetHashCode()
+    {
+        return _metadataToken.GetHashCode();
+    }
 }
 
-class ILField(ILType type, string declType, string name, bool isStatic) : ILLValue
+class ILField(ILType type, string declType, string name, bool isStatic, int token) : ILLValue
 {
     public static ILField Static(FieldInfo f)
     {
-        return new ILField(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, true);
+        return new ILField(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, true,
+            f.GetMetadataToken());
     }
 
     public static ILField Instance(FieldInfo f, ILExpr inst)
     {
-        ILField field = new ILField(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, false)
+        ILField field = new ILField(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, false,
+            f.GetMetadataToken())
         {
             Receiver = inst
         };
@@ -184,6 +198,7 @@ class ILField(ILType type, string declType, string name, bool isStatic) : ILLVal
     public bool IsStatic = isStatic;
     public ILExpr? Receiver;
     public ILType Type => type;
+    private int _metadataToken = token;
 
     public override string ToString()
     {
@@ -193,5 +208,15 @@ class ILField(ILType type, string declType, string name, bool isStatic) : ILLVal
             true => $"{DeclaringType}.{Name}",
             false => $"{Receiver!.ToString()}.{Name}"
         };
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ILField f && f._metadataToken == _metadataToken;
+    }
+
+    public override int GetHashCode()
+    {
+        return _metadataToken.GetHashCode();
     }
 }
