@@ -88,6 +88,7 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
     {
         var pos = TacLines.FindIndex(l => l is ILBranchStmt);
         pos = pos == -1 ? TacLines.Count : pos;
+        // TODO reorder extra assignments so that prev line does not use var from next line 
         TacLines.AddRange(ExtraAssignments);
     }
 

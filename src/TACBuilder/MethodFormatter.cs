@@ -111,11 +111,7 @@ static class MethodFormatter
         mp.DumpMethodSignature();
         // mp.DumpEHS();
         mp.DumpVars();
-        mp.DumpBBs();
+        // mp.DumpBBs();
         mp.DumpTAC();
-        foreach (var bb in mp.TacBlocks)
-        {
-            Console.WriteLine(string.Join(", ", bb.Value.ExtraAssignments.Select(v => v.ToString())));
-        }
     }
 }
