@@ -95,6 +95,7 @@ static class ConditionsTests
         string s = (a > b) ? "true" : "false";
         int c = s.Length < a + b ? b - a : a - b;
     }
+
     public static void Loops()
     {
         int i = 1 + 4;
@@ -373,24 +374,24 @@ static class TryBlockTests
             string s = "try";
             if (s != "try") throw new Exception("e");
         }
-        catch (NullReferenceException)
+        catch (NullReferenceException nre)
         {
-            string s = "catch 1";
+            string s = "catch 1 with " + nre;
             try
             {
                 string ss = "try in catch";
                 int zero = 0;
                 float x = 7 / zero;
             }
-            catch (DivideByZeroException)
+            catch (DivideByZeroException dbze)
             {
-                string ss = "catch in catch";
+                string ss = "catch in catch with " + dbze;
                 int x = 1;
             }
 
             return;
         }
-        catch (Exception) when (t == 1)
+        catch (Exception e) when (t == 1)
         {
             string s = "filter";
         }

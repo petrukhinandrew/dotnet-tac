@@ -147,7 +147,7 @@ class FinallyScope : EHScope
 {
     public new static FinallyScope FromClause(ehClause clause)
     {
-        return new FinallyScope()
+        return new FinallyScope
         {
             ilLoc = ILScopeLocation.FromClause(clause)
         };
