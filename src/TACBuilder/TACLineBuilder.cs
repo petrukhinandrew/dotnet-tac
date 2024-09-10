@@ -51,40 +51,40 @@ static class TACLineBuilder
                 case "break": break;
 
                 case "ldarg.0":
-                    frame.Stack.Push(frame.Params[0]);
+                    frame.Push(frame.Params[0]);
                     break;
                 case "ldarg.1":
-                    frame.Stack.Push(frame.Params[1]);
+                    frame.Push(frame.Params[1]);
                     break;
                 case "ldarg.2":
-                    frame.Stack.Push(frame.Params[2]);
+                    frame.Push(frame.Params[2]);
                     break;
                 case "ldarg.3":
-                    frame.Stack.Push(frame.Params[3]);
+                    frame.Push(frame.Params[3]);
                     break;
                 case "ldarg":
-                    frame.Stack.Push(frame.Params[((ILInstrOperand.Arg16)frame.CurInstr.arg).value]);
+                    frame.Push(frame.Params[((ILInstrOperand.Arg16)frame.CurInstr.arg).value]);
                     break;
                 case "ldarg.s":
-                    frame.Stack.Push(frame.Params[((ILInstrOperand.Arg8)frame.CurInstr.arg).value]);
+                    frame.Push(frame.Params[((ILInstrOperand.Arg8)frame.CurInstr.arg).value]);
                     break;
                 case "ldloc.0":
-                    frame.Stack.Push(frame.Locals[0]);
+                    frame.Push(frame.Locals[0]);
                     break;
                 case "ldloc.1":
-                    frame.Stack.Push(frame.Locals[1]);
+                    frame.Push(frame.Locals[1]);
                     break;
                 case "ldloc.2":
-                    frame.Stack.Push(frame.Locals[2]);
+                    frame.Push(frame.Locals[2]);
                     break;
                 case "ldloc.3":
-                    frame.Stack.Push(frame.Locals[3]);
+                    frame.Push(frame.Locals[3]);
                     break;
                 case "ldloc":
-                    frame.Stack.Push(frame.Locals[((ILInstrOperand.Arg16)frame.CurInstr.arg).value]);
+                    frame.Push(frame.Locals[((ILInstrOperand.Arg16)frame.CurInstr.arg).value]);
                     break;
                 case "ldloc.s":
-                    frame.Stack.Push(frame.Locals[((ILInstrOperand.Arg8)frame.CurInstr.arg).value]);
+                    frame.Push(frame.Locals[((ILInstrOperand.Arg8)frame.CurInstr.arg).value]);
                     break;
                 case "stloc.0":
                 {
@@ -133,7 +133,7 @@ static class TACLineBuilder
                 }
                 case "arglist":
                 {
-                    frame.Stack.Push(new ILVarArgValue(frame.GetMethodName()));
+                    frame.Push(new ILVarArgValue(frame.GetMethodName()));
                     break;
                 }
                 case "throw":
@@ -167,14 +167,14 @@ static class TACLineBuilder
                 case "localloc":
                 {
                     ILExpr size = frame.PopSingleAddr();
-                    frame.Stack.Push(new ILStackAlloc(size));
+                    frame.Push(new ILStackAlloc(size));
                     break;
                 }
                 case "ldfld":
                 {
                     FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     ILExpr inst = frame.PopSingleAddr();
-                    frame.Stack.Push(ILField.Instance(field, inst));
+                    frame.Push(ILField.Instance(field, inst));
                     break;
                 }
                 case "ldflda":
@@ -184,11 +184,11 @@ static class TACLineBuilder
                     ILField ilField = ILField.Instance(field, inst);
                     if (inst.Type is ILUnmanagedPointer)
                     {
-                        frame.Stack.Push(new ILUnmanagedRef(ilField));
+                        frame.Push(new ILUnmanagedRef(ilField));
                     }
                     else
                     {
-                        frame.Stack.Push(new ILManagedRef(ilField));
+                        frame.Push(new ILManagedRef(ilField));
                     }
 
                     break;
@@ -197,7 +197,7 @@ static class TACLineBuilder
                 case "ldsfld":
                 {
                     FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                    frame.Stack.Push(ILField.Static(field));
+                    frame.Push(ILField.Static(field));
                     break;
                 }
                 case "ldsflda":
@@ -206,11 +206,11 @@ static class TACLineBuilder
                     ILField ilField = ILField.Static(field);
                     if (field.FieldType.IsUnmanaged())
                     {
-                        frame.Stack.Push(new ILUnmanagedRef(ilField));
+                        frame.Push(new ILUnmanagedRef(ilField));
                     }
                     else
                     {
-                        frame.Stack.Push(new ILManagedRef(ilField));
+                        frame.Push(new ILManagedRef(ilField));
                     }
 
                     break;
@@ -236,7 +236,7 @@ static class TACLineBuilder
                 case "sizeof":
                 {
                     Type mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                    frame.Stack.Push(new ILSizeOfExpr(TypeSolver.Resolve(mbType)));
+                    frame.Push(new ILSizeOfExpr(TypeSolver.Resolve(mbType)));
                     break;
                 }
                 case "ldind.i1":
@@ -248,7 +248,7 @@ static class TACLineBuilder
                 {
                     ILExpr addr = frame.PopSingleAddr();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt32());
-                    frame.Stack.Push(deref);
+                    frame.Push(deref);
                     break;
                 }
                 case "ldind.u8":
@@ -256,28 +256,28 @@ static class TACLineBuilder
                 {
                     ILExpr addr = frame.PopSingleAddr();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt64());
-                    frame.Stack.Push(deref);
+                    frame.Push(deref);
                     break;
                 }
                 case "ldind.r4":
                 {
                     ILExpr addr = frame.PopSingleAddr();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
-                    frame.Stack.Push(deref);
+                    frame.Push(deref);
                     break;
                 }
                 case "ldind.r8":
                 {
                     ILExpr addr = frame.PopSingleAddr();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
-                    frame.Stack.Push(deref);
+                    frame.Push(deref);
                     break;
                 }
                 case "ldind.i":
                 {
                     ILExpr addr = frame.PopSingleAddr();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeInt());
-                    frame.Stack.Push(deref);
+                    frame.Push(deref);
                     break;
                 }
 
@@ -285,7 +285,7 @@ static class TACLineBuilder
                 {
                     ILExpr addr = frame.PopSingleAddr();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILObject());
-                    frame.Stack.Push(deref);
+                    frame.Push(deref);
                     break;
                 }
                 case "ldobj":
@@ -294,7 +294,7 @@ static class TACLineBuilder
                     if (mbType == null) throw new Exception("type not resolved for ldobj");
                     ILExpr addr = frame.PopSingleAddr();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypeSolver.Resolve(mbType));
-                    frame.Stack.Push(deref);
+                    frame.Push(deref);
                     break;
                 }
 
@@ -349,25 +349,25 @@ static class TACLineBuilder
                 case "ldarga":
                 {
                     int idx = ((ILInstrOperand.Arg16)frame.CurInstr.arg).value;
-                    frame.Stack.Push(new ILManagedRef(frame.Params[idx]));
+                    frame.Push(new ILManagedRef(frame.Params[idx]));
                     break;
                 }
                 case "ldarga.s":
                 {
                     int idx = ((ILInstrOperand.Arg8)frame.CurInstr.arg).value;
-                    frame.Stack.Push(new ILManagedRef(frame.Params[idx]));
+                    frame.Push(new ILManagedRef(frame.Params[idx]));
                     break;
                 }
                 case "ldloca":
                 {
                     int idx = ((ILInstrOperand.Arg16)frame.CurInstr.arg).value;
-                    frame.Stack.Push(new ILManagedRef(frame.Locals[idx]));
+                    frame.Push(new ILManagedRef(frame.Locals[idx]));
                     break;
                 }
                 case "ldloca.s":
                 {
                     int idx = ((ILInstrOperand.Arg8)frame.CurInstr.arg).value;
-                    frame.Stack.Push(new ILManagedRef(frame.Locals[idx]));
+                    frame.Push(new ILManagedRef(frame.Locals[idx]));
                     break;
                 }
                 case "leave":
@@ -404,7 +404,7 @@ static class TACLineBuilder
                     MethodBase? mb = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     if (mb == null) throw new Exception("method not resolved at " + frame.CurInstr.idx);
                     ILMethod method = ILMethod.FromMethodBase(mb);
-                    frame.Stack.Push(method);
+                    frame.Push(method);
                     break;
                 }
                 case "ldvirtftn":
@@ -413,11 +413,11 @@ static class TACLineBuilder
                     if (mb == null) throw new Exception("method not resolved at " + frame.CurInstr.idx);
                     ILMethod ilMethod = ILMethod.FromMethodBase(mb);
                     ilMethod.Receiver = frame.PopSingleAddr();
-                    frame.Stack.Push(ilMethod);
+                    frame.Push(ilMethod);
                     break;
                 }
                 case "ldnull":
-                    frame.Stack.Push(new ILNullValue());
+                    frame.Push(new ILNullValue());
                     break;
                 case "ldc.i4.m1":
                 case "ldc.i4.M1":
@@ -471,8 +471,8 @@ static class TACLineBuilder
                 case "dup":
                 {
                     ILExpr dup = frame.PopSingleAddr();
-                    frame.Stack.Push(dup);
-                    frame.Stack.Push(dup);
+                    frame.Push(dup);
+                    frame.Push(dup);
                     break;
                 }
                 case "pop":
@@ -485,7 +485,7 @@ static class TACLineBuilder
                     {
                         MethodBase mbMethod = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                         token = new ILObjectLiteral(new ILHandleRef(), mbMethod.Name);
-                        frame.Stack.Push(token);
+                        frame.Push(token);
                         break;
                     }
                     catch (Exception)
@@ -496,7 +496,7 @@ static class TACLineBuilder
                     {
                         FieldInfo mbField = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                         token = new ILObjectLiteral(new ILHandleRef(), mbField.GetValue(null));
-                        frame.Stack.Push(token);
+                        frame.Push(token);
                         break;
                     }
                     catch (Exception)
@@ -507,7 +507,7 @@ static class TACLineBuilder
                     {
                         Type mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                         token = new ILObjectLiteral(new ILHandleRef(), mbType.Name);
-                        frame.Stack.Push(token);
+                        frame.Push(token);
                         break;
                     }
                     catch (Exception)
@@ -531,7 +531,7 @@ static class TACLineBuilder
                     {
                         var call = new ILCallExpr(ilMethod);
                         if (ilMethod.Returns())
-                            frame.Stack.Push(call);
+                            frame.Push(call);
                         else
                             frame.NewLine(new ILCallStmt(call));
                     }
@@ -546,7 +546,7 @@ static class TACLineBuilder
                     ilMethod.LoadArgs(frame.Stack);
                     var call = new ILCallExpr(ilMethod);
                     if (ilMethod.Returns())
-                        frame.Stack.Push(call);
+                        frame.Push(call);
                     else
                         frame.NewLine(new ILCallStmt(call));
                     break;
@@ -601,7 +601,7 @@ static class TACLineBuilder
                     ILExpr rhs = frame.PopSingleAddr();
                     ILExpr lhs = frame.PopSingleAddr();
                     ILBinaryOperation op = new ILBinaryOperation(lhs, rhs);
-                    frame.Stack.Push(op);
+                    frame.Push(op);
                     break;
                 }
                 case "neg":
@@ -609,7 +609,7 @@ static class TACLineBuilder
                 {
                     ILExpr operand = frame.PopSingleAddr();
                     ILUnaryOperation op = new ILUnaryOperation(operand);
-                    frame.Stack.Push(op);
+                    frame.Push(op);
                     break;
                 }
 
@@ -701,7 +701,7 @@ static class TACLineBuilder
                         inParams[i] = frame.PopSingleAddr();
                     }
 
-                    frame.Stack.Push(new ILNewExpr(
+                    frame.Push(new ILNewExpr(
                         TypeSolver.Resolve(objType),
                         inParams));
                     break;
@@ -725,7 +725,7 @@ static class TACLineBuilder
                         arrTemp,
                         arrExpr
                     ));
-                    frame.Stack.Push(arrTemp);
+                    frame.Push(arrTemp);
                     break;
                 }
                 case "initobj":
@@ -752,20 +752,20 @@ static class TACLineBuilder
                 {
                     ILExpr index = frame.PopSingleAddr();
                     ILExpr arr = frame.PopSingleAddr();
-                    frame.Stack.Push(new ILArrayAccess(arr, index));
+                    frame.Push(new ILArrayAccess(arr, index));
                     break;
                 }
                 case "ldelema":
                 {
                     ILExpr idx = frame.PopSingleAddr();
                     ILExpr arr = frame.PopSingleAddr();
-                    frame.Stack.Push(new ILManagedRef(new ILArrayAccess(arr, idx)));
+                    frame.Push(new ILManagedRef(new ILArrayAccess(arr, idx)));
                     break;
                 }
                 case "ldlen":
                 {
                     ILExpr arr = frame.PopSingleAddr();
-                    frame.Stack.Push(new ILArrayLength(arr));
+                    frame.Push(new ILArrayLength(arr));
                     break;
                 }
                 case "stelem.i1":
@@ -789,28 +789,28 @@ static class TACLineBuilder
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
                 case "conv.i8":
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
                 case "conv.r4":
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILFloat32(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
                 case "conv.r8":
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILFloat64(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
                 case "conv.u1":
@@ -819,35 +819,35 @@ static class TACLineBuilder
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
                 case "conv.u8":
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
                 case "conv.i":
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
                 case "conv.u":
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
                 case "conv.r.un":
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILNativeFloat(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
 
@@ -875,7 +875,7 @@ static class TACLineBuilder
                 {
                     ILExpr value = frame.PopSingleAddr();
                     ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
-                    frame.Stack.Push(conv);
+                    frame.Push(conv);
                     break;
                 }
                 case "isinst":
@@ -889,7 +889,7 @@ static class TACLineBuilder
 
                     ILExpr obj = frame.PopSingleAddr();
                     ILExpr res = new ILCondCastExpr(TypeSolver.Resolve(mbType), obj);
-                    frame.Stack.Push(res);
+                    frame.Push(res);
                     break;
                 }
                 case "castclass":
@@ -903,7 +903,7 @@ static class TACLineBuilder
 
                     ILExpr value = frame.PopSingleAddr();
                     ILExpr casted = new ILCastClassExpr(TypeSolver.Resolve(mbType), value);
-                    frame.Stack.Push(casted);
+                    frame.Push(casted);
                     break;
                 }
                 case "box":
@@ -917,7 +917,7 @@ static class TACLineBuilder
 
                     ILValue value = (ILValue)frame.PopSingleAddr();
                     ILExpr boxed = new ILBoxExpr(value);
-                    frame.Stack.Push(boxed);
+                    frame.Push(boxed);
                     break;
                 }
                 case "unbox":
@@ -932,7 +932,7 @@ static class TACLineBuilder
 
                     ILValue obj = (ILValue)frame.PopSingleAddr();
                     ILExpr unboxed = new ILUnboxExpr(TypeSolver.Resolve(mbType), obj);
-                    frame.Stack.Push(unboxed);
+                    frame.Push(unboxed);
                     break;
                 }
                 default: throw new Exception("unhandled frame.CurInstr " + frame.CurInstr.ToString());

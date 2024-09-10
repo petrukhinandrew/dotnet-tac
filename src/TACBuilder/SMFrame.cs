@@ -80,7 +80,7 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
 
     public ILExpr PopSingleAddr()
     {
-        if (_isMerging) return MergeStacksValues();
+        if (_isMerging && Stack.Count == 0) return MergeStacksValues();
         return ToSingleAddr(Stack.Pop());
     }
 
@@ -98,6 +98,7 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
         TacLines.CopyTo(copy, 0);
         _isMerging = true;
         TacLines.Clear();
+        Stack.Clear();
         CurInstr = _firstInstr;
         this.Branch();
         _preds.Clear();
@@ -113,8 +114,7 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
     private ILExpr MergeStacksValues()
     {
         List<(SMFrame, ILExpr)> values = _preds.Keys.Select(s => (s, ToSingleAddr(s.Stack.Pop()))).ToList();
-        Console.WriteLine("SUKA {0}", string.Join(", ", values.Select(v => v.Item2.ToString())));
-        // if (values.Select(p => p.Item2).Distinct().Count() == 1) return values.Select(p => p.Item2).First();
+        if (values.Select(p => p.Item2).Distinct().Count() == 1) return values.Select(p => p.Item2).First();
         ILLocal tmp = GetNewTemp(values[0].Item2.Type, new ILMergedValueExpr(values[0].Item2.Type));
         for (int i = 0; i < values.Count; i++)
         {
@@ -124,10 +124,15 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
         return tmp;
     }
 
+    public void Push(ILExpr expr)
+    {
+        Stack.Push(expr);
+    }
+
     public void PushLiteral<T>(T value)
     {
         ILLiteral lit = new ILLiteral(TypeSolver.Resolve(typeof(T)), value?.ToString() ?? "");
-        Stack.Push(lit);
+        Push(lit);
     }
 
     private ILExpr ToSingleAddr(ILExpr val)
