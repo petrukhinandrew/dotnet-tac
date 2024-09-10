@@ -36,12 +36,13 @@ class MethodProcessor
         InitEHScopes();
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
+        ProcessEHScopesIL();
         MergeStacks();
-        // ProcessEHScopesIL();
         foreach (var bb in TacBlocks)
         {
             bb.Value.InsertExtraAssignments();
         }
+
         ComposeTac();
     }
 
@@ -97,7 +98,6 @@ class MethodProcessor
                 }
             }
         }
-        
     }
 
     private void ProcessEHScopesIL()
@@ -110,7 +110,6 @@ class MethodProcessor
             {
                 TacBlocks[hbIndex] = new SMFrame(this, null, new Stack<ILExpr>([Errs[catchScope.ErrIdx]]),
                     (ILInstr.Instr)catchScope.ilLoc.hb);
-                TacBlocks[hbIndex].Branch();
             }
             else if (scope is FilterScope filterScope)
             {
@@ -118,16 +117,16 @@ class MethodProcessor
                 Leaders.Add(filterScope.fb);
                 TacBlocks[fbIndex] = new SMFrame(this, null, new Stack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.fb);
-                TacBlocks[fbIndex].Branch();
                 TacBlocks[hbIndex] = new SMFrame(this, null, new Stack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.ilLoc.hb);
-                TacBlocks[hbIndex].Branch();
+                TacBlocks[fbIndex].Branch();
             }
             else
             {
                 TacBlocks[hbIndex] = new SMFrame(this, null, new Stack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
-                TacBlocks[hbIndex].Branch();
             }
+
+            TacBlocks[hbIndex].Branch();
         }
     }
 

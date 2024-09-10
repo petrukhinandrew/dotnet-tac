@@ -522,7 +522,7 @@ static class TACLineBuilder
 
                     ILMethod ilMethod = ILMethod.FromMethodBase(method);
                     // TODO it use raw frame.Stack.Pop inside, must be using PopSingle-like
-                    ilMethod.LoadArgs(frame.Stack);
+                    ilMethod.LoadArgs(frame.PopSingleAddr);
                     if (ilMethod.IsInitializeArray())
                     {
                         frame.InlineInitArray(ilMethod.Args);
@@ -543,7 +543,7 @@ static class TACLineBuilder
                     MethodBase? method = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     if (method == null) throw new Exception("call not resolved at " + frame.CurInstr.idx);
                     ILMethod ilMethod = ILMethod.FromMethodBase(method);
-                    ilMethod.LoadArgs(frame.Stack);
+                    ilMethod.LoadArgs(frame.PopSingleAddr);
                     var call = new ILCallExpr(ilMethod);
                     if (ilMethod.Returns())
                         frame.Push(call);

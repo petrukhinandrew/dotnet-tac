@@ -121,15 +121,15 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
 
     private int _metadataToken = token;
 
-    public void LoadArgs(Stack<ILExpr> stack)
+    public void LoadArgs(Func<ILExpr> pop)
     {
         for (int i = _argCount - 1; i >= 0; i--)
         {
-            Args.Add(stack.Pop());
+            Args.Add(pop());
         }
 
         if (_methodBase.CallingConvention.HasFlag(CallingConventions.HasThis))
-            Receiver = stack.Pop();
+            Receiver = pop();
     }
 
     public bool IsGeneric => GenericArgs.Count > 0;
