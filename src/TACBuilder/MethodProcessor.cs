@@ -20,6 +20,7 @@ class MethodProcessor
     private ILInstr _begin;
     public List<EHScope> Scopes = [];
     public Dictionary<int, int?> ilToTacMapping = new();
+    public Queue<SMFrame> Worklist = new Queue<SMFrame>();
 
     public MethodProcessor(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
         ILInstr begin, ehClause[] ehs)
@@ -37,7 +38,7 @@ class MethodProcessor
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
         ProcessEHScopesIL();
-        MergeStacks();
+        // MergeStacks();
         foreach (var bb in TacBlocks)
         {
             bb.Value.InsertExtraAssignments();
@@ -73,32 +74,41 @@ class MethodProcessor
     {
         TacBlocks[0] = SMFrame.CreateInitial(this);
         Successors.Add(0, []);
-        TacBlocks[0].Branch();
-    }
-
-    private void MergeStacks()
-    {
-        Queue<KeyValuePair<int, SMFrame>> q = new();
-        foreach (var bb in TacBlocks.OrderByDescending(b1 => b1.Key))
+        Worklist.Enqueue(TacBlocks[0]);
+        while (Worklist.Count > 0)
         {
-            if (GetPredecessorsOf(bb.Key).Count > 1)
+            foreach (var frame in TacBlocks.Values)
             {
-                q.Enqueue(bb);
+                frame.ResetVirtualStack();
             }
-        }
 
-        while (q.Count > 0)
-        {
-            var bb = q.Dequeue();
-            if (bb.Value.MergeStacksFrom(GetPredecessorsOf(bb.Key)))
-            {
-                foreach (var sb in TacBlocks.Where(p => Successors[bb.Key].Contains(p.Key)))
-                {
-                    q.Enqueue(sb);
-                }
-            }
+            Worklist.Dequeue().Branch();
         }
     }
+
+    // private void MergeStacks()
+    // {
+    //     Queue<KeyValuePair<int, SMFrame>> q = new();
+    //     foreach (var bb in TacBlocks.OrderByDescending(b1 => b1.Key))
+    //     {
+    //         if (GetPredecessorsOf(bb.Key).Count > 1)
+    //         {
+    //             q.Enqueue(bb);
+    //         }
+    //     }
+    //
+    //     while (q.Count > 0)
+    //     {
+    //         var bb = q.Dequeue();
+    //         if (bb.Value.MergeStacksFrom(GetPredecessorsOf(bb.Key)))
+    //         {
+    //             foreach (var sb in TacBlocks.Where(p => Successors[bb.Key].Contains(p.Key)))
+    //             {
+    //                 q.Enqueue(sb);
+    //             }
+    //         }
+    //     }
+    // }
 
     private void ProcessEHScopesIL()
     {
@@ -108,25 +118,31 @@ class MethodProcessor
             Leaders.Add(scope.ilLoc.hb);
             if (scope is CatchScope catchScope)
             {
-                TacBlocks[hbIndex] = new SMFrame(this, null, new Stack<ILExpr>([Errs[catchScope.ErrIdx]]),
+                TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>([Errs[catchScope.ErrIdx]]),
                     (ILInstr.Instr)catchScope.ilLoc.hb);
             }
             else if (scope is FilterScope filterScope)
             {
                 int fbIndex = filterScope.fb.idx;
                 Leaders.Add(filterScope.fb);
-                TacBlocks[fbIndex] = new SMFrame(this, null, new Stack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                TacBlocks[fbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.fb);
-                TacBlocks[hbIndex] = new SMFrame(this, null, new Stack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.ilLoc.hb);
                 TacBlocks[fbIndex].Branch();
             }
             else
             {
-                TacBlocks[hbIndex] = new SMFrame(this, null, new Stack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
+                TacBlocks[hbIndex] =
+                    new SMFrame(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
             }
 
-            TacBlocks[hbIndex].Branch();
+            Worklist.Enqueue(TacBlocks[hbIndex]);
+        }
+
+        while (Worklist.Count > 0)
+        {
+            Worklist.Dequeue().Branch();
         }
     }
 

@@ -22,15 +22,20 @@ static class TACLineBuilder
 
     private static ILInstr DecideLeaveTarget(this SMFrame frame, ILInstr initialTarget)
     {
-        foreach (var scope in frame.Scopes)
-        {
-            
-        }
+
         return initialTarget;
     }
 
     public static void Branch(this SMFrame frame)
     {
+        ILStmt[] copy = new ILStmt[frame.TacLines.Count];
+        frame.TacLines.CopyTo(copy, 0);
+        frame._lastTacLines = copy.ToList();
+        frame._cachedTacLinesEq = null;
+        frame.TacLines.Clear();
+        frame.ClearStack();
+        frame.CurInstr = frame._firstInstr;
+        
         while (true)
         {
             switch (frame.CurInstr.opCode.Name)
@@ -139,7 +144,7 @@ static class TACLineBuilder
                 case "throw":
                 {
                     ILExpr obj = frame.PopSingleAddr();
-                    frame.Stack.Clear();
+                    frame.ClearStack();
                     frame.NewLine(new ILEHStmt("throw", obj));
                     break;
                 }
@@ -374,7 +379,7 @@ static class TACLineBuilder
                 case "leave.s":
                 {
                     ILInstr target = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
-                    frame.Stack.Clear();
+                    frame.ClearStack();
                     frame.ContinueBranchingTo(DecideLeaveTarget(frame, target), null);
                     return;
                 }
@@ -557,8 +562,6 @@ static class TACLineBuilder
                     frame.NewLine(
                         new ILReturnStmt(retVal)
                     );
-                    if (frame.Stack.Count > 0)
-                        throw new Exception("stack not empty after ret at " + frame.CurInstr.idx);
                     break;
                 }
                 case "add":
@@ -941,7 +944,6 @@ static class TACLineBuilder
             var adv = AdvanceIP(frame.CurInstr!);
             if (adv == null)
             {
-                frame.StopBranching();
                 return;
             }
 

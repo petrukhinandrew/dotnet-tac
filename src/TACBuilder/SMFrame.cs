@@ -5,28 +5,53 @@ using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.Instr instr)
+class SMFrame
 {
-    public readonly Stack<ILExpr> Stack = stack;
-    public int ILFirst = instr.idx;
-    private ILInstr.Instr _firstInstr = instr;
+    public readonly EvaluationStack<ILExpr> Stack = new();
+    public int ILFirst;
+    internal ILInstr.Instr _firstInstr;
     public readonly List<ILStmt> TacLines = new();
-    public ILInstr.Instr CurInstr = instr;
-    private MethodProcessor _mp = proc;
-    private bool _isMerging = false;
-    private Dictionary<SMFrame, Stack<ILExpr>> _preds = new();
+    public ILInstr.Instr CurInstr;
+
+    private MethodProcessor _mp;
+    internal List<ILStmt> _lastTacLines = new();
+
+    internal bool? _cachedTacLinesEq;
+    // private Dictionary<SMFrame, Stack<ILExpr>> _preds = new();
+    private HashSet<SMFrame> _preds = new();
     public List<ILStmt> ExtraAssignments = new();
 
-    private static Stack<ILExpr> stackCopy(Stack<ILExpr> stack)
+    public SMFrame(MethodProcessor proc, SMFrame? pred, EvaluationStack<ILExpr> stack, ILInstr.Instr instr)
+    {
+        ILFirst = instr.idx;
+        _firstInstr = instr;
+        CurInstr = instr;
+        _mp = proc;
+        // _preds.Add(pred ?? this, stackCopy(stack));
+        if (pred != null) _preds.Add(pred);
+        _mp.Successors.TryAdd(ILFirst, []);
+    }
+
+    private static EvaluationStack<ILExpr> stackCopy(EvaluationStack<ILExpr> stack)
     {
         ILExpr[] newStack = new ILExpr[stack.Count];
         stack.CopyTo(newStack, 0);
-        return new Stack<ILExpr>(newStack);
+        return new EvaluationStack<ILExpr>(newStack);
     }
 
+    public void ResetVirtualStack()
+    {
+        Stack.ResetVirtualStack();
+    }
     public static SMFrame CreateInitial(MethodProcessor mp)
     {
-        return new SMFrame(mp, null, new Stack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
+        return new SMFrame(mp, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
+    }
+
+    public void AddPredecessor(SMFrame pred)
+    {
+        // _preds.Add(pred, stackCopy(pred.Stack));
+        _preds.Add(pred);
     }
 
     public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
@@ -43,18 +68,20 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
         }
     }
 
-    public void StopBranching()
-    {
-        _mp.Successors.TryAdd(ILFirst, []);
-    }
-
     private void ContinueTo(ILInstr instr)
     {
-        StopBranching();
         _mp.Successors[ILFirst].Insert(0, instr.idx);
-        if (_mp.TacBlocks.ContainsKey(instr.idx)) return;
-        _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, this, stackCopy(Stack), (ILInstr.Instr)instr));
-        _mp.TacBlocks[instr.idx].Branch();
+        if (_mp.TacBlocks.ContainsKey(instr.idx))
+        {
+            _mp.TacBlocks[instr.idx].AddPredecessor(this);
+        }
+        else
+        {
+            _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, this, stackCopy(Stack), (ILInstr.Instr)instr));
+        }
+
+        if (_cachedTacLinesEq == null) _cachedTacLinesEq = TacLines.SequenceEqual(_lastTacLines);
+        if (_cachedTacLinesEq == false) _mp.Worklist.Enqueue(_mp.TacBlocks[instr.idx]);
     }
 
     public bool IsLeader(ILInstr instr)
@@ -80,8 +107,14 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
 
     public ILExpr PopSingleAddr()
     {
-        if (_isMerging && Stack.Count == 0) return MergeStacksValues();
+Console.WriteLine(Stack.Count);
+        if (Stack.Count == 0) return MergeStacksValues();
         return ToSingleAddr(Stack.Pop());
+    }
+
+    private ILExpr PopSingleAddrVirt()
+    {
+        return ToSingleAddr(Stack.Pop(true));
     }
 
     public void InsertExtraAssignments()
@@ -89,25 +122,24 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
         var pos = TacLines.FindIndex(l => l is ILBranchStmt);
         pos = pos == -1 ? TacLines.Count : pos;
         // TODO reorder extra assignments so that prev line does not use var from next line 
-        TacLines.AddRange(ExtraAssignments);
+        TacLines.InsertRange(pos, ExtraAssignments);
     }
 
-    public bool MergeStacksFrom(List<SMFrame> frames)
-    {
-        _preds = frames.ToDictionary(f => f, f => stackCopy(f.Stack));
-        ILStmt[] copy = new ILStmt[TacLines.Count];
-        TacLines.CopyTo(copy, 0);
-        _isMerging = true;
-        TacLines.Clear();
-        Stack.Clear();
-        CurInstr = _firstInstr;
-        this.Branch();
-        return copy.SequenceEqual(TacLines);
-    }
+    // public bool MergeStacksFrom(List<SMFrame> frames)
+    // {
+    //     _preds = frames.ToDictionary(f => f, f => stackCopy(f.Stack));
+    //     ILStmt[] copy = new ILStmt[TacLines.Count];
+    //     TacLines.CopyTo(copy, 0);
+    //     TacLines.Clear();
+    //     Stack.Clear();
+    //     CurInstr = _firstInstr;
+    //     this.Branch();
+    //     return copy.SequenceEqual(TacLines);
+    // }
 
     private ILExpr MergeStacksValues()
     {
-        List<(SMFrame, ILExpr)> values = _preds.Keys.Select(s => (s, ToSingleAddr(s.Stack.Pop()))).ToList();
+        List<(SMFrame, ILExpr)> values = _preds.Select(s => (s, s.PopSingleAddrVirt())).ToList();
         if (values.Select(p => p.Item2).Distinct().Count() == 1) return values.Select(p => p.Item2).First();
         ILLocal tmp = GetNewTemp(values[0].Item2.Type, new ILMergedValueExpr(values[0].Item2.Type));
         for (int i = 0; i < values.Count; i++)
@@ -121,6 +153,11 @@ class SMFrame(MethodProcessor proc, SMFrame? pred, Stack<ILExpr> stack, ILInstr.
     public void Push(ILExpr expr)
     {
         Stack.Push(expr);
+    }
+
+    public void ClearStack()
+    {
+        Stack.Clear();
     }
 
     public void PushLiteral<T>(T value)
