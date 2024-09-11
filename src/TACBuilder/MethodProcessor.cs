@@ -20,7 +20,7 @@ class MethodProcessor
     private ILInstr _begin;
     public List<EHScope> Scopes = [];
     public Dictionary<int, int?> ilToTacMapping = new();
-    public Queue<SMFrame> Worklist = new Queue<SMFrame>();
+    public Queue<SMFrame> Worklist = new();
 
     public MethodProcessor(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
         ILInstr begin, ehClause[] ehs)
@@ -72,7 +72,7 @@ class MethodProcessor
 
     private void ProcessNonExceptionalIL()
     {
-        TacBlocks[0] = SMFrame.CreateInitial(this);
+        TacBlocks[0] = new SMFrame(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)GetBeginInstr());
         Successors.Add(0, []);
         Worklist.Enqueue(TacBlocks[0]);
         while (Worklist.Count > 0)
@@ -116,10 +116,15 @@ class MethodProcessor
         {
             int hbIndex = scope.ilLoc.hb.idx;
             Leaders.Add(scope.ilLoc.hb);
+
             if (scope is CatchScope catchScope)
             {
-                TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>([Errs[catchScope.ErrIdx]]),
+                TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>(),
                     (ILInstr.Instr)catchScope.ilLoc.hb);
+                catchScope.VirtualFrame = new SMFrame(this, null,
+                    new EvaluationStack<ILExpr>([Errs[catchScope.ErrIdx]]),
+                    (ILInstr.Instr)catchScope.ilLoc.hb);
+                TacBlocks[hbIndex].AddPredecessor(catchScope.VirtualFrame);
             }
             else if (scope is FilterScope filterScope)
             {
@@ -127,9 +132,19 @@ class MethodProcessor
                 Leaders.Add(filterScope.fb);
                 TacBlocks[fbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.fb);
-                TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                filterScope.FilterFrame = new SMFrame(this, null,
+                    new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                    (ILInstr.Instr)filterScope.fb);
+                TacBlocks[fbIndex].AddPredecessor(filterScope.FilterFrame);
+
+                TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>(),
                     (ILInstr.Instr)filterScope.ilLoc.hb);
-                TacBlocks[fbIndex].Branch();
+                filterScope.HandlerFrame = new SMFrame(this, null,
+                    new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                    (ILInstr.Instr)filterScope.ilLoc.hb);
+                TacBlocks[hbIndex].AddPredecessor(filterScope.HandlerFrame);
+                Worklist.Enqueue(TacBlocks[fbIndex]);
+                continue;
             }
             else
             {
@@ -142,6 +157,16 @@ class MethodProcessor
 
         while (Worklist.Count > 0)
         {
+            foreach (var frame in TacBlocks.Values)
+            {
+                frame.ResetVirtualStack();
+            }
+
+            foreach (EHScopeWithVarIdx scope in Scopes.Where(s => s is EHScopeWithVarIdx))
+            {
+                scope.ResetVirtualFrameStack();
+            }
+
             Worklist.Dequeue().Branch();
         }
     }

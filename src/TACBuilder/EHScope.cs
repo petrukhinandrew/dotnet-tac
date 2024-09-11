@@ -32,11 +32,11 @@ abstract class EHScope
                 he = clause.handlerEnd,
             };
         }
-        
+
         // TODO
         // public bool TryContains(int idx) => tb.idx < idx && te.idx > idx;
         // public bool HandlerContains(int idx) => hb.idx < idx && he.idx > idx;
-        
+
         public override string ToString() => string.Join(" ", new int[tb.idx, te.idx, hb.idx, he.idx]);
 
         public override bool Equals(object? obj)
@@ -58,16 +58,24 @@ abstract class EHScopeWithVarIdx(Type type) : EHScope
 {
     public int ErrIdx;
     public readonly Type Type = type;
+    public abstract void ResetVirtualFrameStack();
 }
 
 class CatchScope(Type type) : EHScopeWithVarIdx(type)
 {
+    public SMFrame VirtualFrame;
+
     public new static CatchScope FromClause(ehClause clause)
     {
         return new CatchScope((clause.ehcType as rewriterEhcType.CatchEH)!.type)
         {
             ilLoc = ILScopeLocation.FromClause(clause)
         };
+    }
+
+    public override void ResetVirtualFrameStack()
+    {
+        VirtualFrame.ResetVirtualStack();
     }
 
     public override string ToString()
@@ -89,6 +97,8 @@ class CatchScope(Type type) : EHScopeWithVarIdx(type)
 class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
 {
     public ILInstr fb;
+    public SMFrame FilterFrame;
+    public SMFrame HandlerFrame;
 
     public new static FilterScope FromClause(ehClause clause)
     {
@@ -98,6 +108,12 @@ class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
             fb = (clause.ehcType as rewriterEhcType.FilterEH)!.instr
         };
         return scope;
+    }
+
+    public override void ResetVirtualFrameStack()
+    {
+        FilterFrame.ResetVirtualStack();
+        HandlerFrame.ResetVirtualStack();
     }
 
     public override string ToString()

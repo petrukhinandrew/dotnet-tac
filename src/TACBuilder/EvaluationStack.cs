@@ -2,14 +2,20 @@ using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-public class EvaluationStack<T>(IEnumerable<T> array)
+public class EvaluationStack<T>
 {
     public EvaluationStack() : this([])
     {
     }
 
-    private List<T> _data = array.ToList();
-    private int _virtualStackPtr = 0;
+    private List<T> _data;
+    private int _virtualStackPtr = -1;
+
+    public EvaluationStack(IEnumerable<T> array)
+    {
+        _data = array.ToList();
+        _virtualStackPtr = array.Count() - 1;
+    }
 
     public int Count => _data.Count;
 
@@ -48,5 +54,11 @@ public class EvaluationStack<T>(IEnumerable<T> array)
     public void CopyTo(T[] array, int arrayIndex)
     {
         _data.CopyTo(array, arrayIndex);
+    }
+
+    public void CloneFrom(EvaluationStack<T> source)
+    {
+        _data.AddRange(source._data);
+        _virtualStackPtr = _data.Count - 1;
     }
 }

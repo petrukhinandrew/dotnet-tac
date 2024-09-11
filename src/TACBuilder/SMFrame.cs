@@ -17,6 +17,7 @@ class SMFrame
     internal List<ILStmt> _lastTacLines = new();
 
     internal bool? _cachedTacLinesEq;
+
     // private Dictionary<SMFrame, Stack<ILExpr>> _preds = new();
     private HashSet<SMFrame> _preds = new();
     public List<ILStmt> ExtraAssignments = new();
@@ -30,9 +31,12 @@ class SMFrame
         // _preds.Add(pred ?? this, stackCopy(stack));
         if (pred != null) _preds.Add(pred);
         _mp.Successors.TryAdd(ILFirst, []);
+        if (pred == null)
+            Stack.CloneFrom(stack);
     }
 
-    private static EvaluationStack<ILExpr> stackCopy(EvaluationStack<ILExpr> stack)
+    // TODO move to Eval stack class 
+    private static EvaluationStack<ILExpr> CopyOf(EvaluationStack<ILExpr> stack)
     {
         ILExpr[] newStack = new ILExpr[stack.Count];
         stack.CopyTo(newStack, 0);
@@ -42,10 +46,6 @@ class SMFrame
     public void ResetVirtualStack()
     {
         Stack.ResetVirtualStack();
-    }
-    public static SMFrame CreateInitial(MethodProcessor mp)
-    {
-        return new SMFrame(mp, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)mp.GetBeginInstr());
     }
 
     public void AddPredecessor(SMFrame pred)
@@ -77,7 +77,9 @@ class SMFrame
         }
         else
         {
-            _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, this, stackCopy(Stack), (ILInstr.Instr)instr));
+            _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, this, CopyOf(Stack), (ILInstr.Instr)instr));
+            _mp.Worklist.Enqueue(_mp.TacBlocks[instr.idx]);
+            return;
         }
 
         if (_cachedTacLinesEq == null) _cachedTacLinesEq = TacLines.SequenceEqual(_lastTacLines);
@@ -107,13 +109,14 @@ class SMFrame
 
     public ILExpr PopSingleAddr()
     {
-Console.WriteLine(Stack.Count);
+        // Console.WriteLine(Stack.Count);
         if (Stack.Count == 0) return MergeStacksValues();
         return ToSingleAddr(Stack.Pop());
     }
 
     private ILExpr PopSingleAddrVirt()
     {
+        if (Stack.Count == 0) return MergeStacksValues();
         return ToSingleAddr(Stack.Pop(true));
     }
 
@@ -139,6 +142,7 @@ Console.WriteLine(Stack.Count);
 
     private ILExpr MergeStacksValues()
     {
+        if (_preds.Count == 0) throw new Exception("no pred exist for " + ILFirst + " at " + CurInstr.idx);
         List<(SMFrame, ILExpr)> values = _preds.Select(s => (s, s.PopSingleAddrVirt())).ToList();
         if (values.Select(p => p.Item2).Distinct().Count() == 1) return values.Select(p => p.Item2).First();
         ILLocal tmp = GetNewTemp(values[0].Item2.Type, new ILMergedValueExpr(values[0].Item2.Type));

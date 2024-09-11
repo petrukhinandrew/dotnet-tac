@@ -22,7 +22,6 @@ static class TACLineBuilder
 
     private static ILInstr DecideLeaveTarget(this SMFrame frame, ILInstr initialTarget)
     {
-
         return initialTarget;
     }
 
@@ -35,9 +34,16 @@ static class TACLineBuilder
         frame.TacLines.Clear();
         frame.ClearStack();
         frame.CurInstr = frame._firstInstr;
-        
         while (true)
         {
+            // Console.WriteLine(frame.CurInstr.idx);
+            // var scopeErrs =
+            //     frame.Scopes.Where(s =>
+            //             ((s is CatchScope || s is FilterScope) && s.ilLoc.hb.idx == frame.CurInstr.idx) ||
+            //             (s is FilterScope fs && fs.fb.idx == frame.CurInstr.idx))
+            //         .Select(s => frame.Errs[((EHScopeWithVarIdx)s).ErrIdx]).ToList();
+            // if (scopeErrs.Count > 1) throw new Exception("at most 1 scope err expected");
+            // if (scopeErrs.Count == 1) frame.Push(scopeErrs[0]);
             switch (frame.CurInstr.opCode.Name)
             {
                 case "ckfinite":
