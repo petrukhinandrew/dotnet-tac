@@ -38,18 +38,12 @@ class MethodProcessor
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
         ProcessEHScopesIL();
-        // MergeStacks();
         foreach (var bb in TacBlocks)
         {
             bb.Value.InsertExtraAssignments();
         }
 
         ComposeTac();
-    }
-
-    public ILInstr GetBeginInstr()
-    {
-        return _begin;
     }
 
     private List<ILInstr> CollectLeaders()
@@ -72,7 +66,7 @@ class MethodProcessor
 
     private void ProcessNonExceptionalIL()
     {
-        TacBlocks[0] = new SMFrame(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)GetBeginInstr());
+        TacBlocks[0] = new SMFrame(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
         Successors.Add(0, []);
         Worklist.Enqueue(TacBlocks[0]);
         while (Worklist.Count > 0)
@@ -85,30 +79,6 @@ class MethodProcessor
             Worklist.Dequeue().Branch();
         }
     }
-
-    // private void MergeStacks()
-    // {
-    //     Queue<KeyValuePair<int, SMFrame>> q = new();
-    //     foreach (var bb in TacBlocks.OrderByDescending(b1 => b1.Key))
-    //     {
-    //         if (GetPredecessorsOf(bb.Key).Count > 1)
-    //         {
-    //             q.Enqueue(bb);
-    //         }
-    //     }
-    //
-    //     while (q.Count > 0)
-    //     {
-    //         var bb = q.Dequeue();
-    //         if (bb.Value.MergeStacksFrom(GetPredecessorsOf(bb.Key)))
-    //         {
-    //             foreach (var sb in TacBlocks.Where(p => Successors[bb.Key].Contains(p.Key)))
-    //             {
-    //                 q.Enqueue(sb);
-    //             }
-    //         }
-    //     }
-    // }
 
     private void ProcessEHScopesIL()
     {
@@ -219,12 +189,6 @@ class MethodProcessor
                 Scopes.Add(scope);
             }
         }
-    }
-
-    public List<SMFrame> GetPredecessorsOf(int idx)
-    {
-        List<int> indices = Successors.Where((p) => p.Value.Contains(idx)).Select(p => p.Key).ToList();
-        return TacBlocks.Where(p => indices.Contains(p.Key)).Select(p => p.Value).ToList();
     }
 
     public FieldInfo ResolveField(int target)

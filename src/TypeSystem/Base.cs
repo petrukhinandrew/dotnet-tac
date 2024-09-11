@@ -46,6 +46,7 @@ class ILVarArgValue(string methodName) : ILValue
     public override string ToString() => Method + ".__arglist";
 }
 
+// TODO check merged is not used
 class ILLocal(ILType type, string name, bool merged = false) : ILLValue
 {
     public ILType Type => type;
@@ -123,6 +124,7 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
 
     public void LoadArgs(Func<ILExpr> pop)
     {
+        // TODO check the order
         for (int i = _argCount - 1; i >= 0; i--)
         {
             Args.Add(pop());

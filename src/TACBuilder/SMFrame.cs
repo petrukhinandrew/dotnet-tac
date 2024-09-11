@@ -18,8 +18,9 @@ class SMFrame
 
     internal bool? _cachedTacLinesEq;
 
-    // private Dictionary<SMFrame, Stack<ILExpr>> _preds = new();
     private HashSet<SMFrame> _preds = new();
+
+    // TODO make HashSet instead
     public List<ILStmt> ExtraAssignments = new();
 
     public SMFrame(MethodProcessor proc, SMFrame? pred, EvaluationStack<ILExpr> stack, ILInstr.Instr instr)
@@ -28,7 +29,6 @@ class SMFrame
         _firstInstr = instr;
         CurInstr = instr;
         _mp = proc;
-        // _preds.Add(pred ?? this, stackCopy(stack));
         if (pred != null) _preds.Add(pred);
         _mp.Successors.TryAdd(ILFirst, []);
         if (pred == null)
@@ -50,7 +50,6 @@ class SMFrame
 
     public void AddPredecessor(SMFrame pred)
     {
-        // _preds.Add(pred, stackCopy(pred.Stack));
         _preds.Add(pred);
     }
 
@@ -109,7 +108,6 @@ class SMFrame
 
     public ILExpr PopSingleAddr()
     {
-        // Console.WriteLine(Stack.Count);
         if (Stack.Count == 0) return MergeStacksValues();
         return ToSingleAddr(Stack.Pop());
     }
@@ -120,25 +118,13 @@ class SMFrame
         return ToSingleAddr(Stack.Pop(true));
     }
 
+    // TODO reoder by lhs index
     public void InsertExtraAssignments()
     {
         var pos = TacLines.FindIndex(l => l is ILBranchStmt);
         pos = pos == -1 ? TacLines.Count : pos;
-        // TODO reorder extra assignments so that prev line does not use var from next line 
         TacLines.InsertRange(pos, ExtraAssignments);
     }
-
-    // public bool MergeStacksFrom(List<SMFrame> frames)
-    // {
-    //     _preds = frames.ToDictionary(f => f, f => stackCopy(f.Stack));
-    //     ILStmt[] copy = new ILStmt[TacLines.Count];
-    //     TacLines.CopyTo(copy, 0);
-    //     TacLines.Clear();
-    //     Stack.Clear();
-    //     CurInstr = _firstInstr;
-    //     this.Branch();
-    //     return copy.SequenceEqual(TacLines);
-    // }
 
     private ILExpr MergeStacksValues()
     {
