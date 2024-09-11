@@ -530,6 +530,13 @@ static unsafe class Misc
     {
     }
 
+    public static void RawGotoExample() {
+        int a = 1;
+        goto TargetX;
+
+        TargetX:
+        int b = 2;
+    }
     public static int SampleFunc()
     {
         return 1;
