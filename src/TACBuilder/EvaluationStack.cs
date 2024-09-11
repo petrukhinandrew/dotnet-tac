@@ -4,17 +4,24 @@ namespace Usvm.IL.TACBuilder;
 
 public class EvaluationStack<T>
 {
+    private List<T> _data;
+    private int _virtualStackPtr = -1;
+
     public EvaluationStack() : this([])
     {
     }
-
-    private List<T> _data;
-    private int _virtualStackPtr = -1;
 
     public EvaluationStack(IEnumerable<T> array)
     {
         _data = array.ToList();
         _virtualStackPtr = array.Count() - 1;
+    }
+
+    public static EvaluationStack<ILExpr> CopyOf(EvaluationStack<ILExpr> stack)
+    {
+        ILExpr[] newStack = new ILExpr[stack.Count];
+        stack.CopyTo(newStack, 0);
+        return new EvaluationStack<ILExpr>(newStack);
     }
 
     public int Count => _data.Count;

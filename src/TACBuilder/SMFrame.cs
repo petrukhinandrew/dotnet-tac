@@ -35,14 +35,6 @@ class SMFrame
             Stack.CloneFrom(stack);
     }
 
-    // TODO move to Eval stack class 
-    private static EvaluationStack<ILExpr> CopyOf(EvaluationStack<ILExpr> stack)
-    {
-        ILExpr[] newStack = new ILExpr[stack.Count];
-        stack.CopyTo(newStack, 0);
-        return new EvaluationStack<ILExpr>(newStack);
-    }
-
     public void ResetVirtualStack()
     {
         Stack.ResetVirtualStack();
@@ -76,12 +68,12 @@ class SMFrame
         }
         else
         {
-            _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, this, CopyOf(Stack), (ILInstr.Instr)instr));
+            _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, this, EvaluationStack<ILExpr>.CopyOf(Stack), (ILInstr.Instr)instr));
             _mp.Worklist.Enqueue(_mp.TacBlocks[instr.idx]);
             return;
         }
 
-        if (_cachedTacLinesEq == null) _cachedTacLinesEq = TacLines.SequenceEqual(_lastTacLines);
+        _cachedTacLinesEq ??= TacLines.SequenceEqual(_lastTacLines);
         if (_cachedTacLinesEq == false) _mp.Worklist.Enqueue(_mp.TacBlocks[instr.idx]);
     }
 
