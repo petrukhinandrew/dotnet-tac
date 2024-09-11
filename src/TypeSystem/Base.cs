@@ -124,12 +124,12 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
 
     public void LoadArgs(Func<ILExpr> pop)
     {
-        // TODO check the order
-        for (int i = _argCount - 1; i >= 0; i--)
+        for (int i = 0; i < _argCount; i++)
         {
             Args.Add(pop());
         }
 
+        Args.Reverse();
         if (_methodBase.CallingConvention.HasFlag(CallingConventions.HasThis))
             Receiver = pop();
     }

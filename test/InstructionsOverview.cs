@@ -530,13 +530,15 @@ static unsafe class Misc
     {
     }
 
-    public static void RawGotoExample() {
+    public static void RawGotoExample()
+    {
         int a = 1;
         goto TargetX;
 
         TargetX:
         int b = 2;
     }
+
     public static int SampleFunc()
     {
         return 1;
@@ -598,5 +600,38 @@ static unsafe class Fields
         Sample s = new Sample();
         s.B += 1;
         Sample.A += 2;
+    }
+}
+
+static class CallTests
+{
+    internal class CallTestInstance
+    {
+        public int IntMethod(int x)
+        {
+            return x;
+        }
+
+        public void VoidMethod(string s)
+        {
+        }
+
+        public static void StaticMethod(CallTestInstance instance, int a, string b)
+        {
+        }
+
+        public static int ManyArgs(int a1, int a2, int a3, int a4, string s)
+        {
+            return a1 + a2 + a3 + a4 + s.Length;
+        }
+    }
+
+    public static void DifferentCalls()
+    {
+        var instance = new CallTestInstance();
+        instance.IntMethod(1);
+        instance.VoidMethod("void");
+        CallTestInstance.StaticMethod(instance, 1, "void");
+        CallTestInstance.ManyArgs(1, 2, 3, 4, "1234");
     }
 }
