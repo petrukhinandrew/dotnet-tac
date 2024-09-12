@@ -27,13 +27,18 @@ class SMFrame
     public SMFrame(MethodProcessor proc, SMFrame? pred, EvaluationStack<ILExpr> stack, ILInstr.Instr instr)
     {
         ILFirst = instr.idx;
-        _firstInstr = instr;
         CurInstr = instr;
+        _firstInstr = instr;
         _mp = proc;
-        if (pred != null) _preds.Add(pred);
         _mp.Successors.TryAdd(ILFirst, []);
         if (pred == null)
+        {
             _stack.CloneFrom(stack);
+        }
+        else
+        {
+            _preds.Add(pred);
+        }
     }
 
     public SMFrame SetVirtualStack(IEnumerable<ILExpr> stack)
@@ -41,18 +46,13 @@ class SMFrame
         var virtPred = new SMFrame(_mp, null,
             new EvaluationStack<ILExpr>(stack),
             _firstInstr);
-        AddPredecessor(virtPred);
+        _preds.Add(virtPred);
         return virtPred;
     }
 
     public void ResetVirtualStack()
     {
         _stack.ResetVirtualStack();
-    }
-
-    public void AddPredecessor(SMFrame pred)
-    {
-        _preds.Add(pred);
     }
 
     public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
@@ -74,7 +74,7 @@ class SMFrame
         _mp.Successors[ILFirst].Insert(0, instr.idx);
         if (_mp.TacBlocks.ContainsKey(instr.idx))
         {
-            _mp.TacBlocks[instr.idx].AddPredecessor(this);
+            _mp.TacBlocks[instr.idx]._preds.Add(this);
         }
         else
         {
