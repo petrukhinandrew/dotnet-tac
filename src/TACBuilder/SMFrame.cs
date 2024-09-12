@@ -36,6 +36,15 @@ class SMFrame
             _stack.CloneFrom(stack);
     }
 
+    public SMFrame SetVirtualStack(IEnumerable<ILExpr> stack)
+    {
+        var virtPred = new SMFrame(_mp, null,
+            new EvaluationStack<ILExpr>(stack),
+            _firstInstr);
+        AddPredecessor(virtPred);
+        return virtPred;
+    }
+
     public void ResetVirtualStack()
     {
         _stack.ResetVirtualStack();
@@ -197,7 +206,7 @@ class SMFrame
         return _mp.ResolveString(target);
     }
 
-    
+
     public override bool Equals(object? obj)
     {
         return obj is SMFrame f && ILFirst == f.ILFirst;

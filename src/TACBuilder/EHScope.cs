@@ -54,12 +54,12 @@ abstract class EHScopeWithVarIdx(Type type) : EHScope
 {
     public int ErrIdx;
     public readonly Type Type = type;
+    public SMFrame HandlerFrame;
     public abstract void ResetVirtualFrameStack();
 }
 
 class CatchScope(Type type) : EHScopeWithVarIdx(type)
 {
-    public SMFrame VirtualFrame;
 
     public new static CatchScope FromClause(ehClause clause)
     {
@@ -71,7 +71,7 @@ class CatchScope(Type type) : EHScopeWithVarIdx(type)
 
     public override void ResetVirtualFrameStack()
     {
-        VirtualFrame.ResetVirtualStack();
+        HandlerFrame.ResetVirtualStack();
     }
 
     public override string ToString()
@@ -94,7 +94,6 @@ class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
 {
     public ILInstr fb;
     public SMFrame FilterFrame;
-    public SMFrame HandlerFrame;
 
     public new static FilterScope FromClause(ehClause clause)
     {

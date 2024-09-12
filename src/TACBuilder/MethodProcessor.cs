@@ -88,40 +88,26 @@ class MethodProcessor
             int hbIndex = scope.ilLoc.hb.idx;
             Leaders.Add(scope.ilLoc.hb);
 
-            if (scope is CatchScope catchScope)
+            if (scope is EHScopeWithVarIdx scopeWithVar)
             {
                 TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>(),
-                    (ILInstr.Instr)catchScope.ilLoc.hb);
-                // TODO replace with SMFrame staic call returning new instance
-                catchScope.VirtualFrame = new SMFrame(this, null,
-                    new EvaluationStack<ILExpr>([Errs[catchScope.ErrIdx]]),
-                    (ILInstr.Instr)catchScope.ilLoc.hb);
-                TacBlocks[hbIndex].AddPredecessor(catchScope.VirtualFrame);
-            }
-            else if (scope is FilterScope filterScope)
-            {
-                int fbIndex = filterScope.fb.idx;
-                Leaders.Add(filterScope.fb);
-                TacBlocks[fbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
-                    (ILInstr.Instr)filterScope.fb);
-                filterScope.FilterFrame = new SMFrame(this, null,
-                    new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
-                    (ILInstr.Instr)filterScope.fb);
-                TacBlocks[fbIndex].AddPredecessor(filterScope.FilterFrame);
-
-                TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>(),
-                    (ILInstr.Instr)filterScope.ilLoc.hb);
-                filterScope.HandlerFrame = new SMFrame(this, null,
-                    new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
-                    (ILInstr.Instr)filterScope.ilLoc.hb);
-                TacBlocks[hbIndex].AddPredecessor(filterScope.HandlerFrame);
-                Worklist.Enqueue(TacBlocks[fbIndex]);
-                continue;
+                    (ILInstr.Instr)scopeWithVar.ilLoc.hb);
+                scopeWithVar.HandlerFrame = TacBlocks[hbIndex].SetVirtualStack([Errs[scopeWithVar.ErrIdx]]);
             }
             else
             {
                 TacBlocks[hbIndex] =
                     new SMFrame(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
+            }
+
+            if (scope is FilterScope filterScope)
+            {
+                int fbIndex = filterScope.fb.idx;
+                Leaders.Add(filterScope.fb);
+                TacBlocks[fbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                    (ILInstr.Instr)filterScope.fb);
+                filterScope.FilterFrame = TacBlocks[fbIndex].SetVirtualStack([Errs[filterScope.ErrIdx]]);
+                Worklist.Enqueue(TacBlocks[fbIndex]);
             }
 
             Worklist.Enqueue(TacBlocks[hbIndex]);
