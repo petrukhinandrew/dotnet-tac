@@ -12,7 +12,6 @@ public static class ReflectionUtils
         }
         catch (ReflectionTypeLoadException e)
         {
-            // TODO: pass logger here and show warnings
             return e.Types.Where(t => t is not null)!;
         }
     }

@@ -6,8 +6,8 @@ namespace Usvm.IL.TACBuilder;
 
 class MethodProcessor
 {
-    public Module DeclaringModule;
-    public MethodInfo MethodInfo;
+    private readonly Module _declaringModule;
+    public readonly MethodInfo MethodInfo;
     private ehClause[] _ehs;
     public List<ILLocal> Locals;
     public List<ILLocal> Params;
@@ -17,7 +17,7 @@ class MethodProcessor
     public List<ILInstr> Leaders;
     public Dictionary<int, List<int>> Successors = new();
     public Dictionary<int, SMFrame> TacBlocks;
-    private ILInstr _begin;
+    private readonly ILInstr _begin;
     public List<EHScope> Scopes = [];
     public Dictionary<int, int?> ilToTacMapping = new();
     public Queue<SMFrame> Worklist = new();
@@ -28,13 +28,14 @@ class MethodProcessor
         _begin = begin;
         TacBlocks = new Dictionary<int, SMFrame>();
         _ehs = ehs;
-        DeclaringModule = declaringModule;
+        _declaringModule = declaringModule;
         MethodInfo = methodInfo;
         Params = methodInfo.GetParameters().OrderBy(p => p.Position).Select(l =>
             new ILLocal(TypeSolver.Resolve(l.ParameterType), NamingUtil.ArgVar(l.Position))).ToList();
         Locals = locals.OrderBy(l => l.LocalIndex)
             .Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
         InitEHScopes();
+        // TODO check it is necessary and cannot be resolved in process of branching
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
         ProcessEHScopesIL();
@@ -128,7 +129,7 @@ class MethodProcessor
 
         while (Worklist.Count > 0)
         {
-            // TODO introduce private method 
+            // TODO introduce private method after smaller list will be introduced 
             foreach (var frame in TacBlocks.Values)
             {
                 frame.ResetVirtualStack();
@@ -196,27 +197,27 @@ class MethodProcessor
 
     public FieldInfo ResolveField(int target)
     {
-        return DeclaringModule.ResolveField(target, MethodInfo.DeclaringType!.GetGenericArguments(),
+        return _declaringModule.ResolveField(target, MethodInfo.DeclaringType!.GetGenericArguments(),
             MethodInfo.GetGenericArguments()) ?? throw new Exception("cannot resolve field");
     }
 
     public Type ResolveType(int target)
     {
-        return DeclaringModule.ResolveType(target) ?? throw new Exception("cannot resolve type");
+        return _declaringModule.ResolveType(target) ?? throw new Exception("cannot resolve type");
     }
 
     public MethodBase ResolveMethod(int target)
     {
-        return DeclaringModule.ResolveMethod(target) ?? throw new Exception("cannot resolve method");
+        return _declaringModule.ResolveMethod(target) ?? throw new Exception("cannot resolve method");
     }
 
     public byte[] ResolveSignature(int target)
     {
-        return DeclaringModule.ResolveSignature(target);
+        return _declaringModule.ResolveSignature(target);
     }
 
     public string ResolveString(int target)
     {
-        return DeclaringModule.ResolveString(target);
+        return _declaringModule.ResolveString(target);
     }
 }
