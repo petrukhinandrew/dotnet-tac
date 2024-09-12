@@ -6,7 +6,7 @@ using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-static class TACLineBuilder
+static class FrameTacBuilder
 {
     private static ILInstr.Instr? AdvanceIP(ILInstr.Instr ip)
     {
@@ -524,7 +524,6 @@ static class TACLineBuilder
                     MethodBase method = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
 
                     ILMethod ilMethod = ILMethod.FromMethodBase(method);
-                    // TODO it use raw frame.Stack.Pop inside, must be using PopSingle-like
                     ilMethod.LoadArgs(frame.PopSingleAddr);
                     if (ilMethod.IsInitializeArray())
                     {
