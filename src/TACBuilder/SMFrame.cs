@@ -7,21 +7,22 @@ namespace Usvm.IL.TACBuilder;
 
 class SMFrame
 {
-    public readonly EvaluationStack<ILExpr> Stack = new();
     public int ILFirst;
-    internal ILInstr.Instr _firstInstr;
     public readonly List<ILStmt> TacLines = new();
     public ILInstr.Instr CurInstr;
 
-    private MethodProcessor _mp;
-    internal List<ILStmt> _lastTacLines = new();
+    private readonly MethodProcessor _mp;
+    private readonly EvaluationStack<ILExpr> _stack = new();
 
+    // TODO introduce tac lines cache
+    internal List<ILStmt> _lastTacLines = new();
     internal bool? _cachedTacLinesEq;
+    internal ILInstr.Instr _firstInstr;
 
     private HashSet<SMFrame> _preds = new();
 
     // TODO make HashSet instead
-    public List<ILStmt> ExtraAssignments = new();
+    private readonly List<ILStmt> _extraAssignments = new();
 
     public SMFrame(MethodProcessor proc, SMFrame? pred, EvaluationStack<ILExpr> stack, ILInstr.Instr instr)
     {
@@ -32,12 +33,12 @@ class SMFrame
         if (pred != null) _preds.Add(pred);
         _mp.Successors.TryAdd(ILFirst, []);
         if (pred == null)
-            Stack.CloneFrom(stack);
+            _stack.CloneFrom(stack);
     }
 
     public void ResetVirtualStack()
     {
-        Stack.ResetVirtualStack();
+        _stack.ResetVirtualStack();
     }
 
     public void AddPredecessor(SMFrame pred)
@@ -68,7 +69,8 @@ class SMFrame
         }
         else
         {
-            _mp.TacBlocks.Add(instr.idx, new SMFrame(_mp, this, EvaluationStack<ILExpr>.CopyOf(Stack), (ILInstr.Instr)instr));
+            _mp.TacBlocks.Add(instr.idx,
+                new SMFrame(_mp, this, EvaluationStack<ILExpr>.CopyOf(_stack), (ILInstr.Instr)instr));
             _mp.Worklist.Enqueue(_mp.TacBlocks[instr.idx]);
             return;
         }
@@ -83,10 +85,8 @@ class SMFrame
     }
 
     public List<ILLocal> Locals => _mp.Locals;
-    public List<EHScope> Scopes => _mp.Scopes;
     public List<ILLocal> Params => _mp.Params;
     public List<ILExpr> Temps => _mp.Temps;
-    public List<ILExpr> Errs => _mp.Errs;
 
     public string GetMethodName()
     {
@@ -100,14 +100,14 @@ class SMFrame
 
     public ILExpr PopSingleAddr()
     {
-        if (Stack.Count == 0) return MergeStacksValues();
-        return ToSingleAddr(Stack.Pop());
+        if (_stack.Count == 0) return MergeStacksValues();
+        return ToSingleAddr(_stack.Pop());
     }
 
     private ILExpr PopSingleAddrVirt()
     {
-        if (Stack.Count == 0) return MergeStacksValues();
-        return ToSingleAddr(Stack.Pop(true));
+        if (_stack.Count == 0) return MergeStacksValues();
+        return ToSingleAddr(_stack.Pop(true));
     }
 
     // TODO reoder by lhs index
@@ -115,7 +115,7 @@ class SMFrame
     {
         var pos = TacLines.FindIndex(l => l is ILBranchStmt);
         pos = pos == -1 ? TacLines.Count : pos;
-        TacLines.InsertRange(pos, ExtraAssignments);
+        TacLines.InsertRange(pos, _extraAssignments);
     }
 
     private ILExpr MergeStacksValues()
@@ -126,7 +126,7 @@ class SMFrame
         ILLocal tmp = GetNewTemp(values[0].Item2.Type, new ILMergedValueExpr(values[0].Item2.Type));
         for (int i = 0; i < values.Count; i++)
         {
-            values[i].Item1.ExtraAssignments.Add(new ILAssignStmt(tmp, values[i].Item2));
+            values[i].Item1._extraAssignments.Add(new ILAssignStmt(tmp, values[i].Item2));
         }
 
         return tmp;
@@ -134,12 +134,12 @@ class SMFrame
 
     public void Push(ILExpr expr)
     {
-        Stack.Push(expr);
+        _stack.Push(expr);
     }
 
     public void ClearStack()
     {
-        Stack.Clear();
+        _stack.Clear();
     }
 
     public void PushLiteral<T>(T value)
@@ -163,7 +163,7 @@ class SMFrame
     public ILLocal GetNewTemp(ILType type, ILExpr value)
     {
         Temps.Add(value);
-        return new ILLocal(type, Logger.TempVarName(Temps.Count - 1));
+        return new ILLocal(type, NamingUtil.TempVar(Temps.Count - 1));
     }
 
     public void NewLine(ILStmt line)
@@ -186,6 +186,7 @@ class SMFrame
         return _mp.ResolveMethod(target);
     }
 
+    // TODO find test case with calli
     public byte[] ResolveSignature(int target)
     {
         return _mp.ResolveSignature(target);
@@ -196,6 +197,7 @@ class SMFrame
         return _mp.ResolveString(target);
     }
 
+    
     public override bool Equals(object? obj)
     {
         return obj is SMFrame f && ILFirst == f.ILFirst;

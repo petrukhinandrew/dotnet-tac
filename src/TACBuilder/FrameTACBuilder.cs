@@ -960,7 +960,7 @@ static class FrameTacBuilder
         {
             try
             {
-                ILNewArrayExpr expr = (ILNewArrayExpr)frame.Temps[Logger.NameToIndex(newArr.ToString())];
+                ILNewArrayExpr expr = (ILNewArrayExpr)frame.Temps[NamingUtil.TakeIndexFrom(newArr.ToString())];
                 int arrSize = int.Parse(expr.Size.ToString());
                 Type arrType = ((ILPrimitiveType)expr.Type).BaseType;
                 var tmp = Array.CreateInstance(arrType, arrSize);

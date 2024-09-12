@@ -33,10 +33,6 @@ abstract class EHScope
             };
         }
 
-        // TODO
-        // public bool TryContains(int idx) => tb.idx < idx && te.idx > idx;
-        // public bool HandlerContains(int idx) => hb.idx < idx && he.idx > idx;
-
         public override string ToString() => string.Join(" ", new int[tb.idx, te.idx, hb.idx, he.idx]);
 
         public override bool Equals(object? obj)
@@ -119,7 +115,7 @@ class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
     public override string ToString()
     {
         return string.Format("filter {5} {0} {1} {2} {3} {4}", tacLoc.tb, tacLoc.te, fb, tacLoc.hb, tacLoc.he,
-            Logger.ErrVarName(ErrIdx));
+            NamingUtil.ErrVar(ErrIdx));
     }
 
     public override bool Equals(object? obj)

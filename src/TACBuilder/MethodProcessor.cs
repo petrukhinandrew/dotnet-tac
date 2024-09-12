@@ -31,9 +31,9 @@ class MethodProcessor
         DeclaringModule = declaringModule;
         MethodInfo = methodInfo;
         Params = methodInfo.GetParameters().OrderBy(p => p.Position).Select(l =>
-            new ILLocal(TypeSolver.Resolve(l.ParameterType), Logger.ArgVarName(l.Position))).ToList();
+            new ILLocal(TypeSolver.Resolve(l.ParameterType), NamingUtil.ArgVar(l.Position))).ToList();
         Locals = locals.OrderBy(l => l.LocalIndex)
-            .Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), Logger.LocalVarName(l.LocalIndex))).ToList();
+            .Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
         InitEHScopes();
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
@@ -43,7 +43,7 @@ class MethodProcessor
             bb.Value.InsertExtraAssignments();
         }
 
-        ComposeTac();
+        ComposeTAC();
     }
 
     private List<ILInstr> CollectLeaders()
@@ -91,6 +91,7 @@ class MethodProcessor
             {
                 TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>(),
                     (ILInstr.Instr)catchScope.ilLoc.hb);
+                // TODO replace with SMFrame staic call returning new instance
                 catchScope.VirtualFrame = new SMFrame(this, null,
                     new EvaluationStack<ILExpr>([Errs[catchScope.ErrIdx]]),
                     (ILInstr.Instr)catchScope.ilLoc.hb);
@@ -127,6 +128,7 @@ class MethodProcessor
 
         while (Worklist.Count > 0)
         {
+            // TODO introduce private method 
             foreach (var frame in TacBlocks.Values)
             {
                 frame.ResetVirtualStack();
@@ -141,8 +143,9 @@ class MethodProcessor
         }
     }
 
-    private void ComposeTac()
+    private void ComposeTAC()
     {
+        // TODO separate ordering and Tac composition 
         int lineNum = 0;
         foreach (var m in Successors)
         {
@@ -183,7 +186,7 @@ class MethodProcessor
                 if (scope is EHScopeWithVarIdx s)
                 {
                     s.ErrIdx = Errs.Count;
-                    Errs.Add(new ILLocal(TypeSolver.Resolve(s.Type), Logger.ErrVarName(s.ErrIdx)));
+                    Errs.Add(new ILLocal(TypeSolver.Resolve(s.Type), NamingUtil.ErrVar(s.ErrIdx)));
                 }
 
                 Scopes.Add(scope);

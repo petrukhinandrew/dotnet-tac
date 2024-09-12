@@ -59,7 +59,7 @@ class CodeBase : AssemblyLoadContext
         Assembly asm = LoadFromAssemblyPath(_settings.DllPath);
 
         // Console.WriteLine("asm: {0}", asm.GetName().ToString());
-        // Logger.PrintSeparator();
+        // NamingUtil.PrintSeparator();
         // foreach (var mod in asm.GetModules().Where(m => m != null))
         // {
         //     Console.WriteLine("module {0}", mod.ScopeName);

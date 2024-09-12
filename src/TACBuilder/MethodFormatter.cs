@@ -31,17 +31,17 @@ static class MethodFormatter
 
     private static List<string> FormatTempVars(this MethodProcessor mp)
     {
-        return FormatAnyVars(mp.Temps, Logger.TempVarName);
+        return FormatAnyVars(mp.Temps, NamingUtil.TempVar);
     }
 
     private static List<string> FormatLocalVars(this MethodProcessor mp)
     {
-        return FormatAnyVars(mp.Locals.Select(v => (ILExpr)v).ToList(), Logger.LocalVarName);
+        return FormatAnyVars(mp.Locals.Select(v => (ILExpr)v).ToList(), NamingUtil.LocalVar);
     }
 
     private static List<string> FormatErrVars(this MethodProcessor mp)
     {
-        return FormatAnyVars(mp.Errs, Logger.ErrVarName);
+        return FormatAnyVars(mp.Errs, NamingUtil.ErrVar);
     }
 
     private static string FormatMethodSignature(this MethodProcessor mp)
@@ -111,7 +111,7 @@ static class MethodFormatter
         mp.DumpMethodSignature();
         // mp.DumpEHS();
         mp.DumpVars();
-        // mp.DumpBBs();
+        mp.DumpBBs();
         mp.DumpTAC();
     }
 }

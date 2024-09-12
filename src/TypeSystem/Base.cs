@@ -40,14 +40,12 @@ class ILNullValue : ILValue
 
 class ILVarArgValue(string methodName) : ILValue
 {
-    private static ILType _instance = new ILHandleRef();
+    private static readonly ILType _instance = new ILHandleRef();
     public ILType Type => _instance;
-    public string Method = methodName;
-    public override string ToString() => Method + ".__arglist";
+    public override string ToString() => methodName + ".__arglist";
 }
 
-// TODO check merged is not used
-class ILLocal(ILType type, string name, bool merged = false) : ILLValue
+class ILLocal(ILType type, string name) : ILLValue
 {
     public ILType Type => type;
 
