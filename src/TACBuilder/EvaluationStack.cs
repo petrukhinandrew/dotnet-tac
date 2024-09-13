@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
@@ -25,7 +26,7 @@ public class EvaluationStack<T>
     }
 
     public int Count => _data.Count;
-
+    public int CountVirtual => _virtualStackPtr + 1;
     public T Pop(bool virtually = false)
     {
         if (virtually) return _data[_virtualStackPtr--];
@@ -39,6 +40,7 @@ public class EvaluationStack<T>
     {
         _data.Add(value);
         _virtualStackPtr++;
+        Debug.Assert(_virtualStackPtr == _data.Count - 1);
     }
 
     /// <summary>
@@ -55,10 +57,10 @@ public class EvaluationStack<T>
     public void Clear()
     {
         _data.Clear();
-        _virtualStackPtr = 0;
+        _virtualStackPtr = -1;
     }
 
-    public void CopyTo(T[] array, int arrayIndex)
+    private void CopyTo(T[] array, int arrayIndex)
     {
         _data.CopyTo(array, arrayIndex);
     }
@@ -67,5 +69,10 @@ public class EvaluationStack<T>
     {
         _data.AddRange(source._data);
         _virtualStackPtr = _data.Count - 1;
+    }
+
+    public override string ToString()
+    {
+        return string.Join(", ", _data.Select(d => d.ToString())) + " " + _virtualStackPtr + " " + (_data.Count - 1);
     }
 }

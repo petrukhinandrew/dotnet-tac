@@ -22,6 +22,8 @@ class MethodProcessor
     public Dictionary<int, int?> ilToTacMapping = new();
     public Queue<SMFrame> Worklist = new();
 
+    private HashSet<SMFrame> _shouldResetStack = new();
+
     public MethodProcessor(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
         ILInstr begin, ehClause[] ehs)
     {
@@ -65,6 +67,26 @@ class MethodProcessor
         return [.. leaders.OrderBy(l => l.idx)];
     }
 
+    public void UseVirtualStack(SMFrame frame)
+    {
+        _shouldResetStack.Add(frame);
+    }
+
+    private void ResetUsedStacks(bool includeEHS = false)
+    {
+        foreach (var frame in _shouldResetStack) 
+        // foreach (var frame in TacBlocks.Values)
+        {
+            frame.ResetVirtualStack();
+        }
+        _shouldResetStack.Clear();
+        if (!includeEHS) return;
+        foreach (EHScopeWithVarIdx scope in Scopes.Where(s => s is EHScopeWithVarIdx))
+        {
+            scope.ResetVirtualFrameStack();
+        }
+    }
+
     private void ProcessNonExceptionalIL()
     {
         TacBlocks[0] = new SMFrame(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
@@ -72,11 +94,7 @@ class MethodProcessor
         Worklist.Enqueue(TacBlocks[0]);
         while (Worklist.Count > 0)
         {
-            foreach (var frame in TacBlocks.Values)
-            {
-                frame.ResetVirtualStack();
-            }
-
+            ResetUsedStacks();
             Worklist.Dequeue().Branch();
         }
     }
@@ -115,17 +133,7 @@ class MethodProcessor
 
         while (Worklist.Count > 0)
         {
-            // TODO introduce private method after smaller list will be introduced 
-            foreach (var frame in TacBlocks.Values)
-            {
-                frame.ResetVirtualStack();
-            }
-
-            foreach (EHScopeWithVarIdx scope in Scopes.Where(s => s is EHScopeWithVarIdx))
-            {
-                scope.ResetVirtualFrameStack();
-            }
-
+            ResetUsedStacks(true);
             Worklist.Dequeue().Branch();
         }
     }
