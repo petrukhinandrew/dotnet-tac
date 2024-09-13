@@ -956,7 +956,7 @@ static class FrameTacBuilder
 
     private static void InlineInitArray(this SMFrame frame, List<ILExpr> args)
     {
-        if (args.Last() is ILLocal newArr && args.First() is ILObjectLiteral ilObj)
+        if (args.First() is ILLocal newArr && args.Last() is ILObjectLiteral ilObj)
         {
             try
             {
