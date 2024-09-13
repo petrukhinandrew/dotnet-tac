@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Diagnostics;
 using System.Reflection;
 using Usvm.IL.Parser;
@@ -118,7 +117,9 @@ class SMFrame
     {
         var pos = TacLines.FindIndex(l => l is ILBranchStmt);
         pos = pos == -1 ? TacLines.Count : pos;
-        TacLines.InsertRange(pos, _extraAssignments.OrderBy(p => p.Key.ToString()).Select(p => new ILAssignStmt(p.Key, p.Value)));
+        TacLines.InsertRange(pos,
+            _extraAssignments.OrderBy(p => p.Key.ToString())
+                .Select(p => new ILAssignStmt(p.Key, p.Value)));
     }
 
     public ILExpr PopSingleAddr()

@@ -13,7 +13,7 @@ class MethodProcessor
     public List<ILLocal> Params;
     public List<ILExpr> Temps = new();
     public List<ILExpr> Errs = new();
-    public Dictionary<int, int> Merged = new();
+    public Dictionary<int, ILMerged> Merged = new();
     public List<ILIndexedStmt> Tac = new();
     public List<ILInstr> Leaders;
     public Dictionary<int, List<int>> Successors = new();
@@ -23,7 +23,7 @@ class MethodProcessor
     public Dictionary<int, int?> ilToTacMapping = new();
     public Queue<SMFrame> Worklist = new();
 
-    private HashSet<SMFrame> _shouldResetStack = new();
+    private readonly HashSet<SMFrame> _shouldResetStack = new();
 
     public MethodProcessor(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
         ILInstr begin, ehClause[] ehs)
@@ -38,10 +38,15 @@ class MethodProcessor
         Locals = locals.OrderBy(l => l.LocalIndex)
             .Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
         InitEHScopes();
-        // TODO check it is necessary and cannot be resolved in process of branching
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
         ProcessEHScopesIL();
+        foreach (var m in Merged.Values)
+        {
+            var temp = GetNewTemp(m.Type, m);
+            m.MakeTemp(temp.ToString());
+        }
+
         foreach (var bb in TacBlocks)
         {
             bb.Value.InsertExtraAssignments();
@@ -195,12 +200,10 @@ class MethodProcessor
     {
         if (!Merged.ContainsKey(instrIdx))
         {
-            var merged = new ILMerged(NamingUtil.MergedVar(Merged.Count));
-            Temps.Add(merged);
-            Merged.Add(instrIdx, Temps.Count - 1);
+            Merged.Add(instrIdx, new ILMerged(NamingUtil.MergedVar(Merged.Count)));
         }
 
-        return (ILMerged)Temps[Merged[instrIdx]];
+        return Merged[instrIdx];
     }
 
     public FieldInfo ResolveField(int target)
