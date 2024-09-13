@@ -1,4 +1,8 @@
+using System.Collections;
+using System.Data;
 using System.Reflection;
+using System.Security.AccessControl;
+using Usvm.IL.Parser;
 
 namespace Usvm.IL.TypeSystem;
 
@@ -60,6 +64,43 @@ class ILLocal(ILType type, string name) : ILLValue
     {
         return obj is ILLocal loc && loc.ToString() == ToString();
     }
+}
+
+class ILMergedType : ILType
+{
+    private List<ILType> _types = new();
+
+    public ILType Merge()
+    {
+        // TODO
+        return _types[0];
+    }
+
+    public void OfTypes(List<ILType> types)
+    {
+        _types = types;
+    }
+}
+
+class ILMerged(string name) : ILLocal(new ILMergedType(), name)
+{
+    public ILType Type => ((ILMergedType)base.Type).Merge();
+
+    public void MergeOf(List<ILExpr> exprs)
+    {
+        ((ILMergedType)base.Type).OfTypes(exprs.Select(e => e.Type).ToList());
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is ILMerged m && m.ToString() == ToString();
+    }
+
+    public override int GetHashCode()
+    {
+        return ToString().GetHashCode();
+    }
+    
 }
 
 class ILObjectLiteral(ILType type, object? obj) : ILValue

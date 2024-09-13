@@ -54,17 +54,6 @@ class ILSizeOfExpr(ILType type) : ILExpr
     }
 }
 
-// TODO rename to Phi smth
-class ILMergedValueExpr(ILType type) : ILExpr
-{
-    public ILType Type => type;
-
-    public override string ToString()
-    {
-        return "merged";
-    }
-}
-
 class ILNewArrayExpr(ILArray type, ILExpr size) : ILExpr
 {
     public ILType Type => type.ElemType;

@@ -13,6 +13,7 @@ class MethodProcessor
     public List<ILLocal> Params;
     public List<ILExpr> Temps = new();
     public List<ILExpr> Errs = new();
+    public Dictionary<int, int> Merged = new();
     public List<ILIndexedStmt> Tac = new();
     public List<ILInstr> Leaders;
     public Dictionary<int, List<int>> Successors = new();
@@ -74,10 +75,11 @@ class MethodProcessor
 
     private void ResetUsedStacks(bool includeEHS = false)
     {
-        foreach (var frame in _shouldResetStack) 
+        foreach (var frame in _shouldResetStack)
         {
             frame.ResetVirtualStack();
         }
+
         _shouldResetStack.Clear();
     }
 
@@ -181,6 +183,24 @@ class MethodProcessor
                 Scopes.Add(scope);
             }
         }
+    }
+
+    public ILLocal GetNewTemp(ILType type, ILExpr value)
+    {
+        Temps.Add(value);
+        return new ILLocal(type, NamingUtil.TempVar(Temps.Count - 1));
+    }
+
+    public ILMerged GetMerged(int instrIdx)
+    {
+        if (!Merged.ContainsKey(instrIdx))
+        {
+            var merged = new ILMerged(NamingUtil.MergedVar(Merged.Count));
+            Temps.Add(merged);
+            Merged.Add(instrIdx, Temps.Count - 1);
+        }
+
+        return (ILMerged)Temps[Merged[instrIdx]];
     }
 
     public FieldInfo ResolveField(int target)

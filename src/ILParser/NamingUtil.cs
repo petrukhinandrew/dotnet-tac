@@ -22,6 +22,11 @@ public static class NamingUtil
         return $"err${idx}";
     }
 
+    public static string MergedVar(int idx)
+    {
+        return $"merged${idx}";
+    }
+
     public static int TakeIndexFrom(string name)
     {
         return int.Parse(name.Split("$")[1]);

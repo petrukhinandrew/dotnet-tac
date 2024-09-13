@@ -24,8 +24,7 @@ class SMFrame
     private bool _hasVirtualPred;
     private HashSet<SMFrame> _preds = new();
 
-    // TODO make HashSet instead
-    private readonly List<ILStmt> _extraAssignments = new();
+    private readonly Dictionary<ILMerged, ILExpr> _extraAssignments = new();
 
     public SMFrame(MethodProcessor proc, SMFrame? pred, EvaluationStack<ILExpr> stack, ILInstr.Instr instr)
     {
@@ -115,16 +114,23 @@ class SMFrame
         return _mp.MethodInfo.ReturnParameter.ParameterType;
     }
 
+    public void InsertExtraAssignments()
+    {
+        var pos = TacLines.FindIndex(l => l is ILBranchStmt);
+        pos = pos == -1 ? TacLines.Count : pos;
+        TacLines.InsertRange(pos, _extraAssignments.OrderBy(p => p.Key.ToString()).Select(p => new ILAssignStmt(p.Key, p.Value)));
+    }
+
     public ILExpr PopSingleAddr()
     {
-        if (_stack.Count == 0) return MergeStacksValues();
+        if (_stack.Count == 0) return MergeStacksValues(CurInstr.idx);
         return ToSingleAddr(_stack.Pop());
     }
 
-    private ILExpr PopSingleAddrVirt()
+    private ILExpr PopSingleAddrVirt(int targetInstrIdx)
     {
         _mp.UseVirtualStack(this);
-        
+
         if (!_isVirtualPred)
         {
             Debug.Assert(ReferenceEquals(this, _mp.TacBlocks[ILFirst]));
@@ -138,27 +144,20 @@ class SMFrame
             }
         }
 
-        if (_stack.CountVirtual == 0) return MergeStacksValues();
+        if (_stack.CountVirtual == 0) return MergeStacksValues(targetInstrIdx);
         return ToSingleAddr(_stack.Pop(true));
     }
 
-    // TODO reoder by lhs index
-    public void InsertExtraAssignments()
-    {
-        var pos = TacLines.FindIndex(l => l is ILBranchStmt);
-        pos = pos == -1 ? TacLines.Count : pos;
-        TacLines.InsertRange(pos, _extraAssignments);
-    }
-
-    private ILExpr MergeStacksValues()
+    private ILExpr MergeStacksValues(int targetInstrIdx)
     {
         if (_preds.Count == 0) throw new Exception("no pred exist for " + ILFirst + " at " + CurInstr.idx);
-        List<(SMFrame, ILExpr)> values = _preds.Select(s => (s, s.PopSingleAddrVirt())).ToList();
+        List<(SMFrame, ILExpr)> values = _preds.Select(s => (s, s.PopSingleAddrVirt(targetInstrIdx))).ToList();
         if (values.Select(p => p.Item2).Distinct().Count() == 1) return values.Select(p => p.Item2).First();
-        ILLocal tmp = GetNewTemp(values[0].Item2.Type, new ILMergedValueExpr(values[0].Item2.Type));
-        for (int i = 0; i < values.Count; i++)
+        ILMerged tmp = GetMerged(targetInstrIdx);
+        tmp.MergeOf(values.Select(p => p.Item2).ToList());
+        foreach (var (frame, val) in values)
         {
-            values[i].Item1._extraAssignments.Add(new ILAssignStmt(tmp, values[i].Item2));
+            frame._extraAssignments[tmp] = val;
         }
 
         return tmp;
@@ -194,8 +193,12 @@ class SMFrame
 
     public ILLocal GetNewTemp(ILType type, ILExpr value)
     {
-        Temps.Add(value);
-        return new ILLocal(type, NamingUtil.TempVar(Temps.Count - 1));
+        return _mp.GetNewTemp(type, value);
+    }
+
+    public ILMerged GetMerged(int instrIdx)
+    {
+        return _mp.GetMerged(instrIdx);
     }
 
     public void NewLine(ILStmt line)
