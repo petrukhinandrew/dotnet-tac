@@ -1,11 +1,6 @@
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 
-using System.Collections;
-using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text.RegularExpressions;
-
 namespace Usvm.IL.Test.Instructions;
 
 public class OpsTest
