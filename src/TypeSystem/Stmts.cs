@@ -5,7 +5,7 @@ abstract class ILStmt()
 {
     private int Index = Indexer++;
     private static int Indexer = 0;
-    public abstract new string ToString();
+    public new abstract string ToString();
     public override bool Equals(object? obj)
     {
         return obj != null && obj is ILStmt stmt && stmt.Index == Index;
