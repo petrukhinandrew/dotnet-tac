@@ -20,7 +20,8 @@ class SMFrame
     internal bool? _cachedTacLinesEq;
     internal ILInstr.Instr _firstInstr;
 
-    private bool _isVirtual = false;
+    private bool _isVirtualPred;
+    private bool _hasVirtualPred;
     private HashSet<SMFrame> _preds = new();
 
     // TODO make HashSet instead
@@ -47,8 +48,11 @@ class SMFrame
     {
         var virtPred = new SMFrame(_mp, null,
             new EvaluationStack<ILExpr>(stack),
-            _firstInstr);
-        virtPred._isVirtual = true;
+            _firstInstr)
+        {
+            _isVirtualPred = true
+        };
+        _hasVirtualPred = true;
         _preds.Add(virtPred);
         return virtPred;
     }
@@ -71,6 +75,7 @@ class SMFrame
             ContinueTo(target);
         }
     }
+
     // TODO mb refactor, move _mp logic into MethodProcessor 
     private void ContinueTo(ILInstr instr)
     {
@@ -118,13 +123,22 @@ class SMFrame
 
     private ILExpr PopSingleAddrVirt()
     {
-        if (_stack.CountVirtual == 0) return MergeStacksValues();
-        if (!_isVirtual)
+        _mp.UseVirtualStack(this);
+        
+        if (!_isVirtualPred)
         {
             Debug.Assert(ReferenceEquals(this, _mp.TacBlocks[ILFirst]));
-            _mp.UseVirtualStack(this);
         }
 
+        if (_hasVirtualPred && _stack.CountVirtual == 0)
+        {
+            foreach (var pred in _preds)
+            {
+                _mp.UseVirtualStack(pred);
+            }
+        }
+
+        if (_stack.CountVirtual == 0) return MergeStacksValues();
         return ToSingleAddr(_stack.Pop(true));
     }
 

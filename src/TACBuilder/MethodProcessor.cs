@@ -75,16 +75,10 @@ class MethodProcessor
     private void ResetUsedStacks(bool includeEHS = false)
     {
         foreach (var frame in _shouldResetStack) 
-        // foreach (var frame in TacBlocks.Values)
         {
             frame.ResetVirtualStack();
         }
         _shouldResetStack.Clear();
-        if (!includeEHS) return;
-        foreach (EHScopeWithVarIdx scope in Scopes.Where(s => s is EHScopeWithVarIdx))
-        {
-            scope.ResetVirtualFrameStack();
-        }
     }
 
     private void ProcessNonExceptionalIL()
