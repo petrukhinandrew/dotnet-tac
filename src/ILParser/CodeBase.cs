@@ -1,3 +1,4 @@
+using System.ComponentModel.Design;
 using System.Reflection;
 using System.Runtime.Loader;
 using Usvm.IL.TACBuilder;
@@ -92,10 +93,10 @@ class CodeBase : AssemblyLoadContext
                         }
                         catch (Exception e)
                         {
-                            Console.WriteLine("Caught on {0}: ", method.Name);
                             Console.WriteLine(e.Message);
                             Console.WriteLine(e.TargetSite);
                             Console.WriteLine(e.StackTrace);
+                            throw new Exception("Caught on {0}: " + method.Name);
                         }
                     }
 
