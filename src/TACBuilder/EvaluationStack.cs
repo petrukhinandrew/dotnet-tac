@@ -5,7 +5,7 @@ namespace Usvm.IL.TACBuilder;
 
 public class EvaluationStack<T>
 {
-    private List<T> _data;
+    private readonly List<T> _data;
     private int _virtualStackPtr = -1;
 
     public EvaluationStack() : this([])
@@ -33,6 +33,7 @@ public class EvaluationStack<T>
         T ret = _data.Last();
         _data.RemoveAt(_data.Count - 1);
         _virtualStackPtr--;
+        Debug.Assert(_virtualStackPtr == _data.Count - 1);
         return ret;
     }
 
