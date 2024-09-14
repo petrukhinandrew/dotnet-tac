@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Usvm.IL.TypeSystem;
 
@@ -76,9 +77,22 @@ class ILMergedType : ILType
 
     private static ILType merge(List<ILType> types)
     {
-        throw new Exception("TODO");
+        var res = types.First().ReflectedType;
+        foreach (var type in types.Skip(1))
+        {
+            res = meet(res, type.ReflectedType);
+        }
+
+        return TypeSolver.Resolve(res);
     }
 
+    private static Type meet(Type? left, Type? right)
+    {
+        if (left == null || right == null) return typeof(object);
+        if (left.IsAssignableTo(right)) return right;
+        if (right.IsAssignableTo(left)) return left;
+        return meet(left.BaseType, right.BaseType);
+    }
 
     public void OfTypes(List<ILType> types)
     {

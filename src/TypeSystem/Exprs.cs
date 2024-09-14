@@ -65,24 +65,16 @@ class ILNewArrayExpr(ILArray type, ILExpr size) : ILExpr
     }
 }
 
-class ILArrayAccess : ILLValue
+class ILArrayAccess(ILExpr arrRef, ILExpr idx) : ILLValue
 {
-    public ILArrayAccess(ILExpr arrRef, ILExpr idx)
-    {
-        _arrRef = arrRef;
-        _idx = idx;
-    }
-
-    ILExpr _arrRef;
-    ILExpr _idx;
-    public ILType Type => _arrRef.Type;
-    public ILExpr Index => _idx;
+    public ILType Type => arrRef.Type;
+    public ILExpr Index => idx;
 
     public string Name => ToString();
 
     public override string ToString()
     {
-        return _arrRef.ToString() + "[" + _idx.ToString() + "]";
+        return arrRef.ToString() + "[" + Index.ToString() + "]";
     }
 }
 
@@ -106,7 +98,7 @@ abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
 
     public override string ToString()
     {
-        return $"({_targetType.ToString()}) {_target.ToString()}";
+        return $"({_targetType}) {_target.ToString()}";
     }
 }
 
