@@ -1,4 +1,5 @@
 namespace Usvm.IL.TypeSystem;
+
 static class TypeSolver
 {
     public static ILType Resolve(Type type)
@@ -23,11 +24,11 @@ static class TypeSolver
             }
             else if (type.IsEnum)
             {
-                return new ILEnumType(type.FullName ?? type.AssemblyQualifiedName ?? type.Name);
+                return new ILEnumType(type, type.FullName ?? type.AssemblyQualifiedName ?? type.Name);
             }
             else if (type.IsValueType)
             {
-                return new ILStructType(FormatObjectName(type));
+                return new ILStructType(type, FormatObjectName(type));
             }
         }
         else if (type.IsFunctionPointer)
@@ -36,11 +37,11 @@ static class TypeSolver
         }
         else if (type.IsPointer)
         {
-            return new ILUnmanagedPointer(Resolve(type.GetElementType()!));
+            return new ILUnmanagedPointer(type, Resolve(type.GetElementType()!));
         }
         else if (type.IsByRef)
         {
-            return new ILManagedPointer(Resolve(type.GetElementType()!));
+            return new ILManagedPointer(type, Resolve(type.GetElementType()!));
         }
         else if (type.IsByRefLike)
         {
@@ -56,14 +57,15 @@ static class TypeSolver
         {
             Type? elemType = type.GetElementType();
             if (elemType != null)
-                return new ILArray(Resolve(elemType));
+                return new ILArray(type, Resolve(elemType));
             else
                 throw new Exception("bad elem type for " + type.ToString());
         }
         else if (type.IsInterface || type.IsClass)
         {
-            return new ILClassOrInterfaceType(FormatObjectName(type));
+            return new ILClassOrInterfaceType(type, FormatObjectName(type));
         }
+
         throw new Exception("unhandled type " + type.ToString());
     }
 
@@ -76,15 +78,27 @@ static class TypeSolver
         {
             return string.Format("{0}.{1}", nsName, rawName);
         }
+
         string name = tokens[0];
         int paramsCnt = int.Parse(tokens[1]);
-        return string.Format("{0}.{1}<{2}>", nsName, name, string.Join(",", type.GenericTypeArguments.Select(t => Resolve(t).ToString())));
+        return string.Format("{0}.{1}<{2}>", nsName, name,
+            string.Join(",", type.GenericTypeArguments.Select(t => Resolve(t).ToString())));
     }
 
-    class UnmanagedCheck<T> where T : unmanaged { }
+    class UnmanagedCheck<T> where T : unmanaged
+    {
+    }
+
     public static bool IsUnmanaged(this Type t)
     {
-        try { typeof(UnmanagedCheck<>).MakeGenericType(t); return true; }
-        catch (Exception) { return false; }
+        try
+        {
+            typeof(UnmanagedCheck<>).MakeGenericType(t);
+            return true;
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 }

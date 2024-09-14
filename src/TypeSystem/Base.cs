@@ -4,6 +4,7 @@ namespace Usvm.IL.TypeSystem;
 
 public interface ILType
 {
+    public Type ReflectedType { get; }
 }
 
 public interface ILExpr
@@ -66,12 +67,18 @@ class ILMergedType : ILType
 {
     private List<ILType> _types = new();
     private ILType? _cache;
+    public Type ReflectedType => Merge().ReflectedType;
 
     public ILType Merge()
     {
-        // TODO
-        return _cache ??= _types[0];
+        return _cache ??= merge(_types);
     }
+
+    private static ILType merge(List<ILType> types)
+    {
+        throw new Exception("TODO");
+    }
+
 
     public void OfTypes(List<ILType> types)
     {

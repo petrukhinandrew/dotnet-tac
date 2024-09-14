@@ -716,7 +716,7 @@ static class FrameTacBuilder
                                             sizeExpr.Type.ToString());
                     }
 
-                    ILArray resolvedType = new ILArray(TypeSolver.Resolve(arrType));
+                    ILArray resolvedType = new ILArray(arrType, TypeSolver.Resolve(arrType));
                     ILExpr arrExpr = new ILNewArrayExpr(
                         resolvedType,
                         sizeExpr);
@@ -962,7 +962,7 @@ static class FrameTacBuilder
             {
                 ILNewArrayExpr expr = (ILNewArrayExpr)frame.Temps[NamingUtil.TakeIndexFrom(newArr.ToString())];
                 int arrSize = int.Parse(expr.Size.ToString());
-                Type arrType = ((ILPrimitiveType)expr.Type).BaseType;
+                Type arrType = ((ILPrimitiveType)expr.Type).ReflectedType;
                 var tmp = Array.CreateInstance(arrType, arrSize);
                 GCHandle handle = GCHandle.Alloc(tmp, GCHandleType.Pinned);
 
@@ -976,7 +976,7 @@ static class FrameTacBuilder
                 }
 
                 List<object> list = [.. tmp];
-                ILLiteral arrLit = new ILLiteral(new ILArray(new ILInt32()),
+                ILLiteral arrLit = new ILLiteral(new ILArray(Array.CreateInstance(arrType, 0).GetType(), new ILInt32()),
                     "[" + string.Join(", ", list.Select(v => v.ToString())) + "]");
                 for (int i = 0; i < list.Count; i++)
                 {

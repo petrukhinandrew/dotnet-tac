@@ -1,13 +1,16 @@
 namespace Usvm.IL.TypeSystem;
 
-public abstract class ILPointer(ILType targetType) : ILType
+public abstract class ILPointer(Type reflectedType, ILType targetType) : ILType
 {
     public ILType TargetType = targetType;
+    public Type ReflectedType => reflectedType;
     public abstract override string ToString();
 }
-class ILManagedPointer(ILType targetType) : ILPointer(targetType)
+
+class ILManagedPointer(Type reflectedType, ILType targetType) : ILPointer(reflectedType, targetType)
 {
     public override string ToString() => TargetType.ToString() + "&";
+
     public override bool Equals(object? obj)
     {
         return obj is ILManagedPointer pt && TargetType == pt.TargetType;
@@ -18,9 +21,11 @@ class ILManagedPointer(ILType targetType) : ILPointer(targetType)
         return ToString().GetHashCode();
     }
 }
-class ILUnmanagedPointer(ILType targetType) : ILPointer(targetType)
+
+class ILUnmanagedPointer(Type reflectedType, ILType targetType) : ILPointer(reflectedType, targetType)
 {
     public override string ToString() => TargetType.ToString() + "*";
+
     public override bool Equals(object? obj)
     {
         return obj is ILUnmanagedPointer pt && TargetType == pt.TargetType;

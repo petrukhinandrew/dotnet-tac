@@ -106,7 +106,7 @@ abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
 
     public override string ToString()
     {
-        return string.Format("({0}) {1}", _targetType.ToString(), _target.ToString());
+        return $"({_targetType.ToString()}) {_target.ToString()}";
     }
 }
 
@@ -179,7 +179,7 @@ class ILManagedRef(ILExpr value) : ILRefExpr
 {
     public ILExpr Value => value;
 
-    public ILType Type => new ILManagedPointer(Value.Type);
+    public ILType Type => new ILManagedPointer(Value.Type.ReflectedType, Value.Type);
 
     public override string ToString()
     {
@@ -191,7 +191,7 @@ class ILUnmanagedRef(ILExpr value) : ILRefExpr
 {
     public ILExpr Value => value;
 
-    public ILType Type => new ILUnmanagedPointer(Value.Type);
+    public ILType Type => new ILUnmanagedPointer(Value.Type.ReflectedType, Value.Type);
 
     public override string ToString()
     {
@@ -223,12 +223,12 @@ class ILUnmanagedDeref(ILExpr pointedVal, ILType resType) : ILDerefExpr
 
 class ILStackAlloc(ILExpr size) : ILExpr
 {
-    public ILType Type => new ILUnmanagedPointer(new ILNull());
+    public ILType Type => new ILUnmanagedPointer(Array.Empty<byte>().GetType(), new ILUInt8());
 
-    public ILExpr Size = size;
+    private readonly ILExpr _size = size;
 
     public override string ToString()
     {
-        return "stackalloc " + Size.ToString();
+        return "stackalloc " + _size.ToString();
     }
 }

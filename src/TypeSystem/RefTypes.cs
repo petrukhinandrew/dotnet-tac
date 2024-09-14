@@ -1,12 +1,21 @@
+using System.Runtime.InteropServices;
+
 namespace Usvm.IL.TypeSystem;
-interface ILRefType : ILType { }
-class ILClassOrInterfaceType(string qName) : ILRefType
+
+interface ILRefType : ILType
+{
+}
+
+class ILClassOrInterfaceType(Type reflectedType, string qName) : ILRefType
 {
     private string QualifiedName = qName;
+    public Type ReflectedType => reflectedType;
+
     public override string ToString()
     {
         return QualifiedName;
     }
+
     public override bool Equals(object? obj)
     {
         return obj is ILClassOrInterfaceType another && another.QualifiedName == QualifiedName;
@@ -17,17 +26,22 @@ class ILClassOrInterfaceType(string qName) : ILRefType
         return QualifiedName.GetHashCode();
     }
 }
-class ILArray(ILType elemType) : ILRefType
+
+class ILArray(Type reflectedType, ILType elemType) : ILRefType
 {
     public ILType ElemType => elemType;
+    public Type ReflectedType => reflectedType;
+
     public override string ToString()
     {
         return elemType.ToString() + "[]";
     }
+
     public override bool Equals(object? obj)
     {
         return obj is ILArray arr && ElemType == arr.ElemType;
     }
+
     public override int GetHashCode()
     {
         return base.GetHashCode();
@@ -36,6 +50,8 @@ class ILArray(ILType elemType) : ILRefType
 
 class ILObject : ILRefType
 {
+    public Type ReflectedType => typeof(object);
+
     public bool Equals(ILType? other)
     {
         return other is ILObject;
@@ -46,8 +62,11 @@ class ILObject : ILRefType
         return "object";
     }
 }
+
 class ILVoid : ILRefType
 {
+    public Type ReflectedType => typeof(void);
+
     public bool Equals(ILType? other)
     {
         return other is ILVoid;
@@ -58,8 +77,11 @@ class ILVoid : ILRefType
         return "void";
     }
 }
+
 class ILNull : ILRefType
 {
+    public Type ReflectedType => typeof(void);
+
     public bool Equals(ILType? other)
     {
         return other is ILNull;
@@ -70,8 +92,11 @@ class ILNull : ILRefType
         return "null";
     }
 }
+
 class ILString : ILRefType
 {
+    public Type ReflectedType => typeof(string);
+
     public bool Equals(ILType? other)
     {
         return other is ILString;
@@ -85,6 +110,8 @@ class ILString : ILRefType
 
 class ILHandleRef : ILRefType
 {
+    public Type ReflectedType => typeof(HandleRef);
+
     public bool Equals(ILType? other)
     {
         return other is ILHandleRef;
