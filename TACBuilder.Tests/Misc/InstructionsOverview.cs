@@ -1,6 +1,6 @@
 #pragma warning disable CS0219
 #pragma warning disable CS8500
-
+#pragma warning disable
 namespace Usvm.IL.Test.Instructions;
 
 public class OpsTest
@@ -74,6 +74,25 @@ static class CastTests
     }
 }
 
+interface ConditionTestInterface
+{
+    void Do();
+}
+
+struct ConditionTestStruct1 : ConditionTestInterface
+{
+    public void Do()
+    {
+    }
+}
+
+struct ConditionTestStruct2 : ConditionTestInterface
+{
+    public void Do()
+    {
+    }
+}
+
 static class ConditionsTests
 {
     public static string Concat(string s1, string s2, string s3)
@@ -89,6 +108,14 @@ static class ConditionsTests
         int b = 2;
         string s = (a > b) ? "true" : "false";
         int c = s.Length < a + b ? b - a : a - b;
+    }
+
+    public static void TernaryOWithInterfaceResult()
+    {
+        int a = 1;
+        int b = 2;
+        ConditionTestInterface res = a > b ? new ConditionTestStruct1() : new ConditionTestStruct2();
+        res.Do();
     }
 
     public static void Loops()
