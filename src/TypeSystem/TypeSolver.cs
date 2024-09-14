@@ -1,8 +1,8 @@
 namespace Usvm.IL.TypeSystem;
 
-static class TypeSolver
+static class TypingUtil
 {
-    public static ILType Resolve(Type type)
+    public static ILType ILTypeFrom(Type type)
     {
         if (type == typeof(void)) return new ILVoid();
         if (type == typeof(object)) return new ILObject();
@@ -37,11 +37,11 @@ static class TypeSolver
         }
         else if (type.IsPointer)
         {
-            return new ILUnmanagedPointer(type, Resolve(type.GetElementType()!));
+            return new ILUnmanagedPointer(type, ILTypeFrom(type.GetElementType()!));
         }
         else if (type.IsByRef)
         {
-            return new ILManagedPointer(type, Resolve(type.GetElementType()!));
+            return new ILManagedPointer(type, ILTypeFrom(type.GetElementType()!));
         }
         else if (type.IsByRefLike)
         {
@@ -57,7 +57,7 @@ static class TypeSolver
         {
             Type? elemType = type.GetElementType();
             if (elemType != null)
-                return new ILArray(type, Resolve(elemType));
+                return new ILArray(type, ILTypeFrom(elemType));
             else
                 throw new Exception("bad elem type for " + type.ToString());
         }
@@ -67,6 +67,25 @@ static class TypeSolver
         }
 
         throw new Exception("unhandled type " + type.ToString());
+    }
+
+    public static ILType Merge(List<ILType> types)
+    {
+        var res = types.First().ReflectedType;
+        foreach (var type in types.Skip(1))
+        {
+            res = meetTypes(res, type.ReflectedType);
+        }
+
+        return ILTypeFrom(res);
+    }
+
+    private static Type meetTypes(Type? left, Type? right)
+    {
+        if (left == null || right == null) return typeof(object);
+        if (left.IsAssignableTo(right)) return right;
+        if (right.IsAssignableTo(left)) return left;
+        return meetTypes(left.BaseType, right.BaseType);
     }
 
     private static string FormatObjectName(Type type)
@@ -82,7 +101,7 @@ static class TypeSolver
         string name = tokens[0];
         int paramsCnt = int.Parse(tokens[1]);
         return string.Format("{0}.{1}<{2}>", nsName, name,
-            string.Join(",", type.GenericTypeArguments.Select(t => Resolve(t).ToString())));
+            string.Join(",", type.GenericTypeArguments.Select(t => ILTypeFrom(t).ToString())));
     }
 
     class UnmanagedCheck<T> where T : unmanaged

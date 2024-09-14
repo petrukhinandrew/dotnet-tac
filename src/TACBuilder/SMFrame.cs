@@ -176,7 +176,7 @@ class SMFrame
 
     public void PushLiteral<T>(T value)
     {
-        ILLiteral lit = new ILLiteral(TypeSolver.Resolve(typeof(T)), value?.ToString() ?? "");
+        ILLiteral lit = new ILLiteral(TypingUtil.ILTypeFrom(typeof(T)), value?.ToString() ?? "");
         Push(lit);
     }
 

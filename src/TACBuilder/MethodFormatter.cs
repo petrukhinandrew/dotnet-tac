@@ -47,10 +47,10 @@ static class MethodFormatter
 
     private static string FormatMethodSignature(this MethodProcessor mp)
     {
-        ILType retType = TypeSolver.Resolve(mp.MethodInfo.ReturnType);
+        ILType retType = TypingUtil.ILTypeFrom(mp.MethodInfo.ReturnType);
         return string.Format("{0} {1}({2})", retType, mp.MethodInfo.Name,
             string.Join(", ",
-                mp.MethodInfo.GetParameters().Select(mi => TypeSolver.Resolve(mi.ParameterType).ToString())));
+                mp.MethodInfo.GetParameters().Select(mi => TypingUtil.ILTypeFrom(mi.ParameterType).ToString())));
     }
 
     private static void DumpMethodSignature(this MethodProcessor mp)

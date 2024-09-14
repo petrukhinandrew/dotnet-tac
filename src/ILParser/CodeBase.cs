@@ -79,7 +79,7 @@ class CodeBase : AssemblyLoadContext
                     MethodBody? methodBody;
                     if ((methodBody = method.GetMethodBody()) != null)
                     {
-                        ILType ilType = TypeSolver.Resolve(type);
+                        ILType ilType = TypingUtil.ILTypeFrom(type);
                         Console.WriteLine(ilType.ToString());
                         try
                         {

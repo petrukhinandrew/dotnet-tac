@@ -34,9 +34,9 @@ class MethodProcessor
         _declaringModule = declaringModule;
         MethodInfo = methodInfo;
         Params = methodInfo.GetParameters().OrderBy(p => p.Position).Select(l =>
-            new ILLocal(TypeSolver.Resolve(l.ParameterType), NamingUtil.ArgVar(l.Position))).ToList();
+            new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position))).ToList();
         Locals = locals.OrderBy(l => l.LocalIndex)
-            .Select(l => new ILLocal(TypeSolver.Resolve(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
+            .Select(l => new ILLocal(TypingUtil.ILTypeFrom(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
         InitEHScopes();
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
@@ -182,7 +182,7 @@ class MethodProcessor
                 if (scope is EHScopeWithVarIdx s)
                 {
                     s.ErrIdx = Errs.Count;
-                    Errs.Add(new ILLocal(TypeSolver.Resolve(s.Type), NamingUtil.ErrVar(s.ErrIdx)));
+                    Errs.Add(new ILLocal(TypingUtil.ILTypeFrom(s.Type), NamingUtil.ErrVar(s.ErrIdx)));
                 }
 
                 Scopes.Add(scope);

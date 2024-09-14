@@ -72,26 +72,7 @@ class ILMergedType : ILType
 
     public ILType Merge()
     {
-        return _cache ??= merge(_types);
-    }
-
-    private static ILType merge(List<ILType> types)
-    {
-        var res = types.First().ReflectedType;
-        foreach (var type in types.Skip(1))
-        {
-            res = meet(res, type.ReflectedType);
-        }
-
-        return TypeSolver.Resolve(res);
-    }
-
-    private static Type meet(Type? left, Type? right)
-    {
-        if (left == null || right == null) return typeof(object);
-        if (left.IsAssignableTo(right)) return right;
-        if (right.IsAssignableTo(left)) return left;
-        return meet(left.BaseType, right.BaseType);
+        return _cache ??= TypingUtil.Merge(_types);
     }
 
     public void OfTypes(List<ILType> types)
@@ -177,13 +158,13 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
             retType = methodInfo.ReturnType;
         }
 
-        ILType ilRetType = TypeSolver.Resolve(retType);
+        ILType ilRetType = TypingUtil.ILTypeFrom(retType);
         ILMethod method = new ILMethod(mb, ilRetType, mb.DeclaringType?.FullName ?? "", mb.Name, paramCount,
             mb.GetMetadataToken());
 
         foreach (var t in mb.GetGenericArguments())
         {
-            method.GenericArgs.Add(TypeSolver.Resolve(t));
+            method.GenericArgs.Add(TypingUtil.ILTypeFrom(t));
         }
 
         return method;
@@ -250,13 +231,13 @@ class ILField(ILType type, string declType, string name, bool isStatic, int toke
 {
     public static ILField Static(FieldInfo f)
     {
-        return new ILField(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, true,
+        return new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, true,
             f.GetMetadataToken());
     }
 
     public static ILField Instance(FieldInfo f, ILExpr inst)
     {
-        ILField field = new ILField(TypeSolver.Resolve(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, false,
+        ILField field = new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, false,
             f.GetMetadataToken())
         {
             Receiver = inst

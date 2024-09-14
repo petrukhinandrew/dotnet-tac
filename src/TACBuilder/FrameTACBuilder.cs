@@ -239,7 +239,7 @@ static class FrameTacBuilder
                 case "sizeof":
                 {
                     Type mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                    frame.Push(new ILSizeOfExpr(TypeSolver.Resolve(mbType)));
+                    frame.Push(new ILSizeOfExpr(TypingUtil.ILTypeFrom(mbType)));
                     break;
                 }
                 case "ldind.i1":
@@ -296,7 +296,7 @@ static class FrameTacBuilder
                     Type? mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     if (mbType == null) throw new Exception("type not resolved for ldobj");
                     ILExpr addr = frame.PopSingleAddr();
-                    ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypeSolver.Resolve(mbType));
+                    ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(mbType));
                     frame.Push(deref);
                     break;
                 }
@@ -345,7 +345,7 @@ static class FrameTacBuilder
                     if (mbType == null) throw new Exception("type not resolved for sizeof");
                     ILExpr val = frame.PopSingleAddr();
                     ILLValue addr = (ILLValue)frame.PopSingleAddr();
-                    frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, TypeSolver.Resolve(mbType)),
+                    frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(mbType)),
                         val));
                     break;
                 }
@@ -702,7 +702,7 @@ static class FrameTacBuilder
                     }
 
                     frame.Push(new ILNewExpr(
-                        TypeSolver.Resolve(objType),
+                        TypingUtil.ILTypeFrom(objType),
                         inParams));
                     break;
                 }
@@ -716,7 +716,7 @@ static class FrameTacBuilder
                                             sizeExpr.Type.ToString());
                     }
 
-                    ILArray resolvedType = new ILArray(arrType, TypeSolver.Resolve(arrType));
+                    ILArray resolvedType = new ILArray(arrType, TypingUtil.ILTypeFrom(arrType));
                     ILExpr arrExpr = new ILNewArrayExpr(
                         resolvedType,
                         sizeExpr);
@@ -732,7 +732,7 @@ static class FrameTacBuilder
                 {
                     Type type = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     ILExpr addr = frame.PopSingleAddr();
-                    ILType ilType = TypeSolver.Resolve(type);
+                    ILType ilType = TypingUtil.ILTypeFrom(type);
                     frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, ilType),
                         new ILNewDefaultExpr(ilType)));
                     break;
@@ -888,7 +888,7 @@ static class FrameTacBuilder
                     }
 
                     ILExpr obj = frame.PopSingleAddr();
-                    ILExpr res = new ILCondCastExpr(TypeSolver.Resolve(mbType), obj);
+                    ILExpr res = new ILCondCastExpr(TypingUtil.ILTypeFrom(mbType), obj);
                     frame.Push(res);
                     break;
                 }
@@ -902,7 +902,7 @@ static class FrameTacBuilder
                     }
 
                     ILExpr value = frame.PopSingleAddr();
-                    ILExpr casted = new ILCastClassExpr(TypeSolver.Resolve(mbType), value);
+                    ILExpr casted = new ILCastClassExpr(TypingUtil.ILTypeFrom(mbType), value);
                     frame.Push(casted);
                     break;
                 }
@@ -931,7 +931,7 @@ static class FrameTacBuilder
                     }
 
                     ILValue obj = (ILValue)frame.PopSingleAddr();
-                    ILExpr unboxed = new ILUnboxExpr(TypeSolver.Resolve(mbType), obj);
+                    ILExpr unboxed = new ILUnboxExpr(TypingUtil.ILTypeFrom(mbType), obj);
                     frame.Push(unboxed);
                     break;
                 }
