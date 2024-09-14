@@ -41,4 +41,16 @@ public class TypeMergeTest
         var parent = TypingUtil.ILTypeFrom(typeof(BaseClass));
         Assert.Equal(parent, merged);
     }
+
+    [Fact]
+    public void MergeChildAndGrandChild()
+    {
+        var child = TypingUtil.ILTypeFrom(typeof(BaseChild1));
+        var grandchild = TypingUtil.ILTypeFrom(typeof(BaseChild2Child));
+        var merged = TypingUtil.Merge([child, grandchild]);
+        Assert.NotEqual(child, merged);
+        Assert.NotEqual(grandchild, merged);
+        var parent = TypingUtil.ILTypeFrom(typeof(BaseClass));
+        Assert.Equal(parent, merged);
+    }
 }
