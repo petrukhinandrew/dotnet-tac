@@ -1,6 +1,6 @@
 namespace Usvm.IL.TypeSystem;
 
-static class TypingUtil
+public static class TypingUtil
 {
     public static ILType ILTypeFrom(Type type)
     {
