@@ -3,7 +3,7 @@ using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-public class EvaluationStack<T>
+public class EvaluationStack<T> where T : notnull
 {
     private readonly List<T> _data;
     private int _virtualStackPtr = -1;
@@ -27,6 +27,7 @@ public class EvaluationStack<T>
 
     public int Count => _data.Count;
     public int CountVirtual => _virtualStackPtr + 1;
+
     public T Pop(bool virtually = false)
     {
         if (virtually) return _data[_virtualStackPtr--];

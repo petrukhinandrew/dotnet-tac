@@ -94,7 +94,6 @@ class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
 {
     public ILInstr fb;
     public SMFrame FilterFrame;
-
     public new static FilterScope FromClause(ehClause clause)
     {
         FilterScope scope = new FilterScope

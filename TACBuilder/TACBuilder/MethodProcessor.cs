@@ -1,6 +1,6 @@
 using System.Reflection;
-using Usvm.IL.TypeSystem;
 using Usvm.IL.Parser;
+using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
