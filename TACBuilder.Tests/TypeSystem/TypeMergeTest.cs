@@ -15,8 +15,10 @@ public class TypeMergeTest
     interface BaseInterface;
 
     struct StructWithInterface1 : BaseInterface;
-
+    class ClassWithInterface1 : BaseInterface;
     struct StructWithInterface2 : BaseInterface;
+    class ClassWithInterface2 : BaseInterface;
+    
 
     [Fact]
     public void MergeSame()
@@ -63,7 +65,7 @@ public class TypeMergeTest
     }
 
     [Fact]
-    public void MergeStructsFromInterface()
+    public void MergeStructsToInterface()
     {
         var s1 = TypingUtil.ILTypeFrom(typeof(StructWithInterface1));
         var s2 = TypingUtil.ILTypeFrom(typeof(StructWithInterface2));
@@ -73,6 +75,16 @@ public class TypeMergeTest
         Assert.NotEqual(TypingUtil.ILTypeFrom(typeof(ValueType)), merged);
     }
 
+    [Fact]
+    public void MergeClassToInterface()
+    {
+        var c1 = TypingUtil.ILTypeFrom(typeof(ClassWithInterface1));
+        var c2 = TypingUtil.ILTypeFrom(typeof(ClassWithInterface2));
+        var merged = TypingUtil.Merge([c1, c2]);
+        Assert.NotEqual(c1, merged);
+        Assert.NotEqual(c2, merged);
+        Assert.Equal(TypingUtil.ILTypeFrom(typeof(BaseInterface)), merged);   
+    }
     [Fact]
     public void MergePrimitives()
     {

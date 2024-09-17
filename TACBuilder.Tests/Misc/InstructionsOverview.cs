@@ -89,13 +89,25 @@ struct ConditionTestStruct1 : ConditionTestInterface
     }
 }
 
-struct ConditionTestStruct2 : ConditionTestInterface
+class ConditionTestClass1 : ConditionTestInterface
 {
     public void Do()
     {
     }
 }
 
+struct ConditionTestStruct2 : ConditionTestInterface
+{
+    public void Do()
+    {
+    }
+}
+class ConditionTestClass2 : ConditionTestInterface
+{
+    public void Do()
+    {
+    }
+}
 static class ConditionsTests
 {
     public static string Concat(string s1, string s2, string s3)
@@ -113,12 +125,14 @@ static class ConditionsTests
         int c = s.Length < a + b ? b - a : a - b;
     }
 
-    public static void TernaryOWithInterfaceResult()
+    public static void TernaryOpWithInterfaceResult()
     {
         int a = 1;
         int b = 2;
-        ConditionTestInterface res = a > b ? new ConditionTestStruct1() : new ConditionTestStruct2();
-        res.Do();
+        ConditionTestInterface structRes = a > b ? new ConditionTestStruct1() : new ConditionTestStruct2();
+        structRes.Do();
+        ConditionTestInterface classRes = a > b ? new ConditionTestClass1() : new ConditionTestClass2();
+        classRes.Do();
     }
 
     public static void Loops()
@@ -563,13 +577,14 @@ static unsafe class Misc
         TargetX:
         int b = 2;
     }
+
     public static void ByteAndInt()
     {
         byte b = 2;
         int a = 1 + b;
         long c = 2 + a;
-        
     }
+
     public static void FinallyGoto()
     {
         try
