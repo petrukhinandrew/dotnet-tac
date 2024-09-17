@@ -137,7 +137,7 @@ class MethodTacBuilder
                 Tac.Add(new ILIndexedStmt(lineNum++, line));
             }
 
-            if (tacBlocksIndexed.Count > i + 1 && Successors[bb.ILFirst][0] != tacBlocksIndexed[i + 1].Key)
+            if (tacBlocksIndexed.Count > i + 1 && Successors.ContainsKey(bb.ILFirst) && Successors[bb.ILFirst].Count > 0 && Successors[bb.ILFirst][0] != tacBlocksIndexed[i + 1].Key)
             {
                 Tac.Add(new ILIndexedStmt(lineNum++, new ILGotoStmt(Successors[bb.ILFirst][0])));
             }
