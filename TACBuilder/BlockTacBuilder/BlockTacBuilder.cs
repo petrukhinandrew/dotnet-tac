@@ -87,7 +87,6 @@ class BlockTacBuilder
         Debug.Assert(lengths.Max() == lengths.Min());
         for (int j = 0; j < lengths.Max(); j++)
         {
-            Console.WriteLine("spinning");
             var values = stacks.Select(s => s.Item2.Pop()).ToList();
             if (values.Distinct().Count() == 1)
             {
