@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Usvm.IL.Parser;
@@ -8,7 +7,7 @@ namespace Usvm.IL.TACBuilder;
 
 static class FrameTacBuilder
 {
-    private static ILInstr.Instr? AdvanceIP(ILInstr.Instr ip)
+    private static ILInstr.Instr? AdvanceIp(ILInstr.Instr ip)
     {
         ILInstr tmp = ip.next;
         while (tmp is not ILInstr.Instr)
@@ -492,7 +491,7 @@ static class FrameTacBuilder
                         frame.Push(token);
                         break;
                     }
-                    catch (Exception)
+                    catch
                     {
                     }
 
@@ -503,7 +502,7 @@ static class FrameTacBuilder
                         frame.Push(token);
                         break;
                     }
-                    catch (Exception)
+                    catch
                     {
                     }
 
@@ -514,7 +513,7 @@ static class FrameTacBuilder
                         frame.Push(token);
                         break;
                     }
-                    catch (Exception)
+                    catch
                     {
                     }
 
@@ -936,10 +935,10 @@ static class FrameTacBuilder
                     frame.Push(unboxed);
                     break;
                 }
-                default: throw new Exception("unhandled frame.CurInstr " + frame.CurInstr.ToString());
+                default: throw new Exception("unhandled frame.CurInstr " + frame.CurInstr);
             }
 
-            var adv = AdvanceIP(frame.CurInstr!);
+            var adv = AdvanceIp(frame.CurInstr);
             if (adv == null)
             {
                 return;
