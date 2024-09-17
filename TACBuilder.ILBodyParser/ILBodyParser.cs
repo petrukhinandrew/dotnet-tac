@@ -5,15 +5,8 @@ using Usvm.IL.Utils;
 
 namespace TACBuilder.ILBodyParser;
 
-public class ILBodyParser
+public class ILBodyParser(Module mod)
 {
-    private Module _module;
-    // private ILRewriterDumpMode _mode;
-    public ILBodyParser(Module mod)//, ILRewriterDumpMode mode)
-    {
-        _module = mod;
-        // _mode = mode;
-    }
     byte[]? il;
     ILInstr[] offsetToInstr = [];
     ILInstr back = new ILInstr.Back();
@@ -37,9 +30,7 @@ public class ILBodyParser
             return new ehClause(tryBegin, tryEnd, handlerBegin, handlerEnd, type);
         }
         exceptionHandlingClause[] clauses = methodBody.ExceptionHandlingClauses.Select(ehc => new exceptionHandlingClause(ehc)).ToArray();
-        // if (_mode == ILRewriterDumpMode.ILAndEHS) Console.WriteLine("found {0} ehcs", clauses.Length);
         ehs = clauses.Select(parseEH).ToArray();
-        // if (_mode == ILRewriterDumpMode.ILAndEHS) foreach (var ehc in ehs) Console.WriteLine(ehc.ToString());
     }
     public ILInstr GetBeginning()
     {
@@ -52,12 +43,7 @@ public class ILBodyParser
     public void ImportIL(MethodBody methodBody)
     {
         il = methodBody.GetILAsByteArray() ?? [];
-        // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Importing IL with size of {0}", il.Length);
         offsetToInstr = new ILInstr[il.Length + 1];
-        // foreach (var v in methodBody.LocalVariables)
-        // {
-            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Local {0}", v.ToString());
-        // }
         int offset = 0;
         bool branch = false;
         while (offset < il.Length)
@@ -200,7 +186,6 @@ public class ILBodyParser
 
         foreach (var instr in ILInstrs())
         {
-            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("IL_{0} {1} {2}", instr.idx, instr.ToString(), instr.arg.ToString());
             if (instr is ILInstr.Instr ilinstr)
             {
                 ILInstrOperand.Arg32 arg;
@@ -246,8 +231,7 @@ public class ILBodyParser
     {
         try
         {
-            Type t = _module.ResolveType(arg);
-            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {0}", t);
+            Type t = mod.ResolveType(arg);
         }
         catch (Exception e)
         {
@@ -258,10 +242,9 @@ public class ILBodyParser
     {
         try
         {
-            MethodBase? mb = _module.ResolveMethod(arg);
+            MethodBase? mb = mod.ResolveMethod(arg);
             if (mb != null)
             {
-                // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", mb.Name, mb.DeclaringType);
             }
         }
         catch (Exception e)
@@ -273,10 +256,9 @@ public class ILBodyParser
     {
         try
         {
-            FieldInfo? fi = _module.ResolveField(arg);
+            FieldInfo? fi = mod.ResolveField(arg);
             if (fi != null)
             {
-                // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", fi.Name, fi.DeclaringType);
             }
         }
         catch (Exception e)
@@ -288,8 +270,7 @@ public class ILBodyParser
     {
         try
         {
-            string res = _module.ResolveString(arg);
-            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
+            string res = mod.ResolveString(arg);
         }
         catch (Exception e)
         {
@@ -300,9 +281,7 @@ public class ILBodyParser
     {
         try
         {
-            MemberInfo? res = _module.ResolveMember(arg);
-            if (res == null) return;
-            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
+            MemberInfo? res = mod.ResolveMember(arg);
         }
         catch (Exception e)
         {
@@ -310,7 +289,7 @@ public class ILBodyParser
         }
     }
 
-    public IEnumerable<ILInstr> ILInstrs()
+    private IEnumerable<ILInstr> ILInstrs()
     {
 
         ILInstr cur = back.next;

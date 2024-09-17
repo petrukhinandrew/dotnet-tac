@@ -1,3 +1,4 @@
+using Usvm.IL.Parser;
 using Usvm.IL.TACBuilder.Utils;
 using Usvm.IL.TypeSystem;
 
@@ -106,8 +107,21 @@ static class MethodTacFormatter
         }
     }
 
+    public static void DumpIL(this MethodTacBuilder mp)
+    {
+        int index = 0;
+        var instr = mp.GetFirstInstr();
+        while (instr is not ILInstr.Back)
+        {
+            var arg = instr.arg is ILInstrOperand.NoArg ? "" : instr.arg.ToString();
+            Console.WriteLine($"IL_{++index} {instr} {arg}");
+            instr = instr.next;
+        }
+    }
+
     public static void DumpAll(this MethodTacBuilder mp)
     {
+        mp.DumpIL();
         mp.DumpSuccessors();
         mp.DumpMethodSignature();
         // mp.DumpEHS();

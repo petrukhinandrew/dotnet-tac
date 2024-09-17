@@ -27,7 +27,7 @@ static class BlockTacLineBuilder
 
     public static void Branch(this BlockTacBuilder frame)
     {
-        var sameStack = frame.StackInitIsTheSame();
+        var sameStack = frame.StackInitIsTheSame() && frame.AtLeastOnce;
         if (sameStack) return;
         frame.ResetStackToInitial();
         frame.TacLines.Clear();
@@ -152,18 +152,18 @@ static class BlockTacLineBuilder
                 case "endfault":
                 {
                     frame.NewLine(new ILEHStmt("endfault"));
-                    break;
+                    return;
                 }
                 case "endfinally":
                 {
                     frame.NewLine(new ILEHStmt("endfinally"));
-                    break;
+                    return;
                 }
                 case "endfilter":
                 {
                     ILExpr value = frame.Pop();
                     frame.NewLine(new ILEHStmt("endfilter", value));
-                    break;
+                    return;
                 }
                 case "localloc":
                 {

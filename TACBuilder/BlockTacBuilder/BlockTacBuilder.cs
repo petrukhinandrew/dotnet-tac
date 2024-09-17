@@ -7,6 +7,18 @@ namespace Usvm.IL.TACBuilder;
 
 class BlockTacBuilder
 {
+    private bool _atLeastOnce = false;
+
+    public bool AtLeastOnce
+    {
+        get
+        {
+            var res = _atLeastOnce;
+            _atLeastOnce = true;
+            return res;
+        }
+    }
+
     internal ILInstr.Instr _firstInstr;
     private readonly MethodTacBuilder _mp;
 
@@ -75,17 +87,16 @@ class BlockTacBuilder
         _mp.Worklist.Enqueue(_mp.TacBlocks[instr.idx]);
     }
 
-    private static int _mergedCnt = 0;
-
     public bool StackInitIsTheSame()
     {
-        if (_preds.Count == 0) return false;
+        if (_preds.Count == 0) return true;
         EvaluationStack<ILExpr> copy = EvaluationStack<ILExpr>.CopyOf(_entryStackState);
+
         var stacks = _preds.Select((p, i) => (i, EvaluationStack<ILExpr>.CopyOf(p._stack))).ToList();
         List<ILExpr> newStack = new();
-        var lengths = stacks.Select(p => p.Item2.Count);
-        Debug.Assert(lengths.Max() == lengths.Min());
-        for (int j = 0; j < lengths.Max(); j++)
+        var stackLengths = stacks.Select(p => p.Item2.Count).ToList();
+        Debug.Assert(stackLengths.Max() == stackLengths.Min());
+        for (int j = 0; j < stackLengths.Max(); j++)
         {
             var values = stacks.Select(s => s.Item2.Pop()).ToList();
             if (values.Distinct().Count() == 1)
@@ -94,12 +105,14 @@ class BlockTacBuilder
                 continue;
             }
 
-            ILMerged tmp = _mp.GetMerged(_mergedCnt++);
+            ILMerged tmp = _mp.GetMerged(ILFirst, j);
             tmp.MergeOf(values);
             foreach (var (i, p) in _preds.Select((v, i) => (i, v)))
             {
                 p._extraAssignments[tmp] = values[i];
             }
+
+            newStack.Add(tmp);
         }
 
         _entryStackState = new EvaluationStack<ILExpr>(newStack);

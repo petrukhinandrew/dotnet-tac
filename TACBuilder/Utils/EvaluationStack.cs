@@ -2,7 +2,7 @@ namespace Usvm.IL.TACBuilder;
 
 public class EvaluationStack<T>(IEnumerable<T> collection) where T : notnull
 {
-    private readonly Stack<T> _stack = new(collection);
+    private Stack<T> _stack = new(collection);
     public int Count => _stack.Count;
 
     public EvaluationStack() : this([])

@@ -14,7 +14,7 @@ class MethodTacBuilder
     public List<ILLocal> Params;
     public List<ILExpr> Temps = new();
     public List<ILExpr> Errs = new();
-    public Dictionary<int, ILMerged> Merged = new();
+    public Dictionary<(int, int), ILMerged> Merged = new();
     public List<ILIndexedStmt> Tac = new();
     public List<ILInstr> Leaders;
     public Dictionary<int, List<int>> Successors = new();
@@ -23,7 +23,7 @@ class MethodTacBuilder
     public List<EHScope> Scopes = [];
     public Dictionary<int, int?> ilToTacMapping = new();
     public Queue<BlockTacBuilder> Worklist = new();
-    
+
     public MethodTacBuilder(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
         ILInstr begin, ehClause[] ehs)
     {
@@ -137,7 +137,8 @@ class MethodTacBuilder
                 Tac.Add(new ILIndexedStmt(lineNum++, line));
             }
 
-            if (tacBlocksIndexed.Count > i + 1 && Successors.ContainsKey(bb.ILFirst) && Successors[bb.ILFirst].Count > 0 && Successors[bb.ILFirst][0] != tacBlocksIndexed[i + 1].Key)
+            if (tacBlocksIndexed.Count > i + 1 && Successors.ContainsKey(bb.ILFirst) &&
+                Successors[bb.ILFirst].Count > 0 && Successors[bb.ILFirst][0] != tacBlocksIndexed[i + 1].Key)
             {
                 Tac.Add(new ILIndexedStmt(lineNum++, new ILGotoStmt(Successors[bb.ILFirst][0])));
             }
@@ -176,14 +177,14 @@ class MethodTacBuilder
         return new ILLocal(type, NamingUtil.TempVar(Temps.Count - 1));
     }
 
-    public ILMerged GetMerged(int instrIdx)
+    public ILMerged GetMerged(int blockIdx, int stackDepth)
     {
-        if (!Merged.ContainsKey(instrIdx))
+        if (!Merged.ContainsKey((blockIdx, stackDepth)))
         {
-            Merged.Add(instrIdx, new ILMerged(NamingUtil.MergedVar(Merged.Count)));
+            Merged.Add((blockIdx, stackDepth), new ILMerged(NamingUtil.MergedVar(Merged.Count)));
         }
 
-        return Merged[instrIdx];
+        return Merged[(blockIdx, stackDepth)];
     }
 
     public FieldInfo ResolveField(int target)
@@ -210,5 +211,10 @@ class MethodTacBuilder
     public string ResolveString(int target)
     {
         return _declaringModule.ResolveString(target);
+    }
+
+    public ILInstr GetFirstInstr()
+    {
+        return _begin;
     }
 }
