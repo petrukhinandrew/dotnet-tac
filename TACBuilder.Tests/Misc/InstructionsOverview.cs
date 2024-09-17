@@ -102,12 +102,14 @@ struct ConditionTestStruct2 : ConditionTestInterface
     {
     }
 }
+
 class ConditionTestClass2 : ConditionTestInterface
 {
     public void Do()
     {
     }
 }
+
 static class ConditionsTests
 {
     public static string Concat(string s1, string s2, string s3)
@@ -567,6 +569,12 @@ static unsafe class Misc
 
     public static void FuncPtrs()
     {
+    }
+
+    public static (int, int) TupleRet()
+    {
+        (int, int) tuple = (0, 1);
+        return tuple;
     }
 
     public static void RawGotoExample()

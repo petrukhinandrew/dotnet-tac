@@ -162,10 +162,11 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
         ILMethod method = new ILMethod(mb, ilRetType, mb.DeclaringType?.FullName ?? "", mb.Name, paramCount,
             mb.GetMetadataToken());
 
-        foreach (var t in mb.GetGenericArguments())
-        {
-            method.GenericArgs.Add(TypingUtil.ILTypeFrom(t));
-        }
+        if (mb.ContainsGenericParameters)
+            foreach (var t in mb.GetGenericArguments())
+            {
+                method.GenericArgs.Add(TypingUtil.ILTypeFrom(t));
+            }
 
         return method;
     }
