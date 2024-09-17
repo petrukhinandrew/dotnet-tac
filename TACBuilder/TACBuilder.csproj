@@ -8,8 +8,7 @@
         <RootNamespace>Usvm.IL</RootNamespace>
     </PropertyGroup>
 
-<!--    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">-->
-<!--      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>-->
-<!--    </PropertyGroup>-->
-
+    <ItemGroup>
+      <ProjectReference Include="..\TACBuilder.ILBodyParser\TACBuilder.ILBodyParser.csproj" />
+    </ItemGroup>
 </Project>

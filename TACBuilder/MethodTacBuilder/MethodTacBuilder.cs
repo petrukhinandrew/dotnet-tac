@@ -1,10 +1,11 @@
 using System.Reflection;
 using Usvm.IL.Parser;
+using Usvm.IL.TACBuilder.Utils;
 using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-class MethodProcessor
+class MethodTacBuilder
 {
     private readonly Module _declaringModule;
     public readonly MethodInfo MethodInfo;
@@ -17,19 +18,19 @@ class MethodProcessor
     public List<ILIndexedStmt> Tac = new();
     public List<ILInstr> Leaders;
     public Dictionary<int, List<int>> Successors = new();
-    public Dictionary<int, SMFrame> TacBlocks;
+    public Dictionary<int, BlockTacBuilder> TacBlocks;
     private readonly ILInstr _begin;
     public List<EHScope> Scopes = [];
     public Dictionary<int, int?> ilToTacMapping = new();
-    public Queue<SMFrame> Worklist = new();
+    public Queue<BlockTacBuilder> Worklist = new();
 
-    private readonly HashSet<SMFrame> _shouldResetStack = new();
+    private readonly HashSet<BlockTacBuilder> _shouldResetStack = new();
 
-    public MethodProcessor(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
+    public MethodTacBuilder(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
         ILInstr begin, ehClause[] ehs)
     {
         _begin = begin;
-        TacBlocks = new Dictionary<int, SMFrame>();
+        TacBlocks = new Dictionary<int, BlockTacBuilder>();
         _ehs = ehs;
         _declaringModule = declaringModule;
         MethodInfo = methodInfo;
@@ -73,7 +74,7 @@ class MethodProcessor
         return [.. leaders.OrderBy(l => l.idx)];
     }
 
-    public void UseVirtualStack(SMFrame frame)
+    public void UseVirtualStack(BlockTacBuilder frame)
     {
         _shouldResetStack.Add(frame);
     }
@@ -90,7 +91,7 @@ class MethodProcessor
 
     private void ProcessNonExceptionalIL()
     {
-        TacBlocks[0] = new SMFrame(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
+        TacBlocks[0] = new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
         Successors.Add(0, []);
         Worklist.Enqueue(TacBlocks[0]);
         while (Worklist.Count > 0)
@@ -109,21 +110,21 @@ class MethodProcessor
 
             if (scope is EHScopeWithVarIdx scopeWithVar)
             {
-                TacBlocks[hbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>(),
+                TacBlocks[hbIndex] = new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(),
                     (ILInstr.Instr)scopeWithVar.ilLoc.hb);
                 scopeWithVar.HandlerFrame = TacBlocks[hbIndex].SetVirtualStack([Errs[scopeWithVar.ErrIdx]]);
             }
             else
             {
                 TacBlocks[hbIndex] =
-                    new SMFrame(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
+                    new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
             }
 
             if (scope is FilterScope filterScope)
             {
                 int fbIndex = filterScope.fb.idx;
                 Leaders.Add(filterScope.fb);
-                TacBlocks[fbIndex] = new SMFrame(this, null, new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                TacBlocks[fbIndex] = new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.fb);
                 filterScope.FilterFrame = TacBlocks[fbIndex].SetVirtualStack([Errs[filterScope.ErrIdx]]);
                 Worklist.Enqueue(TacBlocks[fbIndex]);

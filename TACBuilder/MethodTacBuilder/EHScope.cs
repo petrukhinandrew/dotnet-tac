@@ -1,6 +1,5 @@
-using System.Runtime.InteropServices;
 using Usvm.IL.Parser;
-using Usvm.IL.TypeSystem;
+using Usvm.IL.TACBuilder.Utils;
 
 namespace Usvm.IL.TACBuilder;
 
@@ -54,7 +53,7 @@ abstract class EHScopeWithVarIdx(Type type) : EHScope
 {
     public int ErrIdx;
     public readonly Type Type = type;
-    public SMFrame HandlerFrame;
+    public BlockTacBuilder HandlerFrame;
     public abstract void ResetVirtualFrameStack();
 }
 
@@ -93,7 +92,7 @@ class CatchScope(Type type) : EHScopeWithVarIdx(type)
 class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
 {
     public ILInstr fb;
-    public SMFrame FilterFrame;
+    public BlockTacBuilder FilterFrame;
     public new static FilterScope FromClause(ehClause clause)
     {
         FilterScope scope = new FilterScope

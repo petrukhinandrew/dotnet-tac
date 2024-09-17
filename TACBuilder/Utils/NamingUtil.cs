@@ -1,4 +1,4 @@
-namespace Usvm.IL.Parser;
+namespace Usvm.IL.TACBuilder.Utils;
 
 public static class NamingUtil
 {

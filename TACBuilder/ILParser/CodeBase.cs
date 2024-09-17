@@ -1,22 +1,25 @@
-using System.ComponentModel.Design;
 using System.Reflection;
 using System.Runtime.Loader;
+using TACBuilder.ILBodyParser;
 using Usvm.IL.TACBuilder;
 using Usvm.IL.TypeSystem;
 using Usvm.IL.Utils;
 
 
 namespace Usvm.IL.Parser;
+
 class CodeBase : AssemblyLoadContext
 {
     private Dictionary<string, Assembly> _assemblies = new();
     private Dictionary<string, AssemblyDependencyResolver> _resolvers = new();
     private Dictionary<string, Type> _types = new();
     private ParserSettings _settings;
+
     public CodeBase(ParserSettings settings)
     {
         _settings = settings;
     }
+
     private const BindingFlags Flags =
         BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
 
@@ -27,7 +30,6 @@ class CodeBase : AssemblyLoadContext
 
     private new Assembly LoadFromAssemblyPath(string path)
     {
-
         if (_assemblies.TryGetValue(path, out var assembly))
         {
             return assembly;
@@ -52,6 +54,7 @@ class CodeBase : AssemblyLoadContext
 
             _types[GetTypeName(type)] = type;
         }
+
         return asm;
     }
 
@@ -83,13 +86,13 @@ class CodeBase : AssemblyLoadContext
                         Console.WriteLine(ilType.ToString());
                         try
                         {
-                            ILRewriter r = new ILRewriter(module, ILRewriterDumpMode.ILAndEHS);
+                            var r = new ILBodyParser(module); //, ILRewriterDumpMode.ILAndEHS);
 
                             r.ImportIL(methodBody);
                             r.ImportEH(methodBody);
-                            MethodProcessor mp = new MethodProcessor(module, method, methodBody.LocalVariables, r.GetBeginning(), r.GetEHs());
+                            MethodTacBuilder mp = new MethodTacBuilder(module, method, methodBody.LocalVariables,
+                                r.GetBeginning(), r.GetEHs());
                             mp.DumpAll();
-
                         }
                         catch (Exception e)
                         {
@@ -99,7 +102,6 @@ class CodeBase : AssemblyLoadContext
                             throw new Exception("Caught on {0}: " + method.Name);
                         }
                     }
-
                 }
             }
         }
@@ -119,6 +121,7 @@ class CodeBase : AssemblyLoadContext
     {
         return _types.SelectMany(t => t.Value.GetMethods()).ToList().Select(mi => mi.Name).ToList();
     }
+
     public List<string> ListModules()
     {
         return [];

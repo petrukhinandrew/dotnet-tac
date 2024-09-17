@@ -5,13 +5,13 @@ using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-class SMFrame
+class BlockTacBuilder
 {
     public int ILFirst;
     public readonly List<ILStmt> TacLines = new();
     public ILInstr.Instr CurInstr;
 
-    private readonly MethodProcessor _mp;
+    private readonly MethodTacBuilder _mp;
     private readonly EvaluationStack<ILExpr> _stack = new();
 
     // TODO introduce tac lines cache
@@ -21,11 +21,11 @@ class SMFrame
 
     private bool _isVirtualPred;
     private bool _hasVirtualPred;
-    private HashSet<SMFrame> _preds = new();
+    private HashSet<BlockTacBuilder> _preds = new();
 
     private readonly Dictionary<ILMerged, ILExpr> _extraAssignments = new();
 
-    public SMFrame(MethodProcessor proc, SMFrame? pred, EvaluationStack<ILExpr> stack, ILInstr.Instr instr)
+    public BlockTacBuilder(MethodTacBuilder proc, BlockTacBuilder? pred, EvaluationStack<ILExpr> stack, ILInstr.Instr instr)
     {
         ILFirst = instr.idx;
         CurInstr = instr;
@@ -42,9 +42,9 @@ class SMFrame
         }
     }
 
-    public SMFrame SetVirtualStack(IEnumerable<ILExpr> stack)
+    public BlockTacBuilder SetVirtualStack(IEnumerable<ILExpr> stack)
     {
-        var virtPred = new SMFrame(_mp, null,
+        var virtPred = new BlockTacBuilder(_mp, null,
             new EvaluationStack<ILExpr>(stack),
             _firstInstr)
         {
@@ -74,7 +74,7 @@ class SMFrame
         }
     }
 
-    // TODO mb refactor, move _mp logic into MethodProcessor 
+    // TODO mb refactor, move _mp logic into MethodTacBuilder 
     private void ContinueTo(ILInstr instr)
     {
         _mp.Successors[ILFirst].Insert(0, instr.idx);
@@ -85,7 +85,7 @@ class SMFrame
         else
         {
             _mp.TacBlocks.Add(instr.idx,
-                new SMFrame(_mp, this, EvaluationStack<ILExpr>.CopyOf(_stack), (ILInstr.Instr)instr));
+                new BlockTacBuilder(_mp, this, EvaluationStack<ILExpr>.CopyOf(_stack), (ILInstr.Instr)instr));
             _mp.Worklist.Enqueue(_mp.TacBlocks[instr.idx]);
             return;
         }
@@ -152,7 +152,7 @@ class SMFrame
     private ILExpr MergeStacksValues(int targetInstrIdx)
     {
         if (_preds.Count == 0) throw new Exception("no pred exist for " + ILFirst + " at " + CurInstr.idx);
-        List<(SMFrame, ILExpr)> values = _preds.Select(s => (s, s.PopSingleAddrVirt(targetInstrIdx))).ToList();
+        List<(BlockTacBuilder, ILExpr)> values = _preds.Select(s => (s, s.PopSingleAddrVirt(targetInstrIdx))).ToList();
         if (values.Select(p => p.Item2).Distinct().Count() == 1) return values.Select(p => p.Item2).First();
         ILMerged tmp = GetMerged(targetInstrIdx);
         tmp.MergeOf(values.Select(p => p.Item2).ToList());
@@ -239,7 +239,7 @@ class SMFrame
 
     public override bool Equals(object? obj)
     {
-        return obj is SMFrame f && ILFirst == f.ILFirst;
+        return obj is BlockTacBuilder f && ILFirst == f.ILFirst;
     }
 
     public override int GetHashCode()

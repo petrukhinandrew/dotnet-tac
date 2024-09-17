@@ -1,24 +1,18 @@
-using System.ComponentModel;
 using System.Reflection;
 using System.Reflection.Emit;
+using Usvm.IL.Parser;
+using Usvm.IL.Utils;
 
-namespace Usvm.IL.Parser;
+namespace TACBuilder.ILBodyParser;
 
-enum ILRewriterDumpMode
-{
-    None = 0,
-    ILOnly = 1,
-    ILAndEHS = 2
-}
-
-class ILRewriter
+public class ILBodyParser
 {
     private Module _module;
-    private ILRewriterDumpMode _mode;
-    public ILRewriter(Module mod, ILRewriterDumpMode mode)
+    // private ILRewriterDumpMode _mode;
+    public ILBodyParser(Module mod)//, ILRewriterDumpMode mode)
     {
         _module = mod;
-        _mode = mode;
+        // _mode = mode;
     }
     byte[]? il;
     ILInstr[] offsetToInstr = [];
@@ -43,9 +37,9 @@ class ILRewriter
             return new ehClause(tryBegin, tryEnd, handlerBegin, handlerEnd, type);
         }
         exceptionHandlingClause[] clauses = methodBody.ExceptionHandlingClauses.Select(ehc => new exceptionHandlingClause(ehc)).ToArray();
-        if (_mode == ILRewriterDumpMode.ILAndEHS) Console.WriteLine("found {0} ehcs", clauses.Length);
+        // if (_mode == ILRewriterDumpMode.ILAndEHS) Console.WriteLine("found {0} ehcs", clauses.Length);
         ehs = clauses.Select(parseEH).ToArray();
-        if (_mode == ILRewriterDumpMode.ILAndEHS) foreach (var ehc in ehs) Console.WriteLine(ehc.ToString());
+        // if (_mode == ILRewriterDumpMode.ILAndEHS) foreach (var ehc in ehs) Console.WriteLine(ehc.ToString());
     }
     public ILInstr GetBeginning()
     {
@@ -58,12 +52,12 @@ class ILRewriter
     public void ImportIL(MethodBody methodBody)
     {
         il = methodBody.GetILAsByteArray() ?? [];
-        if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Importing IL with size of {0}", il.Length);
+        // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Importing IL with size of {0}", il.Length);
         offsetToInstr = new ILInstr[il.Length + 1];
-        foreach (var v in methodBody.LocalVariables)
-        {
-            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Local {0}", v.ToString());
-        }
+        // foreach (var v in methodBody.LocalVariables)
+        // {
+            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("Local {0}", v.ToString());
+        // }
         int offset = 0;
         bool branch = false;
         while (offset < il.Length)
@@ -206,7 +200,7 @@ class ILRewriter
 
         foreach (var instr in ILInstrs())
         {
-            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("IL_{0} {1} {2}", instr.idx, instr.ToString(), instr.arg.ToString());
+            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine("IL_{0} {1} {2}", instr.idx, instr.ToString(), instr.arg.ToString());
             if (instr is ILInstr.Instr ilinstr)
             {
                 ILInstrOperand.Arg32 arg;
@@ -253,7 +247,7 @@ class ILRewriter
         try
         {
             Type t = _module.ResolveType(arg);
-            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {0}", t);
+            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {0}", t);
         }
         catch (Exception e)
         {
@@ -267,7 +261,7 @@ class ILRewriter
             MethodBase? mb = _module.ResolveMethod(arg);
             if (mb != null)
             {
-                if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", mb.Name, mb.DeclaringType);
+                // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", mb.Name, mb.DeclaringType);
             }
         }
         catch (Exception e)
@@ -282,7 +276,7 @@ class ILRewriter
             FieldInfo? fi = _module.ResolveField(arg);
             if (fi != null)
             {
-                if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", fi.Name, fi.DeclaringType);
+                // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved {1} {0}", fi.Name, fi.DeclaringType);
             }
         }
         catch (Exception e)
@@ -295,7 +289,7 @@ class ILRewriter
         try
         {
             string res = _module.ResolveString(arg);
-            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
+            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
         }
         catch (Exception e)
         {
@@ -308,7 +302,7 @@ class ILRewriter
         {
             MemberInfo? res = _module.ResolveMember(arg);
             if (res == null) return;
-            if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
+            // if (_mode >= ILRewriterDumpMode.ILOnly) Console.WriteLine(" ∟--resolved `{0}`", res);
         }
         catch (Exception e)
         {
@@ -326,87 +320,4 @@ class ILRewriter
             cur = cur.next;
         }
     }
-}
-
-public abstract record ILInstr
-{
-    public ILInstrOperand arg = new ILInstrOperand.NoArg();
-    public int idx;
-    public ILInstr next;
-    public ILInstr prev;
-
-    ILInstr()
-    {
-        next = this;
-        prev = this;
-        idx = 0;
-    }
-    public bool isJump()
-    {
-        if (this is SwitchArg)
-        {
-            return true;
-        }
-        if (this is Instr instr)
-        {
-            switch (instr.opCode.OperandType)
-            {
-                case OperandType.ShortInlineBrTarget:
-                case OperandType.InlineBrTarget: return true;
-                default: return false;
-            }
-        }
-        return false;
-    }
-    public static void InsertBefore(ILInstr where, ILInstr what)
-    {
-        what.next = where;
-        what.prev = where.prev;
-        what.next.prev = what;
-        what.prev.next = what;
-        what.idx = what.prev.idx + 1;
-    }
-    public record
-    Instr(OpCode opCode, int offset) : ILInstr
-    {
-        public override string ToString()
-        {
-            return opCode.ToString() ?? "null opcode";
-        }
-    }
-    public record SwitchArg() : ILInstr
-    {
-        public override string ToString()
-        {
-            return "SwitchArg";
-        }
-    }
-    public record Back() : ILInstr
-    {
-        public override string ToString()
-        {
-            return "Back";
-        }
-    }
-    public override int GetHashCode()
-    {
-        return idx;
-    }
-}
-
-public abstract record ILInstrOperand
-{
-    public record NoArg() : ILInstrOperand;
-    public record Arg8(byte value) : ILInstrOperand;
-    public record Arg16(short value) : ILInstrOperand;
-    public record Arg32(int value) : ILInstrOperand;
-    public record Arg64(long value) : ILInstrOperand;
-    public record Target(ILInstr value) : ILInstrOperand
-    {
-        public override string ToString()
-        {
-            return base.ToString() + " to IL_" + value.idx;
-        }
-    }
-
 }

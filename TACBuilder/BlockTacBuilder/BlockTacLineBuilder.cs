@@ -1,11 +1,12 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Usvm.IL.Parser;
+using Usvm.IL.TACBuilder.Utils;
 using Usvm.IL.TypeSystem;
 
 namespace Usvm.IL.TACBuilder;
 
-static class FrameTacBuilder
+static class BlockTacLineBuilder
 {
     private static ILInstr.Instr? AdvanceIp(ILInstr.Instr ip)
     {
@@ -19,12 +20,12 @@ static class FrameTacBuilder
         return (ILInstr.Instr)tmp;
     }
 
-    private static ILInstr DecideLeaveTarget(this SMFrame frame, ILInstr initialTarget)
+    private static ILInstr DecideLeaveTarget(this BlockTacBuilder frame, ILInstr initialTarget)
     {
         return initialTarget;
     }
 
-    public static void Branch(this SMFrame frame)
+    public static void Branch(this BlockTacBuilder frame)
     {
         ILStmt[] copy = new ILStmt[frame.TacLines.Count];
         frame.TacLines.CopyTo(copy, 0);
@@ -954,7 +955,7 @@ static class FrameTacBuilder
         }
     }
 
-    private static void InlineInitArray(this SMFrame frame, List<ILExpr> args)
+    private static void InlineInitArray(this BlockTacBuilder frame, List<ILExpr> args)
     {
         if (args.First() is ILLocal newArr && args.Last() is ILObjectLiteral ilObj)
         {
