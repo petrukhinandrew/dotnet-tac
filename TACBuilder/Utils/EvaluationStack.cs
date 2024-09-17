@@ -1,80 +1,43 @@
-using System.Diagnostics;
-using Usvm.IL.TypeSystem;
-
 namespace Usvm.IL.TACBuilder;
 
-public class EvaluationStack<T> where T : notnull
+public class EvaluationStack<T>(IEnumerable<T> collection) where T : notnull
 {
-    private readonly List<T> _data;
-    private int _virtualStackPtr = -1;
+    private readonly Stack<T> _stack = new(collection);
+    public int Count => _stack.Count;
 
     public EvaluationStack() : this([])
     {
     }
 
-    public EvaluationStack(IEnumerable<T> array)
+    public static EvaluationStack<T> CopyOf(EvaluationStack<T> stack)
     {
-        _data = array.ToList();
-        _virtualStackPtr = array.Count() - 1;
+        T[] copy = new T[stack.Count];
+        stack.copyTo(copy, 0);
+        return new EvaluationStack<T>(copy);
     }
 
-    public static EvaluationStack<ILExpr> CopyOf(EvaluationStack<ILExpr> stack)
+    private void copyTo(T[] array, int index)
     {
-        ILExpr[] newStack = new ILExpr[stack.Count];
-        stack.CopyTo(newStack, 0);
-        return new EvaluationStack<ILExpr>(newStack);
+        _stack.CopyTo(array, index);
     }
 
-    public int Count => _data.Count;
-    public int CountVirtual => _virtualStackPtr + 1;
-
-    public T Pop(bool virtually = false)
+    public void Push(T item)
     {
-        if (virtually) return _data[_virtualStackPtr--];
-        T ret = _data.Last();
-        _data.RemoveAt(_data.Count - 1);
-        _virtualStackPtr--;
-        Debug.Assert(_virtualStackPtr == _data.Count - 1);
-        return ret;
+        _stack.Push(item);
     }
 
-    public void Push(T value)
+    public T Pop()
     {
-        _data.Add(value);
-        _virtualStackPtr++;
-        Debug.Assert(_virtualStackPtr == _data.Count - 1);
-    }
-
-    /// <summary>
-    /// resets virtual stack pointer
-    /// </summary>
-    /// <returns> true if ptr chagned</returns>
-    public bool ResetVirtualStack()
-    {
-        if (_virtualStackPtr == _data.Count - 1) return false;
-        _virtualStackPtr = _data.Count - 1;
-        return true;
+        return _stack.Pop();
     }
 
     public void Clear()
     {
-        _data.Clear();
-        _virtualStackPtr = -1;
+        _stack.Clear();
     }
 
-    private void CopyTo(T[] array, int arrayIndex)
+    public bool SequenceEqual(EvaluationStack<T> other)
     {
-        _data.CopyTo(array, arrayIndex);
-    }
-
-    public void CloneFrom(EvaluationStack<T> source)
-    {
-        _data.AddRange(source._data);
-        _virtualStackPtr = _data.Count - 1;
-    }
-
-    public override string ToString()
-    {
-        return string.Join(", ", _data.Select(d => d.ToString())) + " " + _virtualStackPtr + " " + (_data.Count - 1);
+        return _stack.SequenceEqual(other._stack);
     }
 }

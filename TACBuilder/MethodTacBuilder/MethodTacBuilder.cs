@@ -23,9 +23,7 @@ class MethodTacBuilder
     public List<EHScope> Scopes = [];
     public Dictionary<int, int?> ilToTacMapping = new();
     public Queue<BlockTacBuilder> Worklist = new();
-
-    private readonly HashSet<BlockTacBuilder> _shouldResetStack = new();
-
+    
     public MethodTacBuilder(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
         ILInstr begin, ehClause[] ehs)
     {
@@ -38,10 +36,9 @@ class MethodTacBuilder
             new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position))).ToList();
         Locals = locals.OrderBy(l => l.LocalIndex)
             .Select(l => new ILLocal(TypingUtil.ILTypeFrom(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
-        InitEHScopes();
+        InitEhScopes();
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
-        ProcessEHScopesIL();
         foreach (var m in Merged.Values)
         {
             var temp = GetNewTemp(m.Type, m);
@@ -53,7 +50,7 @@ class MethodTacBuilder
             bb.Value.InsertExtraAssignments();
         }
 
-        ComposeTAC();
+        ComposeTac();
     }
 
     private List<ILInstr> CollectLeaders()
@@ -74,34 +71,20 @@ class MethodTacBuilder
         return [.. leaders.OrderBy(l => l.idx)];
     }
 
-    public void UseVirtualStack(BlockTacBuilder frame)
-    {
-        _shouldResetStack.Add(frame);
-    }
-
-    private void ResetUsedStacks(bool includeEHS = false)
-    {
-        foreach (var frame in _shouldResetStack)
-        {
-            frame.ResetVirtualStack();
-        }
-
-        _shouldResetStack.Clear();
-    }
-
     private void ProcessNonExceptionalIL()
     {
         TacBlocks[0] = new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
         Successors.Add(0, []);
+        Worklist.Clear();
         Worklist.Enqueue(TacBlocks[0]);
+        EnqueueEhsBlocks();
         while (Worklist.Count > 0)
         {
-            ResetUsedStacks();
             Worklist.Dequeue().Branch();
         }
     }
 
-    private void ProcessEHScopesIL()
+    private void EnqueueEhsBlocks()
     {
         foreach (var scope in Scopes)
         {
@@ -110,9 +93,10 @@ class MethodTacBuilder
 
             if (scope is EHScopeWithVarIdx scopeWithVar)
             {
-                TacBlocks[hbIndex] = new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(),
+                TacBlocks[hbIndex] = new BlockTacBuilder(this, null,
+                    new EvaluationStack<ILExpr>([Errs[scopeWithVar.ErrIdx]]),
                     (ILInstr.Instr)scopeWithVar.ilLoc.hb);
-                scopeWithVar.HandlerFrame = TacBlocks[hbIndex].SetVirtualStack([Errs[scopeWithVar.ErrIdx]]);
+                scopeWithVar.HandlerFrame = TacBlocks[hbIndex];
             }
             else
             {
@@ -124,23 +108,18 @@ class MethodTacBuilder
             {
                 int fbIndex = filterScope.fb.idx;
                 Leaders.Add(filterScope.fb);
-                TacBlocks[fbIndex] = new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
+                TacBlocks[fbIndex] = new BlockTacBuilder(this, null,
+                    new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.fb);
-                filterScope.FilterFrame = TacBlocks[fbIndex].SetVirtualStack([Errs[filterScope.ErrIdx]]);
+                filterScope.FilterFrame = TacBlocks[fbIndex];
                 Worklist.Enqueue(TacBlocks[fbIndex]);
             }
 
             Worklist.Enqueue(TacBlocks[hbIndex]);
         }
-
-        while (Worklist.Count > 0)
-        {
-            ResetUsedStacks(true);
-            Worklist.Dequeue().Branch();
-        }
     }
 
-    private void ComposeTAC()
+    private void ComposeTac()
     {
         // TODO separate ordering and Tac composition 
         int lineNum = 0;
@@ -173,7 +152,7 @@ class MethodTacBuilder
         }
     }
 
-    private void InitEHScopes()
+    private void InitEhScopes()
     {
         foreach (var ehc in _ehs)
         {

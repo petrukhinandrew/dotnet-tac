@@ -54,23 +54,16 @@ abstract class EHScopeWithVarIdx(Type type) : EHScope
     public int ErrIdx;
     public readonly Type Type = type;
     public BlockTacBuilder HandlerFrame;
-    public abstract void ResetVirtualFrameStack();
 }
 
 class CatchScope(Type type) : EHScopeWithVarIdx(type)
 {
-
     public new static CatchScope FromClause(ehClause clause)
     {
         return new CatchScope((clause.ehcType as rewriterEhcType.CatchEH)!.type)
         {
             ilLoc = ILScopeLocation.FromClause(clause)
         };
-    }
-
-    public override void ResetVirtualFrameStack()
-    {
-        HandlerFrame.ResetVirtualStack();
     }
 
     public override string ToString()
@@ -93,6 +86,7 @@ class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
 {
     public ILInstr fb;
     public BlockTacBuilder FilterFrame;
+
     public new static FilterScope FromClause(ehClause clause)
     {
         FilterScope scope = new FilterScope
@@ -101,12 +95,6 @@ class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
             fb = (clause.ehcType as rewriterEhcType.FilterEH)!.instr
         };
         return scope;
-    }
-
-    public override void ResetVirtualFrameStack()
-    {
-        FilterFrame.ResetVirtualStack();
-        HandlerFrame.ResetVirtualStack();
     }
 
     public override string ToString()

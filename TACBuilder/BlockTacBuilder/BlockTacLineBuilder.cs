@@ -27,12 +27,10 @@ static class BlockTacLineBuilder
 
     public static void Branch(this BlockTacBuilder frame)
     {
-        ILStmt[] copy = new ILStmt[frame.TacLines.Count];
-        frame.TacLines.CopyTo(copy, 0);
-        frame._lastTacLines = copy.ToList();
-        frame._cachedTacLinesEq = null;
+        var sameStack = frame.StackInitIsTheSame();
+        if (sameStack) return;
+        frame.ResetStackToInitial();
         frame.TacLines.Clear();
-        frame.ClearStack();
         frame.CurInstr = frame._firstInstr;
         while (true)
         {
@@ -92,57 +90,57 @@ static class BlockTacLineBuilder
                     break;
                 case "stloc.0":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     frame.NewLine(new ILAssignStmt(frame.Locals[0], value));
                     break;
                 }
                 case "stloc.1":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     frame.NewLine(new ILAssignStmt(frame.Locals[1], value));
                     break;
                 }
                 case "stloc.2":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     frame.NewLine(new ILAssignStmt(frame.Locals[2], value));
                     break;
                 }
                 case "stloc.3":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     frame.NewLine(new ILAssignStmt(frame.Locals[3], value));
                     break;
                 }
                 case "stloc.s":
                 {
                     int idx = ((ILInstrOperand.Arg8)frame.CurInstr.arg).value;
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     frame.NewLine(new ILAssignStmt(frame.Locals[idx], value));
                     break;
                 }
                 case "starg":
                 {
                     int idx = ((ILInstrOperand.Arg16)frame.CurInstr.arg).value;
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     frame.NewLine(new ILAssignStmt(frame.Params[idx], value));
                     break;
                 }
                 case "starg.s":
                 {
                     int idx = ((ILInstrOperand.Arg8)frame.CurInstr.arg).value;
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     frame.NewLine(new ILAssignStmt(frame.Params[idx], value));
                     break;
                 }
                 case "arglist":
                 {
-                    frame.Push(new ILVarArgValue(frame.GetMethodName()));
+                    frame.Push(new ILVarArgValue(frame.MethodName));
                     break;
                 }
                 case "throw":
                 {
-                    ILExpr obj = frame.PopSingleAddr();
+                    ILExpr obj = frame.Pop();
                     frame.ClearStack();
                     frame.NewLine(new ILEHStmt("throw", obj));
                     break;
@@ -164,27 +162,27 @@ static class BlockTacLineBuilder
                 }
                 case "endfilter":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     frame.NewLine(new ILEHStmt("endfilter", value));
                     break;
                 }
                 case "localloc":
                 {
-                    ILExpr size = frame.PopSingleAddr();
+                    ILExpr size = frame.Pop();
                     frame.Push(new ILStackAlloc(size));
                     break;
                 }
                 case "ldfld":
                 {
                     FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                    ILExpr inst = frame.PopSingleAddr();
+                    ILExpr inst = frame.Pop();
                     frame.Push(ILField.Instance(field, inst));
                     break;
                 }
                 case "ldflda":
                 {
                     FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                    ILExpr inst = frame.PopSingleAddr();
+                    ILExpr inst = frame.Pop();
                     ILField ilField = ILField.Instance(field, inst);
                     if (inst.Type is ILUnmanagedPointer)
                     {
@@ -223,8 +221,8 @@ static class BlockTacLineBuilder
                 case "stfld":
                 {
                     FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                    ILExpr value = frame.PopSingleAddr();
-                    ILExpr obj = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
+                    ILExpr obj = frame.Pop();
                     ILField ilField = ILField.Instance(field, obj);
                     frame.NewLine(new ILAssignStmt(ilField, value));
                     break;
@@ -232,7 +230,7 @@ static class BlockTacLineBuilder
                 case "stsfld":
                 {
                     FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILField ilField = ILField.Static(field);
                     frame.NewLine(new ILAssignStmt(ilField, value));
                     break;
@@ -250,7 +248,7 @@ static class BlockTacLineBuilder
                 case "ldind.u2":
                 case "ldind.u4":
                 {
-                    ILExpr addr = frame.PopSingleAddr();
+                    ILExpr addr = frame.Pop();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt32());
                     frame.Push(deref);
                     break;
@@ -258,28 +256,28 @@ static class BlockTacLineBuilder
                 case "ldind.u8":
                 case "ldind.i8":
                 {
-                    ILExpr addr = frame.PopSingleAddr();
+                    ILExpr addr = frame.Pop();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt64());
                     frame.Push(deref);
                     break;
                 }
                 case "ldind.r4":
                 {
-                    ILExpr addr = frame.PopSingleAddr();
+                    ILExpr addr = frame.Pop();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
                     frame.Push(deref);
                     break;
                 }
                 case "ldind.r8":
                 {
-                    ILExpr addr = frame.PopSingleAddr();
+                    ILExpr addr = frame.Pop();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
                     frame.Push(deref);
                     break;
                 }
                 case "ldind.i":
                 {
-                    ILExpr addr = frame.PopSingleAddr();
+                    ILExpr addr = frame.Pop();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeInt());
                     frame.Push(deref);
                     break;
@@ -287,7 +285,7 @@ static class BlockTacLineBuilder
 
                 case "ldind.ref":
                 {
-                    ILExpr addr = frame.PopSingleAddr();
+                    ILExpr addr = frame.Pop();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILObject());
                     frame.Push(deref);
                     break;
@@ -296,7 +294,7 @@ static class BlockTacLineBuilder
                 {
                     Type? mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     if (mbType == null) throw new Exception("type not resolved for ldobj");
-                    ILExpr addr = frame.PopSingleAddr();
+                    ILExpr addr = frame.Pop();
                     ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(mbType));
                     frame.Push(deref);
                     break;
@@ -307,36 +305,36 @@ static class BlockTacLineBuilder
                 case "stind.i4":
                 case "stind.i8":
                 {
-                    ILExpr val = frame.PopSingleAddr();
-                    ILLValue addr = (ILLValue)frame.PopSingleAddr();
+                    ILExpr val = frame.Pop();
+                    ILLValue addr = (ILLValue)frame.Pop();
                     frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILInt32()), val));
                     break;
                 }
                 case "stind.r4":
                 {
-                    ILExpr val = frame.PopSingleAddr();
-                    ILLValue addr = (ILLValue)frame.PopSingleAddr();
+                    ILExpr val = frame.Pop();
+                    ILLValue addr = (ILLValue)frame.Pop();
                     frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILFloat32()), val));
                     break;
                 }
                 case "stind.r8":
                 {
-                    ILExpr val = frame.PopSingleAddr();
-                    ILLValue addr = (ILLValue)frame.PopSingleAddr();
+                    ILExpr val = frame.Pop();
+                    ILLValue addr = (ILLValue)frame.Pop();
                     frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILFloat64()), val));
                     break;
                 }
                 case "stind.i":
                 {
-                    ILExpr val = frame.PopSingleAddr();
-                    ILLValue addr = (ILLValue)frame.PopSingleAddr();
+                    ILExpr val = frame.Pop();
+                    ILLValue addr = (ILLValue)frame.Pop();
                     frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILNativeInt()), val));
                     break;
                 }
                 case "stind.ref":
                 {
-                    ILExpr val = frame.PopSingleAddr();
-                    ILLValue addr = (ILLValue)frame.PopSingleAddr();
+                    ILExpr val = frame.Pop();
+                    ILLValue addr = (ILLValue)frame.Pop();
                     frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILObject()), val));
                     break;
                 }
@@ -344,8 +342,8 @@ static class BlockTacLineBuilder
                 {
                     Type? mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     if (mbType == null) throw new Exception("type not resolved for sizeof");
-                    ILExpr val = frame.PopSingleAddr();
-                    ILLValue addr = (ILLValue)frame.PopSingleAddr();
+                    ILExpr val = frame.Pop();
+                    ILLValue addr = (ILLValue)frame.Pop();
                     frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(mbType)),
                         val));
                     break;
@@ -385,7 +383,7 @@ static class BlockTacLineBuilder
                 case "switch":
                 {
                     int branchCnt = ((ILInstrOperand.Arg32)frame.CurInstr.arg).value;
-                    ILExpr compVal = frame.PopSingleAddr();
+                    ILExpr compVal = frame.Pop();
                     ILInstr switchBranch = frame.CurInstr;
                     List<ILInstr> targets = [];
                     for (int branch = 0; branch < branchCnt; branch++)
@@ -416,7 +414,7 @@ static class BlockTacLineBuilder
                     MethodBase? mb = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     if (mb == null) throw new Exception("method not resolved at " + frame.CurInstr.idx);
                     ILMethod ilMethod = ILMethod.FromMethodBase(mb);
-                    ilMethod.Receiver = frame.PopSingleAddr();
+                    ilMethod.Receiver = frame.Pop();
                     frame.Push(ilMethod);
                     break;
                 }
@@ -474,13 +472,13 @@ static class BlockTacLineBuilder
                     break;
                 case "dup":
                 {
-                    ILExpr dup = frame.PopSingleAddr();
+                    ILExpr dup = frame.Pop();
                     frame.Push(dup);
                     frame.Push(dup);
                     break;
                 }
                 case "pop":
-                    frame.PopSingleAddr();
+                    frame.Pop();
                     break;
                 case "ldtoken":
                 {
@@ -525,7 +523,7 @@ static class BlockTacLineBuilder
                     MethodBase method = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
 
                     ILMethod ilMethod = ILMethod.FromMethodBase(method);
-                    ilMethod.LoadArgs(frame.PopSingleAddr);
+                    ilMethod.LoadArgs(frame.Pop);
                     if (ilMethod.IsInitializeArray())
                     {
                         frame.InlineInitArray(ilMethod.Args);
@@ -546,7 +544,7 @@ static class BlockTacLineBuilder
                     MethodBase? method = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     if (method == null) throw new Exception("call not resolved at " + frame.CurInstr.idx);
                     ILMethod ilMethod = ILMethod.FromMethodBase(method);
-                    ilMethod.LoadArgs(frame.PopSingleAddr);
+                    ilMethod.LoadArgs(frame.Pop);
                     var call = new ILCallExpr(ilMethod);
                     if (ilMethod.Returns())
                         frame.Push(call);
@@ -556,7 +554,7 @@ static class BlockTacLineBuilder
                 }
                 case "ret":
                 {
-                    ILExpr? retVal = frame.GetMethodReturnType() != typeof(void) ? frame.PopSingleAddr() : null;
+                    ILExpr? retVal = frame.MethodReturnType != typeof(void) ? frame.Pop() : null;
                     frame.NewLine(
                         new ILReturnStmt(retVal)
                     );
@@ -599,8 +597,8 @@ static class BlockTacLineBuilder
                 case "clt.un":
                 case "clt":
                 {
-                    ILExpr rhs = frame.PopSingleAddr();
-                    ILExpr lhs = frame.PopSingleAddr();
+                    ILExpr rhs = frame.Pop();
+                    ILExpr lhs = frame.Pop();
                     ILBinaryOperation op = new ILBinaryOperation(lhs, rhs);
                     frame.Push(op);
                     break;
@@ -608,7 +606,7 @@ static class BlockTacLineBuilder
                 case "neg":
                 case "not":
                 {
-                    ILExpr operand = frame.PopSingleAddr();
+                    ILExpr operand = frame.Pop();
                     ILUnaryOperation op = new ILUnaryOperation(operand);
                     frame.Push(op);
                     break;
@@ -648,8 +646,8 @@ static class BlockTacLineBuilder
                 case "blt":
 
                 {
-                    ILExpr lhs = frame.PopSingleAddr();
-                    ILExpr rhs = frame.PopSingleAddr();
+                    ILExpr lhs = frame.Pop();
+                    ILExpr rhs = frame.Pop();
                     ILInstr tb = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
                     ILInstr fb = frame.CurInstr.next;
                     frame.NewLine(new ILIfStmt(
@@ -664,8 +662,8 @@ static class BlockTacLineBuilder
                 case "brtrue":
                 {
                     frame.PushLiteral<bool>(true);
-                    ILExpr rhs = frame.PopSingleAddr();
-                    ILExpr lhs = frame.PopSingleAddr();
+                    ILExpr rhs = frame.Pop();
+                    ILExpr lhs = frame.Pop();
                     ILInstr tb = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
                     ILInstr fb = frame.CurInstr.next;
                     frame.NewLine(new ILIfStmt(
@@ -681,8 +679,8 @@ static class BlockTacLineBuilder
                 case "brfalse":
                 {
                     frame.PushLiteral<bool>(false);
-                    ILExpr rhs = frame.PopSingleAddr();
-                    ILExpr lhs = frame.PopSingleAddr();
+                    ILExpr rhs = frame.Pop();
+                    ILExpr lhs = frame.Pop();
                     ILInstr tb = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
                     ILInstr fb = frame.CurInstr.next;
                     frame.NewLine(new ILIfStmt(
@@ -694,12 +692,12 @@ static class BlockTacLineBuilder
                 {
                     MethodBase mb = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
                     if (!mb.IsConstructor) throw new Exception("expected constructor for newobj");
-                    int arity = mb.GetParameters().Where(p => !p.IsRetval).Count();
+                    int arity = mb.GetParameters().Count(p => !p.IsRetval);
                     Type objType = mb.DeclaringType!;
                     ILExpr[] inParams = new ILExpr[arity];
                     for (int i = 0; i < arity; i++)
                     {
-                        inParams[i] = frame.PopSingleAddr();
+                        inParams[i] = frame.Pop();
                     }
 
                     frame.Push(new ILNewExpr(
@@ -710,7 +708,7 @@ static class BlockTacLineBuilder
                 case "newarr":
                 {
                     Type arrType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                    ILExpr sizeExpr = frame.PopSingleAddr();
+                    ILExpr sizeExpr = frame.Pop();
                     if (sizeExpr.Type is not ILInt32 && sizeExpr.Type is not ILNativeInt)
                     {
                         throw new Exception("expected arr size of type int32 or native int, got " +
@@ -732,7 +730,7 @@ static class BlockTacLineBuilder
                 case "initobj":
                 {
                     Type type = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                    ILExpr addr = frame.PopSingleAddr();
+                    ILExpr addr = frame.Pop();
                     ILType ilType = TypingUtil.ILTypeFrom(type);
                     frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, ilType),
                         new ILNewDefaultExpr(ilType)));
@@ -751,21 +749,21 @@ static class BlockTacLineBuilder
                 case "ldelem.ref":
                 case "ldelem":
                 {
-                    ILExpr index = frame.PopSingleAddr();
-                    ILExpr arr = frame.PopSingleAddr();
+                    ILExpr index = frame.Pop();
+                    ILExpr arr = frame.Pop();
                     frame.Push(new ILArrayAccess(arr, index));
                     break;
                 }
                 case "ldelema":
                 {
-                    ILExpr idx = frame.PopSingleAddr();
-                    ILExpr arr = frame.PopSingleAddr();
+                    ILExpr idx = frame.Pop();
+                    ILExpr arr = frame.Pop();
                     frame.Push(new ILManagedRef(new ILArrayAccess(arr, idx)));
                     break;
                 }
                 case "ldlen":
                 {
-                    ILExpr arr = frame.PopSingleAddr();
+                    ILExpr arr = frame.Pop();
                     frame.Push(new ILArrayLength(arr));
                     break;
                 }
@@ -778,9 +776,9 @@ static class BlockTacLineBuilder
                 case "stelem.ref":
                 case "stelem":
                 {
-                    ILExpr value = frame.PopSingleAddr();
-                    ILExpr index = frame.PopSingleAddr();
-                    ILExpr arr = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
+                    ILExpr index = frame.Pop();
+                    ILExpr arr = frame.Pop();
                     frame.NewLine(new ILAssignStmt(new ILArrayAccess(arr, index), value));
                     break;
                 }
@@ -788,28 +786,28 @@ static class BlockTacLineBuilder
                 case "conv.i2":
                 case "conv.i4":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
                     frame.Push(conv);
                     break;
                 }
                 case "conv.i8":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
                     frame.Push(conv);
                     break;
                 }
                 case "conv.r4":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILFloat32(), value);
                     frame.Push(conv);
                     break;
                 }
                 case "conv.r8":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILFloat64(), value);
                     frame.Push(conv);
                     break;
@@ -818,35 +816,35 @@ static class BlockTacLineBuilder
                 case "conv.u2":
                 case "conv.u4":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
                     frame.Push(conv);
                     break;
                 }
                 case "conv.u8":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
                     frame.Push(conv);
                     break;
                 }
                 case "conv.i":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
                     frame.Push(conv);
                     break;
                 }
                 case "conv.u":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
                     frame.Push(conv);
                     break;
                 }
                 case "conv.r.un":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILNativeFloat(), value);
                     frame.Push(conv);
                     break;
@@ -874,7 +872,7 @@ static class BlockTacLineBuilder
                 case "conv.ovf.i.un":
                 case "conv.ovf.u.un":
                 {
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
                     frame.Push(conv);
                     break;
@@ -888,7 +886,7 @@ static class BlockTacLineBuilder
                         break;
                     }
 
-                    ILExpr obj = frame.PopSingleAddr();
+                    ILExpr obj = frame.Pop();
                     ILExpr res = new ILCondCastExpr(TypingUtil.ILTypeFrom(mbType), obj);
                     frame.Push(res);
                     break;
@@ -902,7 +900,7 @@ static class BlockTacLineBuilder
                         break;
                     }
 
-                    ILExpr value = frame.PopSingleAddr();
+                    ILExpr value = frame.Pop();
                     ILExpr casted = new ILCastClassExpr(TypingUtil.ILTypeFrom(mbType), value);
                     frame.Push(casted);
                     break;
@@ -916,7 +914,7 @@ static class BlockTacLineBuilder
                         break;
                     }
 
-                    ILValue value = (ILValue)frame.PopSingleAddr();
+                    ILValue value = (ILValue)frame.Pop();
                     ILExpr boxed = new ILBoxExpr(value);
                     frame.Push(boxed);
                     break;
@@ -931,7 +929,7 @@ static class BlockTacLineBuilder
                         break;
                     }
 
-                    ILValue obj = (ILValue)frame.PopSingleAddr();
+                    ILValue obj = (ILValue)frame.Pop();
                     ILExpr unboxed = new ILUnboxExpr(TypingUtil.ILTypeFrom(mbType), obj);
                     frame.Push(unboxed);
                     break;
