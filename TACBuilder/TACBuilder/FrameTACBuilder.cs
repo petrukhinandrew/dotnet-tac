@@ -36,6 +36,7 @@ static class FrameTacBuilder
         frame.CurInstr = frame._firstInstr;
         while (true)
         {
+            Console.WriteLine(frame.CurInstr.idx);
             switch (frame.CurInstr.opCode.Name)
             {
                 case "ckfinite":

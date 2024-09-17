@@ -166,6 +166,9 @@ class SMFrame
 
     public void Push(ILExpr expr)
     {
+        // check expr Type
+        // if < ILInt => push ((ILInt) expr)
+        // coercion
         _stack.Push(expr);
     }
 

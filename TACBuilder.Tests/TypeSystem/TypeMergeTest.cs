@@ -83,4 +83,24 @@ public class TypeMergeTest
         Assert.NotEqual(ilDouble, merged);
         Assert.NotEqual(TypingUtil.ILTypeFrom(typeof(ValueType)), merged);
     }
+
+    [Fact]
+    public void MergeFloats()
+    {
+        var ilFloat = TypingUtil.ILTypeFrom(typeof(float));
+        var ilDouble = TypingUtil.ILTypeFrom(typeof(double));
+        var merged = TypingUtil.Merge([ilFloat, ilDouble]);
+        Assert.NotEqual(ilFloat, merged);
+        Assert.Equal(ilDouble, merged);
+    }
+
+    [Fact]
+    public void MergeIntegers()
+    {
+        var ilByte = TypingUtil.ILTypeFrom(typeof(byte));
+        var ilInt = TypingUtil.ILTypeFrom(typeof(int));
+        var merged = TypingUtil.Merge([ilByte, ilInt]);
+        Assert.NotEqual(ilByte, merged);
+        Assert.Equal(ilInt, merged);
+    }
 }

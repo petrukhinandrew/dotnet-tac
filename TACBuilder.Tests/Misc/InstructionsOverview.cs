@@ -1,3 +1,6 @@
+using System.Linq.Expressions;
+using System.Runtime.CompilerServices;
+
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 #pragma warning disable
@@ -559,6 +562,32 @@ static unsafe class Misc
 
         TargetX:
         int b = 2;
+    }
+    public static void ByteAndInt()
+    {
+        byte b = 2;
+        int a = 1 + b;
+        long c = 2 + a;
+        
+    }
+    public static void FinallyGoto()
+    {
+        try
+        {
+            throw new Exception("lolkek");
+        }
+        catch (Exception)
+        {
+            goto LabelX;
+        }
+        finally
+        {
+            Console.WriteLine("another kek");
+        }
+
+        int a = 1;
+        LabelX:
+        int b = 1;
     }
 
     public static int SampleFunc()

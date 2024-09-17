@@ -7,7 +7,9 @@ class Program
     static void Main(string[] args)
     {
         var settings = new ParserSettings("TACBuilder.Tests/bin/Debug/net8.0/TACBuilder.Tests.dll",
-            ["Filter", "TernaryOp", "NestedTryCatch", "ArrayRef"]
+            // ["Filter", "TernaryOp", "NestedTryCatch", "ArrayRef"]
+            ["ByteAndInt"]
+            // ["NestedTryBlocks2"]
         );
         var codeBase = new CodeBase(settings);
         codeBase.Load();

@@ -137,7 +137,7 @@ class ILCallExpr(ILMethod method) : ILExpr
     }
 }
 
-interface ILRefExpr : ILExpr
+interface ILRefExpr : ILLValue
 {
     public ILExpr Value { get; }
 }
@@ -178,6 +178,8 @@ class ILManagedRef(ILExpr value) : ILRefExpr
         return "&" + Value.ToString();
     }
 }
+
+// TODO check &int64 |-> int* ~> *v
 
 class ILUnmanagedRef(ILExpr value) : ILRefExpr
 {
