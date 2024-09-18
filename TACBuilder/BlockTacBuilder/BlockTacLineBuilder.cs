@@ -51,7 +51,7 @@ static class BlockTacLineBuilder
                 case "nop":
                 case "break": break;
 
-                case "ldarg.0":
+                case "ldarg.0": 
                     frame.Push(frame.Params[0]);
                     break;
                 case "ldarg.1":
@@ -142,7 +142,7 @@ static class BlockTacLineBuilder
                     ILExpr obj = frame.Pop();
                     frame.ClearStack();
                     frame.NewLine(new ILEHStmt("throw", obj));
-                    break;
+                    return;
                 }
                 case "rethrow":
                 {

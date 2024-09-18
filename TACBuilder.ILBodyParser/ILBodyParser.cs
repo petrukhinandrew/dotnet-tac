@@ -4,6 +4,9 @@ using Usvm.IL.Parser;
 using Usvm.IL.Utils;
 
 namespace TACBuilder.ILBodyParser;
+// TODO exepcted API is:
+// parse(MethodBody) void
+// getters for ILInstr list and ehClauses list (now these are ImportIL and ImportEH)
 
 public class ILBodyParser(Module mod)
 {
@@ -16,9 +19,9 @@ public class ILBodyParser(Module mod)
         ehClause parseEH(exceptionHandlingClause c)
         {
             ILInstr tryBegin = offsetToInstr![c.tryOffset];
-            ILInstr tryEnd = offsetToInstr[c.tryOffset + c.tryLength].prev;
+            ILInstr tryEnd = offsetToInstr[c.tryOffset + c.tryLength].prev; // - //-
             ILInstr handlerBegin = offsetToInstr[c.handlerOffset];
-            ILInstr handlerEnd = offsetToInstr[c.handlerOffset + c.handlerLength].prev;
+            ILInstr handlerEnd = offsetToInstr[c.handlerOffset + c.handlerLength].prev; // take closest not null
             rewriterEhcType type = c.type switch
             {
                 ehcType.Filter f => new rewriterEhcType.FilterEH(offsetToInstr[f.offset]),
@@ -194,11 +197,11 @@ public class ILBodyParser(Module mod)
                     case "newarr":
                     case "isinst":
                         arg = (ILInstrOperand.Arg32)ilinstr.arg;
-                        tryResolveType(arg.value);
+                        // tryResolveType(arg.value);
                         break;
                     case "ldtoken":
                         arg = (ILInstrOperand.Arg32)ilinstr.arg;
-                        tryResolveToken(arg.value);
+                        // tryResolveToken(arg.value);
                         break;
                     case "newobj":
                     case "jmp":
@@ -207,11 +210,11 @@ public class ILBodyParser(Module mod)
                     case "call":
                     case "callvirt":
                         arg = (ILInstrOperand.Arg32)ilinstr.arg;
-                        tryResolveMethod(arg.value);
+                        // tryResolveMethod(arg.value);
                         break;
                     case "ldstr":
                         arg = (ILInstrOperand.Arg32)ilinstr.arg;
-                        tryResolveString(arg.value);
+                        // tryResolveString(arg.value);
                         break;
                     case "stsfld":
                     case "stfld":
@@ -220,7 +223,7 @@ public class ILBodyParser(Module mod)
                     case "ldfld":
                     case "ldflda":
                         arg = (ILInstrOperand.Arg32)ilinstr.arg;
-                        tryResolveField(arg.value);
+                        // tryResolveField(arg.value);
                         break;
                     default: continue;
                 }

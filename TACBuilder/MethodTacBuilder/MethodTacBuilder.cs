@@ -11,7 +11,7 @@ class MethodTacBuilder
     public readonly MethodInfo MethodInfo;
     private ehClause[] _ehs;
     public List<ILLocal> Locals;
-    public List<ILLocal> Params;
+    public List<ILLocal> Params = new();
     public List<ILExpr> Temps = new();
     public List<ILExpr> Errs = new();
     public Dictionary<(int, int), ILMerged> Merged = new();
@@ -32,8 +32,15 @@ class MethodTacBuilder
         _ehs = ehs;
         _declaringModule = declaringModule;
         MethodInfo = methodInfo;
-        Params = methodInfo.GetParameters().OrderBy(p => p.Position).Select(l =>
-            new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position))).ToList();
+        int hasThis = 0;
+        if (!methodInfo.IsStatic)
+        {
+            Params.Add(new ILLocal(TypingUtil.ILTypeFrom(methodInfo.ReflectedType), NamingUtil.ArgVar(0)));
+            hasThis = 1;
+        }
+
+        Params.AddRange(methodInfo.GetParameters().OrderBy(p => p.Position).Select(l =>
+            new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position + hasThis))));
         Locals = locals.OrderBy(l => l.LocalIndex)
             .Select(l => new ILLocal(TypingUtil.ILTypeFrom(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
         InitEhScopes();
@@ -189,6 +196,7 @@ class MethodTacBuilder
 
     public FieldInfo ResolveField(int target)
     {
+        // TODO mb reflectedtype 
         return _declaringModule.ResolveField(target, MethodInfo.DeclaringType!.GetGenericArguments(),
             MethodInfo.GetGenericArguments()) ?? throw new Exception("cannot resolve field");
     }

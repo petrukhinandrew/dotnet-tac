@@ -699,7 +699,7 @@ static class CallTests
             return a1 + a2 + a3 + a4 + s.Length;
         }
     }
-
+    
     public static void DifferentCalls()
     {
         var instance = new CallTestInstance();
