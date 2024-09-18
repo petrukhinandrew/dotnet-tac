@@ -3,7 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-tac", "dotnet-tac.csproj", "{D9986548-9989-4251-9855-41B9474FBE7F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACBuilder", "TACBuilder\TACBuilder.csproj", "{0C4403B3-1C48-473D-9C9D-BC2BF3B79FB1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACBuilder.Tests", "TACBuilder.Tests\TACBuilder.Tests.csproj", "{5B570B69-7705-4DB0-AEA8-FC84B1A01DA7}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACBuilder.ILMeta", "TACBuilder.ILMeta\TACBuilder.ILMeta.csproj", "{D92832B1-1F99-4215-8BC5-74D11AB43D8F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACBuilder.ILTAC", "TACBuilder.ILTAC\TACBuilder.ILTAC.csproj", "{708D0FBD-95C0-4F4F-92A3-096D639A86AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACBuilder.Utils", "TACBuilder.Utils\TACBuilder.Utils.csproj", "{8C54BB35-90F9-44F7-BA33-6CBD79E5B857}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +19,26 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D9986548-9989-4251-9855-41B9474FBE7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9986548-9989-4251-9855-41B9474FBE7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9986548-9989-4251-9855-41B9474FBE7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9986548-9989-4251-9855-41B9474FBE7F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0C4403B3-1C48-473D-9C9D-BC2BF3B79FB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0C4403B3-1C48-473D-9C9D-BC2BF3B79FB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0C4403B3-1C48-473D-9C9D-BC2BF3B79FB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0C4403B3-1C48-473D-9C9D-BC2BF3B79FB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5B570B69-7705-4DB0-AEA8-FC84B1A01DA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5B570B69-7705-4DB0-AEA8-FC84B1A01DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5B570B69-7705-4DB0-AEA8-FC84B1A01DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5B570B69-7705-4DB0-AEA8-FC84B1A01DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D92832B1-1F99-4215-8BC5-74D11AB43D8F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D92832B1-1F99-4215-8BC5-74D11AB43D8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D92832B1-1F99-4215-8BC5-74D11AB43D8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D92832B1-1F99-4215-8BC5-74D11AB43D8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{708D0FBD-95C0-4F4F-92A3-096D639A86AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{708D0FBD-95C0-4F4F-92A3-096D639A86AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{708D0FBD-95C0-4F4F-92A3-096D639A86AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{708D0FBD-95C0-4F4F-92A3-096D639A86AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8C54BB35-90F9-44F7-BA33-6CBD79E5B857}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8C54BB35-90F9-44F7-BA33-6CBD79E5B857}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8C54BB35-90F9-44F7-BA33-6CBD79E5B857}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8C54BB35-90F9-44F7-BA33-6CBD79E5B857}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
