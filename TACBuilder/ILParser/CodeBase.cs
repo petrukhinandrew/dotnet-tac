@@ -1,11 +1,8 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.Marshalling;
 using System.Runtime.Loader;
-using TACBuilder.ILBodyParser;
+using TACBuilder.ILMeta;
+using TACBuilder.ILMeta.ILBodyParser;
 using Usvm.IL.TACBuilder;
-using Usvm.IL.TypeSystem;
-using Usvm.IL.Utils;
 
 
 namespace Usvm.IL.Parser;
@@ -83,12 +80,11 @@ class CodeBase : AssemblyLoadContext
                     {
                         try
                         {
-                            var r = new ILBodyParser(module); //, ILRewriterDumpMode.ILAndEHS);
-
-                            r.ImportIL(methodBody);
-                            r.ImportEH(methodBody);
+                            var r = new ILBodyParser(methodBody);
+    
+                            r.Parse();
                             MethodTacBuilder mp = new MethodTacBuilder(module, method, methodBody.LocalVariables,
-                                r.GetBeginning(), r.GetEHs());
+                                r.Instructions, r.EhClauses);
                             // mp.DumpAll();
                         }
                         catch (Exception e)
@@ -101,25 +97,5 @@ class CodeBase : AssemblyLoadContext
                 }
             }
         }
-    }
-
-    public List<string> ListAssemblies()
-    {
-        return _assemblies.Select(asm => asm.Value.FullName ?? asm.Value.GetName().FullName).ToList();
-    }
-
-    public List<string> ListTypes()
-    {
-        return _types.Select(t => t.Value.FullName ?? t.Value.Name).ToList();
-    }
-
-    public List<string> ListMethods()
-    {
-        return _types.SelectMany(t => t.Value.GetMethods()).ToList().Select(mi => mi.Name).ToList();
-    }
-
-    public List<string> ListModules()
-    {
-        return [];
     }
 }

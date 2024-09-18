@@ -1,4 +1,5 @@
 using System.Reflection;
+using TACBuilder.ILMeta.ILBodyParser;
 using Usvm.IL.Parser;
 using Usvm.IL.TACBuilder.Utils;
 using Usvm.IL.TypeSystem;
@@ -25,11 +26,11 @@ class MethodTacBuilder
     public Queue<BlockTacBuilder> Worklist = new();
 
     public MethodTacBuilder(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
-        ILInstr begin, ehClause[] ehs)
+        ILInstr begin, List<ehClause> ehs)
     {
         _begin = begin;
         TacBlocks = new Dictionary<int, BlockTacBuilder>();
-        _ehs = ehs;
+        _ehs = ehs.ToArray();
         _declaringModule = declaringModule;
         MethodInfo = methodInfo;
         int hasThis = 0;
@@ -66,7 +67,7 @@ class MethodTacBuilder
         HashSet<ILInstr> leaders = [cur];
         while (cur is not ILInstr.Back)
         {
-            if (cur.isJump())
+            if (cur.IsJump())
             {
                 leaders.Add(((ILInstrOperand.Target)cur.arg).value);
                 leaders.Add(cur.next);

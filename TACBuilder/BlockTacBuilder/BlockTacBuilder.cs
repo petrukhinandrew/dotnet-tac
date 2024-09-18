@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using TACBuilder.ILMeta.ILBodyParser;
 using Usvm.IL.Parser;
 using Usvm.IL.TypeSystem;
 

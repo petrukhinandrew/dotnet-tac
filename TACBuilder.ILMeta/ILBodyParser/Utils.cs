@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Usvm.IL.Utils;
+namespace TACBuilder.ILMeta.ILBodyParser;
 
 public static class ReflectionUtils
 {

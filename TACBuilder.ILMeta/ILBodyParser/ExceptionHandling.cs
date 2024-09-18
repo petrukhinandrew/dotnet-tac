@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Usvm.IL.Parser;
+namespace TACBuilder.ILMeta.ILBodyParser;
 
 public abstract record ehcType
 {

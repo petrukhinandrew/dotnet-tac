@@ -1,6 +1,6 @@
 using System.Reflection.Emit;
 
-namespace Usvm.IL.Parser;
+namespace TACBuilder.ILMeta.ILBodyParser;
 
 public abstract record ILInstr
 {
@@ -15,7 +15,7 @@ public abstract record ILInstr
         prev = this;
         idx = 0;
     }
-    public bool isJump()
+    public bool IsJump()
     {
         if (this is SwitchArg)
         {

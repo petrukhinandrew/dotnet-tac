@@ -1,3 +1,4 @@
+using TACBuilder.ILMeta.ILBodyParser;
 using Usvm.IL.Parser;
 using Usvm.IL.TACBuilder.Utils;
 

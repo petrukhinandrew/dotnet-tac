@@ -9,6 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\TACBuilder.ILBodyParser\TACBuilder.ILBodyParser.csproj" />
+      <ProjectReference Include="..\TACBuilder.ILMeta\TACBuilder.ILMeta.csproj" />
     </ItemGroup>
 </Project>
