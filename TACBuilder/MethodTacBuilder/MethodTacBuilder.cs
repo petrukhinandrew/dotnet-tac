@@ -37,7 +37,6 @@ class MethodTacBuilder(MethodMeta meta)
         _tacMethodInfo.Meta = _meta;
         _begin = meta.FirstInstruction;
         _ehs = meta.EhClauses;
-
         int hasThis = 0;
         if (!MethodInfo.IsStatic)
         {
@@ -207,8 +206,7 @@ class MethodTacBuilder(MethodMeta meta)
 
     internal FieldInfo ResolveField(int target)
     {
-        // TODO what if reflected type is null and when it is possible 
-        return _declaringModule.ResolveField(target, MethodInfo.ReflectedType!.GetGenericArguments(),
+        return _declaringModule.ResolveField(target, (MethodInfo.ReflectedType ?? MethodInfo.DeclaringType)!.GetGenericArguments(),
             MethodInfo.GetGenericArguments()) ?? throw new Exception("cannot resolve field");
     }
 

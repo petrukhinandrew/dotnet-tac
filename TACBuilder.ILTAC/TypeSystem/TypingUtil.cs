@@ -20,6 +20,7 @@ public static class TypingUtil
                 if (type == typeof(double)) return new ILInt64();
                 if (type == typeof(int)) return new ILInt32();
                 if (type == typeof(nint)) return new ILNativeInt();
+                if (type == typeof(UIntPtr)) return new ILNativeInt();
                 if (type == typeof(uint)) return new ILUInt32();
             }
             else if (type.IsEnum)
@@ -59,14 +60,14 @@ public static class TypingUtil
             if (elemType != null)
                 return new ILArray(type, ILTypeFrom(elemType));
             else
-                throw new Exception("bad elem type for " + type.ToString());
+                throw new Exception("bad elem type for " + type);
         }
         else if (type.IsInterface || type.IsClass)
         {
             return new ILClassOrInterfaceType(type, FormatObjectName(type));
         }
-        
-        throw new Exception("unhandled type " + type.ToString());
+
+        throw new Exception("unhandled type " + type);
     }
 
     public static ILType Merge(List<ILType> types)

@@ -40,7 +40,8 @@ public class AssemblyMeta(Assembly assembly)
         foreach (var t in asm.GetTypesChecked())
         {
             var type = t.IsGenericType ? t.GetGenericTypeDefinition() : t;
-            if (type is null) continue;
+            // TODO prev line is needed? 
+            if (type.FullName is null) continue;
             types.Add(new TypeMeta(type));
         }
 

@@ -14,16 +14,20 @@ public class MethodMeta
     private List<ehClause> _ehClauses = new();
     public List<ehClause> EhClauses => _ehClauses;
     private bool _resolved = false;
+    private readonly bool _hasMethodBody;
+    public bool HasMethodBody => _hasMethodBody;
 
     public MethodMeta(MethodInfo methodInfo, bool resolveImmediately = true)
     {
         _methodInfo = methodInfo;
+        _hasMethodBody = methodInfo.GetMethodBody() != null;
         if (resolveImmediately) Resolve();
     }
 
     public void Resolve()
     {
         // TODO what to do if method body is null
+        if (!_hasMethodBody) return;
         if (_resolved) return;
         _resolved = true;
         if (_methodInfo.GetMethodBody() == null) return;
