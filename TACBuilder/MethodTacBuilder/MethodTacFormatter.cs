@@ -1,10 +1,10 @@
 using TACBuilder.ILMeta.ILBodyParser;
-using Usvm.IL.Parser;
-using Usvm.IL.TACBuilder.Utils;
-using Usvm.IL.TypeSystem;
+using TACBuilder.ILTAC.TypeSystem;
+using TACBuilder.Utils;
 
-namespace Usvm.IL.TACBuilder;
+namespace Usvm.IL.MethodTacBuilder;
 
+// TODO move to TACMethod
 static class MethodTacFormatter
 {
     private static List<string> FormatAnyVars(IEnumerable<ILExpr> vars, Func<int, string> nameGen)
@@ -31,23 +31,22 @@ static class MethodTacFormatter
         return res;
     }
 
-    private static List<string> FormatTempVars(this MethodTacBuilder mp)
+    private static List<string> FormatTempVars(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         return FormatAnyVars(mp.Temps, NamingUtil.TempVar);
-        ;
     }
 
-    private static List<string> FormatLocalVars(this MethodTacBuilder mp)
+    private static List<string> FormatLocalVars(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         return FormatAnyVars(mp.Locals.Select(v => (ILExpr)v).ToList(), NamingUtil.LocalVar);
     }
 
-    private static List<string> FormatErrVars(this MethodTacBuilder mp)
+    private static List<string> FormatErrVars(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         return FormatAnyVars(mp.Errs, NamingUtil.ErrVar);
     }
 
-    private static string FormatMethodSignature(this MethodTacBuilder mp)
+    private static string FormatMethodSignature(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         ILType retType = TypingUtil.ILTypeFrom(mp.MethodInfo.ReturnType);
         return string.Format("{0} {1}({2})", retType, mp.MethodInfo.Name,
@@ -55,12 +54,12 @@ static class MethodTacFormatter
                 mp.MethodInfo.GetParameters().Select(mi => TypingUtil.ILTypeFrom(mi.ParameterType).ToString())));
     }
 
-    private static void DumpMethodSignature(this MethodTacBuilder mp)
+    private static void DumpMethodSignature(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         Console.WriteLine(mp.FormatMethodSignature());
     }
 
-    public static void DumpEHS(this MethodTacBuilder mp)
+    public static void DumpEHS(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         foreach (var scope in mp.Scopes)
         {
@@ -68,7 +67,7 @@ static class MethodTacFormatter
         }
     }
 
-    private static void DumpVars(this MethodTacBuilder mp)
+    private static void DumpVars(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         foreach (var v in mp.FormatLocalVars().Concat(mp.FormatTempVars()).Concat(mp.FormatErrVars()))
         {
@@ -76,7 +75,7 @@ static class MethodTacFormatter
         }
     }
 
-    public static void DumpBBs(this MethodTacBuilder mp)
+    public static void DumpBBs(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         foreach (var e in mp.TacBlocks.OrderBy(b => b.Key))
         {
@@ -90,7 +89,7 @@ static class MethodTacFormatter
         }
     }
 
-    private static void DumpSuccessors(this MethodTacBuilder mp)
+    private static void DumpSuccessors(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         foreach (var s in mp.Successors.OrderBy(e => e.Key))
         {
@@ -100,7 +99,7 @@ static class MethodTacFormatter
         }
     }
 
-    private static void DumpTAC(this MethodTacBuilder mp)
+    private static void DumpTAC(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         foreach (var line in mp.Tac)
         {
@@ -108,7 +107,7 @@ static class MethodTacFormatter
         }
     }
 
-    public static void DumpIL(this MethodTacBuilder mp)
+    public static void DumpIL(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         int index = 0;
         var instr = mp.GetFirstInstr();
@@ -120,7 +119,7 @@ static class MethodTacFormatter
         }
     }
 
-    public static void DumpAll(this MethodTacBuilder mp)
+    public static void DumpAll(this TACBuilder.MethodTacBuilder.MethodTacBuilder mp)
     {
         mp.DumpIL();
         mp.DumpSuccessors();

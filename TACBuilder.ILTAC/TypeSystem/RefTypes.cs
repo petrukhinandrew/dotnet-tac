@@ -1,12 +1,12 @@
 using System.Runtime.InteropServices;
 
-namespace Usvm.IL.TypeSystem;
+namespace TACBuilder.ILTAC.TypeSystem;
 
-interface ILRefType : ILType
+public interface ILRefType : ILType
 {
 }
 
-class ILClassOrInterfaceType(Type reflectedType, string qName) : ILRefType
+public class ILClassOrInterfaceType(Type reflectedType, string qName) : ILRefType
 {
     private string QualifiedName = qName;
     public Type ReflectedType => reflectedType;
@@ -27,7 +27,7 @@ class ILClassOrInterfaceType(Type reflectedType, string qName) : ILRefType
     }
 }
 
-class ILArray(Type reflectedType, ILType elemType) : ILRefType
+public class ILArray(Type reflectedType, ILType elemType) : ILRefType
 {
     public ILType ElemType => elemType;
     public Type ReflectedType => reflectedType;
@@ -48,7 +48,7 @@ class ILArray(Type reflectedType, ILType elemType) : ILRefType
     }
 }
 
-class ILObject : ILRefType
+public class ILObject : ILRefType
 {
     public Type ReflectedType => typeof(object);
 
@@ -63,7 +63,7 @@ class ILObject : ILRefType
     }
 }
 
-class ILVoid : ILRefType
+public class ILVoid : ILRefType
 {
     public Type ReflectedType => typeof(void);
 
@@ -78,7 +78,7 @@ class ILVoid : ILRefType
     }
 }
 
-class ILNull : ILRefType
+public class ILNull : ILRefType
 {
     public Type ReflectedType => typeof(void);
 
@@ -93,7 +93,7 @@ class ILNull : ILRefType
     }
 }
 
-class ILString : ILRefType
+public class ILString : ILRefType
 {
     public Type ReflectedType => typeof(string);
 
@@ -108,7 +108,7 @@ class ILString : ILRefType
     }
 }
 
-class ILHandleRef : ILRefType
+public class ILHandleRef : ILRefType
 {
     public Type ReflectedType => typeof(HandleRef);
 

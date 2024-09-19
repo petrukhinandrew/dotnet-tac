@@ -1,9 +1,9 @@
 namespace Usvm.IL.Parser;
-class ParserSettings
+class ProgramSettings
 {
     public string DllPath;
     public List<string> Methods;
-    public ParserSettings(string dllPath, List<string> methods)
+    public ProgramSettings(string dllPath, List<string> methods)
     {
         if (dllPath.StartsWith('/'))
             DllPath = dllPath;

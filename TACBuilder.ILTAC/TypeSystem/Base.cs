@@ -1,7 +1,6 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
 
-namespace Usvm.IL.TypeSystem;
+namespace TACBuilder.ILTAC.TypeSystem;
 
 public interface ILType
 {
@@ -14,15 +13,15 @@ public interface ILExpr
     public string ToString();
 }
 
-interface ILValue : ILExpr
+public interface ILValue : ILExpr
 {
 }
 
-interface ILLValue : ILValue
+public interface ILLValue : ILValue
 {
 }
 
-class ILNullValue : ILValue
+public class ILNullValue : ILValue
 {
     private static ILType _instance = new ILNull();
     public ILType Type => _instance;
@@ -40,14 +39,14 @@ class ILNullValue : ILValue
     }
 }
 
-class ILVarArgValue(string methodName) : ILValue
+public class ILVarArgValue(string methodName) : ILValue
 {
     private static readonly ILType _instance = new ILHandleRef();
     public ILType Type => _instance;
     public override string ToString() => methodName + ".__arglist";
 }
 
-class ILLocal(ILType type, string name) : ILLValue
+public class ILLocal(ILType type, string name) : ILLValue
 {
     public ILType Type => type;
 
@@ -64,7 +63,7 @@ class ILLocal(ILType type, string name) : ILLValue
     }
 }
 
-class ILMergedType : ILType
+public class ILMergedType : ILType
 {
     private List<ILType> _types = new();
     private ILType? _cache;
@@ -82,7 +81,7 @@ class ILMergedType : ILType
     }
 }
 
-class ILMerged(string name) : ILLValue
+public class ILMerged(string name) : ILLValue
 {
     private string _name = name;
     private readonly ILMergedType _type = new();
@@ -114,7 +113,7 @@ class ILMerged(string name) : ILLValue
     }
 }
 
-class ILObjectLiteral(ILType type, object? obj) : ILValue
+public class ILObjectLiteral(ILType type, object? obj) : ILValue
 {
     public object? Object = obj;
 
@@ -126,7 +125,7 @@ class ILObjectLiteral(ILType type, object? obj) : ILValue
     }
 }
 
-class ILLiteral(ILType type, string value) : ILValue
+public class ILLiteral(ILType type, string value) : ILValue
 {
     public ILType Type => type;
 
@@ -147,7 +146,7 @@ class ILLiteral(ILType type, string value) : ILValue
     }
 }
 
-class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount, int token) : ILExpr
+public class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount, int token) : ILExpr
 {
     public static ILMethod FromMethodBase(MethodBase mb)
     {
@@ -228,7 +227,7 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
     }
 }
 
-class ILField(ILType type, string declType, string name, bool isStatic, int token) : ILLValue
+public class ILField(ILType type, string declType, string name, bool isStatic, int token) : ILLValue
 {
     public static ILField Static(FieldInfo f)
     {

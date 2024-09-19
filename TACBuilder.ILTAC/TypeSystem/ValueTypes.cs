@@ -1,10 +1,10 @@
-namespace Usvm.IL.TypeSystem;
+namespace TACBuilder.ILTAC.TypeSystem;
 
-interface ILValueType : ILType
+public interface ILValueType : ILType
 {
 }
 
-abstract class ILPrimitiveType : ILValueType
+public abstract class ILPrimitiveType : ILValueType
 {
     public abstract Type ReflectedType { get; }
 
@@ -19,7 +19,7 @@ abstract class ILPrimitiveType : ILValueType
     }
 }
 
-class ILBool : ILPrimitiveType
+public class ILBool : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(bool);
 
@@ -29,7 +29,7 @@ class ILBool : ILPrimitiveType
     }
 }
 
-class ILChar : ILPrimitiveType
+public class ILChar : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(char);
 
@@ -39,7 +39,7 @@ class ILChar : ILPrimitiveType
     }
 }
 
-class ILUInt8 : ILPrimitiveType
+public class ILUInt8 : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(byte);
 
@@ -49,7 +49,7 @@ class ILUInt8 : ILPrimitiveType
     }
 }
 
-class ILUInt16 : ILPrimitiveType
+public class ILUInt16 : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(ushort);
 
@@ -59,7 +59,7 @@ class ILUInt16 : ILPrimitiveType
     }
 }
 
-class ILUInt32 : ILPrimitiveType
+public class ILUInt32 : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(ushort);
 
@@ -69,7 +69,7 @@ class ILUInt32 : ILPrimitiveType
     }
 }
 
-class ILInt32 : ILPrimitiveType
+public class ILInt32 : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(int);
 
@@ -79,7 +79,7 @@ class ILInt32 : ILPrimitiveType
     }
 }
 
-class ILInt64 : ILPrimitiveType
+public class ILInt64 : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(long);
 
@@ -89,19 +89,19 @@ class ILInt64 : ILPrimitiveType
     }
 }
 
-class ILNativeInt : ILPrimitiveType
+public class ILNativeInt : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(nint);
     public override string ToString() => "nint";
 }
 
-class ILNativeFloat : ILPrimitiveType
+public class ILNativeFloat : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(float);
     public override string ToString() => "nfloat";
 }
 
-class ILFloat32 : ILPrimitiveType
+public class ILFloat32 : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(float);
 
@@ -111,7 +111,7 @@ class ILFloat32 : ILPrimitiveType
     }
 }
 
-class ILFloat64 : ILPrimitiveType
+public class ILFloat64 : ILPrimitiveType
 {
     public override Type ReflectedType => typeof(double);
 
@@ -121,7 +121,7 @@ class ILFloat64 : ILPrimitiveType
     }
 }
 
-class ILEnumType(Type reflectedType, string qName) : ILValueType
+public class ILEnumType(Type reflectedType, string qName) : ILValueType
 {
     private string QualifiedName = qName;
     public Type ReflectedType => reflectedType;
@@ -132,7 +132,7 @@ class ILEnumType(Type reflectedType, string qName) : ILValueType
     }
 }
 
-class ILStructType(Type reflectedType, string qName) : ILValueType
+public class ILStructType(Type reflectedType, string qName) : ILValueType
 {
     private string QualifiedName = qName;
     public Type ReflectedType => reflectedType;

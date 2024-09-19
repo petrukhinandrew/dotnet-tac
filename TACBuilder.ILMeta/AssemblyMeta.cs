@@ -1,37 +1,44 @@
 ﻿using System.Reflection;
 using System.Runtime.Loader;
+using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
 
 public class AssemblyMeta(Assembly assembly)
 {
-    internal class AssemblyLoader : AssemblyLoadContext
+    private class AssemblyLoader : AssemblyLoadContext
     {
         // TODO introduce cache
     }
 
-    public static AssemblyMeta FromPath(string assemblyPath)
+    private static readonly AssemblyLoader _loader = new();
+
+    public AssemblyMeta(string assemblyPath) : this(_loader.LoadFromAssemblyPath(assemblyPath))
     {
-        var asm = new AssemblyLoader().LoadFromAssemblyPath(assemblyPath);
-        var instance = new AssemblyMeta(asm)
-        {
-            _isFromPath = true
-        };
-        return instance;
+        _isFromPath = true;
     }
 
-    public static AssemblyMeta FromName(AssemblyName assemblyName)
+    public AssemblyMeta(AssemblyName assemblyName) : this(_loader.LoadFromAssemblyName(assemblyName))
     {
-        var asm = new AssemblyLoader().LoadFromAssemblyName(assemblyName);
-        var instance = new AssemblyMeta(asm)
-        {
-            _isFromName = true
-        };
-        return instance;
+        _isFromName = true;
     }
 
     private Assembly _assembly = assembly;
-    private List<TypeMeta> _types = assembly.GetTypes().Select(t => new TypeMeta(t)).ToList();
+
+    public List<TypeMeta> Types { get; } = resolveTypes(assembly);
+
+    private static List<TypeMeta> resolveTypes(Assembly asm)
+    {
+        var types = new List<TypeMeta>();
+        foreach (var t in asm.GetTypesChecked())
+        {
+            var type = t.IsGenericType ? t.GetGenericTypeDefinition() : t;
+            if (type is null) continue;
+            types.Add(new TypeMeta(type));
+        }
+
+        return types;
+    }
 
     private bool _isFromPath = false;
     public bool IsFromPath => _isFromPath;

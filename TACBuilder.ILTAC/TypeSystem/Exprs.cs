@@ -1,7 +1,7 @@
-namespace Usvm.IL.TypeSystem;
+namespace TACBuilder.ILTAC.TypeSystem;
 
 // impl 86-87
-class ILUnaryOperation(ILExpr operand) : ILExpr
+public class ILUnaryOperation(ILExpr operand) : ILExpr
 {
     public ILExpr Operand => operand;
 
@@ -13,7 +13,7 @@ class ILUnaryOperation(ILExpr operand) : ILExpr
     }
 }
 
-class ILBinaryOperation(ILExpr lhs, ILExpr rhs, string op = " binop ") : ILExpr
+public class ILBinaryOperation(ILExpr lhs, ILExpr rhs, string op = " binop ") : ILExpr
 {
     public ILType Type => lhs.Type;
 
@@ -22,7 +22,7 @@ class ILBinaryOperation(ILExpr lhs, ILExpr rhs, string op = " binop ") : ILExpr
     public new string ToString() => lhs.ToString() + op + rhs.ToString();
 }
 
-class ILNewDefaultExpr(ILType type) : ILExpr
+public class ILNewDefaultExpr(ILType type) : ILExpr
 {
     public ILType Type => type;
 
@@ -32,7 +32,7 @@ class ILNewDefaultExpr(ILType type) : ILExpr
     }
 }
 
-class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
+public class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
 {
     public ILType Type => type;
     public ILExpr[] Args = args;
@@ -43,7 +43,7 @@ class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
     }
 }
 
-class ILSizeOfExpr(ILType type) : ILExpr
+public class ILSizeOfExpr(ILType type) : ILExpr
 {
     public ILType Type => new ILUInt32();
     public ILType Arg => type;
@@ -54,7 +54,7 @@ class ILSizeOfExpr(ILType type) : ILExpr
     }
 }
 
-class ILNewArrayExpr(ILArray type, ILExpr size) : ILExpr
+public class ILNewArrayExpr(ILArray type, ILExpr size) : ILExpr
 {
     public ILType Type => type.ElemType;
     public ILExpr Size => size;
@@ -65,7 +65,7 @@ class ILNewArrayExpr(ILArray type, ILExpr size) : ILExpr
     }
 }
 
-class ILArrayAccess(ILExpr arrRef, ILExpr idx) : ILLValue
+public class ILArrayAccess(ILExpr arrRef, ILExpr idx) : ILLValue
 {
     public ILType Type => arrRef.Type;
     public ILExpr Index => idx;
@@ -78,7 +78,7 @@ class ILArrayAccess(ILExpr arrRef, ILExpr idx) : ILLValue
     }
 }
 
-class ILArrayLength(ILExpr arr) : ILExpr
+public class ILArrayLength(ILExpr arr) : ILExpr
 {
     private ILExpr _arr = arr;
     private ILType _type = new ILInt32();
@@ -90,7 +90,7 @@ class ILArrayLength(ILExpr arr) : ILExpr
     }
 }
 
-abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
+public abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
 {
     protected ILType _targetType = targetType;
     protected ILExpr _target = target;
@@ -102,23 +102,23 @@ abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
     }
 }
 
-class ILConvExpr(ILPrimitiveType targetType, ILExpr value) : ILCastExpr(targetType, value)
+public class ILConvExpr(ILPrimitiveType targetType, ILExpr value) : ILCastExpr(targetType, value)
 {
 }
 
-class ILBoxExpr(ILValue value) : ILCastExpr(new ILObject(), value)
+public class ILBoxExpr(ILValue value) : ILCastExpr(new ILObject(), value)
 {
 }
 
-class ILUnboxExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
+public class ILUnboxExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
 {
 }
 
-class ILCastClassExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
+public class ILCastClassExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
 {
 }
 
-class ILCondCastExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
+public class ILCondCastExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
 {
     public override string ToString()
     {
@@ -126,7 +126,7 @@ class ILCondCastExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, v
     }
 }
 
-class ILCallExpr(ILMethod method) : ILExpr
+public class ILCallExpr(ILMethod method) : ILExpr
 {
     protected ILMethod _method = method;
     public ILType Type => _method.ReturnType;
@@ -137,16 +137,16 @@ class ILCallExpr(ILMethod method) : ILExpr
     }
 }
 
-interface ILRefExpr : ILLValue
+public interface ILRefExpr : ILLValue
 {
     public ILExpr Value { get; }
 }
 
-interface ILDerefExpr : ILLValue
+public interface ILDerefExpr : ILLValue
 {
 }
 
-class PointerExprTypeResolver
+public class PointerExprTypeResolver
 {
     public static ILDerefExpr DerefAs(ILExpr instance, ILType type)
     {
@@ -167,7 +167,7 @@ class PointerExprTypeResolver
     }
 }
 
-class ILManagedRef(ILExpr value) : ILRefExpr
+public class ILManagedRef(ILExpr value) : ILRefExpr
 {
     public ILExpr Value => value;
 
@@ -181,7 +181,7 @@ class ILManagedRef(ILExpr value) : ILRefExpr
 
 // TODO check &int64 |-> int* ~> *v
 
-class ILUnmanagedRef(ILExpr value) : ILRefExpr
+public class ILUnmanagedRef(ILExpr value) : ILRefExpr
 {
     public ILExpr Value => value;
 
@@ -193,7 +193,7 @@ class ILUnmanagedRef(ILExpr value) : ILRefExpr
     }
 }
 
-class ILManagedDeref(ILExpr byRefVal, ILType resType) : ILDerefExpr
+public class ILManagedDeref(ILExpr byRefVal, ILType resType) : ILDerefExpr
 {
     private ILExpr Value = byRefVal;
     public ILType Type => resType;
@@ -204,7 +204,7 @@ class ILManagedDeref(ILExpr byRefVal, ILType resType) : ILDerefExpr
     }
 }
 
-class ILUnmanagedDeref(ILExpr pointedVal, ILType resType) : ILDerefExpr
+public class ILUnmanagedDeref(ILExpr pointedVal, ILType resType) : ILDerefExpr
 {
     private ILExpr Value = pointedVal;
     public ILType Type => resType;
@@ -215,7 +215,7 @@ class ILUnmanagedDeref(ILExpr pointedVal, ILType resType) : ILDerefExpr
     }
 }
 
-class ILStackAlloc(ILExpr size) : ILExpr
+public class ILStackAlloc(ILExpr size) : ILExpr
 {
     public ILType Type => new ILUnmanagedPointer(Array.Empty<byte>().GetType(), new ILUInt8());
 

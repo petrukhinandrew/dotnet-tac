@@ -5,10 +5,15 @@ namespace TACBuilder.ILMeta;
 public class TypeMeta(Type type)
 {
     private Type _type = type;
-    private List<MethodMeta> _methods = type.GetMethods().Select(methodInfo => new MethodMeta(methodInfo)).ToList();
+
+    private const BindingFlags BindingFlags =
+        System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static;
+
+
     private List<FieldMeta> _fields = type.GetFields().Select(fieldInfo => new FieldMeta(fieldInfo)).ToList();
-    
-    // TODO anon namespaces and is it true fully qualified name == ns + name
+
+    public List<MethodMeta> Methods { get; } = type.GetMethods(BindingFlags).Select(methodInfo => new MethodMeta(methodInfo)).ToList();
+
     public string Name => _type.Name;
     public string Namespace => _type.Namespace ?? "";
 }
