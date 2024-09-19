@@ -1,4 +1,4 @@
-namespace Usvm.IL.TypeSystem;
+namespace TACBuilder.ILTAC.TypeSystem;
 
 public static class TypingUtil
 {
@@ -93,9 +93,9 @@ public static class TypingUtil
         string nsName = type.Namespace ?? "ns";
         string rawName = type.Name;
         string[] tokens = rawName.Split('`');
-        if (tokens.Count() == 1)
+        if (tokens.Length == 1)
         {
-            return string.Format("{0}.{1}", nsName, rawName);
+            return $"{nsName}.{rawName}";
         }
 
         string name = tokens[0];

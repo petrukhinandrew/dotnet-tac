@@ -28,6 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\TACBuilder.ILTAC\TACBuilder.ILTAC.csproj" />
       <ProjectReference Include="..\TACBuilder\TACBuilder.csproj" />
     </ItemGroup>
 

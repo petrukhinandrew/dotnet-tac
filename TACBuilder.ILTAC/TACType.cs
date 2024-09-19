@@ -1,6 +1,6 @@
 namespace TACBuilder.ILTAC;
 
-public class TACType
+public class TACType(IEnumerable<TACMethod> methods)
 {
     // MetaType
 }

@@ -1,16 +1,22 @@
-﻿using Usvm.IL.Parser;
+﻿using System.Reflection;
+using System.Runtime.Loader;
+using TACBuilder.ILMeta;
+using TACBuilder.ILMeta.ILBodyParser;
+using Usvm.IL.Parser;
 
-namespace Usvm.IL;
+namespace Usvm.TACBuilder;
 
 class Program
 {
     static void Main(string[] args)
     {
-        var settings = new ParserSettings("TACBuilder.Tests/bin/Debug/net8.0/TACBuilder.Tests.dll",
+        var settings = new ProgramSettings("TACBuilder.Tests/bin/Debug/net8.0/TACBuilder.Tests.dll",
             // ["Filter", "TernaryOp", "NestedTryCatch", "ArrayRef", "TupleRet", "NestedTryBlocks2"]
             ["IntMethod"]
         );
-        var codeBase = new CodeBase(settings);
-        codeBase.Load();
+        var assemblyTacBuilder = new AssemblyTacBuilder.AssemblyTacBuilder(
+            new AssemblyMeta(settings.DllPath)
+        );
+        var tacAssembly = assemblyTacBuilder.Build();
     }
 }

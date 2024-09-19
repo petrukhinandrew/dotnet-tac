@@ -1,8 +1,7 @@
 using TACBuilder.ILMeta.ILBodyParser;
-using Usvm.IL.Parser;
-using Usvm.IL.TACBuilder.Utils;
-
-namespace Usvm.IL.TACBuilder;
+using TACBuilder.Utils;
+using Usvm.TACBuilder.BlockTacBuilder;
+namespace Usvm.TACBuilder.MethodTacBuilder;
 
 abstract class EHScope
 {
@@ -54,7 +53,7 @@ abstract class EHScopeWithVarIdx(Type type) : EHScope
 {
     public int ErrIdx;
     public readonly Type Type = type;
-    public BlockTacBuilder HandlerFrame;
+    public BlockTacBuilder.BlockTacBuilder HandlerFrame;
 }
 
 class CatchScope(Type type) : EHScopeWithVarIdx(type)
@@ -86,7 +85,7 @@ class CatchScope(Type type) : EHScopeWithVarIdx(type)
 class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
 {
     public ILInstr fb;
-    public BlockTacBuilder FilterFrame;
+    public BlockTacBuilder.BlockTacBuilder FilterFrame;
 
     public new static FilterScope FromClause(ehClause clause)
     {

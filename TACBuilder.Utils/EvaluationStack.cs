@@ -1,4 +1,4 @@
-namespace Usvm.IL.TACBuilder;
+namespace TACBuilder.Utils;
 
 public class EvaluationStack<T>(IEnumerable<T> collection) where T : notnull
 {
@@ -12,11 +12,11 @@ public class EvaluationStack<T>(IEnumerable<T> collection) where T : notnull
     public static EvaluationStack<T> CopyOf(EvaluationStack<T> stack)
     {
         T[] copy = new T[stack.Count];
-        stack.copyTo(copy, 0);
+        stack.CopyTo(copy, 0);
         return new EvaluationStack<T>(copy);
     }
 
-    private void copyTo(T[] array, int index)
+    private void CopyTo(T[] array, int index)
     {
         _stack.CopyTo(array, index);
     }

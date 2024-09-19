@@ -1,11 +1,23 @@
 using System.Reflection;
+using TACBuilder.ILMeta;
 using TACBuilder.ILMeta.ILBodyParser;
-using Usvm.IL.Parser;
-using Usvm.IL.TACBuilder.Utils;
-using Usvm.IL.TypeSystem;
+using TACBuilder.ILTAC;
+using TACBuilder.ILTAC.TypeSystem;
+using TACBuilder.Utils;
+using Usvm.TACBuilder.BlockTacBuilder;
 
-namespace Usvm.IL.TACBuilder;
+namespace Usvm.TACBuilder.MethodTacBuilder;
 
+/*
+ * notes on lazy API 
+ *
+ * we separate ctor (1), fields instantiation(2) and building(3)
+ * (1) may be just setting method info
+ * (1) and (2) may be merged if needed for lazy strategy or does not produce overhead
+ * (3) calls MethodMeta resolve first 
+ */
+
+// TODO primary ctor is to take MethodMeta only
 class MethodTacBuilder
 {
     private readonly Module _declaringModule;
@@ -17,19 +29,25 @@ class MethodTacBuilder
     public List<ILExpr> Errs = new();
     public Dictionary<(int, int), ILMerged> Merged = new();
     public List<ILIndexedStmt> Tac = new();
-    public List<ILInstr> Leaders;
+    public List<ILInstr> Leaders = new();
     public Dictionary<int, List<int>> Successors = new();
-    public Dictionary<int, BlockTacBuilder> TacBlocks;
+    public Dictionary<int, BlockTacBuilder.BlockTacBuilder> TacBlocks;
     private readonly ILInstr _begin;
     public List<EHScope> Scopes = [];
-    public Dictionary<int, int?> ilToTacMapping = new();
-    public Queue<BlockTacBuilder> Worklist = new();
+    public readonly Dictionary<int, int?> ilToTacMapping = new();
+    public Queue<BlockTacBuilder.BlockTacBuilder> Worklist = new();
 
+    public MethodTacBuilder(MethodMeta meta) : this(meta.MethodInfo.Module, meta.MethodInfo,
+        meta.MethodInfo.GetMethodBody()!.LocalVariables, meta.FirstInstruction, meta.EhClauses)
+    {
+    }
+
+    // TODO remove declaring module from ctor 
     public MethodTacBuilder(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
         ILInstr begin, List<ehClause> ehs)
     {
         _begin = begin;
-        TacBlocks = new Dictionary<int, BlockTacBuilder>();
+        TacBlocks = new Dictionary<int, BlockTacBuilder.BlockTacBuilder>();
         _ehs = ehs.ToArray();
         _declaringModule = declaringModule;
         MethodInfo = methodInfo;
@@ -44,6 +62,10 @@ class MethodTacBuilder
             new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position + hasThis))));
         Locals = locals.OrderBy(l => l.LocalIndex)
             .Select(l => new ILLocal(TypingUtil.ILTypeFrom(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
+    }
+
+    public TACMethod Build()
+    {
         InitEhScopes();
         Leaders = CollectLeaders();
         ProcessNonExceptionalIL();
@@ -59,6 +81,7 @@ class MethodTacBuilder
         }
 
         ComposeTac();
+        return new TACMethod();
     }
 
     private List<ILInstr> CollectLeaders()
@@ -81,14 +104,15 @@ class MethodTacBuilder
 
     private void ProcessNonExceptionalIL()
     {
-        TacBlocks[0] = new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
+        TacBlocks[0] =
+            new BlockTacBuilder.BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
         Successors.Add(0, []);
         Worklist.Clear();
         Worklist.Enqueue(TacBlocks[0]);
         EnqueueEhsBlocks();
         while (Worklist.Count > 0)
         {
-            Worklist.Dequeue().Branch();
+            BlockTacLineBuilder.Branch(Worklist.Dequeue());
         }
     }
 
@@ -101,7 +125,7 @@ class MethodTacBuilder
 
             if (scope is EHScopeWithVarIdx scopeWithVar)
             {
-                TacBlocks[hbIndex] = new BlockTacBuilder(this, null,
+                TacBlocks[hbIndex] = new BlockTacBuilder.BlockTacBuilder(this, null,
                     new EvaluationStack<ILExpr>([Errs[scopeWithVar.ErrIdx]]),
                     (ILInstr.Instr)scopeWithVar.ilLoc.hb);
                 scopeWithVar.HandlerFrame = TacBlocks[hbIndex];
@@ -109,14 +133,15 @@ class MethodTacBuilder
             else
             {
                 TacBlocks[hbIndex] =
-                    new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
+                    new BlockTacBuilder.BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(),
+                        (ILInstr.Instr)scope.ilLoc.hb);
             }
 
             if (scope is FilterScope filterScope)
             {
                 int fbIndex = filterScope.fb.idx;
                 Leaders.Add(filterScope.fb);
-                TacBlocks[fbIndex] = new BlockTacBuilder(this, null,
+                TacBlocks[fbIndex] = new BlockTacBuilder.BlockTacBuilder(this, null,
                     new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.fb);
                 filterScope.FilterFrame = TacBlocks[fbIndex];
@@ -179,13 +204,13 @@ class MethodTacBuilder
         }
     }
 
-    public ILLocal GetNewTemp(ILType type, ILExpr value)
+    internal ILLocal GetNewTemp(ILType type, ILExpr value)
     {
         Temps.Add(value);
         return new ILLocal(type, NamingUtil.TempVar(Temps.Count - 1));
     }
 
-    public ILMerged GetMerged(int blockIdx, int stackDepth)
+    internal ILMerged GetMerged(int blockIdx, int stackDepth)
     {
         if (!Merged.ContainsKey((blockIdx, stackDepth)))
         {
@@ -195,34 +220,34 @@ class MethodTacBuilder
         return Merged[(blockIdx, stackDepth)];
     }
 
-    public FieldInfo ResolveField(int target)
+    internal FieldInfo ResolveField(int target)
     {
-        // TODO mb reflectedtype 
-        return _declaringModule.ResolveField(target, MethodInfo.DeclaringType!.GetGenericArguments(),
+        // TODO what if reflected type is null and when it is possible 
+        return _declaringModule.ResolveField(target, MethodInfo.ReflectedType!.GetGenericArguments(),
             MethodInfo.GetGenericArguments()) ?? throw new Exception("cannot resolve field");
     }
 
-    public Type ResolveType(int target)
+    internal Type ResolveType(int target)
     {
         return _declaringModule.ResolveType(target) ?? throw new Exception("cannot resolve type");
     }
 
-    public MethodBase ResolveMethod(int target)
+    internal MethodBase ResolveMethod(int target)
     {
         return _declaringModule.ResolveMethod(target) ?? throw new Exception("cannot resolve method");
     }
 
-    public byte[] ResolveSignature(int target)
+    internal byte[] ResolveSignature(int target)
     {
         return _declaringModule.ResolveSignature(target);
     }
 
-    public string ResolveString(int target)
+    internal string ResolveString(int target)
     {
         return _declaringModule.ResolveString(target);
     }
 
-    public ILInstr GetFirstInstr()
+    internal ILInstr GetFirstInstr()
     {
         return _begin;
     }
