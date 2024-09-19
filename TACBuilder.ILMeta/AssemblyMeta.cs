@@ -25,6 +25,13 @@ public class AssemblyMeta(Assembly assembly)
 
     private Assembly _assembly = assembly;
 
+    private bool _isFromPath = false;
+
+    public bool IsFromPath => _isFromPath;
+
+    private bool _isFromName = false;
+
+    public bool IsFromName => _isFromName;
     public List<TypeMeta> Types { get; } = resolveTypes(assembly);
 
     private static List<TypeMeta> resolveTypes(Assembly asm)
@@ -39,10 +46,4 @@ public class AssemblyMeta(Assembly assembly)
 
         return types;
     }
-
-    private bool _isFromPath = false;
-    public bool IsFromPath => _isFromPath;
-
-    private bool _isFromName = false;
-    public bool IsFromName => _isFromName;
 }

@@ -7,17 +7,24 @@ public class TypeTacBuilder(TypeMeta meta)
 {
     private TypeMeta _meta = meta;
 
+    private List<MethodTacBuilder.MethodTacBuilder> _methodBuilders =
+        meta.Methods.Select(methodMeta => new MethodTacBuilder.MethodTacBuilder(methodMeta)).ToList();
+
     public TACType Build()
     {
-        var methodBuilders = _meta.Methods.Select(methodMeta => new MethodTacBuilder.MethodTacBuilder(methodMeta));
-        var builtMethods = methodBuilders.Select(methodBuilder => methodBuilder.Build());
+        var builtMethods = new List<TACMethod>();
+        foreach (var methodBuilder in _methodBuilders)
+        {
+            try
+            {
+                builtMethods.Add(methodBuilder.Build());
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(_meta.Name + " " + methodBuilder.MethodInfo.Name + " " + e.Message);
+            }
+        }
+
         return new TACType(builtMethods);
     }
-    /*
-     * notes on lazy API
-     *
-     * instead of built TAC methods we store builders (that also may have cache)
-     * and introduce methods like BuildSelected(needed info or method identifiers) and BuildAll that for all stored builders call build
-     * initially every builder should do lazy resolving (no body parsing)
-     */
 }

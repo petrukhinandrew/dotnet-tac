@@ -1,6 +1,9 @@
 namespace TACBuilder.ILTAC;
 
-public class TACBasicBlock
+// TODO mb redundant 
+public class TACBasicBlock : TACInstance
 {
-    
+    public void SerializeTo(Stream to)
+    {
+    }
 }

@@ -12,11 +12,13 @@ class Program
     {
         var settings = new ProgramSettings("TACBuilder.Tests/bin/Debug/net8.0/TACBuilder.Tests.dll",
             // ["Filter", "TernaryOp", "NestedTryCatch", "ArrayRef", "TupleRet", "NestedTryBlocks2"]
-            ["IntMethod"]
+            ["Filter"]
         );
         var assemblyTacBuilder = new AssemblyTacBuilder.AssemblyTacBuilder(
             new AssemblyMeta(settings.DllPath)
         );
         var tacAssembly = assemblyTacBuilder.Build();
+
+        tacAssembly.SerializeTo(Console.OpenStandardOutput());
     }
 }
