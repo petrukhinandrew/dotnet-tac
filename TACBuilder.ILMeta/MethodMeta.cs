@@ -13,6 +13,7 @@ public class MethodMeta
     public ILInstr FirstInstruction => _firstInstruction;
     private List<ehClause> _ehClauses = new();
     public List<ehClause> EhClauses => _ehClauses;
+    private bool _resolved = false;
 
     public MethodMeta(MethodInfo methodInfo, bool resolveImmediately = true)
     {
@@ -23,13 +24,24 @@ public class MethodMeta
     public void Resolve()
     {
         // TODO what to do if method body is null
+        if (_resolved) return;
+        _resolved = true;
         if (_methodInfo.GetMethodBody() == null) return;
-        var bodyParser = new ILBodyParser.ILBodyParser(_methodInfo.GetMethodBody()!);
-        bodyParser.Parse();
-        _firstInstruction = bodyParser.Instructions;
-        _ehClauses = bodyParser.EhClauses;
-        var cfg = new CFG(bodyParser.Instructions, bodyParser.EhClauses);
-        cfg.MarkBasicBlocks();
-        _basicBlocks = cfg.BasicBlocksMarkup.Select(bbLocation => new BasicBlockMeta(bbLocation)).ToList();
+
+        try
+        {
+            var bodyParser = new ILBodyParser.ILBodyParser(_methodInfo.GetMethodBody()!);
+            bodyParser.Parse();
+            _firstInstruction = bodyParser.Instructions;
+            _ehClauses = bodyParser.EhClauses;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("error at " + _methodInfo.Name + " " + e);
+        }
+
+        // var cfg = new CFG(bodyParser.Instructions, bodyParser.EhClauses);
+        // cfg.MarkBasicBlocks();
+        // _basicBlocks = cfg.BasicBlocksMarkup.Select(bbLocation => new BasicBlockMeta(bbLocation)).ToList();
     }
 }

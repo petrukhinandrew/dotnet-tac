@@ -65,7 +65,7 @@ public static class TypingUtil
         {
             return new ILClassOrInterfaceType(type, FormatObjectName(type));
         }
-
+        
         throw new Exception("unhandled type " + type.ToString());
     }
 

@@ -1,8 +1,12 @@
 ﻿namespace TACBuilder.ILTAC;
 
-public class TACAssembly(IEnumerable<TACType> types)
+public class TACAssembly(IEnumerable<TACType> types) : TACInstance
 {
-    // MetaAssembly
-    //new by path (creating meta assembly) 
-    // serialize (to file or so) 
+    public void SerializeTo(Stream to)
+    {
+        foreach (var t in types)
+        {
+            t.SerializeTo(to);
+        }
+    }
 }

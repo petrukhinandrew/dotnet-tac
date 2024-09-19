@@ -6,4 +6,9 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\TACBuilder.ILMeta\TACBuilder.ILMeta.csproj" />
+      <ProjectReference Include="..\TACBuilder.Utils\TACBuilder.Utils.csproj" />
+    </ItemGroup>
+
 </Project>
