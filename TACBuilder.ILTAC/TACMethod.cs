@@ -1,4 +1,3 @@
-using System.Reflection;
 using TACBuilder.ILMeta;
 using TACBuilder.ILMeta.ILBodyParser;
 using TACBuilder.ILTAC.TypeSystem;
@@ -8,6 +7,7 @@ namespace TACBuilder.ILTAC;
 
 public class TACMethodInfo
 {
+    // TODO pass signature here instead
     public MethodMeta Meta;
     public List<ILLocal> Locals = new();
     public List<ILLocal> Params = new();
@@ -16,14 +16,31 @@ public class TACMethodInfo
     public List<EHScope> Scopes = new();
 }
 
-public class TACMethod(TACMethodInfo info, List<ILIndexedStmt> statements) : TACInstance
+public abstract class ITACMethod(TACMethodInfo info) : TACInstance
 {
     public TACMethodInfo Info => info;
-    public List<ILIndexedStmt> Statements => statements;
 
     public void SerializeTo(Stream to)
     {
+        throw new NotImplementedException();
+    }
+}
+
+public class TACMethod(TACMethodInfo info, List<ILIndexedStmt> statements) : ITACMethod(info)
+{
+    public List<ILIndexedStmt> Statements => statements;
+
+    public new void SerializeTo(Stream to)
+    {
         this.DumpAllTo(to);
+    }
+}
+
+public class TACMethodWithoutBody(TACMethodInfo info) : ITACMethod(info)
+{
+    public new void SerializeTo(Stream to)
+    {
+        this.DumpMethodWithoutBody(to);
     }
 }
 
@@ -68,7 +85,7 @@ internal static class TACMethodPrinter
         return FormatAnyVars(method.Info.Errs, NamingUtil.ErrVar);
     }
 
-    private static string FormatMethodSignature(this TACMethod method)
+    private static string FormatMethodSignature(this ITACMethod method)
     {
         var rawMethodInfo = method.Info.Meta.MethodInfo;
         ILType retType = TypingUtil.ILTypeFrom(rawMethodInfo.ReturnType);
@@ -77,7 +94,7 @@ internal static class TACMethodPrinter
                 rawMethodInfo.GetParameters().Select(mi => TypingUtil.ILTypeFrom(mi.ParameterType).ToString())));
     }
 
-    private static void DumpMethodSignature(this TACMethod method, StreamWriter writer)
+    private static void DumpMethodSignature(this ITACMethod method, StreamWriter writer)
     {
         writer.WriteLine(method.FormatMethodSignature());
     }
@@ -127,6 +144,16 @@ internal static class TACMethodPrinter
         // method.DumpEHS(writer);
         method.DumpVars(writer);
         method.DumpTAC(writer);
+        writer.WriteLine();
+        writer.Close();
+    }
+
+    public static void DumpMethodWithoutBody(this TACMethodWithoutBody method, Stream to)
+    {
+        var writer = new StreamWriter(to, leaveOpen: true);
+        writer.AutoFlush = true;
+        method.DumpMethodSignature(writer);
+        writer.WriteLine("NO BODY");
         writer.WriteLine();
         writer.Close();
     }
