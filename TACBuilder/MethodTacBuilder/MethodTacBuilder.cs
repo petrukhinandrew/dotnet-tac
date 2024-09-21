@@ -4,9 +4,8 @@ using TACBuilder.ILMeta.ILBodyParser;
 using TACBuilder.ILTAC;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
-using Usvm.TACBuilder.BlockTacBuilder;
 
-namespace Usvm.TACBuilder.MethodTacBuilder;
+namespace Usvm.TACBuilder;
 
 class MethodTacBuilder(MethodMeta meta)
 {
@@ -25,10 +24,10 @@ class MethodTacBuilder(MethodMeta meta)
     public List<ILIndexedStmt> Tac = new();
     public List<ILInstr> Leaders = new();
     public Dictionary<int, List<int>> Successors = new();
-    public Dictionary<int, BlockTacBuilder.BlockTacBuilder> TacBlocks = new();
+    public Dictionary<int, BlockTacBuilder> TacBlocks = new();
     private ILInstr _begin;
     public readonly Dictionary<int, int?> ilToTacMapping = new();
-    public Queue<BlockTacBuilder.BlockTacBuilder> Worklist = new();
+    public Queue<BlockTacBuilder> Worklist = new();
     private MethodMeta _meta = meta;
 
     public TACMethod Build()
@@ -113,7 +112,7 @@ class MethodTacBuilder(MethodMeta meta)
 
             if (scope is EHScopeWithVarIdx scopeWithVar)
             {
-                TacBlocks[hbIndex] = new BlockTacBuilder.BlockTacBuilder(this, null,
+                TacBlocks[hbIndex] = new BlockTacBuilder(this, null,
                     new EvaluationStack<ILExpr>([Errs[scopeWithVar.ErrIdx]]),
                     (ILInstr.Instr)scopeWithVar.ilLoc.hb);
                 // scopeWithVar.HandlerFrame = TacBlocks[hbIndex];
@@ -121,7 +120,7 @@ class MethodTacBuilder(MethodMeta meta)
             else
             {
                 TacBlocks[hbIndex] =
-                    new BlockTacBuilder.BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(),
+                    new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(),
                         (ILInstr.Instr)scope.ilLoc.hb);
             }
 
@@ -129,7 +128,7 @@ class MethodTacBuilder(MethodMeta meta)
             {
                 int fbIndex = filterScope.fb.idx;
                 Leaders.Add(filterScope.fb);
-                TacBlocks[fbIndex] = new BlockTacBuilder.BlockTacBuilder(this, null,
+                TacBlocks[fbIndex] = new BlockTacBuilder(this, null,
                     new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
                     (ILInstr.Instr)filterScope.fb);
                 // filterScope.FilterFrame = TacBlocks[fbIndex];
@@ -143,7 +142,7 @@ class MethodTacBuilder(MethodMeta meta)
     private void ProcessIL()
     {
         TacBlocks[0] =
-            new BlockTacBuilder.BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
+            new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
         Successors.Add(0, []);
         Worklist.Clear();
         Worklist.Enqueue(TacBlocks[0]);
@@ -206,7 +205,8 @@ class MethodTacBuilder(MethodMeta meta)
 
     internal FieldInfo ResolveField(int target)
     {
-        return _declaringModule.ResolveField(target, (MethodInfo.ReflectedType ?? MethodInfo.DeclaringType)!.GetGenericArguments(),
+        return _declaringModule.ResolveField(target,
+            (MethodInfo.ReflectedType ?? MethodInfo.DeclaringType)!.GetGenericArguments(),
             MethodInfo.GetGenericArguments()) ?? throw new Exception("cannot resolve field");
     }
 

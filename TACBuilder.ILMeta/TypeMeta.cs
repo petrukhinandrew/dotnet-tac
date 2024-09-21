@@ -23,4 +23,4 @@ public class TypeMeta(Type type)
 
 public class FieldMeta(FieldInfo fieldInfo)
 {
-}0
+}
