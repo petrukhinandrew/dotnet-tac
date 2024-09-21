@@ -11,7 +11,7 @@ class Program
             // ["Filter", "TernaryOp", "NestedTryCatch", "ArrayRef", "TupleRet", "NestedTryBlocks2"]
             ["Filter"]
         );
-        var assemblyTacBuilder = new AssemblyTacBuilder.AssemblyTacBuilder(
+        var assemblyTacBuilder = new AssemblyTacBuilder(
             new AssemblyMeta(settings.DllPath)
         );
         var tacAssembly = assemblyTacBuilder.Build();

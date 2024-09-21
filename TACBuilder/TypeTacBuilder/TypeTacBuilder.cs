@@ -1,14 +1,14 @@
 using TACBuilder.ILMeta;
 using TACBuilder.ILTAC;
 
-namespace Usvm.TACBuilder.TypeTacBuilder;
+namespace Usvm.TACBuilder;
 
 public class TypeTacBuilder(TypeMeta meta)
 {
     private TypeMeta _meta = meta;
 
-    private List<MethodTacBuilder.MethodTacBuilder> _methodBuilders =
-        meta.Methods.Select(methodMeta => new MethodTacBuilder.MethodTacBuilder(methodMeta)).ToList();
+    private List<MethodTacBuilder> _methodBuilders =
+        meta.Methods.Select(methodMeta => new MethodTacBuilder(methodMeta)).ToList();
 
     public TACType Build()
     {

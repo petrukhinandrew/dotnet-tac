@@ -4,7 +4,7 @@ using TACBuilder.ILMeta.ILBodyParser;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
-namespace Usvm.TACBuilder.BlockTacBuilder
+namespace Usvm.TACBuilder
 {
     static class BlockTacLineBuilder
     {
@@ -20,12 +20,12 @@ namespace Usvm.TACBuilder.BlockTacBuilder
             return (ILInstr.Instr)tmp;
         }
 
-        private static ILInstr DecideLeaveTarget(this TACBuilder.BlockTacBuilder.BlockTacBuilder frame, ILInstr initialTarget)
+        private static ILInstr DecideLeaveTarget(this TACBuilder.BlockTacBuilder frame, ILInstr initialTarget)
         {
             return initialTarget;
         }
 
-        public static void Branch(this TACBuilder.BlockTacBuilder.BlockTacBuilder frame)
+        public static void Branch(this TACBuilder.BlockTacBuilder frame)
         {
             var sameStack = frame.StackInitIsTheSame() && frame.AtLeastOnce;
             if (sameStack) return;
@@ -953,7 +953,7 @@ namespace Usvm.TACBuilder.BlockTacBuilder
             }
         }
 
-        private static void InlineInitArray(this TACBuilder.BlockTacBuilder.BlockTacBuilder frame, List<ILExpr> args)
+        private static void InlineInitArray(this TACBuilder.BlockTacBuilder frame, List<ILExpr> args)
         {
             if (args.First() is ILLocal newArr && args.Last() is ILObjectLiteral ilObj)
             {

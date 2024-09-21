@@ -4,7 +4,7 @@ using TACBuilder.ILMeta.ILBodyParser;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
-namespace Usvm.TACBuilder.BlockTacBuilder;
+namespace Usvm.TACBuilder;
 
 class BlockTacBuilder
 {
@@ -21,7 +21,7 @@ class BlockTacBuilder
     }
 
     internal ILInstr.Instr _firstInstr;
-    private readonly MethodTacBuilder.MethodTacBuilder _mp;
+    private readonly MethodTacBuilder _mp;
 
     public ILInstr.Instr CurInstr;
 
@@ -33,7 +33,7 @@ class BlockTacBuilder
     private readonly Dictionary<ILMerged, ILExpr> _extraAssignments = new();
     public readonly List<ILStmt> TacLines = new();
 
-    public BlockTacBuilder(MethodTacBuilder.MethodTacBuilder proc, BlockTacBuilder? pred, EvaluationStack<ILExpr> stack,
+    public BlockTacBuilder(MethodTacBuilder proc, BlockTacBuilder? pred, EvaluationStack<ILExpr> stack,
         ILInstr.Instr instr)
     {
         _mp = proc;
