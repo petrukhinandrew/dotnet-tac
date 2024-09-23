@@ -26,7 +26,7 @@ public abstract record ILInstr
     public bool IsControlFlowInterruptor() => IsJump() || this is Instr
     {
         opCode.FlowControl: FlowControl.Throw or FlowControl.Return
-    };
+    } || next is Back;
 
     public static void InsertBefore(ILInstr where, ILInstr what)
     {

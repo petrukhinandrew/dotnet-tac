@@ -9,6 +9,7 @@ public class MethodMeta
     public MethodInfo MethodInfo => _methodInfo;
 
     private List<BasicBlockMeta> _basicBlocks = new();
+    public List<BasicBlockMeta> BasicBlocks => _basicBlocks;
     private ILInstr _firstInstruction;
     public ILInstr FirstInstruction => _firstInstruction;
     private List<ehClause> _ehClauses = new();
@@ -17,6 +18,7 @@ public class MethodMeta
     private readonly bool _hasMethodBody;
     public bool HasMethodBody => _hasMethodBody;
     public CFG Cfg;
+    public List<int> StartBlocksIndices => Cfg.StartBlocksIndices;
 
     public MethodMeta(MethodInfo methodInfo, bool resolveImmediately = true)
     {
@@ -46,5 +48,10 @@ public class MethodMeta
         {
             Console.WriteLine("error at " + _methodInfo.Name + " " + e);
         }
+    }
+
+    private void AddErrorsIntoBlocks()
+    {
+        
     }
 }

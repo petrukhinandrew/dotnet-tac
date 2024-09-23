@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using TACBuilder.ILMeta.ILBodyParser;
@@ -8,33 +9,22 @@ namespace Usvm.TACBuilder
 {
     static class BlockTacLineBuilder
     {
-        private static ILInstr.Instr? AdvanceIp(ILInstr.Instr ip)
+        /*
+         * returns true if successors may be rebuild
+         */
+        public static bool Rebuild(this BlockTacBuilder blockBuilder)
         {
-            ILInstr tmp = ip.next;
-            while (tmp is not ILInstr.Instr)
-            {
-                if (tmp is ILInstr.Back) return null;
-                tmp = tmp.next;
-            }
-
-            return (ILInstr.Instr)tmp;
-        }
-
-        private static ILInstr DecideLeaveTarget(this TACBuilder.BlockTacBuilder frame, ILInstr initialTarget)
-        {
-            return initialTarget;
-        }
-
-        public static void Branch(this TACBuilder.BlockTacBuilder frame)
-        {
-            var sameStack = frame.StackInitIsTheSame() && frame.AtLeastOnce;
-            if (sameStack) return;
-            frame.ResetStackToInitial();
-            frame.TacLines.Clear();
-            frame.CurInstr = frame._firstInstr;
+            var sameStack = blockBuilder.StackInitIsTheSame() && blockBuilder.BuiltAtLeastOnce;
+            if (sameStack) return false;
+            blockBuilder._builtAtLeastOnce = true;
+            
+            blockBuilder.ResetStackToInitial();
+            blockBuilder.TacLines.Clear();
+            blockBuilder.CurInstr = blockBuilder._firstInstr;
             while (true)
             {
-                switch (frame.CurInstr.opCode.Name)
+                Debug.Assert(blockBuilder.CurInstr is ILInstr.Instr);
+                switch (((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name)
                 {
                     case "ckfinite":
                     case "mkrefany":
@@ -46,150 +36,155 @@ namespace Usvm.TACBuilder
                     case "ldelem.i":
                     case "initblk":
                     case "cpobj":
-                    case "cpblk": throw new Exception("not implemented " + frame.CurInstr.opCode.Name);
+                    case "cpblk":
+                        throw new Exception("not implemented " + ((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name);
 
                     case "nop":
                     case "break": break;
 
                     case "ldarg.0":
-                        frame.Push(frame.Params[0]);
+                        blockBuilder.Push(blockBuilder.Params[0]);
                         break;
                     case "ldarg.1":
-                        frame.Push(frame.Params[1]);
+                        blockBuilder.Push(blockBuilder.Params[1]);
                         break;
                     case "ldarg.2":
-                        frame.Push(frame.Params[2]);
+                        blockBuilder.Push(blockBuilder.Params[2]);
                         break;
                     case "ldarg.3":
-                        frame.Push(frame.Params[3]);
+                        blockBuilder.Push(blockBuilder.Params[3]);
                         break;
                     case "ldarg":
-                        frame.Push(frame.Params[((ILInstrOperand.Arg16)frame.CurInstr.arg).value]);
+                        blockBuilder.Push(blockBuilder.Params[((ILInstrOperand.Arg16)blockBuilder.CurInstr.arg).value]);
                         break;
                     case "ldarg.s":
-                        frame.Push(frame.Params[((ILInstrOperand.Arg8)frame.CurInstr.arg).value]);
+                        blockBuilder.Push(blockBuilder.Params[((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value]);
                         break;
                     case "ldloc.0":
-                        frame.Push(frame.Locals[0]);
+                        blockBuilder.Push(blockBuilder.Locals[0]);
                         break;
                     case "ldloc.1":
-                        frame.Push(frame.Locals[1]);
+                        blockBuilder.Push(blockBuilder.Locals[1]);
                         break;
                     case "ldloc.2":
-                        frame.Push(frame.Locals[2]);
+                        blockBuilder.Push(blockBuilder.Locals[2]);
                         break;
                     case "ldloc.3":
-                        frame.Push(frame.Locals[3]);
+                        blockBuilder.Push(blockBuilder.Locals[3]);
                         break;
                     case "ldloc":
-                        frame.Push(frame.Locals[((ILInstrOperand.Arg16)frame.CurInstr.arg).value]);
+                        blockBuilder.Push(blockBuilder.Locals[((ILInstrOperand.Arg16)blockBuilder.CurInstr.arg).value]);
                         break;
                     case "ldloc.s":
-                        frame.Push(frame.Locals[((ILInstrOperand.Arg8)frame.CurInstr.arg).value]);
+                        blockBuilder.Push(blockBuilder.Locals[((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value]);
                         break;
                     case "stloc.0":
                     {
-                        ILExpr value = frame.Pop();
-                        frame.NewLine(new ILAssignStmt(frame.Locals[0], value));
+                        ILExpr value = blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[0], value));
                         break;
                     }
                     case "stloc.1":
                     {
-                        ILExpr value = frame.Pop();
-                        frame.NewLine(new ILAssignStmt(frame.Locals[1], value));
+                        ILExpr value = blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[1], value));
                         break;
                     }
                     case "stloc.2":
                     {
-                        ILExpr value = frame.Pop();
-                        frame.NewLine(new ILAssignStmt(frame.Locals[2], value));
+                        ILExpr value = blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[2], value));
                         break;
                     }
                     case "stloc.3":
                     {
-                        ILExpr value = frame.Pop();
-                        frame.NewLine(new ILAssignStmt(frame.Locals[3], value));
+                        ILExpr value = blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[3], value));
                         break;
                     }
                     case "stloc.s":
                     {
-                        int idx = ((ILInstrOperand.Arg8)frame.CurInstr.arg).value;
-                        ILExpr value = frame.Pop();
-                        frame.NewLine(new ILAssignStmt(frame.Locals[idx], value));
+                        int idx = ((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value;
+                        ILExpr value = blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[idx], value));
                         break;
                     }
                     case "starg":
                     {
-                        int idx = ((ILInstrOperand.Arg16)frame.CurInstr.arg).value;
-                        ILExpr value = frame.Pop();
-                        frame.NewLine(new ILAssignStmt(frame.Params[idx], value));
+                        int idx = ((ILInstrOperand.Arg16)blockBuilder.CurInstr.arg).value;
+                        ILExpr value = blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Params[idx], value));
                         break;
                     }
                     case "starg.s":
                     {
-                        int idx = ((ILInstrOperand.Arg8)frame.CurInstr.arg).value;
-                        ILExpr value = frame.Pop();
-                        frame.NewLine(new ILAssignStmt(frame.Params[idx], value));
+                        int idx = ((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value;
+                        ILExpr value = blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Params[idx], value));
                         break;
                     }
                     case "arglist":
                     {
-                        frame.Push(new ILVarArgValue(frame.MethodName));
+                        blockBuilder.Push(new ILVarArgValue(blockBuilder.MethodName));
                         break;
                     }
                     case "throw":
                     {
-                        ILExpr obj = frame.Pop();
-                        frame.ClearStack();
-                        frame.NewLine(new ILEHStmt("throw", obj));
-                        return;
+                        ILExpr obj = blockBuilder.Pop();
+                        blockBuilder.ClearStack();
+                        blockBuilder.NewLine(new ILEHStmt("throw", obj));
+                        return false;
                     }
                     case "rethrow":
                     {
-                        frame.NewLine(new ILEHStmt("rethrow"));
+                        blockBuilder.NewLine(new ILEHStmt("rethrow"));
                         break;
                     }
                     case "endfault":
                     {
-                        frame.NewLine(new ILEHStmt("endfault"));
-                        return;
+                        blockBuilder.NewLine(new ILEHStmt("endfault"));
+                        blockBuilder.ClearStack();
+                        return false;
                     }
                     case "endfinally":
                     {
-                        frame.NewLine(new ILEHStmt("endfinally"));
-                        return;
+                        blockBuilder.NewLine(new ILEHStmt("endfinally"));
+                        blockBuilder.ClearStack();
+                        return false;
                     }
                     case "endfilter":
                     {
-                        ILExpr value = frame.Pop();
-                        frame.NewLine(new ILEHStmt("endfilter", value));
-                        return;
+                        ILExpr value = blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILEHStmt("endfilter", value));
+                        return true;
                     }
                     case "localloc":
                     {
-                        ILExpr size = frame.Pop();
-                        frame.Push(new ILStackAlloc(size));
+                        ILExpr size = blockBuilder.Pop();
+                        blockBuilder.Push(new ILStackAlloc(size));
                         break;
                     }
                     case "ldfld":
                     {
-                        FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        ILExpr inst = frame.Pop();
-                        frame.Push(ILField.Instance(field, inst));
+                        FieldInfo field =
+                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        ILExpr inst = blockBuilder.Pop();
+                        blockBuilder.Push(ILField.Instance(field, inst));
                         break;
                     }
                     case "ldflda":
                     {
-                        FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        ILExpr inst = frame.Pop();
+                        FieldInfo field =
+                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        ILExpr inst = blockBuilder.Pop();
                         ILField ilField = ILField.Instance(field, inst);
                         if (inst.Type is ILUnmanagedPointer)
                         {
-                            frame.Push(new ILUnmanagedRef(ilField));
+                            blockBuilder.Push(new ILUnmanagedRef(ilField));
                         }
                         else
                         {
-                            frame.Push(new ILManagedRef(ilField));
+                            blockBuilder.Push(new ILManagedRef(ilField));
                         }
 
                         break;
@@ -197,21 +192,23 @@ namespace Usvm.TACBuilder
 
                     case "ldsfld":
                     {
-                        FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        frame.Push(ILField.Static(field));
+                        FieldInfo field =
+                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        blockBuilder.Push(ILField.Static(field));
                         break;
                     }
                     case "ldsflda":
                     {
-                        FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        FieldInfo field =
+                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         ILField ilField = ILField.Static(field);
                         if (field.FieldType.IsUnmanaged())
                         {
-                            frame.Push(new ILUnmanagedRef(ilField));
+                            blockBuilder.Push(new ILUnmanagedRef(ilField));
                         }
                         else
                         {
-                            frame.Push(new ILManagedRef(ilField));
+                            blockBuilder.Push(new ILManagedRef(ilField));
                         }
 
                         break;
@@ -219,25 +216,27 @@ namespace Usvm.TACBuilder
 
                     case "stfld":
                     {
-                        FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        ILExpr value = frame.Pop();
-                        ILExpr obj = frame.Pop();
+                        FieldInfo field =
+                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        ILExpr value = blockBuilder.Pop();
+                        ILExpr obj = blockBuilder.Pop();
                         ILField ilField = ILField.Instance(field, obj);
-                        frame.NewLine(new ILAssignStmt(ilField, value));
+                        blockBuilder.NewLine(new ILAssignStmt(ilField, value));
                         break;
                     }
                     case "stsfld":
                     {
-                        FieldInfo field = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        ILExpr value = frame.Pop();
+                        FieldInfo field =
+                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        ILExpr value = blockBuilder.Pop();
                         ILField ilField = ILField.Static(field);
-                        frame.NewLine(new ILAssignStmt(ilField, value));
+                        blockBuilder.NewLine(new ILAssignStmt(ilField, value));
                         break;
                     }
                     case "sizeof":
                     {
-                        Type mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        frame.Push(new ILSizeOfExpr(TypingUtil.ILTypeFrom(mbType)));
+                        Type mbType = blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        blockBuilder.Push(new ILSizeOfExpr(TypingUtil.ILTypeFrom(mbType)));
                         break;
                     }
                     case "ldind.i1":
@@ -247,55 +246,56 @@ namespace Usvm.TACBuilder
                     case "ldind.u2":
                     case "ldind.u4":
                     {
-                        ILExpr addr = frame.Pop();
+                        ILExpr addr = blockBuilder.Pop();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt32());
-                        frame.Push(deref);
+                        blockBuilder.Push(deref);
                         break;
                     }
                     case "ldind.u8":
                     case "ldind.i8":
                     {
-                        ILExpr addr = frame.Pop();
+                        ILExpr addr = blockBuilder.Pop();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILInt64());
-                        frame.Push(deref);
+                        blockBuilder.Push(deref);
                         break;
                     }
                     case "ldind.r4":
                     {
-                        ILExpr addr = frame.Pop();
+                        ILExpr addr = blockBuilder.Pop();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
-                        frame.Push(deref);
+                        blockBuilder.Push(deref);
                         break;
                     }
                     case "ldind.r8":
                     {
-                        ILExpr addr = frame.Pop();
+                        ILExpr addr = blockBuilder.Pop();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeFloat());
-                        frame.Push(deref);
+                        blockBuilder.Push(deref);
                         break;
                     }
                     case "ldind.i":
                     {
-                        ILExpr addr = frame.Pop();
+                        ILExpr addr = blockBuilder.Pop();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILNativeInt());
-                        frame.Push(deref);
+                        blockBuilder.Push(deref);
                         break;
                     }
 
                     case "ldind.ref":
                     {
-                        ILExpr addr = frame.Pop();
+                        ILExpr addr = blockBuilder.Pop();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new ILObject());
-                        frame.Push(deref);
+                        blockBuilder.Push(deref);
                         break;
                     }
                     case "ldobj":
                     {
-                        Type? mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        Type? mbType =
+                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         if (mbType == null) throw new Exception("type not resolved for ldobj");
-                        ILExpr addr = frame.Pop();
+                        ILExpr addr = blockBuilder.Pop();
                         ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(mbType));
-                        frame.Push(deref);
+                        blockBuilder.Push(deref);
                         break;
                     }
 
@@ -304,190 +304,198 @@ namespace Usvm.TACBuilder
                     case "stind.i4":
                     case "stind.i8":
                     {
-                        ILExpr val = frame.Pop();
-                        ILLValue addr = (ILLValue)frame.Pop();
-                        frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILInt32()), val));
+                        ILExpr val = blockBuilder.Pop();
+                        ILLValue addr = (ILLValue)blockBuilder.Pop();
+                        blockBuilder.NewLine(
+                            new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILInt32()), val));
                         break;
                     }
                     case "stind.r4":
                     {
-                        ILExpr val = frame.Pop();
-                        ILLValue addr = (ILLValue)frame.Pop();
-                        frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILFloat32()), val));
+                        ILExpr val = blockBuilder.Pop();
+                        ILLValue addr = (ILLValue)blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILFloat32()),
+                            val));
                         break;
                     }
                     case "stind.r8":
                     {
-                        ILExpr val = frame.Pop();
-                        ILLValue addr = (ILLValue)frame.Pop();
-                        frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILFloat64()), val));
+                        ILExpr val = blockBuilder.Pop();
+                        ILLValue addr = (ILLValue)blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILFloat64()),
+                            val));
                         break;
                     }
                     case "stind.i":
                     {
-                        ILExpr val = frame.Pop();
-                        ILLValue addr = (ILLValue)frame.Pop();
-                        frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILNativeInt()), val));
+                        ILExpr val = blockBuilder.Pop();
+                        ILLValue addr = (ILLValue)blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILNativeInt()),
+                            val));
                         break;
                     }
                     case "stind.ref":
                     {
-                        ILExpr val = frame.Pop();
-                        ILLValue addr = (ILLValue)frame.Pop();
-                        frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILObject()), val));
+                        ILExpr val = blockBuilder.Pop();
+                        ILLValue addr = (ILLValue)blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILObject()),
+                            val));
                         break;
                     }
                     case "stobj":
                     {
-                        Type? mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        Type? mbType =
+                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         if (mbType == null) throw new Exception("type not resolved for sizeof");
-                        ILExpr val = frame.Pop();
-                        ILLValue addr = (ILLValue)frame.Pop();
-                        frame.NewLine(new ILAssignStmt(
+                        ILExpr val = blockBuilder.Pop();
+                        ILLValue addr = (ILLValue)blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(
                             PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(mbType)),
                             val));
                         break;
                     }
                     case "ldarga":
                     {
-                        int idx = ((ILInstrOperand.Arg16)frame.CurInstr.arg).value;
-                        frame.Push(new ILManagedRef(frame.Params[idx]));
+                        int idx = ((ILInstrOperand.Arg16)blockBuilder.CurInstr.arg).value;
+                        blockBuilder.Push(new ILManagedRef(blockBuilder.Params[idx]));
                         break;
                     }
                     case "ldarga.s":
                     {
-                        int idx = ((ILInstrOperand.Arg8)frame.CurInstr.arg).value;
-                        frame.Push(new ILManagedRef(frame.Params[idx]));
+                        int idx = ((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value;
+                        blockBuilder.Push(new ILManagedRef(blockBuilder.Params[idx]));
                         break;
                     }
                     case "ldloca":
                     {
-                        int idx = ((ILInstrOperand.Arg16)frame.CurInstr.arg).value;
-                        frame.Push(new ILManagedRef(frame.Locals[idx]));
+                        int idx = ((ILInstrOperand.Arg16)blockBuilder.CurInstr.arg).value;
+                        blockBuilder.Push(new ILManagedRef(blockBuilder.Locals[idx]));
                         break;
                     }
                     case "ldloca.s":
                     {
-                        int idx = ((ILInstrOperand.Arg8)frame.CurInstr.arg).value;
-                        frame.Push(new ILManagedRef(frame.Locals[idx]));
+                        int idx = ((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value;
+                        blockBuilder.Push(new ILManagedRef(blockBuilder.Locals[idx]));
                         break;
                     }
                     case "leave":
                     case "leave.s":
                     {
-                        ILInstr target = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
-                        frame.ClearStack();
-                        frame.ContinueBranchingTo(DecideLeaveTarget(frame, target), null);
-                        return;
+                        ILInstr target = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                        blockBuilder.ClearStack();
+                        return false;
                     }
                     case "switch":
                     {
-                        int branchCnt = ((ILInstrOperand.Arg32)frame.CurInstr.arg).value;
-                        ILExpr compVal = frame.Pop();
-                        ILInstr switchBranch = frame.CurInstr;
+                        int branchCnt = ((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value;
+                        ILExpr compVal = blockBuilder.Pop();
+                        ILInstr switchBranch = blockBuilder.CurInstr;
                         List<ILInstr> targets = [];
                         for (int branch = 0; branch < branchCnt; branch++)
                         {
                             switchBranch = switchBranch.next;
                             ILInstrOperand.Target target = (ILInstrOperand.Target)((ILInstr.SwitchArg)switchBranch).arg;
                             targets.Add(target.value);
-                            frame.NewLine(new ILIfStmt(
+                            blockBuilder.NewLine(new ILIfStmt(
                                 new ILBinaryOperation(compVal, new ILLiteral(new ILInt32(), branch.ToString())),
                                 target.value.idx
                             ));
                         }
 
-                        frame.ContinueBranchingToMultiple(targets);
                         break;
                     }
 
                     case "ldftn":
                     {
-                        MethodBase? mb = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        if (mb == null) throw new Exception("method not resolved at " + frame.CurInstr.idx);
+                        MethodBase? mb =
+                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        if (mb == null) throw new Exception("method not resolved at " + blockBuilder.CurInstr.idx);
                         ILMethod method = ILMethod.FromMethodBase(mb);
-                        frame.Push(method);
+                        blockBuilder.Push(method);
                         break;
                     }
                     case "ldvirtftn":
                     {
-                        MethodBase? mb = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        if (mb == null) throw new Exception("method not resolved at " + frame.CurInstr.idx);
+                        MethodBase? mb =
+                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        if (mb == null) throw new Exception("method not resolved at " + blockBuilder.CurInstr.idx);
                         ILMethod ilMethod = ILMethod.FromMethodBase(mb);
-                        ilMethod.Receiver = frame.Pop();
-                        frame.Push(ilMethod);
+                        ilMethod.Receiver = blockBuilder.Pop();
+                        blockBuilder.Push(ilMethod);
                         break;
                     }
                     case "ldnull":
-                        frame.Push(new ILNullValue());
+                        blockBuilder.Push(new ILNullValue());
                         break;
                     case "ldc.i4.m1":
                     case "ldc.i4.M1":
-                        frame.PushLiteral(-1);
+                        blockBuilder.PushLiteral(-1);
                         break;
                     case "ldc.i4.0":
-                        frame.PushLiteral(0);
+                        blockBuilder.PushLiteral(0);
                         break;
                     case "ldc.i4.1":
-                        frame.PushLiteral(1);
+                        blockBuilder.PushLiteral(1);
                         break;
                     case "ldc.i4.2":
-                        frame.PushLiteral(2);
+                        blockBuilder.PushLiteral(2);
                         break;
                     case "ldc.i4.3":
-                        frame.PushLiteral(3);
+                        blockBuilder.PushLiteral(3);
                         break;
                     case "ldc.i4.4":
-                        frame.PushLiteral(4);
+                        blockBuilder.PushLiteral(4);
                         break;
                     case "ldc.i4.5":
-                        frame.PushLiteral(5);
+                        blockBuilder.PushLiteral(5);
                         break;
                     case "ldc.i4.6":
-                        frame.PushLiteral(6);
+                        blockBuilder.PushLiteral(6);
                         break;
                     case "ldc.i4.7":
-                        frame.PushLiteral(7);
+                        blockBuilder.PushLiteral(7);
                         break;
                     case "ldc.i4.8":
-                        frame.PushLiteral(8);
+                        blockBuilder.PushLiteral(8);
                         break;
                     case "ldc.i4.s":
-                        frame.PushLiteral<int>(((ILInstrOperand.Arg8)frame.CurInstr.arg).value);
+                        blockBuilder.PushLiteral<int>(((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value);
                         break;
                     case "ldc.i4":
-                        frame.PushLiteral(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        blockBuilder.PushLiteral(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         break;
                     case "ldc.i8":
-                        frame.PushLiteral(((ILInstrOperand.Arg64)frame.CurInstr.arg).value);
+                        blockBuilder.PushLiteral(((ILInstrOperand.Arg64)blockBuilder.CurInstr.arg).value);
                         break;
                     case "ldc.r4":
-                        frame.PushLiteral<float>(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        blockBuilder.PushLiteral<float>(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         break;
                     case "ldc.r8":
-                        frame.PushLiteral<double>(((ILInstrOperand.Arg64)frame.CurInstr.arg).value);
+                        blockBuilder.PushLiteral<double>(((ILInstrOperand.Arg64)blockBuilder.CurInstr.arg).value);
                         break;
                     case "ldstr":
-                        frame.PushLiteral(frame.ResolveString(((ILInstrOperand.Arg32)frame.CurInstr.arg).value));
+                        blockBuilder.PushLiteral(
+                            blockBuilder.ResolveString(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value));
                         break;
                     case "dup":
                     {
-                        ILExpr dup = frame.Pop();
-                        frame.Push(dup);
-                        frame.Push(dup);
+                        ILExpr dup = blockBuilder.Pop();
+                        blockBuilder.Push(dup);
+                        blockBuilder.Push(dup);
                         break;
                     }
                     case "pop":
-                        frame.Pop();
+                        blockBuilder.Pop();
                         break;
                     case "ldtoken":
                     {
                         ILObjectLiteral? token;
                         try
                         {
-                            MethodBase mbMethod = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                            MethodBase mbMethod =
+                                blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                             token = new ILObjectLiteral(new ILHandleRef(), mbMethod.Name);
-                            frame.Push(token);
+                            blockBuilder.Push(token);
                             break;
                         }
                         catch
@@ -496,9 +504,10 @@ namespace Usvm.TACBuilder
 
                         try
                         {
-                            FieldInfo mbField = frame.ResolveField(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                            FieldInfo mbField =
+                                blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                             token = new ILObjectLiteral(new ILHandleRef(), mbField.GetValue(null));
-                            frame.Push(token);
+                            blockBuilder.Push(token);
                             break;
                         }
                         catch
@@ -507,55 +516,62 @@ namespace Usvm.TACBuilder
 
                         try
                         {
-                            Type mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                            Type mbType =
+                                blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                             token = new ILObjectLiteral(new ILHandleRef(), mbType.Name);
-                            frame.Push(token);
+                            blockBuilder.Push(token);
                             break;
                         }
                         catch
                         {
                         }
 
-                        throw new Exception("cannot resolve token at " + frame.CurInstr.idx);
+                        throw new Exception("cannot resolve token at " + blockBuilder.CurInstr.idx);
                     }
                     case "call":
                     {
-                        MethodBase method = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        MethodBase method =
+                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
 
                         ILMethod ilMethod = ILMethod.FromMethodBase(method);
-                        ilMethod.LoadArgs(frame.Pop);
+                        ilMethod.LoadArgs(blockBuilder.Pop);
                         if (ilMethod.IsInitializeArray())
                         {
-                            frame.InlineInitArray(ilMethod.Args);
+                            blockBuilder.InlineInitArray(ilMethod.Args);
                         }
                         else
                         {
                             var call = new ILCallExpr(ilMethod);
                             if (ilMethod.Returns())
-                                frame.Push(call);
+                            {
+                                var tmp = blockBuilder.GetNewTemp(call.Type, call);
+                                blockBuilder.NewLine(new ILAssignStmt(tmp, call));
+                                blockBuilder.Push(tmp);
+                            }
                             else
-                                frame.NewLine(new ILCallStmt(call));
+                                blockBuilder.NewLine(new ILCallStmt(call));
                         }
 
                         break;
                     }
                     case "callvirt":
                     {
-                        MethodBase? method = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        if (method == null) throw new Exception("call not resolved at " + frame.CurInstr.idx);
+                        MethodBase? method =
+                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        if (method == null) throw new Exception("call not resolved at " + blockBuilder.CurInstr.idx);
                         ILMethod ilMethod = ILMethod.FromMethodBase(method);
-                        ilMethod.LoadArgs(frame.Pop);
+                        ilMethod.LoadArgs(blockBuilder.Pop);
                         var call = new ILCallExpr(ilMethod);
                         if (ilMethod.Returns())
-                            frame.Push(call);
+                            blockBuilder.Push(call);
                         else
-                            frame.NewLine(new ILCallStmt(call));
+                            blockBuilder.NewLine(new ILCallStmt(call));
                         break;
                     }
                     case "ret":
                     {
-                        ILExpr? retVal = frame.MethodReturnType != typeof(void) ? frame.Pop() : null;
-                        frame.NewLine(
+                        ILExpr? retVal = blockBuilder.MethodReturnType != typeof(void) ? blockBuilder.Pop() : null;
+                        blockBuilder.NewLine(
                             new ILReturnStmt(retVal)
                         );
                         break;
@@ -597,27 +613,27 @@ namespace Usvm.TACBuilder
                     case "clt.un":
                     case "clt":
                     {
-                        ILExpr rhs = frame.Pop();
-                        ILExpr lhs = frame.Pop();
+                        ILExpr rhs = blockBuilder.Pop();
+                        ILExpr lhs = blockBuilder.Pop();
                         ILBinaryOperation op = new ILBinaryOperation(lhs, rhs);
-                        frame.Push(op);
+                        blockBuilder.Push(op);
                         break;
                     }
                     case "neg":
                     case "not":
                     {
-                        ILExpr operand = frame.Pop();
+                        ILExpr operand = blockBuilder.Pop();
                         ILUnaryOperation op = new ILUnaryOperation(operand);
-                        frame.Push(op);
+                        blockBuilder.Push(op);
                         break;
                     }
 
                     case "br.s":
                     case "br":
                     {
-                        ILInstr target = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
-                        frame.ContinueBranchingTo(target, null);
-                        return;
+                        ILInstr target = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                        // frame.ContinueBranchingTo(target, null);
+                        return true;
                     }
                     case "beq.s":
                     case "beq":
@@ -646,30 +662,29 @@ namespace Usvm.TACBuilder
                     case "blt":
 
                     {
-                        ILExpr lhs = frame.Pop();
-                        ILExpr rhs = frame.Pop();
-                        ILInstr tb = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
-                        ILInstr fb = frame.CurInstr.next;
-                        frame.NewLine(new ILIfStmt(
+                        ILExpr lhs = blockBuilder.Pop();
+                        ILExpr rhs = blockBuilder.Pop();
+                        ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                        ILInstr fb = blockBuilder.CurInstr.next;
+                        blockBuilder.NewLine(new ILIfStmt(
                             new ILBinaryOperation(lhs, rhs),
                             tb.idx));
-                        frame.ContinueBranchingTo(fb, tb);
-                        return;
+                        // frame.ContinueBranchingTo(fb, tb);
+                        return true;
                     }
                     case "brinst":
                     case "brinst.s":
                     case "brtrue.s":
                     case "brtrue":
                     {
-                        frame.PushLiteral<bool>(true);
-                        ILExpr rhs = frame.Pop();
-                        ILExpr lhs = frame.Pop();
-                        ILInstr tb = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
-                        ILInstr fb = frame.CurInstr.next;
-                        frame.NewLine(new ILIfStmt(
+                        blockBuilder.PushLiteral<bool>(true);
+                        ILExpr rhs = blockBuilder.Pop();
+                        ILExpr lhs = blockBuilder.Pop();
+                        ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                        ILInstr fb = blockBuilder.CurInstr.next;
+                        blockBuilder.NewLine(new ILIfStmt(
                             new ILBinaryOperation(lhs, rhs), tb.idx));
-                        frame.ContinueBranchingTo(fb, tb);
-                        return;
+                        return true;
                     }
                     case "brnull":
                     case "brnull.s":
@@ -678,37 +693,38 @@ namespace Usvm.TACBuilder
                     case "brfalse.s":
                     case "brfalse":
                     {
-                        frame.PushLiteral<bool>(false);
-                        ILExpr rhs = frame.Pop();
-                        ILExpr lhs = frame.Pop();
-                        ILInstr tb = ((ILInstrOperand.Target)frame.CurInstr.arg).value;
-                        ILInstr fb = frame.CurInstr.next;
-                        frame.NewLine(new ILIfStmt(
+                        blockBuilder.PushLiteral<bool>(false);
+                        ILExpr rhs = blockBuilder.Pop();
+                        ILExpr lhs = blockBuilder.Pop();
+                        ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                        ILInstr fb = blockBuilder.CurInstr.next;
+                        blockBuilder.NewLine(new ILIfStmt(
                             new ILBinaryOperation(lhs, rhs), tb.idx));
-                        frame.ContinueBranchingTo(fb, tb);
-                        return;
+                        return true;
                     }
                     case "newobj":
                     {
-                        MethodBase mb = frame.ResolveMethod(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        MethodBase mb =
+                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         if (!mb.IsConstructor) throw new Exception("expected constructor for newobj");
                         int arity = mb.GetParameters().Count(p => !p.IsRetval);
                         Type objType = mb.DeclaringType!;
                         ILExpr[] inParams = new ILExpr[arity];
                         for (int i = 0; i < arity; i++)
                         {
-                            inParams[i] = frame.Pop();
+                            inParams[i] = blockBuilder.Pop();
                         }
 
-                        frame.Push(new ILNewExpr(
+                        blockBuilder.Push(new ILNewExpr(
                             TypingUtil.ILTypeFrom(objType),
                             inParams));
                         break;
                     }
                     case "newarr":
                     {
-                        Type arrType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        ILExpr sizeExpr = frame.Pop();
+                        Type arrType =
+                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        ILExpr sizeExpr = blockBuilder.Pop();
                         if (sizeExpr.Type is not ILInt32 && sizeExpr.Type is not ILNativeInt)
                         {
                             throw new Exception("expected arr size of type int32 or native int, got " +
@@ -719,20 +735,20 @@ namespace Usvm.TACBuilder
                         ILExpr arrExpr = new ILNewArrayExpr(
                             resolvedType,
                             sizeExpr);
-                        ILLocal arrTemp = frame.GetNewTemp(resolvedType, arrExpr);
-                        frame.NewLine(new ILAssignStmt(
+                        ILLocal arrTemp = blockBuilder.GetNewTemp(resolvedType, arrExpr);
+                        blockBuilder.NewLine(new ILAssignStmt(
                             arrTemp,
                             arrExpr
                         ));
-                        frame.Push(arrTemp);
+                        blockBuilder.Push(arrTemp);
                         break;
                     }
                     case "initobj":
                     {
-                        Type type = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
-                        ILExpr addr = frame.Pop();
+                        Type type = blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        ILExpr addr = blockBuilder.Pop();
                         ILType ilType = TypingUtil.ILTypeFrom(type);
-                        frame.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, ilType),
+                        blockBuilder.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, ilType),
                             new ILNewDefaultExpr(ilType)));
                         break;
                     }
@@ -749,22 +765,22 @@ namespace Usvm.TACBuilder
                     case "ldelem.ref":
                     case "ldelem":
                     {
-                        ILExpr index = frame.Pop();
-                        ILExpr arr = frame.Pop();
-                        frame.Push(new ILArrayAccess(arr, index));
+                        ILExpr index = blockBuilder.Pop();
+                        ILExpr arr = blockBuilder.Pop();
+                        blockBuilder.Push(new ILArrayAccess(arr, index));
                         break;
                     }
                     case "ldelema":
                     {
-                        ILExpr idx = frame.Pop();
-                        ILExpr arr = frame.Pop();
-                        frame.Push(new ILManagedRef(new ILArrayAccess(arr, idx)));
+                        ILExpr idx = blockBuilder.Pop();
+                        ILExpr arr = blockBuilder.Pop();
+                        blockBuilder.Push(new ILManagedRef(new ILArrayAccess(arr, idx)));
                         break;
                     }
                     case "ldlen":
                     {
-                        ILExpr arr = frame.Pop();
-                        frame.Push(new ILArrayLength(arr));
+                        ILExpr arr = blockBuilder.Pop();
+                        blockBuilder.Push(new ILArrayLength(arr));
                         break;
                     }
                     case "stelem.i1":
@@ -776,77 +792,77 @@ namespace Usvm.TACBuilder
                     case "stelem.ref":
                     case "stelem":
                     {
-                        ILExpr value = frame.Pop();
-                        ILExpr index = frame.Pop();
-                        ILExpr arr = frame.Pop();
-                        frame.NewLine(new ILAssignStmt(new ILArrayAccess(arr, index), value));
+                        ILExpr value = blockBuilder.Pop();
+                        ILExpr index = blockBuilder.Pop();
+                        ILExpr arr = blockBuilder.Pop();
+                        blockBuilder.NewLine(new ILAssignStmt(new ILArrayAccess(arr, index), value));
                         break;
                     }
                     case "conv.i1":
                     case "conv.i2":
                     case "conv.i4":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.i8":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.r4":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILFloat32(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.r8":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILFloat64(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.u1":
                     case "conv.u2":
                     case "conv.u4":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILInt32(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.u8":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILInt64(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.i":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.u":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.r.un":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILNativeFloat(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
 
@@ -872,94 +888,88 @@ namespace Usvm.TACBuilder
                     case "conv.ovf.i.un":
                     case "conv.ovf.u.un":
                     {
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILConvExpr conv = new ILConvExpr(new ILNativeInt(), value);
-                        frame.Push(conv);
+                        blockBuilder.Push(conv);
                         break;
                     }
                     case "isinst":
                     {
-                        Type? mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        Type? mbType =
+                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         if (mbType == null)
                         {
-                            Console.WriteLine("error resolving method at " + frame.CurInstr.idx);
+                            Console.WriteLine("error resolving method at " + blockBuilder.CurInstr.idx);
                             break;
                         }
 
-                        ILExpr obj = frame.Pop();
+                        ILExpr obj = blockBuilder.Pop();
                         ILExpr res = new ILCondCastExpr(TypingUtil.ILTypeFrom(mbType), obj);
-                        frame.Push(res);
+                        blockBuilder.Push(res);
                         break;
                     }
                     case "castclass":
                     {
-                        Type? mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        Type? mbType =
+                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         if (mbType == null)
                         {
-                            Console.WriteLine("error resolving method at " + frame.CurInstr.idx);
+                            Console.WriteLine("error resolving method at " + blockBuilder.CurInstr.idx);
                             break;
                         }
 
-                        ILExpr value = frame.Pop();
+                        ILExpr value = blockBuilder.Pop();
                         ILExpr casted = new ILCastClassExpr(TypingUtil.ILTypeFrom(mbType), value);
-                        frame.Push(casted);
+                        blockBuilder.Push(casted);
                         break;
                     }
                     case "box":
                     {
-                        Type? mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        Type? mbType =
+                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         if (mbType == null)
                         {
-                            Console.WriteLine("error resolving type at " + frame.CurInstr.idx);
+                            Console.WriteLine("error resolving type at " + blockBuilder.CurInstr.idx);
                             break;
                         }
 
-                        ILValue value = (ILValue)frame.Pop();
+                        ILValue value = (ILValue)blockBuilder.Pop();
                         ILExpr boxed = new ILBoxExpr(value);
-                        frame.Push(boxed);
+                        blockBuilder.Push(boxed);
                         break;
                     }
                     case "unbox":
                     case "unbox.any":
                     {
-                        Type? mbType = frame.ResolveType(((ILInstrOperand.Arg32)frame.CurInstr.arg).value);
+                        Type? mbType =
+                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
                         if (mbType == null)
                         {
-                            Console.WriteLine("error resolving type at " + frame.CurInstr.idx);
+                            Console.WriteLine("error resolving type at " + blockBuilder.CurInstr.idx);
                             break;
                         }
 
-                        ILValue obj = (ILValue)frame.Pop();
+                        ILValue obj = (ILValue)blockBuilder.Pop();
                         ILExpr unboxed = new ILUnboxExpr(TypingUtil.ILTypeFrom(mbType), obj);
-                        frame.Push(unboxed);
+                        blockBuilder.Push(unboxed);
                         break;
                     }
-                    default: throw new Exception("unhandled frame.CurInstr " + frame.CurInstr);
+                    default: throw new Exception("unhandled frame.CurInstr " + blockBuilder.CurInstr);
                 }
 
-                var adv = AdvanceIp(frame.CurInstr);
-                if (adv == null)
-                {
-                    return;
-                }
-
-                if (frame.IsLeader(adv))
-                {
-                    frame.ContinueBranchingTo(adv, null);
-                    return;
-                }
-
-                frame.CurInstr = adv;
+                if (blockBuilder.CurInstrIsLast()) return true;
+                blockBuilder.CurInstr = blockBuilder.CurInstr.next;
             }
         }
 
-        private static void InlineInitArray(this TACBuilder.BlockTacBuilder frame, List<ILExpr> args)
+        private static void InlineInitArray(this BlockTacBuilder blockBuilder, List<ILExpr> args)
         {
             if (args.First() is ILLocal newArr && args.Last() is ILObjectLiteral ilObj)
             {
                 try
                 {
-                    ILNewArrayExpr expr = (ILNewArrayExpr)frame.Temps[NamingUtil.TakeIndexFrom(newArr.ToString())];
+                    ILNewArrayExpr expr =
+                        (ILNewArrayExpr)blockBuilder.Temps[NamingUtil.TakeIndexFrom(newArr.ToString())];
                     int arrSize = int.Parse(expr.Size.ToString());
                     Type arrType = ((ILPrimitiveType)expr.Type).ReflectedType;
                     var tmp = Array.CreateInstance(arrType, arrSize);
@@ -975,12 +985,9 @@ namespace Usvm.TACBuilder
                     }
 
                     List<object> list = [.. tmp];
-                    ILLiteral arrLit = new ILLiteral(
-                        new ILArray(Array.CreateInstance(arrType, 0).GetType(), new ILInt32()),
-                        "[" + string.Join(", ", list.Select(v => v.ToString())) + "]");
                     for (int i = 0; i < list.Count; i++)
                     {
-                        frame.NewLine(new ILAssignStmt(
+                        blockBuilder.NewLine(new ILAssignStmt(
                             new ILArrayAccess(newArr, new ILLiteral(new ILInt32(), i.ToString())),
                             new ILLiteral(expr.Type, list[i].ToString()!)
                         ));

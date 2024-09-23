@@ -1,91 +1,46 @@
 using System.Diagnostics;
 using System.Reflection;
+using TACBuilder.ILMeta;
 using TACBuilder.ILMeta.ILBodyParser;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
 namespace Usvm.TACBuilder;
 
-class BlockTacBuilder
+class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
 {
-    private bool _atLeastOnce = false;
+    public BasicBlockMeta Meta => meta;
 
-    public bool AtLeastOnce
-    {
-        get
-        {
-            var res = _atLeastOnce;
-            _atLeastOnce = true;
-            return res;
-        }
-    }
+    public bool BuiltAtLeastOnce => _builtAtLeastOnce;
+    internal bool _builtAtLeastOnce = false;
 
-    internal ILInstr.Instr _firstInstr;
-    private readonly MethodTacBuilder _mp;
+    internal readonly ILInstr _firstInstr = meta.Entry;
+    internal ILInstr CurInstr = meta.Entry;
 
-    public ILInstr.Instr CurInstr;
+    private EvaluationStack<ILExpr> _entryStackState =
+        meta.StackErrType is null ? new() : new([methodBuilder.GetNewErr(meta.StackErrType)]);
 
-    private EvaluationStack<ILExpr> _entryStackState = new();
-    private EvaluationStack<ILExpr> _stack = new();
+    private EvaluationStack<ILExpr> _stack =
+        meta.StackErrType is null ? new() : new([methodBuilder.GetNewErr(meta.StackErrType)]);
 
     private HashSet<BlockTacBuilder> _preds = new();
+    private HashSet<BlockTacBuilder> _succs = new();
+    public List<BlockTacBuilder> Successors => _succs.ToList();
 
     private readonly Dictionary<ILMerged, ILExpr> _extraAssignments = new();
     public readonly List<ILStmt> TacLines = new();
 
-    public BlockTacBuilder(MethodTacBuilder proc, BlockTacBuilder? pred, EvaluationStack<ILExpr> stack,
-        ILInstr.Instr instr)
-    {
-        _mp = proc;
-        _firstInstr = instr;
-        CurInstr = instr;
-        _mp.Successors.TryAdd(ILFirst, []);
-        if (pred == null)
-        {
-            _stack = EvaluationStack<ILExpr>.CopyOf(stack);
-            _entryStackState = EvaluationStack<ILExpr>.CopyOf(stack);
-        }
-        else
-        {
-            _preds.Add(pred);
-        }
-    }
-
-    public List<ILLocal> Locals => _mp.Locals;
-    public List<ILLocal> Params => _mp.Params;
-    public List<ILExpr> Temps => _mp.Temps;
+    public List<ILLocal> Locals => methodBuilder.Locals;
+    public List<ILLocal> Params => methodBuilder.Params;
+    public List<ILExpr> Temps => methodBuilder.Temps;
     public int ILFirst => _firstInstr.idx;
-    public string MethodName => _mp.MethodInfo.Name;
-    public Type MethodReturnType => _mp.MethodInfo.ReturnParameter.ParameterType;
+    public string MethodName => methodBuilder.MethodInfo.Name;
+    public Type MethodReturnType => methodBuilder.MethodInfo.ReturnParameter.ParameterType;
 
-    public void ContinueBranchingTo(ILInstr uncond, ILInstr? cond)
+    public void ConnectSuccsAndPreds(List<BlockTacBuilder> succs, List<BlockTacBuilder> preds)
     {
-        if (cond != null) ContinueTo(cond);
-        ContinueTo(uncond);
-    }
-
-    public void ContinueBranchingToMultiple(List<ILInstr> targets)
-    {
-        foreach (var target in targets)
-        {
-            ContinueTo(target);
-        }
-    }
-
-    private void ContinueTo(ILInstr instr)
-    {
-        _mp.Successors[ILFirst].Insert(0, instr.idx);
-        if (_mp.TacBlocks.ContainsKey(instr.idx))
-        {
-            _mp.TacBlocks[instr.idx]._preds.Add(this);
-        }
-        else
-        {
-            _mp.TacBlocks.Add(instr.idx,
-                new BlockTacBuilder(_mp, this, new EvaluationStack<ILExpr>(), (ILInstr.Instr)instr));
-        }
-
-        _mp.Worklist.Enqueue(_mp.TacBlocks[instr.idx]);
+        _succs = succs.ToHashSet();
+        _preds = preds.ToHashSet();
     }
 
     public bool StackInitIsTheSame()
@@ -93,7 +48,8 @@ class BlockTacBuilder
         if (_preds.Count == 0) return true;
         EvaluationStack<ILExpr> copy = EvaluationStack<ILExpr>.CopyOf(_entryStackState);
 
-        var stacks = _preds.Select((p, i) => (i, EvaluationStack<ILExpr>.CopyOf(p._stack))).ToList();
+        var stacks = _preds.Where(bb => bb._builtAtLeastOnce)
+            .Select((p, i) => (i, EvaluationStack<ILExpr>.CopyOf(p._stack))).ToList();
         List<ILExpr> newStack = new();
         var stackLengths = stacks.Select(p => p.Item2.Count).ToList();
         Debug.Assert(stackLengths.Max() == stackLengths.Min());
@@ -106,7 +62,7 @@ class BlockTacBuilder
                 continue;
             }
 
-            ILMerged tmp = _mp.GetMerged(ILFirst, j);
+            ILMerged tmp = methodBuilder.GetMerged(ILFirst, j);
             tmp.MergeOf(values);
             foreach (var (i, p) in _preds.Select((v, i) => (i, v)))
             {
@@ -125,11 +81,6 @@ class BlockTacBuilder
         _stack = EvaluationStack<ILExpr>.CopyOf(_entryStackState);
     }
 
-    public bool IsLeader(ILInstr instr)
-    {
-        return _mp.Leaders.Select(l => l.idx).Contains(instr.idx);
-    }
-
     public void InsertExtraAssignments()
     {
         var pos = TacLines.FindIndex(l => l is ILBranchStmt);
@@ -139,31 +90,14 @@ class BlockTacBuilder
                 .Select(p => new ILAssignStmt(p.Key, p.Value)));
     }
 
-    // private ILExpr MergeStacksValues(int targetInstrIdx)
-    // {
-    //     if (_preds.Count == 0) throw new Exception("no pred exist for " + ILFirst + " at " + CurInstr.idx);
-    //     List<(BlockTacBuilder, ILExpr)> values = _preds.Select(s => (s, s.PopSingleAddrVirt(targetInstrIdx))).ToList();
-    //     if (values.Select(p => p.Item2).Distinct().Count() == 1) return values.Select(p => p.Item2).First();
-    //     ILMerged tmp = _mp.GetMerged(targetInstrIdx);
-    //     tmp.MergeOf(values.Select(p => p.Item2).ToList());
-    //     foreach (var (frame, val) in values)
-    //     {
-    //         frame._extraAssignments[tmp] = val;
-    //     }
-    //
-    //     return tmp;
-    // }
-
     public ILExpr Pop()
     {
         return _stack.Pop();
     }
 
+    // TODO check expr Type, if < ILInt => push ((ILInt) expr)
     public void Push(ILExpr expr)
     {
-        // check expr Type
-        // if < ILInt => push ((ILInt) expr)
-        // coercion
         _stack.Push(expr);
     }
 
@@ -172,16 +106,9 @@ class BlockTacBuilder
         _stack.Clear();
     }
 
-    private ILExpr ToSingleAddr(ILExpr val)
+    internal bool CurInstrIsLast()
     {
-        if (val is not ILValue)
-        {
-            ILLocal tmp = GetNewTemp(val.Type, val);
-            NewLine(new ILAssignStmt(tmp, val));
-            val = tmp;
-        }
-
-        return val;
+        return CurInstr == Meta.Exit;
     }
 
     public void NewLine(ILStmt line)
@@ -197,33 +124,34 @@ class BlockTacBuilder
 
     public ILLocal GetNewTemp(ILType type, ILExpr value)
     {
-        return _mp.GetNewTemp(type, value);
+        return methodBuilder.GetNewTemp(type, value);
     }
 
+    // TODO move to another extension or introduce new approach
     public FieldInfo ResolveField(int target)
     {
-        return _mp.ResolveField(target);
+        return methodBuilder.ResolveField(target);
     }
 
     public Type ResolveType(int target)
     {
-        return _mp.ResolveType(target);
+        return methodBuilder.ResolveType(target);
     }
 
     public MethodBase ResolveMethod(int target)
     {
-        return _mp.ResolveMethod(target);
+        return methodBuilder.ResolveMethod(target);
     }
 
     // TODO find test case with calli
     public byte[] ResolveSignature(int target)
     {
-        return _mp.ResolveSignature(target);
+        return methodBuilder.ResolveSignature(target);
     }
 
     public string ResolveString(int target)
     {
-        return _mp.ResolveString(target);
+        return methodBuilder.ResolveString(target);
     }
 
 

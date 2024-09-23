@@ -1,4 +1,5 @@
-﻿using TACBuilder.ILMeta.ILBodyParser;
+﻿using System.Diagnostics;
+using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
 
@@ -9,9 +10,11 @@ public class CFG
 
     private HashSet<ILInstr> _leaders = new();
     private Dictionary<int, List<int>> _succsessors;
+    public Dictionary<int, List<int>> Succsessors => _succsessors;
     private Dictionary<int, List<int>> _predecessors;
     private readonly HashSet<BasicBlockMeta> _blocks = [];
     public List<BasicBlockMeta> BasicBlocks => _blocks.ToList();
+    private Dictionary<int, Type> _errTypeMapping = new();
 
     public CFG(ILInstr entry, List<ehClause> ehClauses)
     {
@@ -21,7 +24,7 @@ public class CFG
         _succsessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
         _predecessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
         MarkupBlocks();
-        AttachSuccsAndPreds();
+        AttachMetaInfoToBlocks();
     }
 
     private void CollectLeaders()
@@ -42,6 +45,11 @@ public class CFG
         foreach (var clause in _ehClauses)
         {
             _leaders.Add(clause.handlerBegin);
+            if (clause.ehcType is rewriterEhcType.CatchEH catchEh)
+            {
+                _errTypeMapping[clause.handlerBegin.idx] = catchEh.type;
+            }
+
             if (clause.ehcType is rewriterEhcType.FilterEH filterEh)
                 _leaders.Add(filterEh.instr);
         }
@@ -73,14 +81,20 @@ public class CFG
         }
     }
 
-    private void AttachSuccsAndPreds()
+    private void AttachMetaInfoToBlocks()
     {
         foreach (var block in _blocks)
         {
             block.Successors = _succsessors[block.Entry.idx];
             block.Predecessors = _predecessors[block.Entry.idx];
+
+            block.StackErrType = _errTypeMapping.GetValueOrDefault(block.Entry.idx, null);
         }
     }
 
     private bool IsBlockExit(ILInstr instr) => instr.IsControlFlowInterruptor() || instr.IsJump();
+
+    public List<int> StartBlocksIndices => _ehClauses.Select(c => c.handlerBegin.idx).Concat(_ehClauses
+        .Where(c => c.ehcType is rewriterEhcType.FilterEH).Select(f =>
+            ((rewriterEhcType.FilterEH)f.ehcType).instr.idx)).Concat([_entry.idx]).ToList();
 }
