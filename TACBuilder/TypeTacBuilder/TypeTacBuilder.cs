@@ -21,7 +21,7 @@ public class TypeTacBuilder(TypeMeta meta)
             }
             catch (Exception e)
             {
-                Console.WriteLine("METHOD ERROR " + _meta.Name + " " + methodBuilder.MethodInfo.Name + " " + e.Message);
+                Console.WriteLine("METHOD ERROR " + _meta.Name + " " + methodBuilder.MethodInfo.Name + " " + e.Message + " " + e.TargetSite);
             }
         }
 

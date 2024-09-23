@@ -10,6 +10,7 @@ public class BasicBlockMeta(ILInstr entry, ILInstr exit)
 
     public List<int> Successors = new List<int>();
     public List<int> Predecessors = new List<int>();
+    public Type? StackErrType;
 
     public override bool Equals(object? obj)
     {
