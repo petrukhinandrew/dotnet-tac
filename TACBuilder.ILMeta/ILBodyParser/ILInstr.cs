@@ -1,4 +1,6 @@
+using System.Net.Http.Headers;
 using System.Reflection.Emit;
+using Microsoft.Win32.SafeHandles;
 
 namespace TACBuilder.ILMeta.ILBodyParser;
 
@@ -15,23 +17,17 @@ public abstract record ILInstr
         prev = this;
         idx = 0;
     }
-    public bool IsJump()
+
+    public bool IsJump() => IsCondJump() || IsUncondJump();
+
+    public bool IsCondJump() => this is SwitchArg || this is Instr { opCode.FlowControl: FlowControl.Cond_Branch };
+    public bool IsUncondJump() => this is Instr { opCode.FlowControl: FlowControl.Branch };
+
+    public bool IsControlFlowInterruptor() => IsJump() || this is Instr
     {
-        if (this is SwitchArg)
-        {
-            return true;
-        }
-        if (this is Instr instr)
-        {
-            switch (instr.opCode.OperandType)
-            {
-                case OperandType.ShortInlineBrTarget:
-                case OperandType.InlineBrTarget: return true;
-                default: return false;
-            }
-        }
-        return false;
-    }
+        opCode.FlowControl: FlowControl.Throw or FlowControl.Return
+    };
+
     public static void InsertBefore(ILInstr where, ILInstr what)
     {
         what.next = where;
@@ -40,28 +36,36 @@ public abstract record ILInstr
         what.prev.next = what;
         what.idx = what.prev.idx + 1;
     }
-    public record
-    Instr(OpCode opCode, int offset) : ILInstr
+
+    public sealed record Instr(OpCode opCode, int offset) : ILInstr
     {
         public override string ToString()
         {
             return opCode.ToString() ?? "null opcode";
         }
     }
-    public record SwitchArg() : ILInstr
+
+    public sealed record SwitchArg : ILInstr
     {
         public override string ToString()
         {
             return "SwitchArg";
         }
     }
-    public record Back() : ILInstr
+
+    public sealed record Back : ILInstr
     {
         public override string ToString()
         {
             return "Back";
         }
     }
+
+    public virtual bool Equals(ILInstr? other)
+    {
+        return other != null && idx.Equals(other.idx);
+    }
+
     public override int GetHashCode()
     {
         return idx;
@@ -70,11 +74,16 @@ public abstract record ILInstr
 
 public abstract record ILInstrOperand
 {
-    public record NoArg() : ILInstrOperand;
+    public record NoArg : ILInstrOperand;
+
     public record Arg8(byte value) : ILInstrOperand;
+
     public record Arg16(short value) : ILInstrOperand;
+
     public record Arg32(int value) : ILInstrOperand;
+
     public record Arg64(long value) : ILInstrOperand;
+
     public record Target(ILInstr value) : ILInstrOperand
     {
         public override string ToString()
@@ -82,5 +91,4 @@ public abstract record ILInstrOperand
             return base.ToString() + " to IL_" + value.idx;
         }
     }
-
 }

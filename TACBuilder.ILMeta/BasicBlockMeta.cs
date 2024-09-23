@@ -2,14 +2,22 @@ using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
 
-public class BasicBlockMeta(BasicBlockMeta.Location location)
+public class BasicBlockMeta(ILInstr entry, ILInstr exit)
 {
-    // built by CFG
-    // contains smth like pair of il instrs with guarantees like in JcBasicBlock
-    private IEnumerable<ILInstr> Instructions { get; }
+    public ILInstr Entry => entry;
 
-    public class Location
+    public ILInstr Exit => exit;
+
+    public List<int> Successors = new List<int>();
+    public List<int> Predecessors = new List<int>();
+
+    public override bool Equals(object? obj)
     {
-        
+        return obj is BasicBlockMeta bb && bb.Entry == Entry && bb.Exit == Exit;
+    }
+
+    public override int GetHashCode()
+    {
+        return Entry.idx;
     }
 }

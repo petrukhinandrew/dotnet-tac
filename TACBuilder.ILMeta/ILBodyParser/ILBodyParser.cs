@@ -18,6 +18,7 @@ public class ILBodyParser(MethodBody methodBody)
     }
 
     public ILInstr Instructions => _back.next;
+    public int InstructionsCount => ILInstrs().Count() - 1;
     public List<ehClause> EhClauses => _ehs.ToList();
 
     private void ImportEH()
