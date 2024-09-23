@@ -16,6 +16,7 @@ public class MethodMeta
     private bool _resolved = false;
     private readonly bool _hasMethodBody;
     public bool HasMethodBody => _hasMethodBody;
+    public CFG Cfg;
 
     public MethodMeta(MethodInfo methodInfo, bool resolveImmediately = true)
     {
@@ -38,14 +39,12 @@ public class MethodMeta
             bodyParser.Parse();
             _firstInstruction = bodyParser.Instructions;
             _ehClauses = bodyParser.EhClauses;
+            Cfg = new CFG(bodyParser.Instructions, bodyParser.EhClauses);
+            _basicBlocks = Cfg.BasicBlocks;
         }
         catch (Exception e)
         {
             Console.WriteLine("error at " + _methodInfo.Name + " " + e);
         }
-
-        // var cfg = new CFG(bodyParser.Instructions, bodyParser.EhClauses);
-        // cfg.MarkBasicBlocks();
-        // _basicBlocks = cfg.BasicBlocksMarkup.Select(bbLocation => new BasicBlockMeta(bbLocation)).ToList();
     }
 }

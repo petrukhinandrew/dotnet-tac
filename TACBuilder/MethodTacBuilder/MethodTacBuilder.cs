@@ -49,6 +49,7 @@ class MethodTacBuilder(MethodMeta meta)
         _tacMethodInfo.Locals = _meta.MethodInfo.GetMethodBody().LocalVariables.OrderBy(l => l.LocalIndex)
             .Select(l => new ILLocal(TypingUtil.ILTypeFrom(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
         InitEhScopes();
+        
         Leaders = CollectLeaders();
         ProcessIL();
         foreach (var m in Merged.Values)
@@ -85,6 +86,7 @@ class MethodTacBuilder(MethodMeta meta)
         return [.. leaders.OrderBy(l => l.idx)];
     }
 
+    // move to meta smth
     private void InitEhScopes()
     {
         foreach (var ehc in _ehs)
