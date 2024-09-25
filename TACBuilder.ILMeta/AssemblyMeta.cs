@@ -1,28 +1,16 @@
 ﻿using System.Reflection;
-using System.Runtime.Loader;
 using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
 
 public class AssemblyMeta(Assembly assembly)
 {
-    private class AssemblyLoader : AssemblyLoadContext
-    {
-        // TODO introduce cache
-    }
-
-    private static readonly AssemblyLoader _loader = new();
-
-    public AssemblyMeta(string assemblyPath) : this(_loader.LoadFromAssemblyPath(assemblyPath))
+    public AssemblyMeta(string assemblyPath) : this(Assembly.LoadFrom(assemblyPath))
     {
         _isFromPath = true;
-        foreach (var m in _assembly.GetModules())
-        {
-            Console.WriteLine("MOD LOLKEK " +m.FullyQualifiedName);
-        }
     }
 
-    public AssemblyMeta(AssemblyName assemblyName) : this(_loader.LoadFromAssemblyName(assemblyName))
+    public AssemblyMeta(AssemblyName assemblyName) : this(Assembly.Load(assemblyName))
     {
         _isFromName = true;
     }
@@ -41,6 +29,7 @@ public class AssemblyMeta(Assembly assembly)
     private static List<TypeMeta> resolveTypes(Assembly asm)
     {
         var types = new List<TypeMeta>();
+        // TODO asm.GetReferencedAssemblies()
         foreach (var t in asm.GetTypesChecked())
         {
             var type = t.IsGenericType ? t.GetGenericTypeDefinition() : t;
