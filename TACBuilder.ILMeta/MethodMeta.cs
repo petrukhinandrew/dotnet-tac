@@ -10,14 +10,13 @@ public class MethodMeta
 
     private List<BasicBlockMeta> _basicBlocks = new();
     public List<BasicBlockMeta> BasicBlocks => _basicBlocks;
-    private ILInstr _firstInstruction;
-    public ILInstr FirstInstruction => _firstInstruction;
-    private List<ehClause> _ehClauses = new();
-    public List<ehClause> EhClauses => _ehClauses;
+    public ILInstr FirstInstruction => _bodyParser.Instructions;
+    public List<ehClause> EhClauses => _bodyParser.EhClauses;
     private bool _resolved = false;
     private readonly bool _hasMethodBody;
     public bool HasMethodBody => _hasMethodBody;
     public CFG Cfg;
+    private ILBodyParser.ILBodyParser _bodyParser;
     public List<int> StartBlocksIndices => Cfg.StartBlocksIndices;
 
     public MethodMeta(MethodInfo methodInfo, bool resolveImmediately = true)
@@ -37,21 +36,14 @@ public class MethodMeta
 
         try
         {
-            var bodyParser = new ILBodyParser.ILBodyParser(_methodInfo.GetMethodBody()!);
-            bodyParser.Parse();
-            _firstInstruction = bodyParser.Instructions;
-            _ehClauses = bodyParser.EhClauses;
-            Cfg = new CFG(bodyParser.Instructions, bodyParser.EhClauses);
+            _bodyParser = new ILBodyParser.ILBodyParser(_methodInfo.GetMethodBody()!);
+            _bodyParser.Parse();
+            Cfg = new CFG(_bodyParser.Instructions, _bodyParser.EhClauses);
             _basicBlocks = Cfg.BasicBlocks;
         }
         catch (Exception e)
         {
-            Console.WriteLine("error at " + _methodInfo.Name + " " + e);
+            Console.WriteLine("MethodMeta error at " + (_methodInfo.ReflectedType ?? _methodInfo.DeclaringType)!.Name + " " +_methodInfo.Name + " " + e);
         }
-    }
-
-    private void AddErrorsIntoBlocks()
-    {
-        
     }
 }

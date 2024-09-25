@@ -17,7 +17,7 @@ namespace Usvm.TACBuilder
             var sameStack = blockBuilder.StackInitIsTheSame() && blockBuilder.BuiltAtLeastOnce;
             if (sameStack) return false;
             blockBuilder._builtAtLeastOnce = true;
-            
+
             blockBuilder.ResetStackToInitial();
             blockBuilder.TacLines.Clear();
             blockBuilder.CurInstr = blockBuilder._firstInstr;
@@ -489,44 +489,11 @@ namespace Usvm.TACBuilder
                         break;
                     case "ldtoken":
                     {
-                        ILObjectLiteral? token;
-                        try
-                        {
-                            MethodBase mbMethod =
-                                blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                            token = new ILObjectLiteral(new ILHandleRef(), mbMethod.Name);
-                            blockBuilder.Push(token);
-                            break;
-                        }
-                        catch
-                        {
-                        }
-
-                        try
-                        {
-                            FieldInfo mbField =
-                                blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                            token = new ILObjectLiteral(new ILHandleRef(), mbField.GetValue(null));
-                            blockBuilder.Push(token);
-                            break;
-                        }
-                        catch
-                        {
-                        }
-
-                        try
-                        {
-                            Type mbType =
-                                blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                            token = new ILObjectLiteral(new ILHandleRef(), mbType.Name);
-                            blockBuilder.Push(token);
-                            break;
-                        }
-                        catch
-                        {
-                        }
-
-                        throw new Exception("cannot resolve token at " + blockBuilder.CurInstr.idx);
+                        MemberInfo memberInfo =
+                            blockBuilder.ResolveMember(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        var token = new ILObjectLiteral(new ILHandleRef(), memberInfo.Name);
+                        blockBuilder.Push(token);
+                        break;
                     }
                     case "call":
                     {

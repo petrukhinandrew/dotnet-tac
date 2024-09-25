@@ -154,6 +154,11 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
         return methodBuilder.ResolveString(target);
     }
 
+    public MemberInfo ResolveMember(int target)
+    {
+        return methodBuilder.ResolveMember(target);
+    }
+
 
     public override bool Equals(object? obj)
     {

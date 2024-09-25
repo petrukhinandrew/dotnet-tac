@@ -11,10 +11,9 @@ namespace Usvm.TACBuilder;
 class MethodTacBuilder
 {
     public readonly MethodInfo MethodInfo;
-    private TACMethodInfo _tacMethodInfo = new();
+    private readonly MethodMeta _meta;
+    private readonly TACMethodInfo _tacMethodInfo = new();
     private readonly Module _declaringModule;
-    private List<ehClause> _ehs = new();
-
     public List<ILLocal> Locals => _tacMethodInfo.Locals;
 
     public List<ILLocal> Params => _tacMethodInfo.Params;
@@ -27,22 +26,20 @@ class MethodTacBuilder
     private ILInstr _begin;
     public Dictionary<int, int?> ilToTacMapping = new();
     public Queue<BlockTacBuilder> Worklist = new();
-    private readonly MethodMeta _meta;
 
     public MethodTacBuilder(MethodMeta meta)
     {
         _meta = meta;
         MethodInfo = meta.MethodInfo;
         _declaringModule = meta.MethodInfo.Module;
-        _meta = meta;
     }
 
     public TACMethod Build()
     {
         _meta.Resolve();
         _tacMethodInfo.Meta = _meta;
+        if (!_meta.HasMethodBody) return new TACMethod(_tacMethodInfo, []);
         _begin = _meta.FirstInstruction;
-        _ehs = _meta.EhClauses;
         int hasThisIndexingDelta = 0;
         if (!MethodInfo.IsStatic)
         {
@@ -55,7 +52,7 @@ class MethodTacBuilder
             new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position + hasThisIndexingDelta))));
         _tacMethodInfo.Locals = _meta.MethodInfo.GetMethodBody().LocalVariables.OrderBy(l => l.LocalIndex)
             .Select(l => new ILLocal(TypingUtil.ILTypeFrom(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
-        InitEhScopes();
+        // InitEhScopes();
 
         InitBlockBuilders();
 
@@ -93,7 +90,7 @@ class MethodTacBuilder
     // mb remove 
     private void InitEhScopes()
     {
-        foreach (var ehc in _ehs)
+        foreach (var ehc in _meta.EhClauses)
         {
             EHScope scope = EHScope.FromClause(ehc);
             if (!_tacMethodInfo.Scopes.Contains(scope))
@@ -101,7 +98,7 @@ class MethodTacBuilder
                 if (scope is EHScopeWithVarIdx s)
                 {
                     s.ErrIdx = Errs.Count;
-                    _tacMethodInfo.Errs.Add(new ILLocal(TypingUtil.ILTypeFrom(s.Type), NamingUtil.ErrVar(s.ErrIdx)));
+                    // _tacMethodInfo.Errs.Add(new ILLocal(TypingUtil.ILTypeFrom(s.Type), NamingUtil.ErrVar(s.ErrIdx)));
                 }
 
                 _tacMethodInfo.Scopes.Add(scope);
@@ -190,6 +187,7 @@ class MethodTacBuilder
 
     internal FieldInfo ResolveField(int target)
     {
+        // TODO hide refltype ?? decltype inside meta
         return _declaringModule.ResolveField(target,
             (MethodInfo.ReflectedType ?? MethodInfo.DeclaringType)!.GetGenericArguments(),
             MethodInfo.GetGenericArguments()) ?? throw new Exception("cannot resolve field");
@@ -197,12 +195,24 @@ class MethodTacBuilder
 
     internal Type ResolveType(int target)
     {
-        return _declaringModule.ResolveType(target) ?? throw new Exception("cannot resolve type");
+        return _declaringModule.ResolveType(target,
+            (MethodInfo.ReflectedType ?? MethodInfo.DeclaringType)!.GetGenericArguments(),
+            MethodInfo.GetGenericArguments()) ?? throw new Exception("cannot resolve type");
     }
 
     internal MethodBase ResolveMethod(int target)
     {
-        return _declaringModule.ResolveMethod(target) ?? throw new Exception("cannot resolve method");
+        return _declaringModule.ResolveMethod(target,
+                   (MethodInfo.ReflectedType ?? MethodInfo.DeclaringType)!.GetGenericArguments(),
+                   MethodInfo.GetGenericArguments()) ??
+               throw new Exception("cannot resolve method in " + _declaringModule.Name);
+    }
+
+    internal MemberInfo ResolveMember(int target)
+    {
+        return _declaringModule.ResolveMember(target,
+            (MethodInfo.ReflectedType ?? MethodInfo.DeclaringType)!.GetGenericArguments(),
+            MethodInfo.GetGenericArguments()) ?? throw new Exception("cannot resolve member");
     }
 
     internal byte[] ResolveSignature(int target)
@@ -213,10 +223,5 @@ class MethodTacBuilder
     internal string ResolveString(int target)
     {
         return _declaringModule.ResolveString(target);
-    }
-
-    internal ILInstr GetFirstInstr()
-    {
-        return _begin;
     }
 }
