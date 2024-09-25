@@ -14,7 +14,7 @@ public class CFG
     private Dictionary<int, List<int>> _predecessors;
     private readonly HashSet<BasicBlockMeta> _blocks = [];
     public List<BasicBlockMeta> BasicBlocks => _blocks.ToList();
-    private Dictionary<int, Type> _errTypeMapping = new();
+    private readonly Dictionary<int, Type> _errTypeMapping = new();
 
     public CFG(ILInstr entry, List<ehClause> ehClauses)
     {
@@ -30,12 +30,16 @@ public class CFG
     private void CollectLeaders()
     {
         ILInstr cur = _entry;
-        _leaders = [cur];
+        _leaders.Add(cur);
         while (cur is not ILInstr.Back)
         {
             if (cur.IsJump())
             {
                 _leaders.Add(((ILInstrOperand.Target)cur.arg).value);
+            }
+
+            if (cur.IsCondJump())
+            {
                 _leaders.Add(cur.next);
             }
 
@@ -94,7 +98,8 @@ public class CFG
 
     private bool IsBlockExit(ILInstr instr) => instr.IsControlFlowInterruptor() || instr.IsJump();
 
-    public List<int> StartBlocksIndices => _ehClauses.Select(c => c.handlerBegin.idx).Concat(_ehClauses
-        .Where(c => c.ehcType is rewriterEhcType.FilterEH).Select(f =>
-            ((rewriterEhcType.FilterEH)f.ehcType).instr.idx)).Concat([_entry.idx]).ToList();
+    public List<int> StartBlocksIndices => ((List<int>) [_entry.idx]).ToList()
+        .Concat(_ehClauses.Select(c => c.handlerBegin.idx)).Concat(_ehClauses
+            .Where(c => c.ehcType is rewriterEhcType.FilterEH).Select(f =>
+                ((rewriterEhcType.FilterEH)f.ehcType).instr.idx)).ToList();
 }

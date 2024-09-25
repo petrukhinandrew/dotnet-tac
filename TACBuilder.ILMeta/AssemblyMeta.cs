@@ -16,6 +16,10 @@ public class AssemblyMeta(Assembly assembly)
     public AssemblyMeta(string assemblyPath) : this(_loader.LoadFromAssemblyPath(assemblyPath))
     {
         _isFromPath = true;
+        foreach (var m in _assembly.GetModules())
+        {
+            Console.WriteLine("MOD LOLKEK " +m.FullyQualifiedName);
+        }
     }
 
     public AssemblyMeta(AssemblyName assemblyName) : this(_loader.LoadFromAssemblyName(assemblyName))
