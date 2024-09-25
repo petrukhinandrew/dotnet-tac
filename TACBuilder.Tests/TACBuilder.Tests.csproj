@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk" TreatAsLocalProperty="SelfContained">
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-
+        <SelfContained>True</SelfContained>
+            
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
