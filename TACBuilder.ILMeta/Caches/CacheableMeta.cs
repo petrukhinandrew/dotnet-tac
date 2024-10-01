@@ -1,8 +1,10 @@
+using System.Reflection;
+
 namespace TACBuilder.ILMeta;
 
-public interface CacheableMeta
+public abstract class CacheableMeta
 {
-    // public int MetadataToken { get; }
+    public abstract void Construct();
 }
 
 public class StringMeta(string value) : CacheableMeta
@@ -13,9 +15,17 @@ public class StringMeta(string value) : CacheableMeta
     {
         return Value;
     }
+
+    public override void Construct()
+    {
+    }
 }
 
 public class SignatureMeta(byte[] value) : CacheableMeta
 {
     public byte[] Value => value;
+
+    public override void Construct()
+    {
+    }
 }

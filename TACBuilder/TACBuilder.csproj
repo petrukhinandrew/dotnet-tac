@@ -6,7 +6,7 @@
         <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>Usvm.TACBuilder</RootNamespace>
+        <RootNamespace>TACBuilder</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>

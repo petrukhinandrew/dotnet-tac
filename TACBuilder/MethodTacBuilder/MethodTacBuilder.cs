@@ -6,7 +6,7 @@ using TACBuilder.ILTAC;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
-namespace Usvm.TACBuilder;
+namespace TACBuilder;
 
 class MethodTacBuilder
 {

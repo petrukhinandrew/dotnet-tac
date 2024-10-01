@@ -3,52 +3,57 @@ using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
 
-public class MethodMeta : MemberMeta
+public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
 {
-    public AssemblyMeta DeclaringAssembly { get; }
-    private MethodBase _methodBase;
-    private List<BasicBlockMeta> _basicBlocks = new();
-    private bool _resolved = false;
+    private MethodBase _methodBase = methodBase;
     private ILBodyParser.ILBodyParser _bodyParser;
-    private TypeMeta _typeMeta;
+    private List<BasicBlockMeta> _basicBlocks = new();
 
     public MethodBase MethodBase => _methodBase;
+    public TypeMeta DeclaringType { get; private set; }
+    public TypeMeta? ReturnType { get; private set; }
+    public List<TypeMeta> ParametersType { get; private set; }
+    public bool HasMethodBody { get; private set; }
+    public bool HasThis { get; private set; }
+    public string Name => _methodBase.Name;
+
     public List<BasicBlockMeta> BasicBlocks => _basicBlocks;
     public List<int> StartBlocksIndices => Cfg.StartBlocksIndices;
     public ILInstr FirstInstruction => _bodyParser.Instructions;
     public List<ehClause> EhClauses => _bodyParser.EhClauses;
 
-    public int MetadataToken => _methodBase.MetadataToken;
     // TODO cfg must be private
     public CFG Cfg;
 
-
-    public MethodMeta(TypeMeta typeMeta, MethodBase methodBase): base(methodBase)
+    public override void Construct()
     {
-        _typeMeta = typeMeta;
-        DeclaringAssembly = _typeMeta.DeclaringAssembly;
-        _methodBase = methodBase;
-    }
+        DeclaringType = MetaCache.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
 
-    public void Resolve()
-    {
-        var hasMethodBody = false;
+        if (_methodBase is MethodInfo methodInfo)
+            ReturnType = MetaCache.GetType(methodInfo.ReturnType);
+
+        List<TypeMeta> thisParam = _methodBase.CallingConvention.HasFlag(CallingConventions.HasThis)
+            ? new() { DeclaringType }
+            : new();
+        HasThis = thisParam.Count == 1;
+        ParametersType = thisParam.Concat(_methodBase.GetParameters()
+                .OrderBy(parameter => parameter.Position + thisParam.Count)
+                .Select(parameter => MetaCache.GetType(parameter.ParameterType)))
+            .ToList();
         try
         {
-            hasMethodBody = _methodBase.GetMethodBody() != null;
+            HasMethodBody = _methodBase.GetMethodBody() != null;
         }
         catch
         {
-            Console.WriteLine(_methodBase.Name + " has no body");
-            hasMethodBody = false;
+            HasMethodBody = false;
         }
 
-        if (!hasMethodBody) return;
-        if (_resolved) return;
-        _resolved = true;
+        // if (HasMethodBody) Resolve();
+    }
 
-        if (_methodBase.GetMethodBody() == null) return;
-
+    private void Resolve()
+    {
         try
         {
             _bodyParser = new ILBodyParser.ILBodyParser(_methodBase);
@@ -64,19 +69,4 @@ public class MethodMeta : MemberMeta
                               " " + _methodBase.Name + " " + e);
         }
     }
-
-    public string DeclaringTypeName => _typeMeta.Name;
-    public string Name => _methodBase.Name;
-    public Type? ReturnType => (_methodBase as MethodInfo)?.ReturnType;
-
-    public override int GetHashCode()
-    {
-        return _methodBase.GetHashCode();
-    }
-}
-
-// TODO use instead of MethodInfo pass
-public class MethodParameterMeta(ParameterInfo parameterInfo)
-{
-    private ParameterInfo _parameterInfo = parameterInfo;
 }

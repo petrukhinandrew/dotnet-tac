@@ -6,11 +6,8 @@ namespace TACBuilder.ILMeta.ILBodyParser;
 public class ILBodyParser(MethodBase methodBase)
 {
     private MethodBase _methodBase = methodBase;
-
-    private ModuleCache _resolver = AssemblyMeta.FromName(methodBase.Module.Assembly.GetName())
-        .GetCorrespondingModuleCache(methodBase.Module.MetadataToken);
-
     private MethodBody _methodBody = methodBase.GetMethodBody()!;
+
     private Module _module = methodBase.Module;
     private byte[] _il = [];
     private ILInstr[] _offsetToInstr = [];
@@ -111,41 +108,41 @@ public class ILBodyParser(MethodBase methodBase)
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedMethod(
-                        _resolver.GetMethod(token, _methodBase));
+                        MetaCache.GetMethod(_methodBase, token)
+                    );
                     break;
                 }
                 case OperandType.InlineType:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedType(_resolver.GetType(token,
-                        _methodBase));
+                    instr.arg = new ILInstrOperand.ResolvedType(MetaCache.GetType(_methodBase, token));
                     break;
                 }
                 case OperandType.InlineString:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedString(_resolver.GetString(token, _methodBase).Value);
+                    instr.arg = new ILInstrOperand.ResolvedString(MetaCache.GetString(_methodBase, token).Value);
                     break;
                 }
                 case OperandType.InlineSig:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedSignature(
-                        _resolver.GetSignature(token, _methodBase).Value);
+                        MetaCache.GetSignature(_methodBase, token).Value);
                     break;
                 }
                 case OperandType.InlineTok:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedMember(
-                        _resolver.GetMember(token, _methodBase));
+                        MetaCache.GetMember(_methodBase, token));
                     break;
                 }
                 case OperandType.InlineField:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedField(
-                        _resolver.GetField(token, _methodBase));
+                        MetaCache.GetField(_methodBase, token));
                     break;
                 }
 

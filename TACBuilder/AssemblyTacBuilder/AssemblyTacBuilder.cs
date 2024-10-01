@@ -1,7 +1,7 @@
 using TACBuilder.ILMeta;
 using TACBuilder.ILTAC;
 
-namespace Usvm.TACBuilder;
+namespace TACBuilder;
 
 public class AssemblyTacBuilder(AssemblyMeta meta)
 {

@@ -5,7 +5,7 @@ using TACBuilder.ILMeta.ILBodyParser;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
-namespace Usvm.TACBuilder;
+namespace TACBuilder;
 
 class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
 {
