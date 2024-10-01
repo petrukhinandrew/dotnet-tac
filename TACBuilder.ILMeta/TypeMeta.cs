@@ -6,50 +6,46 @@ namespace TACBuilder.ILMeta;
 
 public class TypeMeta : MemberMeta
 {
-    public AssemblyMeta DeclaringAssembly { get; }
-    private Type _type;
-    public int MetadataToken => _type.MetadataToken;
-    public Type Type => _type;
+    private readonly Type _type;
+    public Type BaseType => _type;
 
     private const BindingFlags BindingFlags =
         System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
         System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static |
         System.Reflection.BindingFlags.DeclaredOnly;
 
-    public TypeMeta(AssemblyMeta declaringAssembly, Type type) : base(type)
+    public TypeMeta(Type type) : base(type)
     {
-        DeclaringAssembly = declaringAssembly;
-        var cache = declaringAssembly.GetCorrespondingModuleCache(type.Module.MetadataToken);
         _type = type;
-        Fields = type.GetFields().Select(fieldInfo =>
-                cache.PutField(new FieldMeta(fieldInfo)))
-            .ToList();
-        Methods = type.GetMethods(BindingFlags).Where(methodInfo => !methodInfo.IsGenericMethod || methodInfo.IsGenericMethodDefinition)
-            .Select(methodInfo => cache.PutMethod(new MethodMeta(this, methodInfo)))
-            .Concat(
-                type.GetConstructors(BindingFlags).Where(ctor => !ctor.IsGenericMethod || ctor.IsGenericMethodDefinition).Select(ctor => cache.PutMethod(new MethodMeta(this, ctor)))
-            ).ToList();
     }
 
-    public List<MethodMeta> Methods { get; }
-    public List<FieldMeta> Fields { get; }
+    public override void Construct()
+    {
+        DeclaringAssembly = MetaCache.GetAssembly(_type.Assembly);
+        Fields = _type.GetFields(BindingFlags).Select(MetaCache.GetField).ToList();
+        var constructors = _type.GetConstructors(BindingFlags).Select(method => MetaCache.GetMethod(method));
+        Methods = _type.GetMethods(BindingFlags).Select(method => MetaCache.GetMethod(method)).Concat(constructors)
+            .ToList();
+    }
+
+    public AssemblyMeta DeclaringAssembly { get; private set; }
+    public List<MethodMeta> Methods { get; private set; }
+    public List<FieldMeta> Fields { get; private set; }
     public string Name => _type.Name;
     public string Namespace => _type.Namespace ?? "";
-
-    public void Resolve()
-    {
-        foreach (var method in Methods)
-        {
-            method.Resolve();
-        }
-    }
+    public int MetadataToken => _type.MetadataToken;
+    public Type Type => _type;
 }
 
 public class FieldMeta(FieldInfo fieldInfo) : MemberMeta(fieldInfo)
 {
-    private FieldInfo _fieldInfo = fieldInfo;
-    public Type FieldType => _fieldInfo.FieldType;
-    public string Name => _fieldInfo.Name;
-    public string DeclaringTypeName => _fieldInfo.DeclaringType?.FullName ?? "";
-    public int MetadataToken => _fieldInfo.MetadataToken;
+    // TODO must be in Construct instead of init
+    public Type FieldType => fieldInfo.FieldType;
+    public string Name => fieldInfo.Name;
+    public string DeclaringTypeName => fieldInfo.DeclaringType?.FullName ?? "";
+    public int MetadataToken => fieldInfo.MetadataToken;
+
+    public override void Construct()
+    {
+    }
 }

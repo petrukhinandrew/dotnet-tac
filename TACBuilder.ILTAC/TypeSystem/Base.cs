@@ -148,49 +148,31 @@ public class ILLiteral(ILType type, string value) : ILValue
 }
 
 // TODO remove MethodInfo access
-public class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount, int token) : ILExpr
+public class ILMethod(MethodMeta meta) : ILExpr
 {
-    public static ILMethod FromMethodMeta(MethodMeta meta)
-    {
-        int paramCount = meta.MethodBase.GetParameters().Count(p => !p.IsRetval);
-        Type retType = meta.ReturnType;
+    private readonly MethodMeta _meta = meta;
 
-        ILType ilRetType = TypingUtil.ILTypeFrom(retType);
-        ILMethod method = new ILMethod(meta.MethodBase, ilRetType, meta.DeclaringTypeName, meta.Name, paramCount,
-            meta.MethodBase.GetMetadataToken());
+    public ILExpr Receiver = new ILNullValue();
+    public string DeclaringType = meta.DeclaringType.Name;
+    public string Name = meta.Name;
 
-        if (meta.MethodBase.ContainsGenericParameters)
-            foreach (var t in meta.MethodBase.GetGenericArguments())
-            {
-                method.GenericArgs.Add(TypingUtil.ILTypeFrom(t));
-            }
-
-        return method;
-    }
-
-    private int _metadataToken = token;
 
     public void LoadArgs(Func<ILExpr> pop)
     {
-        for (int i = 0; i < _argCount; i++)
+        for (int i = 0; i < _meta.ParametersType.Count; i++)
         {
             Args.Add(pop());
         }
 
         Args.Reverse();
-        if (_methodBase.CallingConvention.HasFlag(CallingConventions.HasThis))
+        if (_meta.HasThis)
             Receiver = pop();
     }
 
     public bool IsGeneric => GenericArgs.Count > 0;
     public List<ILType> GenericArgs = new();
-    public ILType ReturnType = retType;
-    public ILExpr Receiver = new ILNullValue();
-    public string DeclaringType = declType;
-    public string Name = name;
-    private int _argCount = argCount;
+    public ILType ReturnType = TypingUtil.ILTypeFrom(meta.ReturnType.Type);
     public List<ILExpr> Args = new List<ILExpr>();
-    private MethodBase _methodBase = mb;
     public ILType Type => ReturnType;
 
     public override string ToString()
@@ -216,12 +198,12 @@ public class ILMethod(MethodBase mb, ILType retType, string declType, string nam
 
     public override bool Equals(object? obj)
     {
-        return obj is ILMethod m && m._metadataToken == _metadataToken;
+        return obj is ILMethod m && m._meta.MethodBase == _meta.MethodBase;
     }
 
     public override int GetHashCode()
     {
-        return _metadataToken.GetHashCode();
+        return _meta.MethodBase.GetHashCode();
     }
 }
 

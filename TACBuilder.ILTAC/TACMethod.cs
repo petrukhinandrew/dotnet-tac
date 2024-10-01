@@ -71,7 +71,7 @@ internal static class TACMethodPrinter
     private static string FormatMethodSignature(this TACMethod method)
     {
         var meta = method.Info.Meta;
-        ILType retType = TypingUtil.ILTypeFrom(meta.ReturnType);
+        ILType retType = TypingUtil.ILTypeFrom(meta.ReturnType.BaseType);
         return string.Format("{0} {1}({2})", retType, meta.Name,
             string.Join(", ",
                 meta.MethodBase.GetParameters().Select(mi => TypingUtil.ILTypeFrom(mi.ParameterType).ToString())));

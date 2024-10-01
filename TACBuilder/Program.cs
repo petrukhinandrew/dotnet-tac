@@ -1,4 +1,4 @@
-﻿namespace Usvm.TACBuilder;
+﻿namespace TACBuilder;
 
 class Program
 {
@@ -8,6 +8,6 @@ class Program
         Console.WriteLine(path);
         var appTacBuilder =
             new AppTacBuilder(path);
-        appTacBuilder.Resolve();
+        // appTacBuilder.Resolve();
     }
 }

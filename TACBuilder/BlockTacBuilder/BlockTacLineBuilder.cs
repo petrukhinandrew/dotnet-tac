@@ -1,12 +1,11 @@
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using TACBuilder.ILMeta;
 using TACBuilder.ILMeta.ILBodyParser;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
-namespace Usvm.TACBuilder
+namespace TACBuilder
 {
     static class BlockTacLineBuilder
     {
@@ -400,7 +399,7 @@ namespace Usvm.TACBuilder
                         MethodMeta methodMeta =
                             ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
 
-                        ILMethod method = ILMethod.FromMethodMeta(methodMeta);
+                        ILMethod method = new ILMethod(methodMeta);
                         blockBuilder.Push(method);
                         break;
                     }
@@ -408,7 +407,7 @@ namespace Usvm.TACBuilder
                     {
                         MethodMeta methodMeta =
                             ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
-                        ILMethod ilMethod = ILMethod.FromMethodMeta(methodMeta);
+                        ILMethod ilMethod = new ILMethod(methodMeta);
                         ilMethod.Receiver = blockBuilder.Pop();
                         blockBuilder.Push(ilMethod);
                         break;
@@ -487,7 +486,7 @@ namespace Usvm.TACBuilder
                         MethodMeta methodMeta =
                             ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
 
-                        ILMethod ilMethod = ILMethod.FromMethodMeta(methodMeta);
+                        ILMethod ilMethod = new ILMethod(methodMeta);
                         ilMethod.LoadArgs(blockBuilder.Pop);
                         if (ilMethod.IsInitializeArray())
                         {
@@ -512,7 +511,7 @@ namespace Usvm.TACBuilder
                     {
                         MethodMeta methodMeta =
                             ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
-                        ILMethod ilMethod = ILMethod.FromMethodMeta(methodMeta);
+                        ILMethod ilMethod = new ILMethod(methodMeta);
                         ilMethod.LoadArgs(blockBuilder.Pop);
                         var call = new ILCallExpr(ilMethod);
                         if (ilMethod.Returns())
@@ -524,7 +523,10 @@ namespace Usvm.TACBuilder
                     case "ret":
                     {
                         var methodMeta = blockBuilder.Meta.MethodMeta!;
-                        ILExpr? retVal = (methodMeta.ReturnType ?? typeof(void)) != typeof(void) ? blockBuilder.Pop() : null;
+
+                        ILExpr? retVal = null;
+                        if (methodMeta.ReturnType != null)
+                            retVal = blockBuilder.Pop();
                         blockBuilder.NewLine(
                             new ILReturnStmt(retVal)
                         );
