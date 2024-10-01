@@ -49,24 +49,24 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
             HasMethodBody = false;
         }
 
-        // if (HasMethodBody) Resolve();
+        if (HasMethodBody) Resolve();
     }
 
     private void Resolve()
     {
-        try
-        {
+        // try
+        // {
             _bodyParser = new ILBodyParser.ILBodyParser(_methodBase);
             _bodyParser.Parse();
 
             Cfg = new CFG(_bodyParser.Instructions, _bodyParser.EhClauses);
             _basicBlocks = Cfg.BasicBlocks;
             foreach (var block in _basicBlocks) block.AttachToMethod(this);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine("MethodMeta error at " + (_methodBase.ReflectedType ?? _methodBase.DeclaringType)!.Name +
-                              " " + _methodBase.Name + " " + e);
-        }
+        // }
+        // catch (Exception e)
+        // {
+        //     Console.WriteLine("MethodMeta error at " + (_methodBase.ReflectedType ?? _methodBase.DeclaringType)!.Name +
+        //                       " " + _methodBase.Name + " " + e);
+        // }
     }
 }

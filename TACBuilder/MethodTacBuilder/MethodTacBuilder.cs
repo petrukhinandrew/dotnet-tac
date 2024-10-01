@@ -37,7 +37,8 @@ class MethodTacBuilder
     public TACMethod Build()
     {
         _tacMethodInfo.Meta = _meta;
-        // if (!_meta.HasMethodBody) return new TACMethod(_tacMethodInfo, []);
+        if (!_meta.HasMethodBody) return new TACMethod(_tacMethodInfo, []);
+
         _begin = _meta.FirstInstruction;
         int hasThisIndexingDelta = 0;
         if (!MethodBase.IsStatic)

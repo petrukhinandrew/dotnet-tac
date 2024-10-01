@@ -4,7 +4,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace TACBuilder.ILMeta.ILBodyParser;
 
-public abstract record ILInstr
+public abstract class ILInstr
 {
     public ILInstrOperand arg = new ILInstrOperand.NoArg();
     public int idx;
@@ -37,15 +37,17 @@ public abstract record ILInstr
         what.idx = what.prev.idx + 1;
     }
 
-    public sealed record Instr(OpCode opCode, int offset) : ILInstr
+    public sealed class Instr(OpCode op, int offset) : ILInstr
     {
+        public OpCode opCode = op;
+
         public override string ToString()
         {
             return opCode.ToString() ?? "null opcode";
         }
     }
 
-    public sealed record SwitchArg : ILInstr
+    public sealed class SwitchArg : ILInstr
     {
         public override string ToString()
         {
@@ -53,7 +55,7 @@ public abstract record ILInstr
         }
     }
 
-    public sealed record Back : ILInstr
+    public sealed class Back : ILInstr
     {
         public override string ToString()
         {

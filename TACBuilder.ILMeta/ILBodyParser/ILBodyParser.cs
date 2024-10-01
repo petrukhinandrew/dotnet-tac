@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -32,18 +33,42 @@ public class ILBodyParser(MethodBase methodBase)
 
         ehClause ParseEh(exceptionHandlingClause c)
         {
-            ILInstr tryBegin = _offsetToInstr![c.tryOffset];
-            ILInstr tryEnd = _offsetToInstr[c.tryOffset + c.tryLength].prev; // - //-
+            ILInstr tryBegin = _offsetToInstr[c.tryOffset];
+            // TODO check
+            int te = c.tryOffset + c.tryLength;
+            while (_offsetToInstr[te] is null)
+            {
+                te--;
+            }
+
+            Debug.Assert(_offsetToInstr[te] is not null);
+            ILInstr tryEnd = _offsetToInstr[te].prev;
             ILInstr handlerBegin = _offsetToInstr[c.handlerOffset];
-            ILInstr handlerEnd = _offsetToInstr[c.handlerOffset + c.handlerLength].prev; // take closest not null
+            Debug.Assert(handlerBegin is not null);
+            int he = c.handlerOffset + c.handlerLength;
+            while (_offsetToInstr[he] is null)
+            {
+                he--;
+            }
+
+            Debug.Assert(_offsetToInstr[he] is not null);
+            ILInstr handlerEnd = _offsetToInstr[he].prev;
+            int fd = 0;
+            if (c.type is ehcType.Filter filt)
+            {
+                fd = filt.offset;
+                while (_offsetToInstr[fd] is null) fd--;
+            }
+
             rewriterEhcType type = c.type switch
             {
-                ehcType.Filter f => new rewriterEhcType.FilterEH(_offsetToInstr[f.offset]),
-                ehcType.Catch ct => type = new rewriterEhcType.CatchEH(ct.type),
-                ehcType.Finally => type = new rewriterEhcType.FinallyEH(),
-                ehcType.Fault => type = new rewriterEhcType.FaultEH(),
+                ehcType.Filter f => new rewriterEhcType.FilterEH(_offsetToInstr[fd]),
+                ehcType.Catch ct => new rewriterEhcType.CatchEH(ct.type),
+                ehcType.Finally => new rewriterEhcType.FinallyEH(),
+                ehcType.Fault => new rewriterEhcType.FaultEH(),
                 _ => throw new Exception("unexpected ehcType")
             };
+
             return new ehClause(tryBegin, tryEnd, handlerBegin, handlerEnd, type);
         }
     }
@@ -85,6 +110,7 @@ public class ILBodyParser(MethodBase methodBase)
             ILInstr instr = new ILInstr.Instr(op, opOffset);
             _offsetToInstr[opOffset] = instr;
             ILInstr.InsertBefore(_back, instr);
+            Debug.Assert(_back.prev == instr);
             switch (op.OperandType)
             {
                 case OperandType.InlineNone:
@@ -206,6 +232,7 @@ public class ILBodyParser(MethodBase methodBase)
                     throw new Exception("Unexpected operand type!");
             }
 
+            Debug.Assert(instr is not null);
             offset += size;
         }
 
@@ -230,6 +257,7 @@ public class ILBodyParser(MethodBase methodBase)
                     }
                 }
 
+                Debug.Assert(cur is not null);
                 return cur;
             }).Last().next;
         }
