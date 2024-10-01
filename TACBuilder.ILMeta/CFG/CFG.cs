@@ -21,18 +21,30 @@ public class CFG
         _entry = entry;
         _ehClauses = ehClauses;
         CollectLeaders();
-        _succsessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
-        _predecessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
+        // TODO make iterator to walk over ILinstr as now _entry moves in collect leaders (at least i think so)
+        Debug.Assert(_leaders.Any(l => l is not null));
+        try
+        {
+            _succsessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
+            _predecessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
+        }
+        catch
+        {
+            Console.WriteLine("lolkek");
+        }
+
         MarkupBlocks();
         AttachMetaInfoToBlocks();
     }
 
     private void CollectLeaders()
     {
+        _leaders.Add(_entry);
         ILInstr cur = _entry;
-        _leaders.Add(cur);
         while (cur is not ILInstr.Back)
         {
+            Debug.Assert(cur is not null);
+            // if (cur.arg is ILInstrOperand.Target)
             if (cur.IsJump())
             {
                 _leaders.Add(((ILInstrOperand.Target)cur.arg).value);
@@ -48,6 +60,7 @@ public class CFG
 
         foreach (var clause in _ehClauses)
         {
+            Debug.Assert(clause.handlerBegin is not null);
             _leaders.Add(clause.handlerBegin);
             if (clause.ehcType is rewriterEhcType.CatchEH catchEh)
             {
@@ -55,8 +68,13 @@ public class CFG
             }
 
             if (clause.ehcType is rewriterEhcType.FilterEH filterEh)
+            {
+                Debug.Assert(filterEh.instr is not null);
                 _leaders.Add(filterEh.instr);
+            }
         }
+
+        Debug.Assert(_leaders.Any(l => l is not null));
     }
 
     private void MarkupBlocks()
