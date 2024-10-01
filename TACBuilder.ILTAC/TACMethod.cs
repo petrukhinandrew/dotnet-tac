@@ -70,11 +70,11 @@ internal static class TACMethodPrinter
 
     private static string FormatMethodSignature(this TACMethod method)
     {
-        var rawMethodInfo = method.Info.Meta.MethodInfo;
-        ILType retType = TypingUtil.ILTypeFrom(rawMethodInfo.ReturnType);
-        return string.Format("{0} {1}({2})", retType, rawMethodInfo.Name,
+        var meta = method.Info.Meta;
+        ILType retType = TypingUtil.ILTypeFrom(meta.ReturnType);
+        return string.Format("{0} {1}({2})", retType, meta.Name,
             string.Join(", ",
-                rawMethodInfo.GetParameters().Select(mi => TypingUtil.ILTypeFrom(mi.ParameterType).ToString())));
+                meta.MethodBase.GetParameters().Select(mi => TypingUtil.ILTypeFrom(mi.ParameterType).ToString())));
     }
 
     private static void DumpMethodSignature(this TACMethod method, StreamWriter writer)

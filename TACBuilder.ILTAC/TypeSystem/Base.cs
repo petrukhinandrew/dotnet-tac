@@ -1,4 +1,5 @@
 using System.Reflection;
+using TACBuilder.ILMeta;
 
 namespace TACBuilder.ILTAC.TypeSystem;
 
@@ -146,23 +147,20 @@ public class ILLiteral(ILType type, string value) : ILValue
     }
 }
 
+// TODO remove MethodInfo access
 public class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount, int token) : ILExpr
 {
-    public static ILMethod FromMethodBase(MethodBase mb)
+    public static ILMethod FromMethodMeta(MethodMeta meta)
     {
-        int paramCount = mb.GetParameters().Count(p => !p.IsRetval);
-        Type retType = typeof(void);
-        if (mb is MethodInfo methodInfo)
-        {
-            retType = methodInfo.ReturnType;
-        }
+        int paramCount = meta.MethodBase.GetParameters().Count(p => !p.IsRetval);
+        Type retType = meta.ReturnType;
 
         ILType ilRetType = TypingUtil.ILTypeFrom(retType);
-        ILMethod method = new ILMethod(mb, ilRetType, mb.DeclaringType?.FullName ?? "", mb.Name, paramCount,
-            mb.GetMetadataToken());
+        ILMethod method = new ILMethod(meta.MethodBase, ilRetType, meta.DeclaringTypeName, meta.Name, paramCount,
+            meta.MethodBase.GetMetadataToken());
 
-        if (mb.ContainsGenericParameters)
-            foreach (var t in mb.GetGenericArguments())
+        if (meta.MethodBase.ContainsGenericParameters)
+            foreach (var t in meta.MethodBase.GetGenericArguments())
             {
                 method.GenericArgs.Add(TypingUtil.ILTypeFrom(t));
             }
@@ -229,16 +227,16 @@ public class ILMethod(MethodBase mb, ILType retType, string declType, string nam
 
 public class ILField(ILType type, string declType, string name, bool isStatic, int token) : ILLValue
 {
-    public static ILField Static(FieldInfo f)
+    public static ILField Static(FieldMeta f)
     {
-        return new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, true,
-            f.GetMetadataToken());
+        return new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringTypeName, f.Name, true,
+            f.MetadataToken);
     }
 
-    public static ILField Instance(FieldInfo f, ILExpr inst)
+    public static ILField Instance(FieldMeta f, ILExpr inst)
     {
-        ILField field = new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, false,
-            f.GetMetadataToken())
+        ILField field = new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringTypeName, f.Name, false,
+            f.MetadataToken)
         {
             Receiver = inst
         };

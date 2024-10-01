@@ -1,43 +1,74 @@
 ﻿using System.Reflection;
+using System.Runtime.Loader;
 using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
 
-public class AssemblyMeta(Assembly assembly)
+public partial class AssemblyMeta
 {
-    public AssemblyMeta(string assemblyPath) : this(Assembly.LoadFrom(assemblyPath))
+    private Assembly _assembly;
+    private Dictionary<int, ModuleCache> _moduleCaches;
+    private List<AssemblyMeta> _refAssemblies;
+
+    private AssemblyMeta(Assembly assembly)
     {
-        _isFromPath = true;
+        _assembly = assembly;
+        _moduleCaches = assembly.GetLoadedModules().ToDictionary(m => m.MetadataToken, m => new ModuleCache(this, m));
+        _refAssemblies = LoadReferencedAssemblies();
+        Types = CollectTypes(assembly);
     }
 
-    public AssemblyMeta(AssemblyName assemblyName) : this(Assembly.Load(assemblyName))
+    public static AssemblyMeta FromPath(string assemblyPath)
     {
-        _isFromName = true;
+        return CachedAssemblies.Get(assemblyPath);
     }
 
-    private Assembly _assembly = assembly;
-
-    private bool _isFromPath = false;
-
-    public bool IsFromPath => _isFromPath;
-
-    private bool _isFromName = false;
-
-    public bool IsFromName => _isFromName;
-    public List<TypeMeta> Types { get; } = resolveTypes(assembly);
-
-    private static List<TypeMeta> resolveTypes(Assembly asm)
+    public static AssemblyMeta FromName(AssemblyName assemblyName)
     {
-        var types = new List<TypeMeta>();
-        // TODO asm.GetReferencedAssemblies()
-        foreach (var t in asm.GetTypesChecked())
+        return CachedAssemblies.Get(assemblyName);
+    }
+
+    public List<AssemblyMeta> GetRefAssemblies() => _refAssemblies;
+
+    private List<AssemblyMeta> LoadReferencedAssemblies()
+    {
+        foreach (var refAssemblyName in _assembly.GetReferencedAssemblies())
         {
-            var type = t.IsGenericType ? t.GetGenericTypeDefinition() : t;
-            // TODO prev line is needed? 
-            if (type.FullName is null) continue;
-            types.Add(new TypeMeta(type));
+            CachedAssemblies.Get(refAssemblyName);
         }
 
-        return types;
+        return CachedAssemblies.GetAll();
+    }
+
+    public List<TypeMeta> Types { get; }
+
+    private List<TypeMeta> CollectTypes(Assembly asm)
+    {
+
+        var types = new List<TypeMeta>();
+        foreach (var mod in asm.GetModules())
+        {
+            foreach (var t in mod.GetTypes())
+            {
+                var cache = GetCorrespondingModuleCache(t.Module.MetadataToken);
+                if ((t.IsGenericType && !t.IsGenericTypeDefinition) || t.FullName is null) continue;
+                types.Add(cache.PutType(new TypeMeta(this, t)));
+            }
+        }
+
+        return types.Distinct().ToList();
+    }
+
+    public ModuleCache GetCorrespondingModuleCache(int moduleToken)
+    {
+        return _moduleCaches[moduleToken] ?? throw new Exception("no ModuleCache found");
+    }
+
+    public void Resolve()
+    {
+        foreach (var type in Types)
+        {
+            type.Resolve();
+        }
     }
 }

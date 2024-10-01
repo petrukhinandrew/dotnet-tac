@@ -2,9 +2,9 @@ namespace TACBuilder.ILTAC.TypeSystem;
 
 public static class TypingUtil
 {
-    public static ILType ILTypeFrom(Type type)
+    public static ILType ILTypeFrom(Type? type)
     {
-        if (type == typeof(void)) return new ILVoid();
+        if (type is null || type == typeof(void)) return new ILVoid();
         if (type == typeof(object)) return new ILObject();
         if (type.IsValueType)
         {

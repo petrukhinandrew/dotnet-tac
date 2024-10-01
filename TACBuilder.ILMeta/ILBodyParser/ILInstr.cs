@@ -91,4 +91,16 @@ public abstract record ILInstrOperand
             return base.ToString() + " to IL_" + value.idx;
         }
     }
+
+    public record ResolvedString(string value) : ILInstrOperand;
+
+    public record ResolvedField(FieldMeta value) : ILInstrOperand;
+
+    public record ResolvedType(TypeMeta value) : ILInstrOperand;
+
+    public record ResolvedSignature(byte[] value) : ILInstrOperand;
+
+    public record ResolvedMethod(MethodMeta value) : ILInstrOperand;
+
+    public record ResolvedMember(MemberMeta value) : ILInstrOperand;
 }
