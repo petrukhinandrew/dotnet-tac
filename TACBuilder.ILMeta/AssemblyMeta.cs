@@ -1,41 +1,74 @@
 ﻿using System.Reflection;
 using System.Runtime.Loader;
+using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
 
-public class AssemblyMeta(Assembly assembly)
+public partial class AssemblyMeta
 {
-    internal class AssemblyLoader : AssemblyLoadContext
+    private Assembly _assembly;
+    private Dictionary<int, ModuleCache> _moduleCaches;
+    private List<AssemblyMeta> _refAssemblies;
+
+    private AssemblyMeta(Assembly assembly)
     {
-        // TODO introduce cache
+        _assembly = assembly;
+        _moduleCaches = assembly.GetLoadedModules().ToDictionary(m => m.MetadataToken, m => new ModuleCache(this, m));
+        _refAssemblies = LoadReferencedAssemblies();
+        Types = CollectTypes(assembly);
     }
 
     public static AssemblyMeta FromPath(string assemblyPath)
     {
-        var asm = new AssemblyLoader().LoadFromAssemblyPath(assemblyPath);
-        var instance = new AssemblyMeta(asm)
-        {
-            _isFromPath = true
-        };
-        return instance;
+        return CachedAssemblies.Get(assemblyPath);
     }
 
     public static AssemblyMeta FromName(AssemblyName assemblyName)
     {
-        var asm = new AssemblyLoader().LoadFromAssemblyName(assemblyName);
-        var instance = new AssemblyMeta(asm)
-        {
-            _isFromName = true
-        };
-        return instance;
+        return CachedAssemblies.Get(assemblyName);
     }
 
-    private Assembly _assembly = assembly;
-    private List<TypeMeta> _types = assembly.GetTypes().Select(t => new TypeMeta(t)).ToList();
+    public List<AssemblyMeta> GetRefAssemblies() => _refAssemblies;
 
-    private bool _isFromPath = false;
-    public bool IsFromPath => _isFromPath;
+    private List<AssemblyMeta> LoadReferencedAssemblies()
+    {
+        foreach (var refAssemblyName in _assembly.GetReferencedAssemblies())
+        {
+            CachedAssemblies.Get(refAssemblyName);
+        }
 
-    private bool _isFromName = false;
-    public bool IsFromName => _isFromName;
+        return CachedAssemblies.GetAll();
+    }
+
+    public List<TypeMeta> Types { get; }
+
+    private List<TypeMeta> CollectTypes(Assembly asm)
+    {
+
+        var types = new List<TypeMeta>();
+        foreach (var mod in asm.GetModules())
+        {
+            foreach (var t in mod.GetTypes())
+            {
+                var cache = GetCorrespondingModuleCache(t.Module.MetadataToken);
+                if ((t.IsGenericType && !t.IsGenericTypeDefinition) || t.FullName is null) continue;
+                types.Add(cache.PutType(new TypeMeta(this, t)));
+            }
+        }
+
+        return types.Distinct().ToList();
+    }
+
+    public ModuleCache GetCorrespondingModuleCache(int moduleToken)
+    {
+        return _moduleCaches[moduleToken] ?? throw new Exception("no ModuleCache found");
+    }
+
+    public void Resolve()
+    {
+        foreach (var type in Types)
+        {
+            type.Resolve();
+        }
+    }
 }

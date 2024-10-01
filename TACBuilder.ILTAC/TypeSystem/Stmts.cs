@@ -1,6 +1,6 @@
-namespace Usvm.IL.TypeSystem;
+namespace TACBuilder.ILTAC.TypeSystem;
 
-abstract class ILStmt()
+public abstract class ILStmt()
 {
     private int Index = Indexer++;
     private static int Indexer = 0;
@@ -17,7 +17,7 @@ abstract class ILStmt()
     }
 }
 
-class ILIndexedStmt(int index, ILStmt stmt)
+public class ILIndexedStmt(int index, ILStmt stmt)
 {
     public int Index = index;
     public ILStmt Stmt = stmt;
@@ -28,7 +28,7 @@ class ILIndexedStmt(int index, ILStmt stmt)
     }
 }
 
-class ILStmtMark(string mark) : ILStmt()
+public class ILStmtMark(string mark) : ILStmt()
 {
     public override string ToString()
     {
@@ -36,7 +36,7 @@ class ILStmtMark(string mark) : ILStmt()
     }
 }
 
-class ILAssignStmt(ILLValue lhs, ILExpr rhs) : ILStmt()
+public class ILAssignStmt(ILLValue lhs, ILExpr rhs) : ILStmt()
 {
     public readonly ILLValue Lhs = lhs;
     public readonly ILExpr Rhs = rhs;
@@ -47,7 +47,7 @@ class ILAssignStmt(ILLValue lhs, ILExpr rhs) : ILStmt()
     }
 }
 
-class ILCallStmt(ILCallExpr expr) : ILStmt()
+public class ILCallStmt(ILCallExpr expr) : ILStmt()
 {
     public ILCallExpr Call = expr;
 
@@ -57,7 +57,7 @@ class ILCallStmt(ILCallExpr expr) : ILStmt()
     }
 }
 
-class ILReturnStmt(ILExpr? retVal) : ILStmt()
+public class ILReturnStmt(ILExpr? retVal) : ILStmt()
 {
     public ILExpr? RetVal => retVal;
 
@@ -68,12 +68,12 @@ class ILReturnStmt(ILExpr? retVal) : ILStmt()
     }
 }
 
-abstract class ILBranchStmt(int target) : ILStmt()
+public abstract class ILBranchStmt(int target) : ILStmt()
 {
     public int Target = target;
 }
 
-class ILGotoStmt(int target) : ILBranchStmt(target)
+public class ILGotoStmt(int target) : ILBranchStmt(target)
 {
     public override string ToString()
     {
@@ -81,7 +81,7 @@ class ILGotoStmt(int target) : ILBranchStmt(target)
     }
 }
 
-class ILIfStmt(ILExpr cond, int target) : ILBranchStmt(target)
+public class ILIfStmt(ILExpr cond, int target) : ILBranchStmt(target)
 {
     public override string ToString()
     {
@@ -89,7 +89,7 @@ class ILIfStmt(ILExpr cond, int target) : ILBranchStmt(target)
     }
 }
 
-class ILEHStmt(string value, ILExpr thrown) : ILStmt()
+public class ILEHStmt(string value, ILExpr thrown) : ILStmt()
 {
     public ILEHStmt(string value) : this(value, new ILNullValue())
     {

@@ -1,4 +1,4 @@
-namespace Usvm.IL.TypeSystem;
+namespace TACBuilder.ILTAC.TypeSystem;
 
 public abstract class ILPointer(Type reflectedType, ILType targetType) : ILType
 {
@@ -22,7 +22,7 @@ class ILManagedPointer(Type reflectedType, ILType targetType) : ILPointer(reflec
     }
 }
 
-class ILUnmanagedPointer(Type reflectedType, ILType targetType) : ILPointer(reflectedType, targetType)
+public class ILUnmanagedPointer(Type reflectedType, ILType targetType) : ILPointer(reflectedType, targetType)
 {
     public override string ToString() => TargetType.ToString() + "*";
 

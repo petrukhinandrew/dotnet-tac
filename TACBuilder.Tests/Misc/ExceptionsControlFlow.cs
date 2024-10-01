@@ -608,5 +608,11 @@ namespace IntegrationTests
 
             return res;
         }
+
+        public static void ForcedFault()
+        {
+            using var d = new Disposable();
+            throw null;
+        }
     }
 }

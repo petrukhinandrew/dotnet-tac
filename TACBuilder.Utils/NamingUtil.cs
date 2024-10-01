@@ -1,4 +1,4 @@
-namespace Usvm.IL.TACBuilder.Utils;
+namespace TACBuilder.Utils;
 
 public static class NamingUtil
 {

@@ -1,142 +1,143 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using TACBuilder.ILMeta;
 using TACBuilder.ILMeta.ILBodyParser;
-using Usvm.IL.Parser;
-using Usvm.IL.TACBuilder.Utils;
-using Usvm.IL.TypeSystem;
+using TACBuilder.ILTAC;
+using TACBuilder.ILTAC.TypeSystem;
+using TACBuilder.Utils;
 
-namespace Usvm.IL.TACBuilder;
+namespace Usvm.TACBuilder;
 
 class MethodTacBuilder
 {
+    public readonly MethodBase MethodBase;
+    private readonly MethodMeta _meta;
+    private readonly TACMethodInfo _tacMethodInfo = new();
     private readonly Module _declaringModule;
-    public readonly MethodInfo MethodInfo;
-    private ehClause[] _ehs;
-    public List<ILLocal> Locals;
-    public List<ILLocal> Params = new();
-    public List<ILExpr> Temps = new();
-    public List<ILExpr> Errs = new();
+    public List<ILLocal> Locals => _tacMethodInfo.Locals;
+
+    public List<ILLocal> Params => _tacMethodInfo.Params;
+    public List<ILExpr> Temps => _tacMethodInfo.Temps;
+    public List<ILExpr> Errs => _tacMethodInfo.Errs;
+    public List<EHScope> Scopes => _tacMethodInfo.Scopes;
     public Dictionary<(int, int), ILMerged> Merged = new();
     public List<ILIndexedStmt> Tac = new();
-    public List<ILInstr> Leaders;
-    public Dictionary<int, List<int>> Successors = new();
-    public Dictionary<int, BlockTacBuilder> TacBlocks;
-    private readonly ILInstr _begin;
-    public List<EHScope> Scopes = [];
+    public Dictionary<int, BlockTacBuilder> BlockTacBuilders = new();
+    private ILInstr _begin;
     public Dictionary<int, int?> ilToTacMapping = new();
     public Queue<BlockTacBuilder> Worklist = new();
 
-    public MethodTacBuilder(Module declaringModule, MethodInfo methodInfo, IList<LocalVariableInfo> locals,
-        ILInstr begin, List<ehClause> ehs)
+    public MethodTacBuilder(MethodMeta meta)
     {
-        _begin = begin;
-        TacBlocks = new Dictionary<int, BlockTacBuilder>();
-        _ehs = ehs.ToArray();
-        _declaringModule = declaringModule;
-        MethodInfo = methodInfo;
-        int hasThis = 0;
-        if (!methodInfo.IsStatic)
+        _meta = meta;
+        MethodBase = meta.MethodBase;
+        _declaringModule = meta.MethodBase.Module;
+    }
+
+    public TACMethod Build()
+    {
+        _tacMethodInfo.Meta = _meta;
+        // if (!_meta.HasMethodBody) return new TACMethod(_tacMethodInfo, []);
+        _begin = _meta.FirstInstruction;
+        int hasThisIndexingDelta = 0;
+        if (!MethodBase.IsStatic)
         {
-            Params.Add(new ILLocal(TypingUtil.ILTypeFrom(methodInfo.ReflectedType), NamingUtil.ArgVar(0)));
-            hasThis = 1;
+            _tacMethodInfo.Params.Add(
+                new ILLocal(TypingUtil.ILTypeFrom(MethodBase.ReflectedType), NamingUtil.ArgVar(0)));
+            hasThisIndexingDelta = 1;
         }
 
-        Params.AddRange(methodInfo.GetParameters().OrderBy(p => p.Position).Select(l =>
-            new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position + hasThis))));
-        Locals = locals.OrderBy(l => l.LocalIndex)
+        _tacMethodInfo.Params.AddRange(MethodBase.GetParameters().OrderBy(p => p.Position).Select(l =>
+            new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position + hasThisIndexingDelta))));
+        _tacMethodInfo.Locals = _meta.MethodBase.GetMethodBody().LocalVariables.OrderBy(l => l.LocalIndex)
             .Select(l => new ILLocal(TypingUtil.ILTypeFrom(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
-        InitEhScopes();
-        Leaders = CollectLeaders();
-        ProcessNonExceptionalIL();
+        // InitEhScopes();
+
+        InitBlockBuilders();
+
+        ProcessIL();
+
         foreach (var m in Merged.Values)
         {
             var temp = GetNewTemp(m.Type, m);
             m.MakeTemp(temp.ToString());
         }
 
-        foreach (var bb in TacBlocks)
+        foreach (var bb in BlockTacBuilders)
         {
             bb.Value.InsertExtraAssignments();
         }
 
         ComposeTac();
+        return new TACMethod(_tacMethodInfo, Tac);
     }
 
-    private List<ILInstr> CollectLeaders()
+    private void InitBlockBuilders()
     {
-        ILInstr cur = _begin;
-        HashSet<ILInstr> leaders = [cur];
-        while (cur is not ILInstr.Back)
-        {
-            if (cur.IsJump())
-            {
-                leaders.Add(((ILInstrOperand.Target)cur.arg).value);
-                leaders.Add(cur.next);
-            }
+        BlockTacBuilders = _meta.BasicBlocks.ToDictionary(bb => bb.Entry.idx, bb => new BlockTacBuilder(this, bb));
 
-            cur = cur.next;
+        foreach (var blockBuilder in BlockTacBuilders.Values)
+        {
+            blockBuilder.ConnectSuccsAndPreds(
+                BlockTacBuilders.Values.Where(bb => blockBuilder.Meta.Successors.Contains(bb.Meta.Entry.idx)).ToList(),
+                BlockTacBuilders.Values.Where(bb => blockBuilder.Meta.Predecessors.Contains(bb.Meta.Entry.idx))
+                    .ToList());
+        }
+    }
+
+    // move to meta smth
+    // mb remove
+    private void InitEhScopes()
+    {
+        foreach (var ehc in _meta.EhClauses)
+        {
+            EHScope scope = EHScope.FromClause(ehc);
+            if (!_tacMethodInfo.Scopes.Contains(scope))
+            {
+                if (scope is EHScopeWithVarIdx s)
+                {
+                    s.ErrIdx = Errs.Count;
+                    // _tacMethodInfo.Errs.Add(new ILLocal(TypingUtil.ILTypeFrom(s.Type), NamingUtil.ErrVar(s.ErrIdx)));
+                }
+
+                _tacMethodInfo.Scopes.Add(scope);
+            }
+        }
+    }
+
+    private void ProcessIL()
+    {
+        Worklist.Clear();
+
+        foreach (var blockIdx in _meta.StartBlocksIndices)
+        {
+            Worklist.Enqueue(BlockTacBuilders[blockIdx]);
         }
 
-        return [.. leaders.OrderBy(l => l.idx)];
-    }
-
-    private void ProcessNonExceptionalIL()
-    {
-        TacBlocks[0] = new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)_begin);
-        Successors.Add(0, []);
-        Worklist.Clear();
-        Worklist.Enqueue(TacBlocks[0]);
-        EnqueueEhsBlocks();
         while (Worklist.Count > 0)
         {
-            Worklist.Dequeue().Branch();
-        }
-    }
-
-    private void EnqueueEhsBlocks()
-    {
-        foreach (var scope in Scopes)
-        {
-            int hbIndex = scope.ilLoc.hb.idx;
-            Leaders.Add(scope.ilLoc.hb);
-
-            if (scope is EHScopeWithVarIdx scopeWithVar)
+            var current = Worklist.Dequeue();
+            if (current.Rebuild())
             {
-                TacBlocks[hbIndex] = new BlockTacBuilder(this, null,
-                    new EvaluationStack<ILExpr>([Errs[scopeWithVar.ErrIdx]]),
-                    (ILInstr.Instr)scopeWithVar.ilLoc.hb);
-                scopeWithVar.HandlerFrame = TacBlocks[hbIndex];
+                foreach (var successor in current.Successors)
+                {
+                    Worklist.Enqueue(successor);
+                }
             }
-            else
-            {
-                TacBlocks[hbIndex] =
-                    new BlockTacBuilder(this, null, new EvaluationStack<ILExpr>(), (ILInstr.Instr)scope.ilLoc.hb);
-            }
-
-            if (scope is FilterScope filterScope)
-            {
-                int fbIndex = filterScope.fb.idx;
-                Leaders.Add(filterScope.fb);
-                TacBlocks[fbIndex] = new BlockTacBuilder(this, null,
-                    new EvaluationStack<ILExpr>([Errs[filterScope.ErrIdx]]),
-                    (ILInstr.Instr)filterScope.fb);
-                filterScope.FilterFrame = TacBlocks[fbIndex];
-                Worklist.Enqueue(TacBlocks[fbIndex]);
-            }
-
-            Worklist.Enqueue(TacBlocks[hbIndex]);
         }
     }
 
     private void ComposeTac()
     {
-        // TODO separate ordering and Tac composition 
+        // TODO separate ordering and Tac composition
         int lineNum = 0;
-        foreach (var m in Successors)
+        var successors = _meta.Cfg.Succsessors;
+        foreach (var ilIdx in successors.Keys)
         {
-            ilToTacMapping.Add(m.Key, null);
+            ilToTacMapping[ilIdx] = null;
         }
 
-        var tacBlocksIndexed = TacBlocks.OrderBy(b => b.Key).ToList();
+        var tacBlocksIndexed = BlockTacBuilders.OrderBy(b => b.Key).ToList();
         foreach (var (i, bb) in tacBlocksIndexed.Select((e, i) => (i, e.Value)))
         {
             ilToTacMapping[bb.ILFirst] = lineNum;
@@ -145,10 +146,10 @@ class MethodTacBuilder
                 Tac.Add(new ILIndexedStmt(lineNum++, line));
             }
 
-            if (tacBlocksIndexed.Count > i + 1 && Successors.ContainsKey(bb.ILFirst) &&
-                Successors[bb.ILFirst].Count > 0 && Successors[bb.ILFirst][0] != tacBlocksIndexed[i + 1].Key)
+            if (tacBlocksIndexed.Count > i + 1 && successors.ContainsKey(bb.ILFirst) &&
+                successors[bb.ILFirst].Count > 0 && successors[bb.ILFirst][0] != tacBlocksIndexed[i + 1].Key)
             {
-                Tac.Add(new ILIndexedStmt(lineNum++, new ILGotoStmt(Successors[bb.ILFirst][0])));
+                Tac.Add(new ILIndexedStmt(lineNum++, new ILGotoStmt(successors[bb.ILFirst][0])));
             }
         }
 
@@ -161,31 +162,19 @@ class MethodTacBuilder
         }
     }
 
-    private void InitEhScopes()
-    {
-        foreach (var ehc in _ehs)
-        {
-            EHScope scope = EHScope.FromClause(ehc);
-            if (!Scopes.Contains(scope))
-            {
-                if (scope is EHScopeWithVarIdx s)
-                {
-                    s.ErrIdx = Errs.Count;
-                    Errs.Add(new ILLocal(TypingUtil.ILTypeFrom(s.Type), NamingUtil.ErrVar(s.ErrIdx)));
-                }
-
-                Scopes.Add(scope);
-            }
-        }
-    }
-
-    public ILLocal GetNewTemp(ILType type, ILExpr value)
+    internal ILLocal GetNewTemp(ILType type, ILExpr value)
     {
         Temps.Add(value);
         return new ILLocal(type, NamingUtil.TempVar(Temps.Count - 1));
     }
 
-    public ILMerged GetMerged(int blockIdx, int stackDepth)
+    internal ILExpr GetNewErr(Type type)
+    {
+        _tacMethodInfo.Errs.Add(new ILLocal(TypingUtil.ILTypeFrom(type), NamingUtil.ErrVar(_tacMethodInfo.Errs.Count)));
+        return _tacMethodInfo.Errs.Last();
+    }
+
+    internal ILMerged GetMerged(int blockIdx, int stackDepth)
     {
         if (!Merged.ContainsKey((blockIdx, stackDepth)))
         {
@@ -193,37 +182,5 @@ class MethodTacBuilder
         }
 
         return Merged[(blockIdx, stackDepth)];
-    }
-
-    public FieldInfo ResolveField(int target)
-    {
-        // TODO mb reflectedtype 
-        return _declaringModule.ResolveField(target, MethodInfo.DeclaringType!.GetGenericArguments(),
-            MethodInfo.GetGenericArguments()) ?? throw new Exception("cannot resolve field");
-    }
-
-    public Type ResolveType(int target)
-    {
-        return _declaringModule.ResolveType(target) ?? throw new Exception("cannot resolve type");
-    }
-
-    public MethodBase ResolveMethod(int target)
-    {
-        return _declaringModule.ResolveMethod(target) ?? throw new Exception("cannot resolve method");
-    }
-
-    public byte[] ResolveSignature(int target)
-    {
-        return _declaringModule.ResolveSignature(target);
-    }
-
-    public string ResolveString(int target)
-    {
-        return _declaringModule.ResolveString(target);
-    }
-
-    public ILInstr GetFirstInstr()
-    {
-        return _begin;
     }
 }

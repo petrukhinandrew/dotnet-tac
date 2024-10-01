@@ -1,7 +1,7 @@
 using System.Reflection;
-using System.Runtime.CompilerServices;
+using TACBuilder.ILMeta;
 
-namespace Usvm.IL.TypeSystem;
+namespace TACBuilder.ILTAC.TypeSystem;
 
 public interface ILType
 {
@@ -14,15 +14,15 @@ public interface ILExpr
     public string ToString();
 }
 
-interface ILValue : ILExpr
+public interface ILValue : ILExpr
 {
 }
 
-interface ILLValue : ILValue
+public interface ILLValue : ILValue
 {
 }
 
-class ILNullValue : ILValue
+public class ILNullValue : ILValue
 {
     private static ILType _instance = new ILNull();
     public ILType Type => _instance;
@@ -40,14 +40,14 @@ class ILNullValue : ILValue
     }
 }
 
-class ILVarArgValue(string methodName) : ILValue
+public class ILVarArgValue(string methodName) : ILValue
 {
     private static readonly ILType _instance = new ILHandleRef();
     public ILType Type => _instance;
     public override string ToString() => methodName + ".__arglist";
 }
 
-class ILLocal(ILType type, string name) : ILLValue
+public class ILLocal(ILType type, string name) : ILLValue
 {
     public ILType Type => type;
 
@@ -64,7 +64,7 @@ class ILLocal(ILType type, string name) : ILLValue
     }
 }
 
-class ILMergedType : ILType
+public class ILMergedType : ILType
 {
     private List<ILType> _types = new();
     private ILType? _cache;
@@ -82,7 +82,7 @@ class ILMergedType : ILType
     }
 }
 
-class ILMerged(string name) : ILLValue
+public class ILMerged(string name) : ILLValue
 {
     private string _name = name;
     private readonly ILMergedType _type = new();
@@ -114,7 +114,7 @@ class ILMerged(string name) : ILLValue
     }
 }
 
-class ILObjectLiteral(ILType type, object? obj) : ILValue
+public class ILObjectLiteral(ILType type, object? obj) : ILValue
 {
     public object? Object = obj;
 
@@ -126,7 +126,7 @@ class ILObjectLiteral(ILType type, object? obj) : ILValue
     }
 }
 
-class ILLiteral(ILType type, string value) : ILValue
+public class ILLiteral(ILType type, string value) : ILValue
 {
     public ILType Type => type;
 
@@ -147,23 +147,20 @@ class ILLiteral(ILType type, string value) : ILValue
     }
 }
 
-class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount, int token) : ILExpr
+// TODO remove MethodInfo access
+public class ILMethod(MethodBase mb, ILType retType, string declType, string name, int argCount, int token) : ILExpr
 {
-    public static ILMethod FromMethodBase(MethodBase mb)
+    public static ILMethod FromMethodMeta(MethodMeta meta)
     {
-        int paramCount = mb.GetParameters().Count(p => !p.IsRetval);
-        Type retType = typeof(void);
-        if (mb is MethodInfo methodInfo)
-        {
-            retType = methodInfo.ReturnType;
-        }
+        int paramCount = meta.MethodBase.GetParameters().Count(p => !p.IsRetval);
+        Type retType = meta.ReturnType;
 
         ILType ilRetType = TypingUtil.ILTypeFrom(retType);
-        ILMethod method = new ILMethod(mb, ilRetType, mb.DeclaringType?.FullName ?? "", mb.Name, paramCount,
-            mb.GetMetadataToken());
+        ILMethod method = new ILMethod(meta.MethodBase, ilRetType, meta.DeclaringTypeName, meta.Name, paramCount,
+            meta.MethodBase.GetMetadataToken());
 
-        if (mb.ContainsGenericParameters)
-            foreach (var t in mb.GetGenericArguments())
+        if (meta.MethodBase.ContainsGenericParameters)
+            foreach (var t in meta.MethodBase.GetGenericArguments())
             {
                 method.GenericArgs.Add(TypingUtil.ILTypeFrom(t));
             }
@@ -228,18 +225,18 @@ class ILMethod(MethodBase mb, ILType retType, string declType, string name, int 
     }
 }
 
-class ILField(ILType type, string declType, string name, bool isStatic, int token) : ILLValue
+public class ILField(ILType type, string declType, string name, bool isStatic, int token) : ILLValue
 {
-    public static ILField Static(FieldInfo f)
+    public static ILField Static(FieldMeta f)
     {
-        return new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, true,
-            f.GetMetadataToken());
+        return new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringTypeName, f.Name, true,
+            f.MetadataToken);
     }
 
-    public static ILField Instance(FieldInfo f, ILExpr inst)
+    public static ILField Instance(FieldMeta f, ILExpr inst)
     {
-        ILField field = new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringType?.FullName ?? "", f.Name, false,
-            f.GetMetadataToken())
+        ILField field = new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringTypeName, f.Name, false,
+            f.MetadataToken)
         {
             Receiver = inst
         };

@@ -1,27 +1,82 @@
 using System.Reflection;
+using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
 
-public class MethodMeta
+public class MethodMeta : MemberMeta
 {
-    private MethodInfo _methodInfo;
+    public AssemblyMeta DeclaringAssembly { get; }
+    private MethodBase _methodBase;
     private List<BasicBlockMeta> _basicBlocks = new();
+    private bool _resolved = false;
+    private ILBodyParser.ILBodyParser _bodyParser;
+    private TypeMeta _typeMeta;
 
-    public MethodMeta(MethodInfo methodInfo, bool resolveImmediately = true)
+    public MethodBase MethodBase => _methodBase;
+    public List<BasicBlockMeta> BasicBlocks => _basicBlocks;
+    public List<int> StartBlocksIndices => Cfg.StartBlocksIndices;
+    public ILInstr FirstInstruction => _bodyParser.Instructions;
+    public List<ehClause> EhClauses => _bodyParser.EhClauses;
+
+    public int MetadataToken => _methodBase.MetadataToken;
+    // TODO cfg must be private
+    public CFG Cfg;
+
+
+    public MethodMeta(TypeMeta typeMeta, MethodBase methodBase): base(methodBase)
     {
-        _methodInfo = methodInfo;
-        if (resolveImmediately) Resolve();
+        _typeMeta = typeMeta;
+        DeclaringAssembly = _typeMeta.DeclaringAssembly;
+        _methodBase = methodBase;
     }
 
     public void Resolve()
     {
-        // TODO what to do if method body is null
-        if (_methodInfo.GetMethodBody() == null) return;
-        var bodyParser = new ILBodyParser.ILBodyParser(_methodInfo.GetMethodBody()!);
-        bodyParser.Parse();
+        var hasMethodBody = false;
+        try
+        {
+            hasMethodBody = _methodBase.GetMethodBody() != null;
+        }
+        catch
+        {
+            Console.WriteLine(_methodBase.Name + " has no body");
+            hasMethodBody = false;
+        }
 
-        var cfg = new CFG(bodyParser.Instructions, bodyParser.EhClauses);
-        cfg.MarkBasicBlocks();
-        _basicBlocks = cfg.BasicBlocksMarkup.Select(bbLocation => new BasicBlockMeta(bbLocation)).ToList();
+        if (!hasMethodBody) return;
+        if (_resolved) return;
+        _resolved = true;
+
+        if (_methodBase.GetMethodBody() == null) return;
+
+        try
+        {
+            _bodyParser = new ILBodyParser.ILBodyParser(_methodBase);
+            _bodyParser.Parse();
+
+            Cfg = new CFG(_bodyParser.Instructions, _bodyParser.EhClauses);
+            _basicBlocks = Cfg.BasicBlocks;
+            foreach (var block in _basicBlocks) block.AttachToMethod(this);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine("MethodMeta error at " + (_methodBase.ReflectedType ?? _methodBase.DeclaringType)!.Name +
+                              " " + _methodBase.Name + " " + e);
+        }
     }
+
+    public string DeclaringTypeName => _typeMeta.Name;
+    public string Name => _methodBase.Name;
+    public Type? ReturnType => (_methodBase as MethodInfo)?.ReturnType;
+
+    public override int GetHashCode()
+    {
+        return _methodBase.GetHashCode();
+    }
+}
+
+// TODO use instead of MethodInfo pass
+public class MethodParameterMeta(ParameterInfo parameterInfo)
+{
+    private ParameterInfo _parameterInfo = parameterInfo;
 }

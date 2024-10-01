@@ -1,10 +1,10 @@
-namespace Usvm.IL.TypeSystem;
+namespace TACBuilder.ILTAC.TypeSystem;
 
 public static class TypingUtil
 {
-    public static ILType ILTypeFrom(Type type)
+    public static ILType ILTypeFrom(Type? type)
     {
-        if (type == typeof(void)) return new ILVoid();
+        if (type is null || type == typeof(void)) return new ILVoid();
         if (type == typeof(object)) return new ILObject();
         if (type.IsValueType)
         {
@@ -20,6 +20,7 @@ public static class TypingUtil
                 if (type == typeof(double)) return new ILInt64();
                 if (type == typeof(int)) return new ILInt32();
                 if (type == typeof(nint)) return new ILNativeInt();
+                if (type == typeof(UIntPtr)) return new ILNativeInt();
                 if (type == typeof(uint)) return new ILUInt32();
             }
             else if (type.IsEnum)
@@ -59,14 +60,14 @@ public static class TypingUtil
             if (elemType != null)
                 return new ILArray(type, ILTypeFrom(elemType));
             else
-                throw new Exception("bad elem type for " + type.ToString());
+                throw new Exception("bad elem type for " + type);
         }
         else if (type.IsInterface || type.IsClass)
         {
             return new ILClassOrInterfaceType(type, FormatObjectName(type));
         }
 
-        throw new Exception("unhandled type " + type.ToString());
+        throw new Exception("unhandled type " + type);
     }
 
     public static ILType Merge(List<ILType> types)
@@ -93,9 +94,9 @@ public static class TypingUtil
         string nsName = type.Namespace ?? "ns";
         string rawName = type.Name;
         string[] tokens = rawName.Split('`');
-        if (tokens.Count() == 1)
+        if (tokens.Length == 1)
         {
-            return string.Format("{0}.{1}", nsName, rawName);
+            return $"{nsName}.{rawName}";
         }
 
         string name = tokens[0];

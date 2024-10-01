@@ -2,9 +2,29 @@ using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
 
-public class BasicBlockMeta(BasicBlockLocation location)
+public class BasicBlockMeta(ILInstr entry, ILInstr exit)
 {
-    // built by CFG
-    // contains smth like pair of il instrs with guarantees like in JcBasicBlock
-    private IEnumerable<ILInstr> Instructions { get; }
+    public ILInstr Entry => entry;
+    public ILInstr Exit => exit;
+    private MethodMeta? _methodMeta;
+    public MethodMeta? MethodMeta => _methodMeta;
+
+    public List<int> Successors = new List<int>();
+    public List<int> Predecessors = new List<int>();
+    public Type? StackErrType;
+
+    public void AttachToMethod(MethodMeta methodMeta)
+    {
+        _methodMeta = methodMeta;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is BasicBlockMeta bb && bb.Entry == Entry && bb.Exit == Exit;
+    }
+
+    public override int GetHashCode()
+    {
+        return Entry.idx;
+    }
 }

@@ -1,4 +1,4 @@
-using Usvm.IL.TypeSystem;
+using TACBuilder.ILTAC.TypeSystem;
 
 namespace TACBuilder.Tests;
 
@@ -15,10 +15,13 @@ public class TypeMergeTest
     interface BaseInterface;
 
     struct StructWithInterface1 : BaseInterface;
+
     class ClassWithInterface1 : BaseInterface;
+
     struct StructWithInterface2 : BaseInterface;
+
     class ClassWithInterface2 : BaseInterface;
-    
+
 
     [Fact]
     public void MergeSame()
@@ -83,8 +86,9 @@ public class TypeMergeTest
         var merged = TypingUtil.Merge([c1, c2]);
         Assert.NotEqual(c1, merged);
         Assert.NotEqual(c2, merged);
-        Assert.Equal(TypingUtil.ILTypeFrom(typeof(BaseInterface)), merged);   
+        Assert.Equal(TypingUtil.ILTypeFrom(typeof(BaseInterface)), merged);
     }
+
     [Fact]
     public void MergePrimitives()
     {

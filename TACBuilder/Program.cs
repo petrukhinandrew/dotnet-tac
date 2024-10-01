@@ -1,16 +1,13 @@
-﻿using Usvm.IL.Parser;
-
-namespace Usvm.IL;
+﻿namespace Usvm.TACBuilder;
 
 class Program
 {
     static void Main(string[] args)
     {
-        var settings = new ParserSettings("TACBuilder.Tests/bin/Debug/net8.0/TACBuilder.Tests.dll",
-            // ["Filter", "TernaryOp", "NestedTryCatch", "ArrayRef", "TupleRet", "NestedTryBlocks2"]
-            ["IntMethod"]
-        );
-        var codeBase = new CodeBase(settings);
-        codeBase.Load();
+        var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
+        Console.WriteLine(path);
+        var appTacBuilder =
+            new AppTacBuilder(path);
+        appTacBuilder.Resolve();
     }
 }
