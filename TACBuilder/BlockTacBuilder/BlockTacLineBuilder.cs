@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using TACBuilder.ILMeta;
 using TACBuilder.ILMeta.ILBodyParser;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
@@ -125,7 +126,7 @@ namespace Usvm.TACBuilder
                     }
                     case "arglist":
                     {
-                        blockBuilder.Push(new ILVarArgValue(blockBuilder.MethodName));
+                        blockBuilder.Push(new ILVarArgValue(blockBuilder.Meta.MethodMeta.Name));
                         break;
                     }
                     case "throw":
@@ -166,16 +167,14 @@ namespace Usvm.TACBuilder
                     }
                     case "ldfld":
                     {
-                        FieldInfo field =
-                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        FieldMeta field = ((ILInstrOperand.ResolvedField)blockBuilder.CurInstr.arg).value;
                         ILExpr inst = blockBuilder.Pop();
                         blockBuilder.Push(ILField.Instance(field, inst));
                         break;
                     }
                     case "ldflda":
                     {
-                        FieldInfo field =
-                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        FieldMeta field = ((ILInstrOperand.ResolvedField)blockBuilder.CurInstr.arg).value;
                         ILExpr inst = blockBuilder.Pop();
                         ILField ilField = ILField.Instance(field, inst);
                         if (inst.Type is ILUnmanagedPointer)
@@ -192,15 +191,13 @@ namespace Usvm.TACBuilder
 
                     case "ldsfld":
                     {
-                        FieldInfo field =
-                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        FieldMeta field = ((ILInstrOperand.ResolvedField)blockBuilder.CurInstr.arg).value;
                         blockBuilder.Push(ILField.Static(field));
                         break;
                     }
                     case "ldsflda":
                     {
-                        FieldInfo field =
-                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        FieldMeta field = ((ILInstrOperand.ResolvedField)blockBuilder.CurInstr.arg).value;
                         ILField ilField = ILField.Static(field);
                         if (field.FieldType.IsUnmanaged())
                         {
@@ -216,8 +213,7 @@ namespace Usvm.TACBuilder
 
                     case "stfld":
                     {
-                        FieldInfo field =
-                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        FieldMeta field = ((ILInstrOperand.ResolvedField)blockBuilder.CurInstr.arg).value;
                         ILExpr value = blockBuilder.Pop();
                         ILExpr obj = blockBuilder.Pop();
                         ILField ilField = ILField.Instance(field, obj);
@@ -226,8 +222,7 @@ namespace Usvm.TACBuilder
                     }
                     case "stsfld":
                     {
-                        FieldInfo field =
-                            blockBuilder.ResolveField(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        FieldMeta field = ((ILInstrOperand.ResolvedField)blockBuilder.CurInstr.arg).value;
                         ILExpr value = blockBuilder.Pop();
                         ILField ilField = ILField.Static(field);
                         blockBuilder.NewLine(new ILAssignStmt(ilField, value));
@@ -235,8 +230,8 @@ namespace Usvm.TACBuilder
                     }
                     case "sizeof":
                     {
-                        Type mbType = blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        blockBuilder.Push(new ILSizeOfExpr(TypingUtil.ILTypeFrom(mbType)));
+                        TypeMeta typeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
+                        blockBuilder.Push(new ILSizeOfExpr(TypingUtil.ILTypeFrom(typeMeta.Type)));
                         break;
                     }
                     case "ldind.i1":
@@ -290,11 +285,9 @@ namespace Usvm.TACBuilder
                     }
                     case "ldobj":
                     {
-                        Type? mbType =
-                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (mbType == null) throw new Exception("type not resolved for ldobj");
+                        TypeMeta typeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         ILExpr addr = blockBuilder.Pop();
-                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(mbType));
+                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(typeMeta.Type));
                         blockBuilder.Push(deref);
                         break;
                     }
@@ -344,13 +337,11 @@ namespace Usvm.TACBuilder
                     }
                     case "stobj":
                     {
-                        Type? mbType =
-                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (mbType == null) throw new Exception("type not resolved for sizeof");
+                        TypeMeta typeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         ILExpr val = blockBuilder.Pop();
                         ILLValue addr = (ILLValue)blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(
-                            PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(mbType)),
+                            PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(typeMeta.Type)),
                             val));
                         break;
                     }
@@ -404,22 +395,20 @@ namespace Usvm.TACBuilder
 
                         break;
                     }
-
                     case "ldftn":
                     {
-                        MethodBase? mb =
-                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (mb == null) throw new Exception("method not resolved at " + blockBuilder.CurInstr.idx);
-                        ILMethod method = ILMethod.FromMethodBase(mb);
+                        MethodMeta methodMeta =
+                            ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
+
+                        ILMethod method = ILMethod.FromMethodMeta(methodMeta);
                         blockBuilder.Push(method);
                         break;
                     }
                     case "ldvirtftn":
                     {
-                        MethodBase? mb =
-                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (mb == null) throw new Exception("method not resolved at " + blockBuilder.CurInstr.idx);
-                        ILMethod ilMethod = ILMethod.FromMethodBase(mb);
+                        MethodMeta methodMeta =
+                            ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
+                        ILMethod ilMethod = ILMethod.FromMethodMeta(methodMeta);
                         ilMethod.Receiver = blockBuilder.Pop();
                         blockBuilder.Push(ilMethod);
                         break;
@@ -474,8 +463,7 @@ namespace Usvm.TACBuilder
                         blockBuilder.PushLiteral<double>(((ILInstrOperand.Arg64)blockBuilder.CurInstr.arg).value);
                         break;
                     case "ldstr":
-                        blockBuilder.PushLiteral(
-                            blockBuilder.ResolveString(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value));
+                        blockBuilder.PushLiteral(((ILInstrOperand.ResolvedString)blockBuilder.CurInstr.arg).value);
                         break;
                     case "dup":
                     {
@@ -489,18 +477,17 @@ namespace Usvm.TACBuilder
                         break;
                     case "ldtoken":
                     {
-                        MemberInfo memberInfo =
-                            blockBuilder.ResolveMember(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        var token = new ILObjectLiteral(new ILHandleRef(), memberInfo.Name);
+                        MemberMeta memberMeta = ((ILInstrOperand.ResolvedMember)blockBuilder.CurInstr.arg).value;
+                        var token = new ILObjectLiteral(new ILHandleRef(), memberMeta.Name);
                         blockBuilder.Push(token);
                         break;
                     }
                     case "call":
                     {
-                        MethodBase method =
-                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        MethodMeta methodMeta =
+                            ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
 
-                        ILMethod ilMethod = ILMethod.FromMethodBase(method);
+                        ILMethod ilMethod = ILMethod.FromMethodMeta(methodMeta);
                         ilMethod.LoadArgs(blockBuilder.Pop);
                         if (ilMethod.IsInitializeArray())
                         {
@@ -523,10 +510,9 @@ namespace Usvm.TACBuilder
                     }
                     case "callvirt":
                     {
-                        MethodBase? method =
-                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (method == null) throw new Exception("call not resolved at " + blockBuilder.CurInstr.idx);
-                        ILMethod ilMethod = ILMethod.FromMethodBase(method);
+                        MethodMeta methodMeta =
+                            ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
+                        ILMethod ilMethod = ILMethod.FromMethodMeta(methodMeta);
                         ilMethod.LoadArgs(blockBuilder.Pop);
                         var call = new ILCallExpr(ilMethod);
                         if (ilMethod.Returns())
@@ -537,7 +523,8 @@ namespace Usvm.TACBuilder
                     }
                     case "ret":
                     {
-                        ILExpr? retVal = blockBuilder.MethodReturnType != typeof(void) ? blockBuilder.Pop() : null;
+                        var methodMeta = blockBuilder.Meta.MethodMeta!;
+                        ILExpr? retVal = (methodMeta.ReturnType ?? typeof(void)) != typeof(void) ? blockBuilder.Pop() : null;
                         blockBuilder.NewLine(
                             new ILReturnStmt(retVal)
                         );
@@ -671,11 +658,12 @@ namespace Usvm.TACBuilder
                     }
                     case "newobj":
                     {
-                        MethodBase mb =
-                            blockBuilder.ResolveMethod(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (!mb.IsConstructor) throw new Exception("expected constructor for newobj");
-                        int arity = mb.GetParameters().Count(p => !p.IsRetval);
-                        Type objType = mb.DeclaringType!;
+                        // TODO hide method info
+                        MethodMeta methodMeta = ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
+                        if (!methodMeta.MethodBase.IsConstructor)
+                            throw new Exception("expected constructor for newobj");
+                        int arity = methodMeta.MethodBase.GetParameters().Count(p => !p.IsRetval);
+                        Type objType = methodMeta.MethodBase.DeclaringType!;
                         ILExpr[] inParams = new ILExpr[arity];
                         for (int i = 0; i < arity; i++)
                         {
@@ -689,16 +677,15 @@ namespace Usvm.TACBuilder
                     }
                     case "newarr":
                     {
-                        Type arrType =
-                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        TypeMeta arrTypeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         ILExpr sizeExpr = blockBuilder.Pop();
                         if (sizeExpr.Type is not ILInt32 && sizeExpr.Type is not ILNativeInt)
                         {
                             throw new Exception("expected arr size of type int32 or native int, got " +
-                                                sizeExpr.Type.ToString());
+                                                sizeExpr.Type);
                         }
 
-                        ILArray resolvedType = new ILArray(arrType, TypingUtil.ILTypeFrom(arrType));
+                        ILArray resolvedType = new ILArray(arrTypeMeta.Type, TypingUtil.ILTypeFrom(arrTypeMeta.Type));
                         ILExpr arrExpr = new ILNewArrayExpr(
                             resolvedType,
                             sizeExpr);
@@ -712,9 +699,9 @@ namespace Usvm.TACBuilder
                     }
                     case "initobj":
                     {
-                        Type type = blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
+                        TypeMeta typeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         ILExpr addr = blockBuilder.Pop();
-                        ILType ilType = TypingUtil.ILTypeFrom(type);
+                        ILType ilType = TypingUtil.ILTypeFrom(typeMeta.Type);
                         blockBuilder.NewLine(new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, ilType),
                             new ILNewDefaultExpr(ilType)));
                         break;
@@ -862,44 +849,24 @@ namespace Usvm.TACBuilder
                     }
                     case "isinst":
                     {
-                        Type? mbType =
-                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (mbType == null)
-                        {
-                            Console.WriteLine("error resolving method at " + blockBuilder.CurInstr.idx);
-                            break;
-                        }
-
+                        TypeMeta typeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         ILExpr obj = blockBuilder.Pop();
-                        ILExpr res = new ILCondCastExpr(TypingUtil.ILTypeFrom(mbType), obj);
+                        ILExpr res = new ILCondCastExpr(TypingUtil.ILTypeFrom(typeMeta.Type), obj);
                         blockBuilder.Push(res);
                         break;
                     }
                     case "castclass":
                     {
-                        Type? mbType =
-                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (mbType == null)
-                        {
-                            Console.WriteLine("error resolving method at " + blockBuilder.CurInstr.idx);
-                            break;
-                        }
-
+                        TypeMeta typeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         ILExpr value = blockBuilder.Pop();
-                        ILExpr casted = new ILCastClassExpr(TypingUtil.ILTypeFrom(mbType), value);
+                        ILExpr casted = new ILCastClassExpr(TypingUtil.ILTypeFrom(typeMeta.Type), value);
                         blockBuilder.Push(casted);
                         break;
                     }
                     case "box":
                     {
-                        Type? mbType =
-                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (mbType == null)
-                        {
-                            Console.WriteLine("error resolving type at " + blockBuilder.CurInstr.idx);
-                            break;
-                        }
-
+                        // TODO use typeMeta
+                        TypeMeta typeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         ILValue value = (ILValue)blockBuilder.Pop();
                         ILExpr boxed = new ILBoxExpr(value);
                         blockBuilder.Push(boxed);
@@ -908,16 +875,9 @@ namespace Usvm.TACBuilder
                     case "unbox":
                     case "unbox.any":
                     {
-                        Type? mbType =
-                            blockBuilder.ResolveType(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value);
-                        if (mbType == null)
-                        {
-                            Console.WriteLine("error resolving type at " + blockBuilder.CurInstr.idx);
-                            break;
-                        }
-
+                        TypeMeta typeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         ILValue obj = (ILValue)blockBuilder.Pop();
-                        ILExpr unboxed = new ILUnboxExpr(TypingUtil.ILTypeFrom(mbType), obj);
+                        ILExpr unboxed = new ILUnboxExpr(TypingUtil.ILTypeFrom(typeMeta.Type), obj);
                         blockBuilder.Push(unboxed);
                         break;
                     }

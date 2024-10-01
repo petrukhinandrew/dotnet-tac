@@ -3,9 +3,15 @@ using System.Reflection.Emit;
 
 namespace TACBuilder.ILMeta.ILBodyParser;
 
-public class ILBodyParser(MethodBody methodBody)
+public class ILBodyParser(MethodBase methodBase)
 {
-    private MethodBody _methodBody = methodBody;
+    private MethodBase _methodBase = methodBase;
+
+    private ModuleCache _resolver = AssemblyMeta.FromName(methodBase.Module.Assembly.GetName())
+        .GetCorrespondingModuleCache(methodBase.Module.MetadataToken);
+
+    private MethodBody _methodBody = methodBase.GetMethodBody()!;
+    private Module _module = methodBase.Module;
     private byte[] _il = [];
     private ILInstr[] _offsetToInstr = [];
     private ILInstr _back = new ILInstr.Back();
@@ -18,7 +24,6 @@ public class ILBodyParser(MethodBody methodBody)
     }
 
     public ILInstr Instructions => _back.next;
-    public int InstructionsCount => ILInstrs().Count() - 1;
     public List<ehClause> EhClauses => _ehs.ToList();
 
     private void ImportEH()
@@ -101,14 +106,51 @@ public class ILBodyParser(MethodBody methodBody)
                     instr.arg = new ILInstrOperand.Arg16(BitConverter.ToInt16(_il, offset));
                     break;
                 }
-                case OperandType.InlineI:
+
                 case OperandType.InlineMethod:
+                {
+                    var token = BitConverter.ToInt32(_il, offset);
+                    instr.arg = new ILInstrOperand.ResolvedMethod(
+                        _resolver.GetMethod(token, _methodBase));
+                    break;
+                }
                 case OperandType.InlineType:
+                {
+                    var token = BitConverter.ToInt32(_il, offset);
+                    instr.arg = new ILInstrOperand.ResolvedType(_resolver.GetType(token,
+                        _methodBase));
+                    break;
+                }
                 case OperandType.InlineString:
+                {
+                    var token = BitConverter.ToInt32(_il, offset);
+                    instr.arg = new ILInstrOperand.ResolvedString(_resolver.GetString(token, _methodBase).Value);
+                    break;
+                }
                 case OperandType.InlineSig:
+                {
+                    var token = BitConverter.ToInt32(_il, offset);
+                    instr.arg = new ILInstrOperand.ResolvedSignature(
+                        _resolver.GetSignature(token, _methodBase).Value);
+                    break;
+                }
                 case OperandType.InlineTok:
-                case OperandType.ShortInlineR:
+                {
+                    var token = BitConverter.ToInt32(_il, offset);
+                    instr.arg = new ILInstrOperand.ResolvedMember(
+                        _resolver.GetMember(token, _methodBase));
+                    break;
+                }
                 case OperandType.InlineField:
+                {
+                    var token = BitConverter.ToInt32(_il, offset);
+                    instr.arg = new ILInstrOperand.ResolvedField(
+                        _resolver.GetField(token, _methodBase));
+                    break;
+                }
+
+                case OperandType.InlineI:
+                case OperandType.ShortInlineR:
                 {
                     instr.arg = new ILInstrOperand.Arg32(BitConverter.ToInt32(_il, offset));
                     break;

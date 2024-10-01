@@ -34,8 +34,6 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
     public List<ILLocal> Params => methodBuilder.Params;
     public List<ILExpr> Temps => methodBuilder.Temps;
     public int ILFirst => _firstInstr.idx;
-    public string MethodName => methodBuilder.MethodInfo.Name;
-    public Type MethodReturnType => methodBuilder.MethodInfo.ReturnParameter.ParameterType;
 
     public void ConnectSuccsAndPreds(List<BlockTacBuilder> succs, List<BlockTacBuilder> preds)
     {
@@ -126,39 +124,6 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
     {
         return methodBuilder.GetNewTemp(type, value);
     }
-
-    // TODO move to another extension or introduce new approach
-    public FieldInfo ResolveField(int target)
-    {
-        return methodBuilder.ResolveField(target);
-    }
-
-    public Type ResolveType(int target)
-    {
-        return methodBuilder.ResolveType(target);
-    }
-
-    public MethodBase ResolveMethod(int target)
-    {
-        return methodBuilder.ResolveMethod(target);
-    }
-
-    // TODO find test case with calli
-    public byte[] ResolveSignature(int target)
-    {
-        return methodBuilder.ResolveSignature(target);
-    }
-
-    public string ResolveString(int target)
-    {
-        return methodBuilder.ResolveString(target);
-    }
-
-    public MemberInfo ResolveMember(int target)
-    {
-        return methodBuilder.ResolveMember(target);
-    }
-
 
     public override bool Equals(object? obj)
     {

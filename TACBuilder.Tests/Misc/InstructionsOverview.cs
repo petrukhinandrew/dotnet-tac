@@ -296,8 +296,11 @@ static class NewInstTests
 
 static unsafe class UnsafeTest
 {
-    unsafe struct LocalUnsafeStruct
+    unsafe struct LocalUnsafeStruct;
+
+    public static void kek<T>()
     {
+
     }
 
     public static void LdStObj()
@@ -699,7 +702,7 @@ static class CallTests
             return a1 + a2 + a3 + a4 + s.Length;
         }
     }
-    
+
     public static void DifferentCalls()
     {
         var instance = new CallTestInstance();
