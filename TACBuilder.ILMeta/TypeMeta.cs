@@ -22,6 +22,10 @@ public class TypeMeta : MemberMeta
     public override void Construct()
     {
         DeclaringAssembly = MetaCache.GetAssembly(_type.Assembly);
+        if (_type.IsGenericType)
+        {
+            GenericArgs = _type.GetGenericArguments().Select(MetaCache.GetType).ToList();
+        }
         Fields = _type.GetFields(BindingFlags).Select(MetaCache.GetField).ToList();
         var constructors = _type.GetConstructors(BindingFlags).Select(method => MetaCache.GetMethod(method));
         Methods = _type.GetMethods(BindingFlags).Select(method => MetaCache.GetMethod(method)).Concat(constructors)
@@ -29,6 +33,7 @@ public class TypeMeta : MemberMeta
     }
 
     public AssemblyMeta DeclaringAssembly { get; private set; }
+    public List<TypeMeta> GenericArgs { get; private set; } = new();
     public List<MethodMeta> Methods { get; private set; }
     public List<FieldMeta> Fields { get; private set; }
     public string Name => _type.Name;

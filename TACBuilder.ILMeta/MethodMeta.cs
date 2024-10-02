@@ -11,6 +11,7 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
 
     public MethodBase MethodBase => _methodBase;
     public TypeMeta DeclaringType { get; private set; }
+    public List<TypeMeta> GenericArgs { get; private set; } = new();
     public TypeMeta? ReturnType { get; private set; }
     public List<TypeMeta> ParametersType { get; private set; }
     public bool HasMethodBody { get; private set; }
@@ -28,7 +29,10 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
     public override void Construct()
     {
         DeclaringType = MetaCache.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
-
+        if (_methodBase.IsGenericMethod)
+        {
+            GenericArgs = _methodBase.GetGenericArguments().Select(MetaCache.GetType).ToList();
+        }
         if (_methodBase is MethodInfo methodInfo)
             ReturnType = MetaCache.GetType(methodInfo.ReturnType);
 
