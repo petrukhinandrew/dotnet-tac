@@ -8,6 +8,6 @@ public class AssemblyMeta(Assembly assembly) : CacheableMeta
 
     public override void Construct()
     {
-        Types = assembly.GetTypes().Select(MetaCache.GetType).ToList();
+        Types = assembly.GetTypes().Where(t => t.IsGenericTypeDefinition || !t.IsGenericType).Select(MetaCache.GetType).ToList();
     }
 }

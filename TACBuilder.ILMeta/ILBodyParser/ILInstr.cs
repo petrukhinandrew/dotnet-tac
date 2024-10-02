@@ -18,10 +18,12 @@ public abstract class ILInstr
         idx = 0;
     }
 
-    public bool IsJump() => IsCondJump() || IsUncondJump();
+    public bool IsJump() => this is SwitchArg || this is Instr
+    {
+        opCode.OperandType: OperandType.InlineBrTarget or OperandType.ShortInlineBrTarget
+    };
 
-    public bool IsCondJump() => this is SwitchArg || this is Instr { opCode.FlowControl: FlowControl.Cond_Branch };
-    public bool IsUncondJump() => this is Instr { opCode.FlowControl: FlowControl.Branch };
+    public bool IsUncondJump() => this is Instr instr && instr.opCode.FlowControl == FlowControl.Cond_Branch;
 
     public bool IsControlFlowInterruptor() => IsJump() || this is Instr
     {

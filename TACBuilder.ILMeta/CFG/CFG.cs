@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Reflection.Emit;
 using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta;
@@ -44,14 +45,15 @@ public class CFG
         while (cur is not ILInstr.Back)
         {
             Debug.Assert(cur is not null);
-            // if (cur.arg is ILInstrOperand.Target)
             if (cur.IsJump())
             {
+                Debug.Assert(((ILInstrOperand.Target)cur.arg).value is not null);
                 _leaders.Add(((ILInstrOperand.Target)cur.arg).value);
             }
 
-            if (cur.IsCondJump())
+            if (cur.IsUncondJump())
             {
+                Debug.Assert(cur.next is not null);
                 _leaders.Add(cur.next);
             }
 
@@ -82,7 +84,7 @@ public class CFG
         foreach (var leader in _leaders)
         {
             ILInstr cur = leader;
-            while (!IsBlockExit(cur))
+            while (!cur.IsControlFlowInterruptor())
             {
                 cur = cur.next;
             }
@@ -113,8 +115,6 @@ public class CFG
             block.StackErrType = _errTypeMapping.GetValueOrDefault(block.Entry.idx, null);
         }
     }
-
-    private bool IsBlockExit(ILInstr instr) => instr.IsControlFlowInterruptor() || instr.IsJump();
 
     public List<int> StartBlocksIndices => ((List<int>) [_entry.idx]).ToList()
         .Concat(_ehClauses.Select(c => c.handlerBegin.idx)).Concat(_ehClauses

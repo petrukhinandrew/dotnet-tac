@@ -34,25 +34,27 @@ public class ILBodyParser(MethodBase methodBase)
         ehClause ParseEh(exceptionHandlingClause c)
         {
             ILInstr tryBegin = _offsetToInstr[c.tryOffset];
+
             // TODO check
-            int te = c.tryOffset + c.tryLength;
+            int te = c.tryOffset + c.tryLength - 1;
             while (_offsetToInstr[te] is null)
             {
                 te--;
             }
 
             Debug.Assert(_offsetToInstr[te] is not null);
-            ILInstr tryEnd = _offsetToInstr[te].prev;
+            ILInstr tryEnd = _offsetToInstr[te];
+
             ILInstr handlerBegin = _offsetToInstr[c.handlerOffset];
             Debug.Assert(handlerBegin is not null);
-            int he = c.handlerOffset + c.handlerLength;
+            int he = c.handlerOffset + c.handlerLength - 1;
             while (_offsetToInstr[he] is null)
             {
                 he--;
             }
 
             Debug.Assert(_offsetToInstr[he] is not null);
-            ILInstr handlerEnd = _offsetToInstr[he].prev;
+            ILInstr handlerEnd = _offsetToInstr[he];
             int fd = 0;
             if (c.type is ehcType.Filter filt)
             {
@@ -77,6 +79,10 @@ public class ILBodyParser(MethodBase methodBase)
     {
         _il = _methodBody.GetILAsByteArray() ?? [];
         _offsetToInstr = new ILInstr[_il.Length + 1];
+
+        _back.next = _back;
+        _back.prev = _back;
+        _offsetToInstr[_il.Length] = _back;
         int offset = 0;
         bool branch = false;
         while (offset < _il.Length)
@@ -107,9 +113,9 @@ public class ILBodyParser(MethodBase methodBase)
                     _ => throw new Exception("unreachable " + op.OperandType.ToString())
                 };
             if (offset + size > _il.Length) throw new Exception("IL stream unexpectedly ended!");
-            ILInstr instr = new ILInstr.Instr(op, opOffset);
-            _offsetToInstr[opOffset] = instr;
-            ILInstr.InsertBefore(_back, instr);
+            ILInstr.InsertBefore(_back, new ILInstr.Instr(op, opOffset));
+            _offsetToInstr[opOffset] = _back.prev;
+            ILInstr instr = _offsetToInstr[opOffset];
             Debug.Assert(_back.prev == instr);
             switch (op.OperandType)
             {
@@ -200,6 +206,7 @@ public class ILBodyParser(MethodBase methodBase)
                     break;
                 }
                 case OperandType.InlineSwitch:
+                {
                     int sizeOfInt = sizeof(int);
                     if (offset + sizeOfInt > _il.Length)
                     {
@@ -228,6 +235,7 @@ public class ILBodyParser(MethodBase methodBase)
 
                     branch = true;
                     break;
+                }
                 default:
                     throw new Exception("Unexpected operand type!");
             }
@@ -241,29 +249,30 @@ public class ILBodyParser(MethodBase methodBase)
             throw new Exception("offset != il.Length");
         }
 
+        Debug.Assert(ILInstrs().All(i => i is not null));
         if (branch)
         {
-            _back = ILInstrs().Select(cur =>
+            foreach (var cur in ILInstrs())
             {
-                if (cur.IsJump())
+                if (!cur.IsJump()) continue;
+                if (cur.arg is ILInstrOperand.Arg32 a32)
                 {
-                    if (cur.arg is ILInstrOperand.Arg32 a32)
+                    if (_offsetToInstr[a32.value] is null)
                     {
-                        cur.arg = new ILInstrOperand.Target(_offsetToInstr[a32.value]);
+                        Debug.Assert(false);
                     }
-                    else
-                    {
-                        throw new Exception("Wrong operand of branching instruction!");
-                    }
-                }
 
-                Debug.Assert(cur is not null);
-                return cur;
-            }).Last().next;
+                    cur.arg = new ILInstrOperand.Target(_offsetToInstr[a32.value]);
+                }
+                else
+                {
+                    throw new Exception("Wrong operand of branching instruction!");
+                }
+            }
         }
     }
 
-    private IEnumerable<ILInstr> ILInstrs()
+    public IEnumerable<ILInstr> ILInstrs()
     {
         ILInstr cur = _back.next;
         while (cur != _back)
