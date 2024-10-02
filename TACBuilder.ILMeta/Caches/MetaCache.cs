@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Security.AccessControl;
 
 namespace TACBuilder.ILMeta;
 
@@ -70,9 +71,24 @@ static class MetaCache
     public static MethodMeta GetMethod(MethodBase source, int token)
     {
         var args = safeGenericArgs(source);
-        var method = source.Module.ResolveMethod(token, args.FromType, args.FromMethod);
+        MethodBase method;
+        // try
+        // {
+        // if (source.Name == "FindEndPosition" && token == 721420408)
+        // {
+        //     Console.WriteLine("");
+        // }
+
+        method = source.Module.ResolveMethod(token, args.FromType, args.FromMethod);
         Debug.Assert(method is not null);
         return GetMethod(method);
+        // }
+        // catch
+        // {
+        //     Console.WriteLine($"{source}, {token}");
+        // }
+        //
+        // throw new Exception("Method not found");
     }
 
     public static FieldMeta GetField(FieldInfo field)
@@ -122,26 +138,9 @@ static class MetaCache
 
     private static (Type[] FromType, Type[] FromMethod) safeGenericArgs(MethodBase source)
     {
-        Type[] typeGenericArgs = [];
-        Type[] methodGenericArgs = [];
-        try
-        {
-            typeGenericArgs = (source.ReflectedType ?? source.DeclaringType)!.GetGenericArguments();
-        }
-        catch
-        {
-            // ignored
-        }
-
-        try
-        {
-            methodGenericArgs = source.GetGenericArguments();
-        }
-        catch
-        {
-            // ignored
-        }
-
+        Type? t = (source.ReflectedType ?? source.DeclaringType);
+        Type[] typeGenericArgs = t is null || !t.IsGenericType ? [] : t.GetGenericArguments();
+        Type[] methodGenericArgs = source.IsGenericMethod ? source.GetGenericArguments() : [];
         return (typeGenericArgs, methodGenericArgs);
     }
 }

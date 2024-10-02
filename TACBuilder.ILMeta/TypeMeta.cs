@@ -26,9 +26,12 @@ public class TypeMeta : MemberMeta
         {
             GenericArgs = _type.GetGenericArguments().Select(MetaCache.GetType).ToList();
         }
+
         Fields = _type.GetFields(BindingFlags).Select(MetaCache.GetField).ToList();
         var constructors = _type.GetConstructors(BindingFlags).Select(method => MetaCache.GetMethod(method));
-        Methods = _type.GetMethods(BindingFlags).Select(method => MetaCache.GetMethod(method)).Concat(constructors)
+        Methods = _type.GetMethods(BindingFlags)
+            .Where(method => method.IsGenericMethodDefinition || !method.IsGenericMethod)
+            .Select(method => MetaCache.GetMethod(method)).Concat(constructors)
             .ToList();
     }
 
