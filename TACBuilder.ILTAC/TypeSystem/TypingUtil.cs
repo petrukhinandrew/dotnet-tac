@@ -108,7 +108,7 @@ public static class TypingUtil
     class UnmanagedCheck<T> where T : unmanaged
     {
     }
-
+    // TODO introduce same thing inside TypeMeta
     public static bool IsUnmanaged(this Type t)
     {
         try

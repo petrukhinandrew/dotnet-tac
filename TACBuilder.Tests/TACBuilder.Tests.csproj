@@ -1,11 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk" TreatAsLocalProperty="SelfContained">
     <PropertyGroup>
-        <TargetFramework>net8.0</TargetFramework>
+        <TargetFramework>net9.0</TargetFramework>
         <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <SelfContained>True</SelfContained>
-            
+
         <IsPackable>false</IsPackable>
         <IsTestProject>true</IsTestProject>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -16,6 +16,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0-rc.1.24431.7" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0-rc.1.24431.7" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0"/>
         <PackageReference Include="xunit" Version="2.4.2"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">

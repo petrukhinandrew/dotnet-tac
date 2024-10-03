@@ -171,7 +171,7 @@ public class ILMethod(MethodMeta meta) : ILExpr
 
     public bool IsGeneric => GenericArgs.Count > 0;
     public List<ILType> GenericArgs = new();
-    public ILType ReturnType = TypingUtil.ILTypeFrom(meta.ReturnType.Type);
+    public ILType ReturnType = TypingUtil.ILTypeFrom(meta.ReturnType?.Type);
     public List<ILExpr> Args = new List<ILExpr>();
     public ILType Type => ReturnType;
 
@@ -211,13 +211,13 @@ public class ILField(ILType type, string declType, string name, bool isStatic, i
 {
     public static ILField Static(FieldMeta f)
     {
-        return new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringTypeName, f.Name, true,
+        return new ILField(TypingUtil.ILTypeFrom(f.Type!.BaseType), f.DeclaringType!.Name, f.Name, true,
             f.MetadataToken);
     }
 
     public static ILField Instance(FieldMeta f, ILExpr inst)
     {
-        ILField field = new ILField(TypingUtil.ILTypeFrom(f.FieldType), f.DeclaringTypeName, f.Name, false,
+        ILField field = new ILField(TypingUtil.ILTypeFrom(f.Type!.BaseType), f.DeclaringType!.Name, f.Name, false,
             f.MetadataToken)
         {
             Receiver = inst

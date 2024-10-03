@@ -1,146 +1,68 @@
-using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
-using System.Security.AccessControl;
 
 namespace TACBuilder.ILMeta;
 
-static class MetaCache
+internal class MetaCache
 {
-    private static MetaConstructQueue _queue = new();
-    private static AssemblyCache _assemblyCache = new();
-    private static Dictionary<Assembly, AssemblyMeta> _assemblies = new();
-    private static Dictionary<Type, TypeMeta> _types = new();
-    private static Dictionary<MethodBase, MethodMeta> _methods = new();
-    private static Dictionary<FieldInfo, FieldMeta> _fields = new();
+    private readonly Dictionary<Assembly, AssemblyMeta> _assemblies = new();
+    private readonly Dictionary<Type, TypeMeta> _types = new();
+    private readonly Dictionary<MethodBase, MethodMeta> _methods = new();
+    private readonly Dictionary<FieldInfo, FieldMeta> _fields = new();
+    private readonly Dictionary<CustomAttributeData, AttributeMeta> _attributes = new();
 
-    public static void Construct()
+    public void AddAssembly(Assembly key, AssemblyMeta value)
     {
-        while (_queue.Count > 0)
-        {
-            _queue.Dequeue().Construct();
-        }
+        _assemblies.Add(key, value);
     }
 
-    public static AssemblyMeta GetAssembly(Assembly assembly)
+    public bool TryGetAssembly(Assembly key, [MaybeNullWhen(false)] out AssemblyMeta value)
     {
-        if (_assemblies.TryGetValue(assembly, out var assemblyMeta)) return assemblyMeta;
-        _assemblies.Add(assembly, new AssemblyMeta(assembly));
-        var meta = _assemblies[assembly];
-        _queue.Enqueue(meta);
-        return meta;
+        return _assemblies.TryGetValue(key, out value);
     }
 
-    public static AssemblyMeta GetAssembly(string assemblyPath)
+    public List<AssemblyMeta> GetAssemblies()
     {
-        var asm = _assemblyCache.Get(assemblyPath);
-        return GetAssembly(asm);
+        return _assemblies.Values.ToList();
     }
 
-    public static AssemblyMeta GetAssembly(AssemblyName assemblyName)
+    public void AddType(Type key, TypeMeta value)
     {
-        var asm = _assemblyCache.Get(assemblyName);
-        return GetAssembly(asm);
+        _types[key] = value;
     }
 
-    public static TypeMeta GetType(Type type)
+    public bool TryGetType(Type key, [MaybeNullWhen(false)] out TypeMeta value)
     {
-        if (_types.TryGetValue(type, out var typeMeta)) return typeMeta;
-        _types.Add(type, new TypeMeta(type));
-        var meta = _types[type];
-        _queue.Enqueue(meta);
-        return meta;
+        return _types.TryGetValue(key, out value);
     }
 
-    public static TypeMeta GetType(MethodBase source, int token)
+    public void AddMethod(MethodBase key, MethodMeta value)
     {
-        var args = safeGenericArgs(source);
-        var type = source.Module.ResolveType(token, args.FromType, args.FromMethod);
-        Debug.Assert(type is not null);
-        return GetType(type);
+        _methods[key] = value;
     }
 
-    public static MethodMeta GetMethod(MethodBase method)
+    public bool TryGetMethod(MethodBase key, [MaybeNullWhen(false)] out MethodMeta value)
     {
-        if (_methods.TryGetValue(method, out var methodMeta)) return methodMeta;
-        _methods.Add(method, new MethodMeta(method));
-        var meta = _methods[method];
-        _queue.Enqueue(meta);
-        return meta;
+        return _methods.TryGetValue(key, out value);
     }
 
-    public static MethodMeta GetMethod(MethodBase source, int token)
+    public void AddField(FieldInfo key, FieldMeta value)
     {
-        var args = safeGenericArgs(source);
-        MethodBase method;
-        // try
-        // {
-        // if (source.Name == "FindEndPosition" && token == 721420408)
-        // {
-        //     Console.WriteLine("");
-        // }
-
-        method = source.Module.ResolveMethod(token, args.FromType, args.FromMethod);
-        Debug.Assert(method is not null);
-        return GetMethod(method);
-        // }
-        // catch
-        // {
-        //     Console.WriteLine($"{source}, {token}");
-        // }
-        //
-        // throw new Exception("Method not found");
+        _fields[key] = value;
     }
 
-    public static FieldMeta GetField(FieldInfo field)
+    public bool TryGetField(FieldInfo key, [MaybeNullWhen(false)] out FieldMeta value)
     {
-        if (_fields.TryGetValue(field, out var fieldMeta)) return fieldMeta;
-        _fields.Add(field, new FieldMeta(field));
-        var meta = _fields[field];
-        _queue.Enqueue(meta);
-        return meta;
+        return _fields.TryGetValue(key, out value);
     }
 
-    public static FieldMeta GetField(MethodBase source, int token)
+    public void AddAttribute(CustomAttributeData key, AttributeMeta value)
     {
-        var args = safeGenericArgs(source);
-        var field = source.Module.ResolveField(token, args.FromType, args.FromMethod);
-        Debug.Assert(field is not null);
-        return GetField(field);
+        _attributes[key] = value;
     }
 
-    public static MemberMeta GetMember(MemberInfo member)
+    public bool TryGetAttribute(CustomAttributeData key, [MaybeNullWhen(false)] out AttributeMeta value)
     {
-        if (member is Type type) return GetType(type);
-        if (member is MethodBase method) return GetMethod(method);
-        if (member is FieldInfo field) return GetField(field);
-        throw new Exception("unexpected member type");
-    }
-
-    public static MemberMeta GetMember(MethodBase source, int token)
-    {
-        var args = safeGenericArgs(source);
-        var member = source.Module.ResolveMember(token, args.FromType, args.FromMethod);
-        Debug.Assert(member is not null);
-        return GetMember(member);
-    }
-
-    public static StringMeta GetString(MethodBase source, int token)
-    {
-        var value = source.Module.ResolveString(token);
-        return new StringMeta(value);
-    }
-
-    public static SignatureMeta GetSignature(MethodBase source, int token)
-    {
-        var value = source.Module.ResolveSignature(token);
-        return new SignatureMeta(value);
-    }
-
-    private static (Type[] FromType, Type[] FromMethod) safeGenericArgs(MethodBase source)
-    {
-        Type? t = (source.ReflectedType ?? source.DeclaringType);
-        Type[] typeGenericArgs = t is null || !t.IsGenericType ? [] : t.GetGenericArguments();
-        Type[] methodGenericArgs = source.IsGenericMethod ? source.GetGenericArguments() : [];
-        return (typeGenericArgs, methodGenericArgs);
+        return _attributes.TryGetValue(key, out value);
     }
 }
