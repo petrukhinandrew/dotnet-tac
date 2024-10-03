@@ -2,7 +2,7 @@
 using System.Reflection.Emit;
 using TACBuilder.ILMeta.ILBodyParser;
 
-namespace TACBuilder.ILMeta;
+namespace TACBuilder.ILMeta.CFG;
 
 public class CFG
 {

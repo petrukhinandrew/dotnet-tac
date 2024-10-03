@@ -1,6 +1,5 @@
 namespace TACBuilder.ILMeta;
 
-public class MetaConstructQueue: Queue<CacheableMeta>
+public class MetaConstructQueue : Queue<CacheableMeta>
 {
-
 }

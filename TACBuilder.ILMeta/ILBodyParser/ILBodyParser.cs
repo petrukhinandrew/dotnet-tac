@@ -140,41 +140,41 @@ public class ILBodyParser(MethodBase methodBase)
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedMethod(
-                        MetaCache.GetMethod(_methodBase, token)
+                        MetaBuilder.GetMethod(_methodBase, token)
                     );
                     break;
                 }
                 case OperandType.InlineType:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedType(MetaCache.GetType(_methodBase, token));
+                    instr.arg = new ILInstrOperand.ResolvedType(MetaBuilder.GetType(_methodBase, token));
                     break;
                 }
                 case OperandType.InlineString:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedString(MetaCache.GetString(_methodBase, token).Value);
+                    instr.arg = new ILInstrOperand.ResolvedString(MetaBuilder.GetString(_methodBase, token).Value);
                     break;
                 }
                 case OperandType.InlineSig:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedSignature(
-                        MetaCache.GetSignature(_methodBase, token).Value);
+                        MetaBuilder.GetSignature(_methodBase, token).Value);
                     break;
                 }
                 case OperandType.InlineTok:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedMember(
-                        MetaCache.GetMember(_methodBase, token));
+                        MetaBuilder.GetMember(_methodBase, token));
                     break;
                 }
                 case OperandType.InlineField:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedField(
-                        MetaCache.GetField(_methodBase, token));
+                        MetaBuilder.GetField(_methodBase, token));
                     break;
                 }
 

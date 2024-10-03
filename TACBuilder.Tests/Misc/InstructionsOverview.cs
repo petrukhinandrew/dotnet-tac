@@ -1,10 +1,21 @@
-using System.Linq.Expressions;
-using System.Runtime.CompilerServices;
-
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 #pragma warning disable
 namespace Usvm.IL.Test.Instructions;
+
+public class CustomAttribute(string value) : Attribute
+{
+    public string Value => value;
+}
+
+[Custom("lolkek")]
+public class CustomAttrUsage
+{
+    public void Kek()
+    {
+
+    }
+}
 
 public class OpsTest
 {
@@ -300,7 +311,6 @@ static unsafe class UnsafeTest
 
     public static void kek<T>()
     {
-
     }
 
     public static void LdStObj()

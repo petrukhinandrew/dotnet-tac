@@ -10,7 +10,7 @@ namespace TACBuilder
     static class BlockTacLineBuilder
     {
         /*
-         * returns true if successors may be rebuild
+         * returns true if successors may be rebuilt
          */
         public static bool Rebuild(this BlockTacBuilder blockBuilder)
         {
@@ -23,7 +23,7 @@ namespace TACBuilder
             blockBuilder.CurInstr = blockBuilder._firstInstr;
             while (true)
             {
-                Debug.Assert(blockBuilder.CurInstr is ILInstr.Instr);
+                Debug.Assert(blockBuilder.CurInstr is ILInstr.Instr, blockBuilder.CurInstr.ToString() + " on " + blockBuilder.Meta.MethodMeta.Name);
                 switch (((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name)
                 {
                     case "ckfinite":
@@ -198,7 +198,7 @@ namespace TACBuilder
                     {
                         FieldMeta field = ((ILInstrOperand.ResolvedField)blockBuilder.CurInstr.arg).value;
                         ILField ilField = ILField.Static(field);
-                        if (field.FieldType.IsUnmanaged())
+                        if (field.Type!.BaseType.IsUnmanaged())
                         {
                             blockBuilder.Push(new ILUnmanagedRef(ilField));
                         }
