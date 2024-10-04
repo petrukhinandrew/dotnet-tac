@@ -23,8 +23,7 @@ public abstract class ILInstr
         opCode.OperandType: OperandType.InlineBrTarget or OperandType.ShortInlineBrTarget
     };
 
-    public bool IsUncondJump() => this is Instr instr && instr.opCode.FlowControl == FlowControl.Cond_Branch;
-
+    public bool IsCondJump => this is Instr instr && instr.opCode.FlowControl == FlowControl.Cond_Branch;
     public bool IsControlFlowInterruptor() => IsJump() || this is Instr
     {
         opCode.FlowControl: FlowControl.Throw or FlowControl.Return
