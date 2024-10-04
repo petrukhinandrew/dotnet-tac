@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using TACBuilder.ILMeta;
@@ -70,6 +71,7 @@ class MethodTacBuilder
         }
 
         ComposeTac();
+        // Debug.Assert(Tac.Count == BlockTacBuilders.Values.Select(bb => bb.TacLines.Count).Sum());
         return new TACMethod(_tacMethodInfo, Tac);
     }
 
@@ -133,7 +135,7 @@ class MethodTacBuilder
         // TODO separate ordering and Tac composition
         int lineNum = 0;
         var successors = _meta.Cfg.Succsessors;
-        foreach (var ilIdx in successors.Keys)
+        foreach (var ilIdx in successors.Keys.OrderBy(k => k))
         {
             ilToTacMapping[ilIdx] = null;
         }

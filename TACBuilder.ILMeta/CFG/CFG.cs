@@ -51,7 +51,7 @@ public class CFG
                 _leaders.Add(((ILInstrOperand.Target)cur.arg).value);
             }
 
-            if (cur.IsUncondJump())
+            if (cur.IsCondJump || cur is ILInstr.SwitchArg)
             {
                 Debug.Assert(cur.next is not null);
                 _leaders.Add(cur.next);
@@ -63,6 +63,7 @@ public class CFG
         foreach (var clause in _ehClauses)
         {
             Debug.Assert(clause.handlerBegin is not null);
+            // TODO check try is to be leader
             _leaders.Add(clause.handlerBegin);
             if (clause.ehcType is rewriterEhcType.CatchEH catchEh)
             {
@@ -76,7 +77,7 @@ public class CFG
             }
         }
 
-        Debug.Assert(_leaders.Any(l => l is not null));
+        Debug.Assert(_leaders.All(l => l is not null));
     }
 
     private void MarkupBlocks()
@@ -84,7 +85,11 @@ public class CFG
         foreach (var leader in _leaders)
         {
             ILInstr cur = leader;
-            while (!cur.IsControlFlowInterruptor())
+            while (cur is ILInstr.Instr
+                   {
+                       opCode.FlowControl: not FlowControl.Cond_Branch and not FlowControl.Branch
+                       and not FlowControl.Return and not FlowControl.Throw and not FlowControl.Meta
+                   } && !_leaders.Contains(cur.next))
             {
                 cur = cur.next;
             }
@@ -97,12 +102,13 @@ public class CFG
                 _predecessors[targetIdx].Add(leader.idx);
             }
 
-            if (!cur.IsUncondJump() && !cur.IsControlFlowInterruptor())
+            if (cur.IsCondJump || cur is ILInstr.SwitchArg)
             {
                 _succsessors[leader.idx].Add(cur.idx + 1);
                 _predecessors[cur.idx + 1].Add(leader.idx);
             }
         }
+        Console.WriteLine();
     }
 
     private void AttachMetaInfoToBlocks()
@@ -116,7 +122,7 @@ public class CFG
         }
     }
 
-    public List<int> StartBlocksIndices => ((List<int>) [_entry.idx]).ToList()
+    public List<int> StartBlocksIndices => new List<int> { _entry.idx }
         .Concat(_ehClauses.Select(c => c.handlerBegin.idx)).Concat(_ehClauses
             .Where(c => c.ehcType is rewriterEhcType.FilterEH).Select(f =>
                 ((rewriterEhcType.FilterEH)f.ehcType).instr.idx)).ToList();
