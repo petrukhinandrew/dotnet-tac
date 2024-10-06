@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using TACBuilder.ILMeta;
 using TACBuilder.ILMeta.ILBodyParser;
@@ -23,7 +25,8 @@ namespace TACBuilder
             blockBuilder.CurInstr = blockBuilder._firstInstr;
             while (true)
             {
-                Debug.Assert(blockBuilder.CurInstr is ILInstr.Instr, blockBuilder.CurInstr.ToString() + " on " + blockBuilder.Meta.MethodMeta.Name);
+                Debug.Assert(blockBuilder.CurInstr is ILInstr.Instr,
+                    blockBuilder.CurInstr.ToString() + " on " + blockBuilder.Meta.MethodMeta.Name);
                 switch (((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name)
                 {
                     case "ckfinite":
@@ -525,7 +528,7 @@ namespace TACBuilder
                         var methodMeta = blockBuilder.Meta.MethodMeta!;
 
                         ILExpr? retVal = null;
-                        if (methodMeta.ReturnType != null)
+                        if (methodMeta.ReturnType != null && methodMeta.ReturnType.BaseType != typeof(void))
                             retVal = blockBuilder.Pop();
                         blockBuilder.NewLine(
                             new ILReturnStmt(retVal)

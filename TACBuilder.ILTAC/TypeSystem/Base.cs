@@ -164,9 +164,13 @@ public class ILMethod(MethodMeta meta) : ILExpr
             Args.Add(pop());
         }
 
-        Args.Reverse();
         if (_meta.HasThis)
-            Receiver = pop();
+        {
+            Receiver = Args.Last();
+            Args.RemoveAt(Args.Count - 1);
+        }
+
+        Args.Reverse();
     }
 
     public bool IsGeneric => GenericArgs.Count > 0;
