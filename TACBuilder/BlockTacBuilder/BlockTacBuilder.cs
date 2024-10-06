@@ -13,7 +13,8 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
 
     public bool BuiltAtLeastOnce => _builtAtLeastOnce;
     internal bool _builtAtLeastOnce = false;
-
+    internal ILExpr? _switchRegister;
+    internal int? _switchBranch;
     internal readonly ILInstr _firstInstr = meta.Entry;
     internal ILInstr CurInstr = meta.Entry;
 

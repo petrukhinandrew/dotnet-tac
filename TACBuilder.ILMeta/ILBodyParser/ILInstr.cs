@@ -48,8 +48,9 @@ public abstract class ILInstr
         }
     }
 
-    public sealed class SwitchArg : ILInstr
+    public sealed class SwitchArg(int value) : ILInstr
     {
+        public int Value => value;
         public override string ToString()
         {
             return "SwitchArg";
