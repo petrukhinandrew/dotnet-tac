@@ -95,6 +95,8 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
     }
 
     // TODO check expr Type, if < ILInt => push ((ILInt) expr)
+    // TODO connect tmp var to stack index in bb or so (e.g. merged values)
+    // TODO make push ILValue only
     public void Push(ILExpr expr)
     {
         _stack.Push(expr);
