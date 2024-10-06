@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection.Emit;
+using System.Runtime.InteropServices.ComTypes;
 using TACBuilder.ILMeta.ILBodyParser;
 
 namespace TACBuilder.ILMeta.CFG;
@@ -73,6 +74,8 @@ public class CFG
             if (clause.ehcType is rewriterEhcType.FilterEH filterEh)
             {
                 Debug.Assert(filterEh.instr is not null);
+                _errTypeMapping[clause.handlerBegin.idx] = typeof(Exception);
+                _errTypeMapping[filterEh.instr.idx] = typeof(Exception);
                 _leaders.Add(filterEh.instr);
             }
         }
@@ -108,6 +111,7 @@ public class CFG
                 _predecessors[cur.idx + 1].Add(leader.idx);
             }
         }
+
         Console.WriteLine();
     }
 

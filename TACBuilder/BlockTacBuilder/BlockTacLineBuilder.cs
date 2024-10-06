@@ -25,6 +25,20 @@ namespace TACBuilder
             blockBuilder.CurInstr = blockBuilder._firstInstr;
             while (true)
             {
+                if (blockBuilder.CurInstr is ILInstr.SwitchArg switchBranch)
+                {
+                    ILInstrOperand.Target target = (ILInstrOperand.Target)switchBranch.arg;
+                    Debug.Assert(blockBuilder._switchRegister is not null);
+                    // targets.Add(target.value);
+                    blockBuilder.NewLine(new ILIfStmt(
+                        new ILBinaryOperation(blockBuilder._switchRegister,
+                            new ILLiteral(new ILInt32(), switchBranch.Value.ToString())),
+                        target.value.idx
+                    ));
+                    blockBuilder.Successors.ForEach(s => s._switchRegister = blockBuilder._switchRegister);
+                    if (blockBuilder.CurInstrIsLast()) return true;
+                }
+
                 Debug.Assert(blockBuilder.CurInstr is ILInstr.Instr,
                     blockBuilder.CurInstr.ToString() + " on " + blockBuilder.Meta.MethodMeta.Name);
                 switch (((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name)
@@ -382,18 +396,19 @@ namespace TACBuilder
                     {
                         int branchCnt = ((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value;
                         ILExpr compVal = blockBuilder.Pop();
-                        ILInstr switchBranch = blockBuilder.CurInstr;
-                        List<ILInstr> targets = [];
-                        for (int branch = 0; branch < branchCnt; branch++)
-                        {
-                            switchBranch = switchBranch.next;
-                            ILInstrOperand.Target target = (ILInstrOperand.Target)((ILInstr.SwitchArg)switchBranch).arg;
-                            targets.Add(target.value);
-                            blockBuilder.NewLine(new ILIfStmt(
-                                new ILBinaryOperation(compVal, new ILLiteral(new ILInt32(), branch.ToString())),
-                                target.value.idx
-                            ));
-                        }
+                        blockBuilder.Successors.ForEach(s => s._switchRegister = compVal);
+                        // ILInstr switchBranch = blockBuilder.CurInstr;
+                        // List<ILInstr> targets = [];
+                        // for (int branch = 0; branch < branchCnt; branch++)
+                        // {
+                        //     switchBranch = switchBranch.next;
+                        //     ILInstrOperand.Target target = (ILInstrOperand.Target)((ILInstr.SwitchArg)switchBranch).arg;
+                        //     targets.Add(target.value);
+                        //     blockBuilder.NewLine(new ILIfStmt(
+                        //         new ILBinaryOperation(compVal, new ILLiteral(new ILInt32(), branch.ToString())),
+                        //         target.value.idx
+                        //     ));
+                        // }
 
                         break;
                     }

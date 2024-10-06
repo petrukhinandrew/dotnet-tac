@@ -224,7 +224,7 @@ public class ILBodyParser(MethodBase methodBase)
                             throw new Exception("IL stream unexpectedly ended!");
                         }
 
-                        ILInstr instrArg = new ILInstr.SwitchArg
+                        ILInstr instrArg = new ILInstr.SwitchArg(i)
                         {
                             arg = new ILInstrOperand.Arg32(BitConverter.ToInt32(_il, offset) + baseOffset)
                         };
