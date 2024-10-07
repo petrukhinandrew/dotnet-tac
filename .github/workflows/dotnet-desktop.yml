@@ -1,0 +1,35 @@
+name: .NET Core Desktop
+
+on:
+  push:
+  pull_request: 
+    branches: [ "main" ]
+
+jobs:
+
+  build:     
+  
+    runs-on: ubuntu-latest  
+    
+    env:
+      Solution_Name: dotnet-tac
+      Test_Project_Path: TACBuilder.Tests/TACBuilder.Tests.csproj
+      
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Install .NET Core
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 9.0.x
+
+    - name: Setup MSBuild.exe
+      uses: microsoft/setup-msbuild@v2
+    - name: Publish TACBuilder.Tests
+      run: dotnet publish TACBuilder.Tests/TACBuilder.Tests.csproj --self-contained -r osx-arm64 -c Release
+
+    - name: Execute unit tests
+      run: dotnet test
