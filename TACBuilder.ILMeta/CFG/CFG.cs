@@ -103,13 +103,25 @@ public class CFG
                 var targetIdx = ((ILInstrOperand.Target)cur.arg).value.idx;
                 _succsessors[leader.idx].Add(targetIdx);
                 _predecessors[targetIdx].Add(leader.idx);
+                if (cur.IsCondJump || cur is ILInstr.SwitchArg)
+                {
+                    _succsessors[leader.idx].Add(cur.idx + 1);
+                    _predecessors[cur.idx + 1].Add(leader.idx);
+                }
+
+                continue;
             }
 
-            if (cur.IsCondJump || cur is ILInstr.SwitchArg)
+            if (_leaders.Any(instr => instr.idx == cur.idx + 1))
             {
                 _succsessors[leader.idx].Add(cur.idx + 1);
                 _predecessors[cur.idx + 1].Add(leader.idx);
             }
+        }
+
+        foreach (var succ in _succsessors.Values)
+        {
+            succ.Sort();
         }
 
         Console.WriteLine();

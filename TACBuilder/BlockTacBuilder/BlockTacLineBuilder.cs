@@ -56,6 +56,7 @@ namespace TACBuilder
                     case "cpblk":
                         throw new Exception("not implemented " + ((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name);
 
+                    case "constrained.":
                     case "nop":
                     case "break": break;
 
@@ -680,10 +681,10 @@ namespace TACBuilder
                     {
                         // TODO hide method info
                         MethodMeta methodMeta = ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
-                        if (!methodMeta.MethodBase.IsConstructor)
-                            throw new Exception("expected constructor for newobj");
-                        int arity = methodMeta.MethodBase.GetParameters().Count(p => !p.IsRetval);
-                        Type objType = methodMeta.MethodBase.DeclaringType!;
+                        // ctor does not have return type
+                        Debug.Assert(methodMeta.ReturnType is null);
+                        int arity = methodMeta.ParametersType.Count;
+                        TypeMeta objType = methodMeta.DeclaringType!;
                         ILExpr[] inParams = new ILExpr[arity];
                         for (int i = 0; i < arity; i++)
                         {
@@ -691,7 +692,7 @@ namespace TACBuilder
                         }
 
                         blockBuilder.Push(new ILNewExpr(
-                            TypingUtil.ILTypeFrom(objType),
+                            TypingUtil.ILTypeFrom(objType.BaseType),
                             inParams));
                         break;
                     }

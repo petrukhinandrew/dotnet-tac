@@ -202,12 +202,12 @@ public class ILMethod(MethodMeta meta) : ILExpr
 
     public override bool Equals(object? obj)
     {
-        return obj is ILMethod m && m._meta.MethodBase == _meta.MethodBase;
+        return obj is ILMethod m && m._meta == _meta;
     }
 
     public override int GetHashCode()
     {
-        return _meta.MethodBase.GetHashCode();
+        return _meta.GetHashCode();
     }
 }
 

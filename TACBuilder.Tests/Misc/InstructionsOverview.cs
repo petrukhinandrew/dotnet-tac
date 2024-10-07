@@ -133,7 +133,7 @@ static class ConditionsTests
     {
         int a = 1;
         int b = 2;
-        string s = (a > b) ? "true" : "false";
+        string s = (a + b < a * b) ? "true" : "false";
         int c = s.Length < a + b ? b - a : a - b;
     }
 

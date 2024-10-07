@@ -33,7 +33,7 @@ public class TypeMeta(Type type) : MemberMeta(type)
         }
 
         DeclaringAssembly.EnsureTypeAttached(this);
-        if (MetaBuilder.TypeFilters.All(f => !f(_type))) return;
+        if (MetaBuilder.TypeFilters.Any(f => !f(_type))) return;
 
         var fields = _type.GetFields(BindingFlags);
         foreach (var field in fields)

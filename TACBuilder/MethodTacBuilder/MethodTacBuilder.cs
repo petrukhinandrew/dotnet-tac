@@ -11,10 +11,9 @@ namespace TACBuilder;
 
 class MethodTacBuilder
 {
-    public readonly MethodBase MethodBase;
     private readonly MethodMeta _meta;
+    private readonly MethodBase _methodBase;
     private readonly TACMethodInfo _tacMethodInfo = new();
-    private readonly Module _declaringModule;
     public List<ILLocal> Locals => _tacMethodInfo.Locals;
 
     public List<ILLocal> Params => _tacMethodInfo.Params;
@@ -24,15 +23,13 @@ class MethodTacBuilder
     public Dictionary<(int, int), ILMerged> Merged = new();
     public List<ILIndexedStmt> Tac = new();
     public Dictionary<int, BlockTacBuilder> BlockTacBuilders = new();
-    private ILInstr _begin;
     public Dictionary<int, int?> ilToTacMapping = new();
     public Queue<BlockTacBuilder> Worklist = new();
 
     public MethodTacBuilder(MethodMeta meta)
     {
         _meta = meta;
-        MethodBase = meta.MethodBase;
-        _declaringModule = meta.MethodBase.Module;
+        _methodBase = meta.MethodBase;
     }
 
     public TACMethod Build()
@@ -40,32 +37,23 @@ class MethodTacBuilder
         _tacMethodInfo.Meta = _meta;
         if (!_meta.HasMethodBody) return new TACMethod(_tacMethodInfo, []);
 
-        _begin = _meta.FirstInstruction;
         int hasThisIndexingDelta = 0;
-        if (!MethodBase.IsStatic)
+        if (!_methodBase.IsStatic)
         {
             _tacMethodInfo.Params.Add(
-                new ILLocal(TypingUtil.ILTypeFrom(MethodBase.ReflectedType), NamingUtil.ArgVar(0)));
+                new ILLocal(TypingUtil.ILTypeFrom(_methodBase.ReflectedType), NamingUtil.ArgVar(0)));
             hasThisIndexingDelta = 1;
         }
 
-        _tacMethodInfo.Params.AddRange(MethodBase.GetParameters().OrderBy(p => p.Position).Select(l =>
+        _tacMethodInfo.Params.AddRange(_methodBase.GetParameters().OrderBy(p => p.Position).Select(l =>
             new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position + hasThisIndexingDelta))));
         _tacMethodInfo.Locals = _meta.MethodBase.GetMethodBody().LocalVariables.OrderBy(l => l.LocalIndex)
             .Select(l => new ILLocal(TypingUtil.ILTypeFrom(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
-        // InitEhScopes();
 
         InitBlockBuilders();
 
         ProcessIL();
-        /* TODO ILExpr -> TempVar -> ILMerged (these are inheritance arrows)
-         * we attach every temp var, including merged ones to exact ILInstr
-         * than we may identify all the variables introduced by the location they were actually introduced
-         * it'll simplify merged values access and won't make temp var introduction way more difficult
-         * another improvement is methodtacbuilder won't know about specific temp var subtypes
-         * it'll know about the idea of temp var in general (more encapsulation)
-         */
-
+        // TODO may be put together with temp vars somehow
         foreach (var m in Merged.Values)
         {
             var temp = GetNewTemp(m, Temps.Keys.Max() + 1);
@@ -78,7 +66,6 @@ class MethodTacBuilder
         }
 
         ComposeTac();
-        // Debug.Assert(Tac.Count == BlockTacBuilders.Values.Select(bb => bb.TacLines.Count).Sum());
         return new TACMethod(_tacMethodInfo, Tac);
     }
 
@@ -92,26 +79,6 @@ class MethodTacBuilder
                 BlockTacBuilders.Values.Where(bb => blockBuilder.Meta.Successors.Contains(bb.Meta.Entry.idx)).ToList(),
                 BlockTacBuilders.Values.Where(bb => blockBuilder.Meta.Predecessors.Contains(bb.Meta.Entry.idx))
                     .ToList());
-        }
-    }
-
-    // move to meta smth
-    // mb remove
-    private void InitEhScopes()
-    {
-        foreach (var ehc in _meta.EhClauses)
-        {
-            EHScope scope = EHScope.FromClause(ehc);
-            if (!_tacMethodInfo.Scopes.Contains(scope))
-            {
-                if (scope is EHScopeWithVarIdx s)
-                {
-                    s.ErrIdx = Errs.Count;
-                    // _tacMethodInfo.Errs.Add(new ILLocal(TypingUtil.ILTypeFrom(s.Type), NamingUtil.ErrVar(s.ErrIdx)));
-                }
-
-                _tacMethodInfo.Scopes.Add(scope);
-            }
         }
     }
 
@@ -139,9 +106,8 @@ class MethodTacBuilder
 
     private void ComposeTac()
     {
-        // TODO separate ordering and Tac composition
         int lineNum = 0;
-        var successors = _meta.Cfg.Succsessors;
+        var successors = _meta.BasicBlocks.ToDictionary(bb => bb.Entry.idx, bb => bb.Successors);
         foreach (var ilIdx in successors.Keys.OrderBy(k => k))
         {
             ilToTacMapping[ilIdx] = null;

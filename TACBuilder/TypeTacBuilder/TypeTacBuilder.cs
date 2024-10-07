@@ -7,7 +7,7 @@ public class TypeTacBuilder(TypeMeta meta)
 {
     private TypeMeta _meta = meta;
 
-    private List<MethodTacBuilder> _methodBuilders =
+    private readonly List<MethodTacBuilder> _methodBuilders =
         meta.Methods.Select(methodMeta => new MethodTacBuilder(methodMeta)).ToList();
 
     public TACType Build()
@@ -15,14 +15,7 @@ public class TypeTacBuilder(TypeMeta meta)
         var builtMethods = new List<TACMethod>();
         foreach (var methodBuilder in _methodBuilders)
         {
-            try
-            {
-                builtMethods.Add(methodBuilder.Build());
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine("TypeTacBuilder with " + e);
-            }
+            builtMethods.Add(methodBuilder.Build());
         }
 
         return new TACType(builtMethods);

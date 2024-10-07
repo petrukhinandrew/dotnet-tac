@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using TACBuilder.ILMeta.ILBodyParser;
@@ -7,8 +8,6 @@ namespace TACBuilder.ILMeta;
 public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
 {
     private readonly MethodBase _methodBase = methodBase;
-    private ILBodyParser.ILBodyParser _bodyParser;
-    private List<BasicBlockMeta> _basicBlocks = new();
 
     public MethodBase MethodBase => _methodBase;
     public TypeMeta? DeclaringType { get; private set; }
@@ -21,13 +20,14 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
     public new string Name => _methodBase.Name;
     public new bool IsConstructed = false;
 
-    public List<BasicBlockMeta> BasicBlocks => _basicBlocks;
-    public List<int> StartBlocksIndices => Cfg.StartBlocksIndices;
+    public List<BasicBlockMeta> BasicBlocks => _cfg.BasicBlocks;
+    public List<int> StartBlocksIndices => _cfg.StartBlocksIndices;
     public ILInstr FirstInstruction => _bodyParser.Instructions;
     public List<ehClause> EhClauses => _bodyParser.EhClauses;
 
     // TODO cfg must be private
-    public CFG.CFG Cfg;
+    private CFG.CFG _cfg;
+    private ILBodyParser.ILBodyParser _bodyParser;
 
     public override void Construct()
     {
@@ -50,13 +50,13 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
 
         if (_methodBase is MethodInfo methodInfo)
             ReturnType = MetaBuilder.GetType(methodInfo.ReturnType);
-
-        if (_methodBase.CallingConvention.HasFlag(CallingConventions.HasThis))
+        Debug.Assert(ParametersType.Count == 0);
+        if (_methodBase.CallingConvention.HasFlag(CallingConventions.HasThis) && !_methodBase.IsConstructor)
             ParametersType.Add(DeclaringType);
 
         HasThis = ParametersType.Count == 1;
         var methodParams = _methodBase.GetParameters()
-            .OrderBy(parameter => parameter.Position + ParametersType.Count);
+            .OrderBy(parameter => parameter.Position);
 
         foreach (var methodParam in methodParams)
         {
@@ -65,7 +65,7 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
 
         // TODO introduce new type for parameter
         DeclaringType.EnsureMethodAttached(this);
-        if (MetaBuilder.MethodFilters.All(f => !f(_methodBase))) return;
+        if (MetaBuilder.MethodFilters.Any(f => !f(_methodBase))) return;
         try
         {
             HasMethodBody = _methodBase.GetMethodBody() != null;
@@ -89,9 +89,9 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
         _bodyParser = new ILBodyParser.ILBodyParser(_methodBase);
         _bodyParser.Parse();
 
-        Cfg = new CFG.CFG(_bodyParser.Instructions, _bodyParser.EhClauses);
-        _basicBlocks = Cfg.BasicBlocks;
-        foreach (var block in _basicBlocks) block.AttachToMethod(this);
+        _cfg = new CFG.CFG(_bodyParser.Instructions, _bodyParser.EhClauses);
+
+        foreach (var block in BasicBlocks) block.AttachToMethod(this);
     }
 
     public override bool Equals(object? obj)

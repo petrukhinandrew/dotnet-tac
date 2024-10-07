@@ -16,7 +16,7 @@ public class AssemblyMeta(Assembly assembly) : CacheableMeta
         Name = _assembly.GetName().FullName;
         Location = _assembly.Location;
         Logger.LogInformation("Constructed {Name}", Name);
-        if (MetaBuilder.AssemblyFilters.All(f => !f(_assembly))) return;
+        if (MetaBuilder.AssemblyFilters.Any(f => !f(_assembly))) return;
         // TODO referenced assemblies
 
         var types = _assembly.GetTypes().Where(t => t.IsGenericTypeDefinition || !t.IsGenericType);

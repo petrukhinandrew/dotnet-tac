@@ -52,6 +52,7 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
             .Select((p, i) => (i, EvaluationStack<ILExpr>.CopyOf(p._stack))).ToList();
         List<ILExpr> newStack = new();
         var stackLengths = stacks.Select(p => p.Item2.Count).ToList();
+        if (stacks.All(s => s.Item2.Count == 0)) return true;
         Debug.Assert(stackLengths.Max() == stackLengths.Min());
         for (int j = 0; j < stackLengths.Max(); j++)
         {
@@ -99,7 +100,7 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
     public void Push(ILExpr expr, int optInstrIdx = -1)
     {
         var instrIdx = optInstrIdx == -1 ? CurInstr.idx : optInstrIdx;
-        if (expr is ILLValue)
+        if (expr is ILValue)
         {
             _stack.Push(expr);
         }

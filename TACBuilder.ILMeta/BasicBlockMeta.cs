@@ -9,8 +9,8 @@ public class BasicBlockMeta(ILInstr entry, ILInstr exit)
     private MethodMeta? _methodMeta;
     public MethodMeta? MethodMeta => _methodMeta;
 
-    public List<int> Successors = new List<int>();
-    public List<int> Predecessors = new List<int>();
+    public List<int> Successors = new();
+    public List<int> Predecessors = new();
     public Type? StackErrType;
 
     public void AttachToMethod(MethodMeta methodMeta)

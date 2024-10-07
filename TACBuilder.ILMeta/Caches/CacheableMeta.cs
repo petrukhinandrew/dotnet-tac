@@ -4,7 +4,7 @@ namespace TACBuilder.ILMeta;
 
 public abstract class CacheableMeta
 {
-    protected static readonly ILogger Logger = LoggerFactory.Create(builder => builder.AddConsole())
+    protected static readonly ILogger Logger = LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.None))
         .CreateLogger("Meta");
 
     public bool IsConstructed { get; private set; } = false;
