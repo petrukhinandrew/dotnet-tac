@@ -6,15 +6,11 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: windows-latest
-
     env:
       Solution_Name: dotnet-tac
       Test_Project_Path: TACBuilder.Tests\TACBuilder.Tests.csproj
-
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -24,7 +20,7 @@ jobs:
     - name: Install .NET Core
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 9.0.x
+        dotnet-version: 9.0.100-rc.1.24452.12
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
