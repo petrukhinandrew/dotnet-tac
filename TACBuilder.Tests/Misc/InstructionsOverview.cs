@@ -13,7 +13,6 @@ public class CustomAttrUsage
 {
     public void Kek()
     {
-
     }
 }
 
@@ -595,8 +594,9 @@ static unsafe class Misc
         int a = 1;
         goto TargetX;
 
-        TargetX:
         int b = 2;
+        TargetX:
+        int c = 3;
     }
 
     public static void ByteAndInt()

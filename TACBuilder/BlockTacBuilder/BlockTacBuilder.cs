@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using TACBuilder.ILMeta;
 using TACBuilder.ILMeta.ILBodyParser;
+using TACBuilder.ILTAC;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
@@ -33,7 +34,7 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
 
     public List<ILLocal> Locals => methodBuilder.Locals;
     public List<ILLocal> Params => methodBuilder.Params;
-    public List<ILExpr> Temps => methodBuilder.Temps;
+    public Dictionary<int, TempVar> Temps => methodBuilder.Temps;
     public int ILFirst => _firstInstr.idx;
 
     public void ConnectSuccsAndPreds(List<BlockTacBuilder> succs, List<BlockTacBuilder> preds)
@@ -95,11 +96,19 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
     }
 
     // TODO check expr Type, if < ILInt => push ((ILInt) expr)
-    // TODO connect tmp var to stack index in bb or so (e.g. merged values)
-    // TODO make push ILValue only
-    public void Push(ILExpr expr)
+    public void Push(ILExpr expr, int optInstrIdx = -1)
     {
-        _stack.Push(expr);
+        var instrIdx = optInstrIdx == -1 ? CurInstr.idx : optInstrIdx;
+        if (expr is ILLValue)
+        {
+            _stack.Push(expr);
+        }
+        else
+        {
+            var tmp = GetNewTemp(expr, instrIdx);
+            NewLine(new ILAssignStmt(tmp, expr));
+            _stack.Push(tmp);
+        }
     }
 
     public void ClearStack()
@@ -120,12 +129,12 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
     public void PushLiteral<T>(T value)
     {
         ILLiteral lit = new ILLiteral(TypingUtil.ILTypeFrom(typeof(T)), value?.ToString() ?? "");
-        Push(lit);
+        Push(lit, -1);
     }
 
-    public ILLocal GetNewTemp(ILType type, ILExpr value)
+    public TempVar GetNewTemp(ILExpr value, int instrIdx)
     {
-        return methodBuilder.GetNewTemp(type, value);
+        return methodBuilder.GetNewTemp(value, instrIdx);
     }
 
     public override bool Equals(object? obj)

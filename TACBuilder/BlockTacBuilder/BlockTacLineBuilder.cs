@@ -515,7 +515,7 @@ namespace TACBuilder
                             var call = new ILCallExpr(ilMethod);
                             if (ilMethod.Returns())
                             {
-                                var tmp = blockBuilder.GetNewTemp(call.Type, call);
+                                var tmp = blockBuilder.GetNewTemp(call, blockBuilder.CurInstr.idx);
                                 blockBuilder.NewLine(new ILAssignStmt(tmp, call));
                                 blockBuilder.Push(tmp);
                             }
@@ -709,7 +709,7 @@ namespace TACBuilder
                         ILExpr arrExpr = new ILNewArrayExpr(
                             resolvedType,
                             sizeExpr);
-                        ILLocal arrTemp = blockBuilder.GetNewTemp(resolvedType, arrExpr);
+                        ILLValue arrTemp = blockBuilder.GetNewTemp(arrExpr, blockBuilder.CurInstr.idx);
                         blockBuilder.NewLine(new ILAssignStmt(
                             arrTemp,
                             arrExpr
@@ -916,7 +916,7 @@ namespace TACBuilder
                 try
                 {
                     ILNewArrayExpr expr =
-                        (ILNewArrayExpr)blockBuilder.Temps[NamingUtil.TakeIndexFrom(newArr.ToString())];
+                        (ILNewArrayExpr)blockBuilder.Temps[NamingUtil.TakeIndexFrom(newArr.ToString())].Value;
                     int arrSize = int.Parse(expr.Size.ToString());
                     Type arrType = ((ILPrimitiveType)expr.Type).ReflectedType;
                     var tmp = Array.CreateInstance(arrType, arrSize);

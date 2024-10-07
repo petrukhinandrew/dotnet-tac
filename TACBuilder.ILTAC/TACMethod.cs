@@ -5,13 +5,32 @@ using TACBuilder.Utils;
 
 namespace TACBuilder.ILTAC;
 
+public class TempVar(int index, ILExpr value) : ILLValue
+{
+    public int Index => index;
+    public ILExpr Value { get; private set; } = value;
+    public ILType Type { get; private set; } = value.Type;
+    private List<int> _accessors = new();
+    private bool _isMerged = false;
+
+    public void AccessFrom(int bb)
+    {
+        _accessors.Add(bb);
+    }
+
+    public override string ToString()
+    {
+        return NamingUtil.TempVar(index);
+    }
+}
+
 public class TACMethodInfo
 {
     // TODO pass signature here instead
     public MethodMeta Meta;
     public List<ILLocal> Locals = new();
     public List<ILLocal> Params = new();
-    public List<ILExpr> Temps = new();
+    public Dictionary<int, TempVar> Temps = new();
     public List<ILExpr> Errs = new();
     public List<EHScope> Scopes = new();
 }
@@ -55,7 +74,7 @@ internal static class TACMethodPrinter
 
     private static List<string> FormatTempVars(this TACMethod method)
     {
-        return FormatAnyVars(method.Info.Temps, NamingUtil.TempVar);
+        return FormatAnyVars(method.Info.Temps.Values, NamingUtil.TempVar);
     }
 
     private static List<string> FormatLocalVars(this TACMethod method)

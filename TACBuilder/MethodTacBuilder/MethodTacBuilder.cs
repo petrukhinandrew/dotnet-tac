@@ -18,7 +18,7 @@ class MethodTacBuilder
     public List<ILLocal> Locals => _tacMethodInfo.Locals;
 
     public List<ILLocal> Params => _tacMethodInfo.Params;
-    public List<ILExpr> Temps => _tacMethodInfo.Temps;
+    public Dictionary<int, TempVar> Temps => _tacMethodInfo.Temps;
     public List<ILExpr> Errs => _tacMethodInfo.Errs;
     public List<EHScope> Scopes => _tacMethodInfo.Scopes;
     public Dictionary<(int, int), ILMerged> Merged = new();
@@ -58,10 +58,17 @@ class MethodTacBuilder
         InitBlockBuilders();
 
         ProcessIL();
+        /* TODO ILExpr -> TempVar -> ILMerged (these are inheritance arrows)
+         * we attach every temp var, including merged ones to exact ILInstr
+         * than we may identify all the variables introduced by the location they were actually introduced
+         * it'll simplify merged values access and won't make temp var introduction way more difficult
+         * another improvement is methodtacbuilder won't know about specific temp var subtypes
+         * it'll know about the idea of temp var in general (more encapsulation)
+         */
 
         foreach (var m in Merged.Values)
         {
-            var temp = GetNewTemp(m.Type, m);
+            var temp = GetNewTemp(m, Temps.Keys.Max() + 1);
             m.MakeTemp(temp.ToString());
         }
 
@@ -165,10 +172,18 @@ class MethodTacBuilder
         }
     }
 
-    internal ILLocal GetNewTemp(ILType type, ILExpr value)
+    // TODO put merge here
+    internal TempVar GetNewTemp(ILExpr value, int instrIdx)
     {
-        Temps.Add(value);
-        return new ILLocal(type, NamingUtil.TempVar(Temps.Count - 1));
+        if (Temps.ContainsKey(instrIdx))
+        {
+        }
+        else
+        {
+            Temps.Add(instrIdx, new TempVar(Temps.Count, value));
+        }
+
+        return Temps[instrIdx];
     }
 
     internal ILExpr GetNewErr(Type type)
