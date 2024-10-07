@@ -20,8 +20,6 @@ public class AppTacBuilder
             if (serializationStream != null)
                 tacAssembly.SerializeTo(serializationStream);
         }
-
-        Console.WriteLine("Done");
     }
 
     public static void FilterMethodsFromRootAsm(string rootAssemblyPath)
