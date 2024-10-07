@@ -52,7 +52,6 @@ class MethodTacBuilder
         InitBlockBuilders();
 
         ProcessIL();
-        // TODO may be put together with temp vars somehow
         foreach (var m in Merged.Values)
         {
             var temp = GetNewTemp(m, Temps.Keys.Max() + 1);
