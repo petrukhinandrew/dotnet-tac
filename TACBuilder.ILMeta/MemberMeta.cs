@@ -13,9 +13,9 @@ public abstract class MemberMeta(MemberInfo memberInfo) : CacheableMeta
 
 public class UnknownMemberMeta : MemberMeta
 {
-    public UnknownMemberMeta() : base(null)
+    public UnknownMemberMeta(MethodBase source) : base(null)
     {
-        Console.WriteLine("Unknown MemberMeta");
+        UnknownMetaUtil.DisplayMessage(source);
     }
 
     public override void Construct()
@@ -25,9 +25,9 @@ public class UnknownMemberMeta : MemberMeta
 
 public class UnknownTypeMeta : TypeMeta
 {
-    public UnknownTypeMeta() : base(null)
+    public UnknownTypeMeta(MethodBase source) : base(null)
     {
-        Console.WriteLine("Unknown MemberMeta");
+        UnknownMetaUtil.DisplayMessage(source);
     }
 
     public override void Construct()
@@ -37,9 +37,9 @@ public class UnknownTypeMeta : TypeMeta
 
 public class UnknownMethodMeta : MethodMeta
 {
-    public UnknownMethodMeta() : base(null)
+    public UnknownMethodMeta(MethodBase source) : base(null)
     {
-        Console.WriteLine("Unknown MemberMeta");
+        UnknownMetaUtil.DisplayMessage(source);
     }
 
     public override void Construct()
@@ -49,12 +49,20 @@ public class UnknownMethodMeta : MethodMeta
 
 public class UnknownFieldMeta : FieldMeta
 {
-    public UnknownFieldMeta() : base(null)
+    public UnknownFieldMeta(MethodBase source) : base(null)
     {
-        Console.WriteLine("Unknown MemberMeta");
+        UnknownMetaUtil.DisplayMessage(source);
     }
 
     public override void Construct()
     {
+    }
+}
+
+internal class UnknownMetaUtil
+{
+    public static void DisplayMessage(MethodBase source)
+    {
+        Console.Error.WriteLine("Unknown MemberMeta at " + source.Name);
     }
 }

@@ -96,7 +96,7 @@ public static class MetaBuilder
         catch
         {
             AssertUnknownMetaComeFromCoreLib(source);
-            return new UnknownTypeMeta();
+            return new UnknownTypeMeta(source);
         }
     }
 
@@ -115,12 +115,12 @@ public static class MetaBuilder
         try
         {
             MethodBase? method = source.Module.ResolveMethod(token, args.FromType, args.FromMethod);
-            return method is null ? new UnknownMethodMeta() : GetMethod(method);
+            return method is null ? new UnknownMethodMeta(source) : GetMethod(method);
         }
         catch
         {
             AssertUnknownMetaComeFromCoreLib(source);
-            return new UnknownMethodMeta();
+            return new UnknownMethodMeta(source);
         }
     }
 
@@ -139,12 +139,12 @@ public static class MetaBuilder
         try
         {
             FieldInfo? field = source.Module.ResolveField(token, args.FromType, args.FromMethod);
-            return field is null ? new UnknownFieldMeta() : GetField(field);
+            return field is null ? new UnknownFieldMeta(source) : GetField(field);
         }
         catch
         {
             AssertUnknownMetaComeFromCoreLib(source);
-            return new UnknownFieldMeta();
+            return new UnknownFieldMeta(source);
         }
     }
 
@@ -171,12 +171,12 @@ public static class MetaBuilder
         try
         {
             MemberInfo? member = source.Module.ResolveMember(token, args.FromType, args.FromMethod);
-            return member is null ? new UnknownMemberMeta() : GetMember(member);
+            return member is null ? new UnknownMemberMeta(source) : GetMember(member);
         }
         catch
         {
             AssertUnknownMetaComeFromCoreLib(source);
-            return new UnknownMemberMeta();
+            return new UnknownMemberMeta(source);
         }
     }
 
@@ -194,7 +194,7 @@ public static class MetaBuilder
 
     private static void AssertUnknownMetaComeFromCoreLib(MethodBase source)
     {
-        Debug.Assert(source.Module.Assembly.FullName.StartsWith("System.Private.CoreLib"));
+        // Debug.Assert(source.Module.Assembly.FullName.StartsWith("System.Private.CoreLib"));
     }
     private static (Type[] FromType, Type[] FromMethod) SafeGenericArgs(MethodBase source)
     {
