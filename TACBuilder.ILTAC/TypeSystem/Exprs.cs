@@ -28,7 +28,7 @@ public class ILNewDefaultExpr(ILType type) : ILExpr
 
     public override string ToString()
     {
-        return string.Format("new {0}(default)", Type.ToString());
+        return $"new {Type}(default)";
     }
 }
 

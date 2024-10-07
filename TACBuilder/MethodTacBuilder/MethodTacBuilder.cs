@@ -19,11 +19,11 @@ class MethodTacBuilder
     public Dictionary<int, TempVar> Temps => _tacMethodInfo.Temps;
     public List<ILExpr> Errs => _tacMethodInfo.Errs;
     public List<EHScope> Scopes => _tacMethodInfo.Scopes;
-    public Dictionary<(int, int), ILMerged> Merged = new();
-    public List<ILIndexedStmt> Tac = new();
+    public readonly Dictionary<(int, int), ILMerged> Merged = new();
+    public readonly List<ILIndexedStmt> Tac = new();
     public Dictionary<int, BlockTacBuilder> BlockTacBuilders = new();
     public Dictionary<int, int?> ilToTacMapping = new();
-    public Queue<BlockTacBuilder> Worklist = new();
+    public readonly Queue<BlockTacBuilder> Worklist = new();
 
     public MethodTacBuilder(MethodMeta meta)
     {
