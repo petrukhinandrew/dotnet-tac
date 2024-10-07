@@ -9,7 +9,7 @@ class Program
     {
         var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
         var appTacBuilder =
-            new AppTacBuilder(path);
+            new AppTacBuilder(path, Console.OpenStandardOutput());
         // appTacBuilder.Resolve();
     }
 }

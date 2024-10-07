@@ -5,7 +5,7 @@ namespace TACBuilder;
 
 public class AppTacBuilder
 {
-    public AppTacBuilder(string rootAssemblyPath)
+    public AppTacBuilder(string rootAssemblyPath, Stream? serializationStream = null)
     {
         Debug.Assert(File.Exists(rootAssemblyPath));
         // FilterMethodsFromSingleMSCoreLibType(rootAssemblyPath, "FileSystemEntry");
@@ -17,12 +17,14 @@ public class AppTacBuilder
         foreach (var asm in MetaBuilder.GetAssemblies())
         {
             var tacAssembly = new AssemblyTacBuilder(asm).Build();
-            tacAssembly.SerializeTo(Console.OpenStandardOutput());
+            if (serializationStream != null)
+                tacAssembly.SerializeTo(serializationStream);
         }
+
         Console.WriteLine("Done");
     }
 
-    private void FilterMethodsFromRootAsm(string rootAssemblyPath)
+    public static void FilterMethodsFromRootAsm(string rootAssemblyPath)
     {
         MetaBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
         MetaBuilder.AddTypeFilter(type =>
@@ -31,7 +33,7 @@ public class AppTacBuilder
             (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath);
     }
 
-    private void FilterSingleMethodFromRootAsm(string rootAssemblyPath, string methodName)
+    public static void FilterSingleMethodFromRootAsm(string rootAssemblyPath, string methodName)
     {
         MetaBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
         MetaBuilder.AddTypeFilter(type =>
@@ -41,7 +43,7 @@ public class AppTacBuilder
         MetaBuilder.AddTypeFilter(method => method.Name.StartsWith(methodName));
     }
 
-    private void FilterMethodsFromSingleMSCoreLibType(string rootAssemblyPath, string typeNamePart)
+    public static void FilterMethodsFromSingleMSCoreLibType(string rootAssemblyPath, string typeNamePart)
     {
         MetaBuilder.AddAssemblyFilter(assembly =>
             assembly.GetName().FullName.StartsWith("System.Private.CoreLib") || assembly.Location == rootAssemblyPath);
