@@ -17,10 +17,7 @@ internal class AssemblyCache
 
     private Assembly GetOrInsert(AssemblyPath path, Assembly assembly)
     {
-        if (!_cache.ContainsKey(path))
-        {
-            _cache.Add(path, assembly);
-        }
+        _cache.TryAdd(path, assembly);
 
         return _cache[path];
     }

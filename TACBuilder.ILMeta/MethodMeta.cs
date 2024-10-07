@@ -9,12 +9,12 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
 {
     private readonly MethodBase _methodBase = methodBase;
 
-    public MethodBase MethodBase => _methodBase;
     public TypeMeta? DeclaringType { get; private set; }
     public List<TypeMeta> Attributes { get; } = new();
     public List<TypeMeta> GenericArgs { get; } = new();
     public TypeMeta? ReturnType { get; private set; }
     public List<TypeMeta> ParametersType { get; } = new();
+    public List<TypeMeta> LocalVarsType { get; } = new();
     public bool HasMethodBody { get; private set; }
     public bool HasThis { get; private set; }
     public new string Name => _methodBase.Name;
@@ -51,9 +51,8 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
         if (_methodBase is MethodInfo methodInfo)
             ReturnType = MetaBuilder.GetType(methodInfo.ReturnType);
         Debug.Assert(ParametersType.Count == 0);
-        if (_methodBase.CallingConvention.HasFlag(CallingConventions.HasThis) && !_methodBase.IsConstructor)
+        if (!_methodBase.IsStatic)
             ParametersType.Add(DeclaringType);
-
         HasThis = ParametersType.Count == 1;
         var methodParams = _methodBase.GetParameters()
             .OrderBy(parameter => parameter.Position);
@@ -78,6 +77,11 @@ public class MethodMeta(MethodBase methodBase) : MemberMeta(methodBase)
         if (HasMethodBody)
         {
             Logger.LogDebug("Resolving body of {Type} {Name}", DeclaringType.Name, Name);
+            foreach (var locVar in _methodBase.GetMethodBody().LocalVariables.OrderBy(localVar => localVar.LocalIndex))
+            {
+                LocalVarsType.Add(MetaBuilder.GetType(locVar.LocalType));
+            }
+
             Resolve();
         }
 

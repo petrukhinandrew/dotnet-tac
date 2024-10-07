@@ -49,7 +49,6 @@ namespace TACBuilder
                     case "refanyval":
                     case "jmp":
                     case "calli":
-                    case "stelem.i":
                     case "ldelem.i":
                     case "initblk":
                     case "cpobj":
@@ -131,14 +130,14 @@ namespace TACBuilder
                     {
                         int idx = ((ILInstrOperand.Arg16)blockBuilder.CurInstr.arg).value;
                         ILExpr value = blockBuilder.Pop();
-                        blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Params[idx], value));
+                        blockBuilder.NewLine(new ILAssignStmt((ILLocal)blockBuilder.Params[idx], value));
                         break;
                     }
                     case "starg.s":
                     {
                         int idx = ((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value;
                         ILExpr value = blockBuilder.Pop();
-                        blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Params[idx], value));
+                        blockBuilder.NewLine(new ILAssignStmt((ILLocal)blockBuilder.Params[idx], value));
                         break;
                     }
                     case "arglist":
@@ -304,7 +303,7 @@ namespace TACBuilder
                     {
                         TypeMeta typeMeta = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         ILExpr addr = blockBuilder.Pop();
-                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(typeMeta.Type));
+                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, TypingUtil.ILTypeFrom(typeMeta.BaseType));
                         blockBuilder.Push(deref);
                         break;
                     }
@@ -683,7 +682,7 @@ namespace TACBuilder
                         MethodMeta methodMeta = ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
                         // ctor does not have return type
                         Debug.Assert(methodMeta.ReturnType is null);
-                        int arity = methodMeta.ParametersType.Count;
+                        int arity = methodMeta.ParametersType.Count - 1; // TODO is hardcoded -1 for `this` ok?
                         TypeMeta objType = methodMeta.DeclaringType!;
                         ILExpr[] inParams = new ILExpr[arity];
                         for (int i = 0; i < arity; i++)
@@ -765,6 +764,7 @@ namespace TACBuilder
                     case "stelem.r4":
                     case "stelem.r8":
                     case "stelem.ref":
+                    case "stelem.i":
                     case "stelem":
                     {
                         ILExpr value = blockBuilder.Pop();

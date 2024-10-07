@@ -68,6 +68,24 @@ public class ILUInt32 : ILPrimitiveType
         return "uint32";
     }
 }
+public class ILUInt64 : ILPrimitiveType
+{
+    public override Type ReflectedType => typeof(ulong);
+
+    public override string ToString()
+    {
+        return "uint64";
+    }
+}
+public class ILInt8 : ILPrimitiveType
+{
+    public override Type ReflectedType => typeof(sbyte);
+
+    public override string ToString()
+    {
+        return "int8";
+    }
+}
 
 public class ILInt32 : ILPrimitiveType
 {

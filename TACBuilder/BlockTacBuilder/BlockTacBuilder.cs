@@ -33,7 +33,7 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
     public readonly List<ILStmt> TacLines = new();
 
     public List<ILLocal> Locals => methodBuilder.Locals;
-    public List<ILLocal> Params => methodBuilder.Params;
+    public List<ILExpr> Params => methodBuilder.Params;
     public Dictionary<int, TempVar> Temps => methodBuilder.Temps;
     public int ILFirst => _firstInstr.idx;
 

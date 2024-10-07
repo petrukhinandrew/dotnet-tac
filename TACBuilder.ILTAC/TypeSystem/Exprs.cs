@@ -162,7 +162,7 @@ public class PointerExprTypeResolver
                 return new ILUnmanagedDeref(instance, type);
             }
             default:
-                throw new Exception("no way");
+                throw new Exception("deref " + instance.ToString() + " as " + type);
         }
     }
 }
@@ -178,7 +178,6 @@ public class ILManagedRef(ILExpr value) : ILRefExpr
         return "&" + Value.ToString();
     }
 }
-
 // TODO check &int64 |-> int* ~> *v
 
 public class ILUnmanagedRef(ILExpr value) : ILRefExpr

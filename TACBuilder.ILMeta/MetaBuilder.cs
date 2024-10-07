@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 
 namespace TACBuilder.ILMeta;
@@ -94,6 +95,7 @@ public static class MetaBuilder
         }
         catch
         {
+            AssertUnknownMetaComeFromCoreLib(source);
             return new UnknownTypeMeta();
         }
     }
@@ -117,6 +119,7 @@ public static class MetaBuilder
         }
         catch
         {
+            AssertUnknownMetaComeFromCoreLib(source);
             return new UnknownMethodMeta();
         }
     }
@@ -140,6 +143,7 @@ public static class MetaBuilder
         }
         catch
         {
+            AssertUnknownMetaComeFromCoreLib(source);
             return new UnknownFieldMeta();
         }
     }
@@ -171,6 +175,7 @@ public static class MetaBuilder
         }
         catch
         {
+            AssertUnknownMetaComeFromCoreLib(source);
             return new UnknownMemberMeta();
         }
     }
@@ -187,6 +192,10 @@ public static class MetaBuilder
         return new SignatureMeta(value);
     }
 
+    private static void AssertUnknownMetaComeFromCoreLib(MethodBase source)
+    {
+        Debug.Assert(source.Module.Assembly.FullName.StartsWith("System.Private.CoreLib"));
+    }
     private static (Type[] FromType, Type[] FromMethod) SafeGenericArgs(MethodBase source)
     {
         Type? t = (source.ReflectedType ?? source.DeclaringType);

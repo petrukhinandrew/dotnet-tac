@@ -13,8 +13,10 @@ public static class TypingUtil
                 if (type == typeof(char)) return new ILChar();
                 if (type == typeof(bool)) return new ILBool();
                 if (type == typeof(byte)) return new ILUInt8();
+                if (type == typeof(sbyte)) return new ILInt8();
                 if (type == typeof(short) || type == typeof(ushort)) return new ILUInt16();
                 if (type == typeof(int)) return new ILInt32();
+                if (type == typeof(ulong)) return new ILUInt64();
                 if (type == typeof(long)) return new ILInt64();
                 if (type == typeof(float)) return new ILFloat32();
                 if (type == typeof(double)) return new ILInt64();

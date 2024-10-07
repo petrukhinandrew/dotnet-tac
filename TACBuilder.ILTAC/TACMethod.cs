@@ -29,7 +29,7 @@ public class TACMethodInfo
     // TODO pass signature here instead
     public MethodMeta Meta;
     public List<ILLocal> Locals = new();
-    public List<ILLocal> Params = new();
+    public List<ILExpr> Params = new();
     public Dictionary<int, TempVar> Temps = new();
     public List<ILExpr> Errs = new();
     public List<EHScope> Scopes = new();
@@ -93,7 +93,7 @@ internal static class TACMethodPrinter
         ILType retType = TypingUtil.ILTypeFrom(meta.ReturnType?.BaseType);
         return string.Format("{0} {1}({2})", retType, meta.Name,
             string.Join(", ",
-                meta.MethodBase.GetParameters().Select(mi => TypingUtil.ILTypeFrom(mi.ParameterType).ToString())));
+                method.Info.Params.Select(mi => mi.Type.ToString())));
     }
 
     private static void DumpMethodSignature(this TACMethod method, StreamWriter writer)

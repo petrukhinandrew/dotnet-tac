@@ -37,6 +37,21 @@ public class CFG
 
         MarkupBlocks();
         AttachMetaInfoToBlocks();
+        if (!CheckAllBlockHaveSuccessors())
+            Debug.Assert(CheckAllBlockHaveSuccessors(), "found block without a successor");
+    }
+
+    private bool CheckAllBlockHaveSuccessors()
+    {
+        bool AcceptableExitInstr(ILInstr instr)
+        {
+            return instr.next is ILInstr.Back || instr is ILInstr.Instr
+            {
+                opCode.FlowControl: FlowControl.Return or FlowControl.Throw
+            };
+        }
+
+        return _blocks.All(bb => bb.Successors.Count > 0 || AcceptableExitInstr(bb.Exit));
     }
 
     private void CollectLeaders()
@@ -91,7 +106,7 @@ public class CFG
             while (cur is ILInstr.Instr
                    {
                        opCode.FlowControl: not FlowControl.Cond_Branch and not FlowControl.Branch
-                       and not FlowControl.Return and not FlowControl.Throw and not FlowControl.Meta
+                       and not FlowControl.Return and not FlowControl.Throw
                    } && !_leaders.Contains(cur.next))
             {
                 cur = cur.next;
@@ -123,8 +138,6 @@ public class CFG
         {
             succ.Sort();
         }
-
-        Console.WriteLine();
     }
 
     private void AttachMetaInfoToBlocks()

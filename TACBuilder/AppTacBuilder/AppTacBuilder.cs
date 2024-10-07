@@ -9,7 +9,9 @@ public class AppTacBuilder
     {
         Debug.Assert(File.Exists(rootAssemblyPath));
         // FilterMethodsFromSingleMSCoreLibType(rootAssemblyPath, "FileSystemEntry");
-        FilterMethodsFromRootAsm(rootAssemblyPath);
+        // FilterMethodsFromSingleMSCoreLibType(rootAssemblyPath, "AhoCorasick");
+        FilterMethodsFromSingleMSCoreLibType(rootAssemblyPath, "Vector128");
+        // FilterMethodsFromRootAsm(rootAssemblyPath);
         var rootAssemblyMeta = MetaBuilder.BuildFrom(rootAssemblyPath);
 
         foreach (var asm in MetaBuilder.GetAssemblies())
@@ -17,6 +19,7 @@ public class AppTacBuilder
             var tacAssembly = new AssemblyTacBuilder(asm).Build();
             tacAssembly.SerializeTo(Console.OpenStandardOutput());
         }
+        Console.WriteLine("Done");
     }
 
     private void FilterMethodsFromRootAsm(string rootAssemblyPath)

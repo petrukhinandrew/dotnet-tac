@@ -12,11 +12,10 @@ namespace TACBuilder;
 class MethodTacBuilder
 {
     private readonly MethodMeta _meta;
-    private readonly MethodBase _methodBase;
     private readonly TACMethodInfo _tacMethodInfo = new();
     public List<ILLocal> Locals => _tacMethodInfo.Locals;
 
-    public List<ILLocal> Params => _tacMethodInfo.Params;
+    public List<ILExpr> Params => _tacMethodInfo.Params;
     public Dictionary<int, TempVar> Temps => _tacMethodInfo.Temps;
     public List<ILExpr> Errs => _tacMethodInfo.Errs;
     public List<EHScope> Scopes => _tacMethodInfo.Scopes;
@@ -29,27 +28,27 @@ class MethodTacBuilder
     public MethodTacBuilder(MethodMeta meta)
     {
         _meta = meta;
-        _methodBase = meta.MethodBase;
     }
 
     public TACMethod Build()
     {
         _tacMethodInfo.Meta = _meta;
-        if (!_meta.HasMethodBody) return new TACMethod(_tacMethodInfo, []);
-
-        int hasThisIndexingDelta = 0;
-        if (!_methodBase.IsStatic)
+        if (_meta.HasThis)
         {
-            _tacMethodInfo.Params.Add(
-                new ILLocal(TypingUtil.ILTypeFrom(_methodBase.ReflectedType), NamingUtil.ArgVar(0)));
-            hasThisIndexingDelta = 1;
+            var thisType = TypingUtil.ILTypeFrom(_meta.ParametersType[0].BaseType);
+            if (thisType is ILValueType)
+                Params.Add(new ILManagedRef(new ILLocal(thisType, "this")));
+            else
+                Params.Add(new ILLocal(thisType, "this"));
         }
 
-        _tacMethodInfo.Params.AddRange(_methodBase.GetParameters().OrderBy(p => p.Position).Select(l =>
-            new ILLocal(TypingUtil.ILTypeFrom(l.ParameterType), NamingUtil.ArgVar(l.Position + hasThisIndexingDelta))));
-        _tacMethodInfo.Locals = _meta.MethodBase.GetMethodBody().LocalVariables.OrderBy(l => l.LocalIndex)
-            .Select(l => new ILLocal(TypingUtil.ILTypeFrom(l.LocalType), NamingUtil.LocalVar(l.LocalIndex))).ToList();
+        Params.AddRange(_meta.ParametersType.Skip(_meta.HasThis ? 1 : 0).Select((l, i) =>
+            new ILLocal(TypingUtil.ILTypeFrom(l.BaseType), NamingUtil.ArgVar(i))));
 
+        Locals.AddRange(_meta.LocalVarsType
+            .Select((l, i) => new ILLocal(TypingUtil.ILTypeFrom(l.BaseType), NamingUtil.LocalVar(i))).ToList());
+
+        if (!_meta.HasMethodBody) return new TACMethod(_tacMethodInfo, []);
         InitBlockBuilders();
 
         ProcessIL();
