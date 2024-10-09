@@ -32,7 +32,10 @@ public class CFG
         MarkupBlocks();
         AttachMetaInfoToBlocks();
         if (!CheckAllBlockHaveSuccessors())
+        {
+            Console.WriteLine("kek");
             Debug.Assert(CheckAllBlockHaveSuccessors(), "found block without a successor");
+        }
     }
 
     private bool CheckAllBlockHaveSuccessors()
@@ -101,7 +104,7 @@ public class CFG
             ILInstr cur = leader;
             while (cur is ILInstr.Instr
                    {
-                       opCode.FlowControl: FlowControl.Next or FlowControl.Call
+                       opCode.FlowControl: FlowControl.Next or FlowControl.Call or FlowControl.Meta
                        // opCode.FlowControl: not FlowControl.Cond_Branch and not FlowControl.Branch
                        // and not FlowControl.Return and not FlowControl.Throw
                    } && !_leaders.Contains(cur.next))
