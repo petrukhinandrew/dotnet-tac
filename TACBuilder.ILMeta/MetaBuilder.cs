@@ -124,6 +124,20 @@ public static class MetaBuilder
         }
     }
 
+    internal static MethodMeta.ParameterMeta GetThisParameter(TypeMeta typeMeta)
+    {
+        var instance = new MethodMeta.This(typeMeta);
+        _queue.Enqueue(instance);
+        return instance;
+    }
+
+    internal static MethodMeta.Parameter GetMethodParameter(ParameterInfo parameter, int index)
+    {
+        var instance = new MethodMeta.Parameter(parameter, index);
+        _queue.Enqueue(instance);
+        return instance;
+    }
+
     internal static FieldMeta GetField(FieldInfo field)
     {
         if (_cache.TryGetField(field, out var meta)) return meta;
@@ -196,6 +210,7 @@ public static class MetaBuilder
     {
         // Debug.Assert(source.Module.Assembly.FullName.StartsWith("System.Private.CoreLib"));
     }
+
     private static (Type[] FromType, Type[] FromMethod) SafeGenericArgs(MethodBase source)
     {
         Type? t = (source.ReflectedType ?? source.DeclaringType);

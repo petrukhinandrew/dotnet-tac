@@ -5,11 +5,11 @@ namespace TACBuilder.ILMeta;
 
 internal class MetaCache
 {
-    private readonly Dictionary<Assembly, AssemblyMeta> _assemblies = new();
-    private readonly Dictionary<Type, TypeMeta> _types = new();
-    private readonly Dictionary<MethodBase, MethodMeta> _methods = new();
-    private readonly Dictionary<FieldInfo, FieldMeta> _fields = new();
-    private readonly Dictionary<CustomAttributeData, AttributeMeta> _attributes = new();
+    public readonly Dictionary<Assembly, AssemblyMeta> _assemblies = new();
+    public readonly Dictionary<Type, TypeMeta> _types = new();
+    public readonly Dictionary<MethodBase, MethodMeta> _methods = new();
+    public readonly Dictionary<FieldInfo, FieldMeta> _fields = new();
+    public readonly Dictionary<CustomAttributeData, AttributeMeta> _attributes = new();
 
     public void AddAssembly(Assembly key, AssemblyMeta value)
     {

@@ -13,7 +13,3 @@ class Program
         // appTacBuilder.Resolve();
     }
 }
-
-
-// /home/andrew/Documents/dotnet-tac/TACBuilder.Tests/bin/Release/net9.0/linux-x64/publish/System.Private.CoreLib.dll
-// /home/andrew/Documents/dotnet-tac/TACBuilder.Tests/bin/Release/net9.0/linux-x64/publish/System.Private.CoreLib.dll

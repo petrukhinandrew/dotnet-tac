@@ -159,7 +159,7 @@ public class ILMethod(MethodMeta meta) : ILExpr
 
     public void LoadArgs(Func<ILExpr> pop)
     {
-        for (int i = 0; i < _meta.ParametersType.Count; i++)
+        for (int i = 0; i < _meta.Parameters.Count; i++)
         {
             Args.Add(pop());
         }

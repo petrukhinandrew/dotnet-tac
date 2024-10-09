@@ -10,8 +10,10 @@ public class AppTacBuilder
         Debug.Assert(File.Exists(rootAssemblyPath));
         // FilterMethodsFromSingleMSCoreLibType(rootAssemblyPath, "FileSystemEntry");
         // FilterMethodsFromSingleMSCoreLibType(rootAssemblyPath, "AhoCorasick");
-        FilterMethodsFromSingleMSCoreLibType(rootAssemblyPath, "Vector128");
-        // FilterMethodsFromRootAsm(rootAssemblyPath);
+        // FilterMethodsFromSingleMSCoreLibType(rootAssemblyPath, "Int32");
+        FilterMethodsFromRootAsm(rootAssemblyPath);
+        MetaBuilder.AddMethodFilter(method => method.Name == "LeaveFromTry");
+        // MetaBuilder.AddTypeFilter(type => type.Name == "CustomAttrUsage");
         var rootAssemblyMeta = MetaBuilder.BuildFrom(rootAssemblyPath);
 
         foreach (var asm in MetaBuilder.GetAssemblies())

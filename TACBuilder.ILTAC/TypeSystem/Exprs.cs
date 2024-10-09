@@ -162,7 +162,8 @@ public class PointerExprTypeResolver
                 return new ILUnmanagedDeref(instance, type);
             }
             default:
-                throw new Exception("deref " + instance.ToString() + " as " + type);
+                // return new ILUnmanagedDeref(instance, type);
+                throw new Exception($"deref {instance.Type} {instance.ToString()} as {type}");
         }
     }
 }

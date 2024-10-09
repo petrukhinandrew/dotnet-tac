@@ -1,3 +1,6 @@
+using System.Numerics;
+using System.Runtime.CompilerServices;
+
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 #pragma warning disable
@@ -11,8 +14,21 @@ public class CustomAttribute(string value) : Attribute
 [Custom("lolkek")]
 public class CustomAttrUsage
 {
-    public void Kek()
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static bool TryConvertFromSaturating<TOther>(TOther value, out int result)
+        where TOther : INumberBase<TOther>
     {
+        if (typeof(TOther) == typeof(double))
+        {
+            double num = (double)(object)value;
+            result = num >= (double)int.MaxValue
+                ? int.MaxValue
+                : (num <= (double)int.MinValue ? int.MinValue : (int)num);
+            return true;
+        }
+
+        result = 0;
+        return false;
     }
 }
 

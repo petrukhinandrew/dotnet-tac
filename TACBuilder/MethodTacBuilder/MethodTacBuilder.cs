@@ -33,18 +33,17 @@ class MethodTacBuilder
     public TACMethod Build()
     {
         _tacMethodInfo.Meta = _meta;
-        if (_meta.HasThis)
+
+        Params.AddRange(_meta.Parameters.Select(mp => mp switch
         {
-            var thisType = TypingUtil.ILTypeFrom(_meta.ParametersType[0].BaseType);
-            if (thisType is ILValueType)
-                Params.Add(new ILManagedRef(new ILLocal(thisType, "this")));
-            else
-                Params.Add(new ILLocal(thisType, "this"));
-        }
-
-        Params.AddRange(_meta.ParametersType.Skip(_meta.HasThis ? 1 : 0).Select((l, i) =>
-            new ILLocal(TypingUtil.ILTypeFrom(l.BaseType), NamingUtil.ArgVar(i))));
-
+            MethodMeta.Parameter p => new ILLocal(TypingUtil.ILTypeFrom(p.Type.BaseType), p.Name),
+            MethodMeta.This t => (ILLValue)(TypingUtil.ILTypeFrom(t.Type.BaseType) switch
+            {
+                ILValueType valueType => new ILManagedRef(new ILLocal(valueType, t.Name)),
+                var refType => new ILLocal(refType, t.Name)
+            }),
+            _ => throw new Exception($"Unknown meta parameter type at {mp}")
+        }));
         Locals.AddRange(_meta.LocalVarsType
             .Select((l, i) => new ILLocal(TypingUtil.ILTypeFrom(l.BaseType), NamingUtil.LocalVar(i))).ToList());
 
@@ -92,7 +91,7 @@ class MethodTacBuilder
         while (Worklist.Count > 0)
         {
             var current = Worklist.Dequeue();
-            if (current.Rebuild())
+            if (current.Rebuild() || current.Successors.Any(succ => !succ.BuiltAtLeastOnce))
             {
                 foreach (var successor in current.Successors)
                 {

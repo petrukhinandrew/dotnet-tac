@@ -314,7 +314,7 @@ namespace TACBuilder
                     case "stind.i8":
                     {
                         ILExpr val = blockBuilder.Pop();
-                        ILLValue addr = (ILLValue)blockBuilder.Pop();
+                        ILExpr addr = blockBuilder.Pop();
                         blockBuilder.NewLine(
                             new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new ILInt32()), val));
                         break;
@@ -682,7 +682,7 @@ namespace TACBuilder
                         MethodMeta methodMeta = ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
                         // ctor does not have return type
                         Debug.Assert(methodMeta.ReturnType is null);
-                        int arity = methodMeta.ParametersType.Count - 1; // TODO is hardcoded -1 for `this` ok?
+                        int arity = methodMeta.Parameters.Count - 1; // TODO is hardcode -1 for `this` ok?
                         TypeMeta objType = methodMeta.DeclaringType!;
                         ILExpr[] inParams = new ILExpr[arity];
                         for (int i = 0; i < arity; i++)

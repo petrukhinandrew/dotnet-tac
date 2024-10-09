@@ -25,15 +25,9 @@ public class CFG
         CollectLeaders();
         // TODO make iterator to walk over ILinstr as now _entry moves in collect leaders (at least i think so)
         Debug.Assert(_leaders.Any(l => l is not null));
-        try
-        {
-            _succsessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
-            _predecessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
-        }
-        catch
-        {
-            Console.WriteLine("lolkek");
-        }
+
+        _succsessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
+        _predecessors = _leaders.ToDictionary(l => l.idx, _ => new List<int>());
 
         MarkupBlocks();
         AttachMetaInfoToBlocks();
@@ -65,6 +59,8 @@ public class CFG
             {
                 Debug.Assert(((ILInstrOperand.Target)cur.arg).value is not null);
                 _leaders.Add(((ILInstrOperand.Target)cur.arg).value);
+                // Debug.Assert(cur.next is not null);
+                // _leaders.Add(cur.next);
             }
 
             if (cur.IsCondJump || cur is ILInstr.SwitchArg)
@@ -105,8 +101,9 @@ public class CFG
             ILInstr cur = leader;
             while (cur is ILInstr.Instr
                    {
-                       opCode.FlowControl: not FlowControl.Cond_Branch and not FlowControl.Branch
-                       and not FlowControl.Return and not FlowControl.Throw
+                       opCode.FlowControl: FlowControl.Next or FlowControl.Call
+                       // opCode.FlowControl: not FlowControl.Cond_Branch and not FlowControl.Branch
+                       // and not FlowControl.Return and not FlowControl.Throw
                    } && !_leaders.Contains(cur.next))
             {
                 cur = cur.next;
@@ -131,7 +128,15 @@ public class CFG
             {
                 _succsessors[leader.idx].Add(cur.idx + 1);
                 _predecessors[cur.idx + 1].Add(leader.idx);
+                continue;
             }
+            // var target = _leaders.Where(instr => instr.idx >= cur.idx + 1).MinBy(instr => instr.idx);
+            // if (target is not null)
+            // {
+            //     _succsessors[leader.idx].Add(target.idx);
+            //     _predecessors[target.idx].Add(leader.idx);
+            //
+            // }
         }
 
         foreach (var succ in _succsessors.Values)

@@ -73,6 +73,7 @@ class BlockTacBuilder(MethodTacBuilder methodBuilder, BasicBlockMeta meta)
             newStack.Add(tmp);
         }
 
+        newStack.Reverse();
         _entryStackState = new EvaluationStack<ILExpr>(newStack);
         return copy.SequenceEqual(_entryStackState);
     }
