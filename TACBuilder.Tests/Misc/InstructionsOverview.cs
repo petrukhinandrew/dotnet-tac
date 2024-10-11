@@ -380,6 +380,26 @@ static unsafe class UnsafeTest
         }
     }
 
+    public class ArgRefTestStruct
+    {
+        public int x = 1;
+    }
+
+    public static void ArgRefUsage()
+    {
+        var s = new ArgRefTestStruct();
+        var b = ArgRef(1, out var res, "lolkek", s);
+        var bb = ArgRef(1, out s.x, "lolkek", s);
+    }
+
+    public static bool ArgRef(int x, out int res, in string kek, in ArgRefTestStruct arts)
+    {
+        x += 1;
+        x += (arts.x += 1);
+        res = x + kek.Length;
+        return res % 2 == 0;
+    }
+
     public static void ArrayRef()
     {
         unsafe
@@ -653,6 +673,15 @@ static unsafe class Misc
         int d = sizeof(double);
         int b = sizeof(bool);
         int s = sizeof(TestStruct);
+    }
+
+    public static void VarArg(params int[] kek)
+    {
+        int x = 0;
+        foreach (var lol in kek)
+        {
+            x += lol;
+        }
     }
 
     public static void ArgList(__arglist)
