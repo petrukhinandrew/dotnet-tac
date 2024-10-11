@@ -54,6 +54,7 @@ namespace TACBuilder
                         throw new Exception("not implemented " + ((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name);
 
                     case "constrained.":
+                    case "volatile.":
                     case "nop":
                     case "break": break;
 

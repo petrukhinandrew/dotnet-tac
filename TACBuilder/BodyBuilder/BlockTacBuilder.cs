@@ -129,7 +129,8 @@ class BlockTacBuilder(MethodBuilder methodBuilder, ILBasicBlock meta)
 
     public void PushLiteral<T>(T value)
     {
-        ILLiteral lit = new ILLiteral(new ILType(typeof(T)), value?.ToString() ?? "");
+        var dump = typeof(T) == typeof(string) ? $"`{value!.ToString()}`" : value?.ToString() ?? "";
+        ILLiteral lit = new ILLiteral(new ILType(typeof(T)), dump);
         Push(lit, -1);
     }
 

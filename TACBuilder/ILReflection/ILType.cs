@@ -72,7 +72,8 @@ public class ILType(Type type) : ILMember(type)
 
     public override string ToString()
     {
-        return Name;
+        return Name.Split("`").First() +
+               (GenericArgs.Count > 0 ? $"<{string.Join(", ", GenericArgs.Select(ga => ga.ToString()))}>" : "");
     }
 
     public override bool Equals(object? obj)
