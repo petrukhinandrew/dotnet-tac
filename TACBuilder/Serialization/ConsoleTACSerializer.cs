@@ -46,7 +46,6 @@ public class ConsoleTACSerializer(IEnumerable<ILAssembly> assemblies, StreamWrit
         foreach (var method in type.Methods)
         {
             SerializeMethod(method);
-            _stream.WriteLine();
         }
 
         _stream.WriteLine("}");
@@ -54,7 +53,7 @@ public class ConsoleTACSerializer(IEnumerable<ILAssembly> assemblies, StreamWrit
 
     private void SerializeTypeField(ILField field)
     {
-        _stream.WriteLine(field.Name);
+        _stream.WriteLine(field.ToString());
     }
 
     private void SerializeMethod(ILMethod method)
