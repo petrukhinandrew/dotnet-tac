@@ -1,5 +1,3 @@
-using TACBuilder.ILTAC.TypeSystem;
-
 namespace TACBuilder.Tests;
 
 public class TypeMergeTest
