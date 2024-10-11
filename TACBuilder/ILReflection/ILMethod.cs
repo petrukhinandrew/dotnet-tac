@@ -122,6 +122,7 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
     public bool HasThis { get; private set; }
     public new string Name => _methodBase.Name;
     public bool IsGeneric => _methodBase.IsGenericMethod;
+    public bool IsStatic => _methodBase.IsStatic;
     public new bool IsConstructed = false;
 
     public TACBody? Body => _tacBody;

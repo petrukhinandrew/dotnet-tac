@@ -1,3 +1,5 @@
+using TACBuilder.ILReflection;
+
 namespace TACBuilder.ILTAC.TypeSystem;
 
 public abstract class ILStmt()
@@ -49,11 +51,11 @@ public class ILAssignStmt(ILLValue lhs, ILExpr rhs) : ILStmt()
 
 public class ILCallStmt(ILCall expr) : ILStmt()
 {
-    public ILCall Call = expr;
+    // public ILCall Call = expr;
 
     public override string ToString()
     {
-        return Call.ToString();
+        return expr.ToString();
     }
 }
 

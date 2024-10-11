@@ -150,6 +150,13 @@ static class ConditionsTests
         int a = 1;
         int b = 2;
         string s = (a + b < a * b) ? "true" : "false";
+    }
+
+    public static void TernaryOpWithComplexRessult()
+    {
+        int a = 1;
+        int b = 2;
+        string s = "string";
         int c = s.Length < a + b ? b - a : a - b;
     }
 
@@ -765,5 +772,17 @@ static class CallTests
         instance.VoidMethod("void");
         CallTestInstance.StaticMethod(instance, 1, "void");
         CallTestInstance.ManyArgs(1, 2, 3, 4, "1234");
+    }
+}
+
+static class GenericUsage
+{
+    public static void ListTest()
+    {
+        List<int> list = new();
+        list.Add(1);
+        list.AddRange([1, 2]);
+        List<List<int>> list2 = new();
+        list2.Add(list);
     }
 }

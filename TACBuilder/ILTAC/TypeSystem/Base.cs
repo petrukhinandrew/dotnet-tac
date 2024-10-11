@@ -6,6 +6,7 @@ namespace TACBuilder.ILTAC.TypeSystem;
 public interface ILExpr
 {
     ILType Type { get; }
+
     public string ToString();
 }
 
@@ -168,11 +169,11 @@ public class ILCall(ILMethod meta) : ILExpr
         string genericExtra =
             _meta.IsGeneric ? $"<{string.Join(", ", _meta.GenericArgs.Select(a => a.ToString()))}>" : "";
 
-        if (Receiver is ILNullValue)
+        if (_meta.IsStatic)
             return string.Format("{0} {1}{3}({2})", ReturnType, Name,
                 string.Join(", ", Args.Select(p => p.ToString())), genericExtra);
 
-        return string.Format("{0} {1}.{2}{4}({3})", ReturnType, Receiver.ToString(), Name,
+        return string.Format("{0}.{1}{3}({2})", Receiver.ToString(), Name,
             string.Join(", ", Args.Select(p => p.ToString())), genericExtra);
     }
 

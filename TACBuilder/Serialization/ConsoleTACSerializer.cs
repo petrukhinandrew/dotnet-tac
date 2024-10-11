@@ -32,6 +32,7 @@ public class ConsoleTACSerializer(IEnumerable<ILAssembly> assemblies, StreamWrit
 
     private void SerializeType(ILType type)
     {
+        if (!type.IsConstructed) return;
         SerializeAttrs(type.Attributes);
         _stream.WriteLine(type.Name + " {");
 
@@ -70,7 +71,7 @@ internal static class TACMethodPrinter
         Dictionary<ILType, List<int>> typeGroupping = new Dictionary<ILType, List<int>>();
         foreach (var (i, v) in vars.Select((x, i) => (i, x)))
         {
-            if(v.Type is null) continue;
+            if (v.Type is null) continue;
             if (!typeGroupping.ContainsKey(v.Type))
             {
                 typeGroupping.Add(v.Type, []);
