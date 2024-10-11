@@ -7,6 +7,11 @@ public abstract class ILMember(MemberInfo memberInfo) : ILCacheable
     private MemberInfo _memberInfo = memberInfo;
     public MemberInfo MemberInfo => _memberInfo;
     public string Name => _memberInfo.Name;
+
+    public override string ToString()
+    {
+        return Name;
+    }
 }
 
 public class UnknownIlMember : ILMember

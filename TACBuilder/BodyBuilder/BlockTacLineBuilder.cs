@@ -914,7 +914,8 @@ namespace TACBuilder
             {
                 try
                 {
-                    ILNewArrayExpr expr = (newArr as TempVar)?.Value as ILNewArrayExpr ?? throw new Exception("expected temp var");
+                    ILNewArrayExpr expr = (newArr as TempVar)?.Value as ILNewArrayExpr ??
+                                          throw new Exception("expected temp var");
                     int arrSize = int.Parse(expr.Size.ToString());
                     Type arrType = expr.Type.BaseType;
                     var tmp = Array.CreateInstance(arrType, arrSize);
@@ -941,6 +942,7 @@ namespace TACBuilder
                 {
                     Console.WriteLine(e);
                 }
+
                 return;
             }
 

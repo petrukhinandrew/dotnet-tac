@@ -94,6 +94,11 @@ public class ILMemberToken(ILMember value) : ILValue
 {
     public ILType Type { get; } = new ILType(typeof(int));
     public ILMember Value => value;
+
+    public override string ToString()
+    {
+        return Value.ToString();
+    }
 }
 
 public class ILFieldHandle(ILField field, object? obj) : ILValue
