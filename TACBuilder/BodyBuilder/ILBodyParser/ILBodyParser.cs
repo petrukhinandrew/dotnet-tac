@@ -154,7 +154,8 @@ public class ILBodyParser(MethodBase methodBase)
                 case OperandType.InlineString:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedString(ILInstanceBuilder.GetString(_methodBase, token).Value);
+                    instr.arg = new ILInstrOperand.ResolvedString(ILInstanceBuilder.GetString(_methodBase, token)
+                        .Value);
                     break;
                 }
                 case OperandType.InlineSig:
@@ -255,7 +256,7 @@ public class ILBodyParser(MethodBase methodBase)
         {
             foreach (var cur in ILInstrs())
             {
-                if (!cur.IsJump()) continue;
+                if (!cur.IsJump) continue;
                 if (cur.arg is ILInstrOperand.Arg32 a32)
                 {
                     if (_offsetToInstr[a32.value] is null)

@@ -17,16 +17,12 @@ public abstract class ILInstr
         idx = 0;
     }
 
-    public bool IsJump() => this is SwitchArg || this is Instr
+    public bool IsJump => this is SwitchArg || this is Instr
     {
         opCode.OperandType: OperandType.InlineBrTarget or OperandType.ShortInlineBrTarget
     };
 
-    public bool IsCondJump => this is Instr instr && instr.opCode.FlowControl == FlowControl.Cond_Branch;
-    public bool IsControlFlowInterruptor() => IsJump() || this is Instr
-    {
-        opCode.FlowControl: FlowControl.Throw or FlowControl.Return
-    } || next is Back;
+    public bool IsCondJump => this is SwitchArg || this is Instr { opCode.FlowControl: FlowControl.Cond_Branch };
 
     public static void InsertBefore(ILInstr where, ILInstr what)
     {

@@ -218,6 +218,13 @@ static class ConditionsTests
         }
     }
 
+    public static void CharMethod(char x)
+    {
+        char z = 'a';
+        z = (char) (x + z);
+        Console.WriteLine(z);
+    }
+
     public static string SwitchExpr()
     {
         string s = "abc";
