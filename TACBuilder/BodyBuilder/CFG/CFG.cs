@@ -53,7 +53,7 @@ public class CFG
         while (cur is not ILInstr.Back)
         {
             Debug.Assert(cur is not null);
-            if (cur.IsJump())
+            if (cur.IsJump)
             {
                 Debug.Assert(((ILInstrOperand.Target)cur.arg).value is not null);
                 _leaders.Add(((ILInstrOperand.Target)cur.arg).value);
@@ -103,7 +103,7 @@ public class CFG
             }
 
             _blocks.Add(new ILBasicBlock(leader, cur));
-            if (cur.IsJump())
+            if (cur.IsJump)
             {
                 var targetIdx = ((ILInstrOperand.Target)cur.arg).value.idx;
                 _succsessors[leader.idx].Add(targetIdx);
@@ -114,14 +114,22 @@ public class CFG
                     _predecessors[cur.idx + 1].Add(leader.idx);
                 }
 
-                continue;
+                // continue;
             }
-
-            if (_leaders.Any(instr => instr.idx == cur.idx + 1))
+            else if (cur is not ILInstr.Instr
+                     {
+                         opCode.FlowControl: FlowControl.Throw or FlowControl.Return
+                     })
             {
                 _succsessors[leader.idx].Add(cur.idx + 1);
                 _predecessors[cur.idx + 1].Add(leader.idx);
             }
+
+            // if (_leaders.Any(instr => instr.idx == cur.idx + 1))
+            // {
+            //     _succsessors[leader.idx].Add(cur.idx + 1);
+            //     _predecessors[cur.idx + 1].Add(leader.idx);
+            // }
         }
 
         foreach (var succ in _succsessors.Values)

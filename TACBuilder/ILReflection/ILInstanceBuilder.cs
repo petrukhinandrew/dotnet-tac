@@ -8,7 +8,7 @@ public static class ILInstanceBuilder
     private static readonly ILConstructQueue _queue = new();
     private static readonly ILCache _cache = new();
     private static readonly AssemblyCache _assemblyCache = new();
-
+    // private static int Indexer = 0;
     internal static readonly List<Func<Assembly, bool>> AssemblyFilters = new();
     internal static readonly List<Func<Type, bool>> TypeFilters = new();
     internal static readonly List<Func<MethodBase, bool>> MethodFilters = new();
