@@ -1,8 +1,10 @@
+using org.jacodb.api.net.generated.models;
+using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 
 namespace TACBuilder.ILTAC.TypeSystem;
 
-public abstract class ILStmt()
+public abstract class IlStmt()
 {
     private int Index = Indexer++;
     private static int Indexer = 0;
@@ -10,7 +12,7 @@ public abstract class ILStmt()
 
     public override bool Equals(object? obj)
     {
-        return obj != null && obj is ILStmt stmt && stmt.Index == Index;
+        return obj != null && obj is IlStmt stmt && stmt.Index == Index;
     }
 
     public override int GetHashCode()
@@ -19,29 +21,10 @@ public abstract class ILStmt()
     }
 }
 
-public class ILIndexedStmt(int index, ILStmt stmt)
+public class ILAssignStmt(IlValue lhs, IlExpr rhs) : IlStmt()
 {
-    public int Index = index;
-    public ILStmt Stmt = stmt;
-
-    public override string ToString()
-    {
-        return Index + " " + Stmt.ToString();
-    }
-}
-
-public class ILStmtMark(string mark) : ILStmt()
-{
-    public override string ToString()
-    {
-        return mark;
-    }
-}
-
-public class ILAssignStmt(ILLValue lhs, ILExpr rhs) : ILStmt()
-{
-    public readonly ILLValue Lhs = lhs;
-    public readonly ILExpr Rhs = rhs;
+    public readonly IlValue Lhs = lhs;
+    public readonly IlExpr Rhs = rhs;
 
     public override string ToString()
     {
@@ -49,9 +32,9 @@ public class ILAssignStmt(ILLValue lhs, ILExpr rhs) : ILStmt()
     }
 }
 
-public class ILCallStmt(ILCall expr) : ILStmt()
+public class IlCallStmt(IlCall expr) : IlStmt()
 {
-    // public ILCall Call = expr;
+    public IlCall Call => expr;
 
     public override string ToString()
     {
@@ -59,9 +42,9 @@ public class ILCallStmt(ILCall expr) : ILStmt()
     }
 }
 
-public class ILReturnStmt(ILExpr? retVal) : ILStmt()
+public class IlReturnStmt(IlExpr? retVal) : IlStmt()
 {
-    public ILExpr? RetVal => retVal;
+    public IlExpr? RetVal => retVal;
 
     public override string ToString()
     {
@@ -70,12 +53,12 @@ public class ILReturnStmt(ILExpr? retVal) : ILStmt()
     }
 }
 
-public abstract class ILBranchStmt(int target) : ILStmt()
+public abstract class IlBranchStmt(int target) : IlStmt()
 {
     public int Target = target;
 }
 
-public class ILGotoStmt(int target) : ILBranchStmt(target)
+public class IlGotoStmt(int target) : IlBranchStmt(target)
 {
     public override string ToString()
     {
@@ -83,26 +66,29 @@ public class ILGotoStmt(int target) : ILBranchStmt(target)
     }
 }
 
-public class ILIfStmt(ILExpr cond, int target) : ILBranchStmt(target)
+public class IlIfStmt(IlExpr cond, int target) : IlBranchStmt(target)
 {
+    public IlExpr Condition => cond;
+
     public override string ToString()
     {
-        return string.Format("if {0} goto {1}", cond.ToString(), Target);
+        return $"if {cond.ToString()} goto {Target}";
     }
 }
 
-public class ILEHStmt(string value, ILExpr thrown) : ILStmt()
+// TODO remake required
+public class ILEHStmt(string value, IlExpr thrown) : IlStmt()
 {
-    public ILEHStmt(string value) : this(value, new ILNullValue())
+    public ILEHStmt(string value) : this(value, new IlNullConst())
     {
     }
 
     public string Value => value;
-    private ILExpr _thrown = thrown;
+    private IlExpr _thrown = thrown;
 
     public override string ToString()
     {
-        if (_thrown is ILNullValue)
+        if (_thrown is IlNullConst)
             return Value;
         else
             return $"{Value} {_thrown.ToString()}";

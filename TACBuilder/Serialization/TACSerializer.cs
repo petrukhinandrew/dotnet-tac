@@ -1,8 +1,9 @@
-using TACBuilder.ILTAC;
+using TACBuilder.ILReflection;
 
 namespace TACBuilder.Serialization;
 
-public interface TACSerializer
+public interface ITacSerializer
 {
     public void Serialize();
+    public void NewInstance(IlCacheable instance);
 }

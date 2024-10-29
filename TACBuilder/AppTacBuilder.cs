@@ -6,45 +6,56 @@ namespace TACBuilder;
 
 public class AppTacBuilder
 {
-    public AppTacBuilder(string rootAssemblyPath, Stream? serializationStream = null)
-    {
-        Debug.Assert(File.Exists(rootAssemblyPath));
+    private string _path;
 
-        var rootAssemblyMeta = ILInstanceBuilder.BuildFrom(rootAssemblyPath);
-        BuiltAssemblies.AddRange(ILInstanceBuilder.GetAssemblies());
+    public AppTacBuilder(string rootAssemblyPath)
+    {
+        _path = rootAssemblyPath;
+        Debug.Assert(File.Exists(rootAssemblyPath));
     }
 
-    public List<ILAssembly> BuiltAssemblies { get; } = new();
+    public void Build()
+    {
+        var rootAssemblyMeta = IlInstanceBuilder.BuildFrom(_path);
+        BuiltAssemblies.AddRange(IlInstanceBuilder.GetAssemblies());
+    }
+
+    public List<IlAssembly> BuiltAssemblies { get; } = new();
 
     public static void FilterMethodsFromRootAsm(string rootAssemblyPath)
     {
-        ILInstanceBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
-        ILInstanceBuilder.AddTypeFilter(type =>
+        IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
+        IlInstanceBuilder.AddTypeFilter(type =>
             type.Assembly.Location == rootAssemblyPath);
-        ILInstanceBuilder.AddMethodFilter(method =>
+        IlInstanceBuilder.AddMethodFilter(method =>
             (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath);
     }
 
     public static void FilterSingleMethodFromRootAsm(string rootAssemblyPath, string methodName)
     {
-        ILInstanceBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
-        ILInstanceBuilder.AddTypeFilter(type =>
+        IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
+        IlInstanceBuilder.AddTypeFilter(type =>
             type.Assembly.Location == rootAssemblyPath);
-        ILInstanceBuilder.AddMethodFilter(method =>
+        IlInstanceBuilder.AddMethodFilter(method =>
             (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath);
-        ILInstanceBuilder.AddTypeFilter(method => method.Name.StartsWith(methodName));
+        IlInstanceBuilder.AddTypeFilter(method => method.Name.StartsWith(methodName));
     }
 
     public static void FilterMethodsFromSingleMSCoreLibType(string rootAssemblyPath, string typeNamePart)
     {
-        ILInstanceBuilder.AddAssemblyFilter(assembly =>
+        IlInstanceBuilder.AddAssemblyFilter(assembly =>
             assembly.GetName().FullName.StartsWith("System.Private.CoreLib") || assembly.Location == rootAssemblyPath);
-        ILInstanceBuilder.AddTypeFilter(type =>
+        IlInstanceBuilder.AddTypeFilter(type =>
             type.Assembly.GetName().FullName.StartsWith("System.Private.CoreLib") ||
             type.Assembly.Location == rootAssemblyPath);
-        ILInstanceBuilder.AddTypeFilter(type => type.Name.StartsWith(typeNamePart));
-        // ILInstanceBuilder.AddMethodFilter(call =>
+        IlInstanceBuilder.AddTypeFilter(type => type.Name.StartsWith(typeNamePart));
+        // IlInstanceBuilder.AddMethodFilter(call =>
         //     (call.ReflectedType ?? call.DeclaringType)!.Assembly.Location == rootAssemblyPath);
-        ILInstanceBuilder.AddMethodFilter(method => method.DeclaringType!.Name.StartsWith(typeNamePart));
+        IlInstanceBuilder.AddMethodFilter(method => method.DeclaringType!.Name.StartsWith(typeNamePart));
+    }
+
+    public static List<IlCacheable> GetFreshInstances()
+    {
+        return IlInstanceBuilder.GetFreshInstances();
     }
 }

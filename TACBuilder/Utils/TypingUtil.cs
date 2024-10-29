@@ -4,7 +4,7 @@ namespace TACBuilder.Utils;
 
 public static class TypingUtil
 {
-    public static ILType Merge(List<ILType> types)
+    public static IlType Merge(List<IlType> types)
     {
         var res = types.First().BaseType;
         foreach (var type in types.Skip(1))
@@ -12,7 +12,7 @@ public static class TypingUtil
             res = meetTypes(res.BaseType, type.BaseType);
         }
 
-        return new ILType(res);
+        return new IlType(res);
     }
 
     private static Type meetTypes(Type? left, Type? right)

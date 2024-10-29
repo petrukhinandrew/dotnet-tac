@@ -2,30 +2,32 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using TACBuilder.BodyBuilder;
+using TACBuilder.Exprs;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
 namespace TACBuilder.ILReflection;
 
-public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
+public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 {
     private readonly MethodBase _methodBase = methodBase;
 
     public interface IParameter
     {
         public string? Name { get; }
-        public ILType IlType { get; }
-        public List<ILType> Attributes { get; }
+        public int Position { get; }
+        public IlType Type { get; }
+        public List<IlType> Attributes { get; }
         public object? DefaultValue { get; }
     }
 
-    public class Parameter(ParameterInfo parameterInfo, int index) : ILCacheable, IParameter
+    public class Parameter(ParameterInfo parameterInfo, int index) : IlCacheable, IParameter
     {
-        private readonly ParameterInfo _parameterInfo = parameterInfo;
         public string Name { get; private set; } = parameterInfo.Name ?? NamingUtil.ArgVar(index);
+        public int Position => index;
         public string FullName => fullName();
-        public ILType IlType { get; private set; }
-        public List<ILType> Attributes { get; } = new();
+        public IlType Type { get; private set; }
+        public List<IlType> Attributes { get; } = new();
         public object? DefaultValue { get; private set; }
 
         private bool IsOut => parameterInfo.IsOut;
@@ -34,34 +36,40 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
 
         public override void Construct()
         {
-            IlType = ILInstanceBuilder.GetType(_parameterInfo.ParameterType);
-            DefaultValue = _parameterInfo.DefaultValue;
-            var attributes = _parameterInfo.CustomAttributes;
+            Type = IlInstanceBuilder.GetType(parameterInfo.ParameterType);
+            DefaultValue = parameterInfo.DefaultValue;
+            var attributes = parameterInfo.CustomAttributes;
             foreach (var attribute in attributes)
             {
-                Attributes.Add(ILInstanceBuilder.GetType(attribute.AttributeType));
+                Attributes.Add(IlInstanceBuilder.GetType(attribute.AttributeType));
             }
         }
 
         private string fullName()
         {
-            if (IsOut) return $"out {IlType} {Name}";
-            if (IsIn) return $"in {IlType} {Name}";
-            if (IsRetVal) return $"retval {IlType} {Name}";
-            return $"{IlType} {Name}";
+            if (IsOut) return $"out {Type} {Name}";
+            if (IsIn) return $"in {Type} {Name}";
+            if (IsRetVal) return $"retval {Type} {Name}";
+            return $"{Type} {Name}";
         }
 
         public override string ToString()
         {
             return FullName;
         }
+
+        public override int GetHashCode()
+        {
+            return parameterInfo.GetHashCode();
+        }
     }
 
-    public class This(ILType ilType) : ILCacheable, IParameter
+    public class This(IlType ilType) : IlCacheable, IParameter
     {
-        public string? Name => "this";
-        public ILType IlType => ilType;
-        public List<ILType> Attributes { get; } = new();
+        public string Name => "this";
+        public int Position => 0;
+        public IlType Type => ilType;
+        public List<IlType> Attributes { get; } = new();
         public object? DefaultValue => null;
 
         public override void Construct()
@@ -70,18 +78,23 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
 
         public override string ToString()
         {
-            return $"{IlType} {Name}";
+            return $"{Type} {Name}";
+        }
+
+        public override int GetHashCode()
+        {
+            return Type.GetHashCode() + Name.GetHashCode();
         }
     }
 
-    public class ILBody(ILMethod method) : ILCacheable
+    public class IlBody(IlMethod method) : IlCacheable
     {
         private ILBodyParser _bodyParser;
         private CFG _cfg;
 
         public ILInstr Instructions => _bodyParser.Instructions;
         public List<ehClause> EhClauses => _bodyParser.EhClauses;
-        public List<ILBasicBlock> BasicBlocks => _cfg.BasicBlocks;
+        public List<IlBasicBlock> BasicBlocks => _cfg.BasicBlocks;
         public List<int> StartBlocksIndices => _cfg.StartBlocksIndices;
 
         public override void Construct()
@@ -95,29 +108,26 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
                 bb.AttachToMethod(method);
             }
 
-            method._tacBody = ILInstanceBuilder.GetMethodTacBody(method);
+            method._tacBody = IlInstanceBuilder.GetMethodTacBody(method);
         }
     }
 
-    public class TACBody(ILMethod method) : ILCacheable
+    public class TacBody(IlMethod method) : IlCacheable
     {
-        public List<ILIndexedStmt> Lines { get; private set; }
+        public List<IlStmt> Lines { get; private set; }
 
         public override void Construct()
         {
-            method.Locals.AddRange(
-                method.LocalVarsType.Select((lvt, idx) => new ILLocal(lvt, NamingUtil.LocalVar(idx))));
             var builder = new MethodBuilder(method);
             Lines = builder.Build();
         }
     }
 
-    public ILType? DeclaringType { get; private set; }
-    public List<ILType> Attributes { get; } = new();
-    public List<ILType> GenericArgs { get; } = new();
-    public ILType? ReturnType { get; private set; }
+    public IlType? DeclaringType { get; private set; }
+    public List<IlType> Attributes { get; } = new();
+    public List<IlType> GenericArgs { get; } = new();
+    public IlType? ReturnType { get; private set; }
     public List<IParameter> Parameters { get; } = new();
-    public List<ILType> LocalVarsType { get; } = new();
     public bool HasMethodBody { get; private set; }
     public bool HasThis { get; private set; }
     public new string Name => _methodBase.Name;
@@ -125,32 +135,34 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
     public bool IsStatic => _methodBase.IsStatic;
     public new bool IsConstructed = false;
 
-    public TACBody? Body => _tacBody;
+    public TacBody? Body => _tacBody;
 
-    public List<ILBasicBlock> BasicBlocks => _ilBody.BasicBlocks;
+    public List<IlBasicBlock> BasicBlocks => _ilBody.BasicBlocks;
     public List<int> StartBlocksIndices => _ilBody.StartBlocksIndices;
     public ILInstr FirstInstruction => _ilBody.Instructions;
     public List<ehClause> EhClauses => _ilBody.EhClauses;
 
-    public List<ILLocal> Locals = new();
-    public Dictionary<int, TempVar> Temps = new();
-    public List<ILExpr> Errs = new();
+    public List<IlLocalVar> LocalVars = new();
+    public Dictionary<int, IlTempVar> Temps = new();
+    public List<IlLocalVar> Errs = new();
     public List<EHScope> Scopes = new();
 
-    private ILBody _ilBody;
-    private TACBody? _tacBody;
+    private IlBody _ilBody;
+    private TacBody? _tacBody;
 
     private CFG _cfg;
     private ILBodyParser _bodyParser;
+    public int ModuleToken => _methodBase.MetadataToken;
+    public int MetadataToken => _methodBase.MetadataToken;
 
     public override void Construct()
     {
-        DeclaringType = ILInstanceBuilder.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
+        DeclaringType = IlInstanceBuilder.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
         Logger.LogInformation("Constructing {Type} {Name}", DeclaringType.Name, Name);
         var attributes = _methodBase.CustomAttributes;
         foreach (var attribute in attributes)
         {
-            Attributes.Add(ILInstanceBuilder.GetType(attribute.AttributeType));
+            Attributes.Add(IlInstanceBuilder.GetType(attribute.AttributeType));
         }
 
         if (_methodBase.IsGenericMethod)
@@ -158,16 +170,16 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
             var genericArgs = _methodBase.GetGenericArguments();
             foreach (var arg in genericArgs)
             {
-                GenericArgs.Add(ILInstanceBuilder.GetType(arg));
+                GenericArgs.Add(IlInstanceBuilder.GetType(arg));
             }
         }
 
         if (_methodBase is MethodInfo methodInfo && methodInfo.ReturnType != typeof(void))
-            ReturnType = ILInstanceBuilder.GetType(methodInfo.ReturnType);
+            ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
         Debug.Assert(Parameters.Count == 0);
         if (!_methodBase.IsStatic)
         {
-            Parameters.Add(ILInstanceBuilder.GetThisParameter(DeclaringType));
+            Parameters.Add(IlInstanceBuilder.GetThisParameter(DeclaringType));
         }
 
         HasThis = Parameters.Count == 1;
@@ -176,11 +188,11 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
 
         foreach (var methodParam in methodParams)
         {
-            Parameters.Add(ILInstanceBuilder.GetMethodParameter(methodParam, Parameters.Count));
+            Parameters.Add(IlInstanceBuilder.GetMethodParameter(methodParam, Parameters.Count));
         }
 
         DeclaringType.EnsureMethodAttached(this);
-        if (ILInstanceBuilder.MethodFilters.Any(f => !f(_methodBase))) return;
+        if (IlInstanceBuilder.MethodFilters.Any(f => !f(_methodBase))) return;
         try
         {
             HasMethodBody = _methodBase.GetMethodBody() != null;
@@ -192,13 +204,15 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
 
         if (HasMethodBody)
         {
+            // TODO new instance for local var type
             Logger.LogDebug("Resolving body of {Type} {Name}", DeclaringType.Name, Name);
             foreach (var locVar in _methodBase.GetMethodBody().LocalVariables.OrderBy(localVar => localVar.LocalIndex))
             {
-                LocalVarsType.Add(ILInstanceBuilder.GetType(locVar.LocalType));
+                LocalVars.Add(new IlLocalVar(IlInstanceBuilder.GetType(locVar.LocalType), locVar.LocalIndex,
+                    locVar.IsPinned));
             }
 
-            _ilBody = ILInstanceBuilder.GetMethodIlBody(this);
+            _ilBody = IlInstanceBuilder.GetMethodIlBody(this);
         }
 
         IsConstructed = true;
@@ -206,7 +220,7 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
 
     public override bool Equals(object? obj)
     {
-        return obj is ILMethod other && _methodBase == other._methodBase;
+        return obj is IlMethod other && _methodBase == other._methodBase;
     }
 
     public override int GetHashCode()
@@ -215,23 +229,11 @@ public class ILMethod(MethodBase methodBase) : ILMember(methodBase)
     }
 }
 
-// public partial class ILMethod
-// {
-//
-// }
-
-public class TempVar(int index, ILExpr value) : ILLValue
+public class IlTempVar(int index, IlExpr value) : IlValue
 {
     public int Index => index;
-    public ILExpr Value { get; private set; } = value;
-    public ILType Type { get; private set; } = value.Type;
-    private List<int> _accessors = new();
-    private bool _isMerged = false;
-
-    public void AccessFrom(int bb)
-    {
-        _accessors.Add(bb);
-    }
+    public IlExpr Value => value;
+    public IlType Type => value.Type;
 
     public override string ToString()
     {

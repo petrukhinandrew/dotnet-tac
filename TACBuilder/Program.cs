@@ -1,5 +1,6 @@
-﻿using System.Diagnostics;
-using System.Runtime.Intrinsics;
+﻿// #define CONSOLE_SERIALIZER
+
+#define RD_SERIALIZER
 using TACBuilder.Serialization;
 
 namespace TACBuilder;
@@ -8,26 +9,42 @@ class Program
 {
     static void Main(string[] args)
     {
-        var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
-        // AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "CounterGroup");
-        // AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "AhoCorasick"); // net9.0
-
-        // AppTacBuilder.FilterMethodsFromRootAsm(path);
-        // AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "FileSystemEntry");
-        // AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "MulticastDelegate");
-        // AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "Vector128");
-        AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "Hashtable");
-
-        // ILInstanceBuilder.AddMethodFilter(call => calfel.Name == "NestedFinally");
-        // ILInstanceBuilder.AddTypeFilter(type => type.Name == "CustomAttrUsage");
-        var appTacBuilder =
-            new AppTacBuilder(path, Console.OpenStandardOutput());
-        var builtAsms = appTacBuilder.BuiltAssemblies;
-
-        var writer = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true);
-        var serializer = new ConsoleTACSerializer(builtAsms, writer);
-        serializer.Serialize();
-        writer.Flush();
-        writer.Close();
+        AppTacBuilder builder;
+        if (args.Contains("--rd"))
+        {
+            Console.WriteLine(Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll"));
+            var connection = new RdConnection(req =>
+            {
+                Console.WriteLine(req.RootAsm);
+                builder = new AppTacBuilder(req.RootAsm);
+                AppTacBuilder.FilterMethodsFromRootAsm(req.RootAsm);
+                builder.Build();
+                var instances = AppTacBuilder.GetFreshInstances();
+                var serialized = RdSerializer.Serialize(instances);
+                return serialized;
+            });
+            connection.Connect(8083);
+        }
+        else
+        {
+            var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
+            var appTacBuilder = new AppTacBuilder(path);
+            AppTacBuilder.FilterMethodsFromRootAsm(path);
+            appTacBuilder.Build();
+            var builtAsms = appTacBuilder.BuiltAssemblies;
+            var writer = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true);
+            var serializer = new ConsoleTacSerializer(builtAsms, writer);
+            serializer.Serialize();
+            writer.Flush();
+            writer.Close();
+        }
     }
 }
+
+// AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "CounterGroup");
+// AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "AhoCorasick"); // net9.0
+
+// AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "Hashtable");
+// AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "FileSystemEntry");
+// AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "MulticastDelegate");
+// AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "Vector128");

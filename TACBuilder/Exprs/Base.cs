@@ -1,52 +1,26 @@
+using System.Reflection;
 using TACBuilder.ILReflection;
 using TACBuilder.Utils;
 
-namespace TACBuilder.ILTAC.TypeSystem;
+namespace TACBuilder.Exprs;
 
-public interface ILExpr
+public interface IlExpr
 {
-    ILType Type { get; }
+    IlType Type { get; }
 
     public string ToString();
 }
 
-public interface ILValue : ILExpr
+public interface IlValue : IlExpr;
+
+public interface IlLocal : IlValue;
+
+public class IlLocalVar(IlType type, int index, bool isPinned) : IlLocal
 {
-}
-
-public interface ILLValue : ILValue
-{
-}
-
-public class ILNullValue : ILValue
-{
-    private static ILType _instance = new(typeof(void));
-    public ILType Type => _instance;
-
-    public override string ToString() => "null";
-
-    public override bool Equals(object? obj)
-    {
-        return obj is ILNullValue;
-    }
-
-    public override int GetHashCode()
-    {
-        return base.GetHashCode();
-    }
-}
-
-public class ILArgumentHandle(ILMethod method) : ILValue
-{
-    public ILType Type => new ILType(typeof(RuntimeArgumentHandle));
-    public override string ToString() => method.Name + " arglist";
-}
-
-public class ILLocal(ILType type, string name) : ILLValue
-{
-    public ILType Type => type;
-
-    public new string ToString() => name;
+    public IlType Type => type;
+    public int Index => index;
+    public new string ToString() => NamingUtil.LocalVar(index);
+    public bool IsPinned => isPinned;
 
     public override int GetHashCode()
     {
@@ -55,24 +29,33 @@ public class ILLocal(ILType type, string name) : ILLValue
 
     public override bool Equals(object? obj)
     {
-        return obj is ILLocal loc && loc.ToString() == ToString();
+        return obj is IlLocalVar loc && loc.ToString() == ToString();
     }
 }
 
-public class ILMerged(string name) : ILLValue
+public class IlArgument(IlMethod.IParameter parameter) : IlLocal
+{
+    public IlType Type => parameter.Type;
+    public int Index => parameter.Position;
+    public new string ToString() => parameter.Name ?? NamingUtil.ArgVar(parameter.Position);
+}
+
+public class IlMerged(string name) : IlValue
 {
     private string _name = name;
-    private ILType? _type;
-    public ILType Type => _type;
+    private IlType? _type;
+    public int Index = -1;
+    public IlType Type => _type;
 
-    public void MergeOf(List<ILExpr> exprs)
+    public void MergeOf(List<IlExpr> exprs)
     {
         _type = TypingUtil.Merge(exprs.Select(e => e.Type).ToList());
     }
 
-    public void MakeTemp(string newName)
+    public void MakeTemp(IlTempVar ilTemp)
     {
-        _name = newName;
+        _name = ilTemp.ToString();
+        Index = ilTemp.Index;
     }
 
     public override string ToString()
@@ -82,7 +65,7 @@ public class ILMerged(string name) : ILLValue
 
     public override bool Equals(object? obj)
     {
-        return obj is ILMerged m && m.ToString() == ToString();
+        return obj is IlMerged m && m.ToString() == ToString();
     }
 
     public override int GetHashCode()
@@ -91,90 +74,106 @@ public class ILMerged(string name) : ILLValue
     }
 }
 
-public class ILMemberToken(ILMember value) : ILValue
-{
-    public ILType Type { get; } = new ILType(typeof(int));
-    public ILMember Value => value;
+public interface IlConstant : IlValue;
 
-    public override string ToString()
-    {
-        return Value.ToString();
-    }
+public interface IlNumericConstant : IlConstant;
+
+public class IlByteConst(byte value) : IlNumericConstant
+{
+    public IlType Type => IlInstanceBuilder.GetType(typeof(byte));
+    public byte Value => value;
 }
 
-public class ILFieldHandle(ILField field, object? obj) : ILValue
+public class IlIntConst(int value) : IlNumericConstant
 {
-    public object? Object = obj;
-
-    public ILType Type => field.Type;
-
-    public override string ToString()
-    {
-        return Type + " obj";
-    }
+    public IlType Type => IlInstanceBuilder.GetType(typeof(int));
+    public int Value => value;
 }
 
-public class ILLiteral(ILType type, string value) : ILValue
+public class IlLongConst(long value) : IlNumericConstant
 {
-    public ILType Type => type;
-
-    public new string ToString() => value;
-
-    public override bool Equals(object? obj)
-    {
-        return obj is ILLiteral literal && literal.ToString() == ToString();
-    }
-
-    public override int GetHashCode()
-    {
-        return ToString().GetHashCode();
-    }
+    public IlType Type => IlInstanceBuilder.GetType(typeof(long));
+    public long Value => value;
 }
 
-// TODO remove MethodInfo access
-public class ILCall(ILMethod meta) : ILExpr
+public class IlFloatConst(float value) : IlNumericConstant
 {
-    public ILCall(ILMethod meta, ILExpr receiver) : this(meta)
-    {
-        Receiver = receiver;
-    }
+    public IlType Type => IlInstanceBuilder.GetType(typeof(float));
+    public float Value => value;
+}
 
-    private readonly ILMethod _meta = meta;
-    private ILExpr Receiver = new ILNullValue();
+public class IlDoubleConst(double value) : IlNumericConstant
+{
+    public IlType Type => IlInstanceBuilder.GetType(typeof(double));
+    public double Value => value;
+}
 
-    public void LoadArgs(Func<ILExpr> pop)
+public class IlStringConst(string value) : IlConstant
+{
+    public IlType Type => IlInstanceBuilder.GetType(typeof(string));
+    public string Value => value;
+}
+
+public class IlNullConst : IlConstant
+{
+    public IlType Type => IlInstanceBuilder.GetType(typeof(object));
+}
+
+public class IlBoolConst(bool value) : IlConstant
+{
+    public IlType Type => IlInstanceBuilder.GetType(typeof(bool));
+    public bool Value => value;
+}
+
+public class IlTypeRef(IlType type) : IlConstant
+{
+    public IlType ReferencedType => type;
+    public IlType Type => IlInstanceBuilder.GetType(typeof(Type));
+}
+
+public class IlFieldRef(IlField field) : IlConstant
+{
+    public IlField Field { get; } = field;
+    public IlType Type => IlInstanceBuilder.GetType(typeof(FieldInfo));
+}
+// TODO check receiver used
+public class IlMethodRef(IlMethod method, IlExpr? receiver = null) : IlConstant
+{
+    public IlType Type => IlInstanceBuilder.GetType(typeof(MethodBase));
+    public IlMethod Method => method;
+}
+
+public class IlCall(IlMethod method) : IlExpr
+{
+    public IlMethod Method => method;
+
+    public void LoadArgs(Func<IlExpr> pop)
     {
-        for (int i = 0; i < _meta.Parameters.Count; i++)
+        for (int i = 0; i < Method.Parameters.Count; i++)
         {
             Args.Add(pop());
-        }
-
-        if (_meta.HasThis)
-        {
-            Receiver = Args.Last();
-            Args.RemoveAt(Args.Count - 1);
         }
 
         Args.Reverse();
     }
 
-    public ILType DeclaringType => meta.DeclaringType;
-    public string Name => meta.Name;
-    public ILType ReturnType => meta.ReturnType;
-    public List<ILExpr> Args = new();
-    public ILType Type => ReturnType;
+    public IlType DeclaringType => Method.DeclaringType;
+    public string Name => Method.Name;
+    public IlType ReturnType => Method.ReturnType ?? new IlType(typeof(void));
+    public List<IlExpr> Args = new();
+    public IlType Type => ReturnType;
 
     public override string ToString()
     {
         string genericExtra =
-            _meta.IsGeneric ? $"<{string.Join(", ", _meta.GenericArgs.Select(a => a.ToString()))}>" : "";
+            Method.IsGeneric ? $"<{string.Join(", ", Method.GenericArgs.Select(a => a.ToString()))}>" : "";
 
-        if (_meta.IsStatic)
+        if (Method.IsStatic)
             return string.Format("{0} {1}{3}({2})", ReturnType, Name,
                 string.Join(", ", Args.Select(p => p.ToString())), genericExtra);
 
-        return string.Format("{0}.{1}{3}({2})", Receiver.ToString(), Name,
-            string.Join(", ", Args.Select(p => p.ToString())), genericExtra);
+        return string.Format("{0}{1}({2})", Name, genericExtra,
+            string.Join(", ", Args.Select(p => p.ToString())));
     }
 
     public bool IsInitializeArray()
@@ -184,46 +183,16 @@ public class ILCall(ILMethod meta) : ILExpr
 
     public bool Returns()
     {
-        return ReturnType is not null;
+        return ReturnType.Type != typeof(void);
     }
 
     public override bool Equals(object? obj)
     {
-        return obj is ILCall m && m._meta == _meta;
+        return obj is IlCall m && m.Method == Method;
     }
 
     public override int GetHashCode()
     {
-        return _meta.GetHashCode();
-    }
-}
-
-public class ILFieldAccess(ILField field, ILExpr? instance = null) : ILLValue
-{
-    private ILField _field = field;
-    public ILType DeclaringType => field.DeclaringType;
-    public string Name => field.Name;
-    public bool IsStatic => field.IsStatic;
-    public ILExpr? Receiver => instance;
-    public ILType Type => field.Type;
-
-    public override string ToString()
-    {
-        if (!IsStatic && Receiver == null) throw new Exception("instance ilField with null receiver");
-        return IsStatic switch
-        {
-            true => $"{DeclaringType.Name}.{Name}",
-            false => $"{Receiver!.ToString()}.{Name}"
-        };
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return obj is ILFieldAccess f && _field == f._field;
-    }
-
-    public override int GetHashCode()
-    {
-        return _field.GetHashCode();
+        return Method.GetHashCode();
     }
 }

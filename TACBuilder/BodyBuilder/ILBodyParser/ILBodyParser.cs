@@ -141,20 +141,20 @@ public class ILBodyParser(MethodBase methodBase)
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedMethod(
-                        ILInstanceBuilder.GetMethod(_methodBase, token)
+                        IlInstanceBuilder.GetMethod(_methodBase, token)
                     );
                     break;
                 }
                 case OperandType.InlineType:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedType(ILInstanceBuilder.GetType(_methodBase, token));
+                    instr.arg = new ILInstrOperand.ResolvedType(IlInstanceBuilder.GetType(_methodBase, token));
                     break;
                 }
                 case OperandType.InlineString:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedString(ILInstanceBuilder.GetString(_methodBase, token)
+                    instr.arg = new ILInstrOperand.ResolvedString(IlInstanceBuilder.GetString(_methodBase, token)
                         .Value);
                     break;
                 }
@@ -162,21 +162,21 @@ public class ILBodyParser(MethodBase methodBase)
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedSignature(
-                        ILInstanceBuilder.GetSignature(_methodBase, token).Value);
+                        IlInstanceBuilder.GetSignature(_methodBase, token).Value);
                     break;
                 }
                 case OperandType.InlineTok:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedMember(
-                        ILInstanceBuilder.GetMember(_methodBase, token));
+                        IlInstanceBuilder.GetMember(_methodBase, token));
                     break;
                 }
                 case OperandType.InlineField:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedField(
-                        ILInstanceBuilder.GetField(_methodBase, token));
+                        IlInstanceBuilder.GetField(_methodBase, token));
                     break;
                 }
 

@@ -4,7 +4,7 @@ using TACBuilder.Utils;
 
 namespace TACBuilder.ILReflection;
 
-public class ILType(Type type) : ILMember(type)
+public class IlType(Type type) : IlMember(type)
 {
     private readonly Type _type = type;
     public Type BaseType => _type;
@@ -18,25 +18,25 @@ public class ILType(Type type) : ILMember(type)
     public override void Construct()
     {
         Logger.LogInformation("Constructing {Name}", Name);
-        DeclaringAssembly = ILInstanceBuilder.GetAssembly(_type.Assembly);
+        DeclaringAssembly = IlInstanceBuilder.GetAssembly(_type.Assembly);
         if (_type.IsGenericType)
         {
-            GenericArgs = _type.GetGenericArguments().Select(ILInstanceBuilder.GetType).ToList();
+            GenericArgs = _type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList();
         }
 
         var attributes = _type.CustomAttributes;
         foreach (var attribute in attributes)
         {
-            Attributes.Add(ILInstanceBuilder.GetAttribute(attribute));
+            Attributes.Add(IlInstanceBuilder.GetAttribute(attribute));
         }
 
         DeclaringAssembly.EnsureTypeAttached(this);
-        if (ILInstanceBuilder.TypeFilters.Any(f => !f(_type))) return;
+        if (IlInstanceBuilder.TypeFilters.Any(f => !f(_type))) return;
 
         var fields = _type.GetFields(BindingFlags);
         foreach (var field in fields)
         {
-            Fields.Add(ILInstanceBuilder.GetField(field));
+            Fields.Add(IlInstanceBuilder.GetField(field));
         }
 
         var constructors = _type.GetConstructors(BindingFlags);
@@ -44,28 +44,32 @@ public class ILType(Type type) : ILMember(type)
             .Where(method => method.IsGenericMethodDefinition || !method.IsGenericMethod);
         foreach (var callable in methods.Concat<MethodBase>(constructors))
         {
-            Methods.Add(ILInstanceBuilder.GetMethod(callable));
+            Methods.Add(IlInstanceBuilder.GetMethod(callable));
         }
 
         IsConstructed = true;
     }
 
-    public ILAssembly DeclaringAssembly { get; private set; }
-    public List<ILAttribute> Attributes { get; } = new();
-    public List<ILType> GenericArgs { get; private set; } = new();
-    public HashSet<ILMethod> Methods { get; private set; } = new();
-    public HashSet<ILField> Fields { get; private set; } = new();
+    public IlAssembly DeclaringAssembly { get; private set; }
+    public int AsmToken => _type.Assembly.GetHashCode();
+    public int ModuleToken => _type.Module.MetadataToken;
+    public int MetadataToken => _type.MetadataToken;
+    public List<IlAttribute> Attributes { get; } = new();
+    public List<IlType> GenericArgs { get; private set; } = new();
+    public HashSet<IlMethod> Methods { get; private set; } = new();
+    public HashSet<IlField> Fields { get; private set; } = new();
     public new string Name => _type.Name;
     public Type Type => _type;
     public bool IsValueType => _type.IsValueType;
     public bool IsManaged => !_type.IsUnmanaged();
+    public bool IsGenericParameter => _type.IsGenericParameter;
 
-    internal void EnsureFieldAttached(ILField ilField)
+    internal void EnsureFieldAttached(IlField ilField)
     {
         Fields.Add(ilField);
     }
 
-    internal void EnsureMethodAttached(ILMethod ilMethod)
+    internal void EnsureMethodAttached(IlMethod ilMethod)
     {
         Methods.Add(ilMethod);
     }
@@ -78,7 +82,7 @@ public class ILType(Type type) : ILMember(type)
 
     public override bool Equals(object? obj)
     {
-        return obj is ILType other && _type == other._type;
+        return obj is IlType other && _type == other._type;
     }
 
     public override int GetHashCode()
@@ -87,22 +91,23 @@ public class ILType(Type type) : ILMember(type)
     }
 }
 
-public class ILField(FieldInfo fieldInfo) : ILMember(fieldInfo)
+public class IlField(FieldInfo fieldInfo) : IlMember(fieldInfo)
 {
     // TODO attributes
     private readonly FieldInfo _fieldInfo = fieldInfo;
-    public FieldInfo Info => _fieldInfo;
-    public ILType? DeclaringType { get; private set; }
+    public IlType? DeclaringType { get; private set; }
     public bool IsStatic => _fieldInfo.IsStatic;
-    public ILType? Type { get; private set; }
+    public IlType? Type { get; private set; }
     public new string Name => _fieldInfo.Name;
-    public new int MetadataToken => _fieldInfo.MetadataToken;
+    public int ModuleToken => _fieldInfo.Module.MetadataToken;
+    public int MetadataToken => _fieldInfo.MetadataToken;
     public new bool IsConstructed = false;
+    public object? GetValue(object? value) => _fieldInfo.GetValue(value);
 
     public override void Construct()
     {
-        DeclaringType = ILInstanceBuilder.GetType((_fieldInfo.ReflectedType ?? _fieldInfo.DeclaringType)!);
-        Type = ILInstanceBuilder.GetType(_fieldInfo.FieldType);
+        DeclaringType = IlInstanceBuilder.GetType((_fieldInfo.ReflectedType ?? _fieldInfo.DeclaringType)!);
+        Type = IlInstanceBuilder.GetType(_fieldInfo.FieldType);
         DeclaringType.EnsureFieldAttached(this);
         IsConstructed = true;
     }
@@ -114,7 +119,7 @@ public class ILField(FieldInfo fieldInfo) : ILMember(fieldInfo)
 
     public override bool Equals(object? obj)
     {
-        return obj is ILField other && other._fieldInfo == _fieldInfo;
+        return obj is IlField other && other._fieldInfo == _fieldInfo;
     }
 
     public override int GetHashCode()

@@ -11,10 +11,10 @@ public class CFG
     private HashSet<ILInstr> _leaders = new();
     private Dictionary<int, List<int>> _succsessors;
     private Dictionary<int, List<int>> _predecessors;
-    private readonly HashSet<ILBasicBlock> _blocks = [];
+    private readonly HashSet<IlBasicBlock> _blocks = [];
     private readonly Dictionary<int, Type> _errTypeMapping = new();
 
-    public List<ILBasicBlock> BasicBlocks => _blocks.ToList();
+    public List<IlBasicBlock> BasicBlocks => _blocks.ToList();
     public Dictionary<int, List<int>> Succsessors => _succsessors;
 
     public CFG(ILInstr entry, List<ehClause> ehClauses)
@@ -102,7 +102,7 @@ public class CFG
                 cur = cur.next;
             }
 
-            _blocks.Add(new ILBasicBlock(leader, cur));
+            _blocks.Add(new IlBasicBlock(leader, cur));
             if (cur.IsJump)
             {
                 var targetIdx = ((ILInstrOperand.Target)cur.arg).value.idx;

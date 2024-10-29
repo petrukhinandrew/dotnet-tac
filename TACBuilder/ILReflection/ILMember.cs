@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace TACBuilder.ILReflection;
 
-public abstract class ILMember(MemberInfo memberInfo) : ILCacheable
+public abstract class IlMember(MemberInfo memberInfo) : IlCacheable
 {
     private MemberInfo _memberInfo = memberInfo;
     public MemberInfo MemberInfo => _memberInfo;
@@ -14,7 +14,7 @@ public abstract class ILMember(MemberInfo memberInfo) : ILCacheable
     }
 }
 
-public class UnknownIlMember : ILMember
+public class UnknownIlMember : IlMember
 {
     public UnknownIlMember(MethodBase source) : base(null)
     {
@@ -26,7 +26,7 @@ public class UnknownIlMember : ILMember
     }
 }
 
-public class UnknownIlType : ILType
+public class UnknownIlType : IlType
 {
     public UnknownIlType(MethodBase source) : base(null)
     {
@@ -38,7 +38,7 @@ public class UnknownIlType : ILType
     }
 }
 
-public class UnknownIlMethod : ILMethod
+public class UnknownIlMethod : IlMethod
 {
     public UnknownIlMethod(MethodBase source) : base(null)
     {
@@ -50,7 +50,7 @@ public class UnknownIlMethod : ILMethod
     }
 }
 
-public class UnknownIlField : ILField
+public class UnknownIlField : IlField
 {
     public UnknownIlField(MethodBase source) : base(null)
     {

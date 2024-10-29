@@ -1,13 +1,19 @@
+using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
 namespace TACBuilder.Serialization;
 
-public class ConsoleTACSerializer(IEnumerable<ILAssembly> assemblies, StreamWriter stream) : TACSerializer
+public class ConsoleTacSerializer(IEnumerable<IlAssembly> assemblies, StreamWriter stream) : ITacSerializer
 {
-    private List<ILAssembly> _assemblies = assemblies.ToList();
+    private List<IlAssembly> _assemblies = assemblies.ToList();
     private StreamWriter _stream = stream;
+
+    public void NewInstance(IlCacheable instance)
+    {
+        throw new NotImplementedException();
+    }
 
     public void Serialize()
     {
@@ -17,7 +23,7 @@ public class ConsoleTACSerializer(IEnumerable<ILAssembly> assemblies, StreamWrit
         }
     }
 
-    private void SerializeAsm(ILAssembly assembly)
+    private void SerializeAsm(IlAssembly assembly)
     {
         _stream.WriteLine(assembly.Name);
         foreach (var type in assembly.Types)
@@ -26,11 +32,11 @@ public class ConsoleTACSerializer(IEnumerable<ILAssembly> assemblies, StreamWrit
         }
     }
 
-    private void SerializeAttrs(List<ILAttribute> attributes)
+    private void SerializeAttrs(List<IlAttribute> attributes)
     {
     }
 
-    private void SerializeType(ILType type)
+    private void SerializeType(IlType type)
     {
         if (!type.IsConstructed) return;
         SerializeAttrs(type.Attributes);
@@ -52,12 +58,12 @@ public class ConsoleTACSerializer(IEnumerable<ILAssembly> assemblies, StreamWrit
         _stream.WriteLine("}");
     }
 
-    private void SerializeTypeField(ILField field)
+    private void SerializeTypeField(IlField field)
     {
         _stream.WriteLine(field.ToString());
     }
 
-    private void SerializeMethod(ILMethod method)
+    private void SerializeMethod(IlMethod method)
     {
         method.DumpAllTo(_stream);
     }
@@ -65,10 +71,10 @@ public class ConsoleTACSerializer(IEnumerable<ILAssembly> assemblies, StreamWrit
 
 internal static class TACMethodPrinter
 {
-    private static List<string> FormatAnyVars(IEnumerable<ILExpr> vars, Func<int, string> nameGen)
+    private static List<string> FormatAnyVars(IEnumerable<IlExpr> vars, Func<int, string> nameGen)
     {
         List<string> res = new List<string>();
-        Dictionary<ILType, List<int>> typeGroupping = new Dictionary<ILType, List<int>>();
+        Dictionary<IlType, List<int>> typeGroupping = new Dictionary<IlType, List<int>>();
         foreach (var (i, v) in vars.Select((x, i) => (i, x)))
         {
             if (v.Type is null) continue;
@@ -90,35 +96,35 @@ internal static class TACMethodPrinter
         return res;
     }
 
-    private static List<string> FormatTempVars(this ILMethod method)
+    private static List<string> FormatTempVars(this IlMethod method)
     {
         return FormatAnyVars(method.Temps.Values, NamingUtil.TempVar);
     }
 
-    private static List<string> FormatLocalVars(this ILMethod method)
+    private static List<string> FormatLocalVars(this IlMethod method)
     {
-        return FormatAnyVars(method.Locals.Select(v => (ILExpr)v).ToList(), NamingUtil.LocalVar);
+        return FormatAnyVars(method.LocalVars.Select(v => (IlExpr)v).ToList(), NamingUtil.LocalVar);
     }
 
-    private static List<string> FormatErrVars(this ILMethod method)
+    private static List<string> FormatErrVars(this IlMethod method)
     {
         return FormatAnyVars(method.Errs, NamingUtil.ErrVar);
     }
 
-    private static string FormatMethodSignature(this ILMethod method)
+    private static string FormatMethodSignature(this IlMethod method)
     {
-        ILType retType = method.ReturnType ?? new ILType(typeof(void));
+        IlType retType = method.ReturnType ?? new IlType(typeof(void));
         return string.Format("{0} {1}({2})", retType, method.Name,
             string.Join(", ",
                 method.Parameters.Select(mi => mi.ToString())));
     }
 
-    private static void DumpMethodSignature(this ILMethod method, StreamWriter writer)
+    private static void DumpMethodSignature(this IlMethod method, StreamWriter writer)
     {
         writer.WriteLine(method.FormatMethodSignature());
     }
 
-    private static void DumpEHS(this ILMethod method, StreamWriter writer)
+    private static void DumpEHS(this IlMethod method, StreamWriter writer)
     {
         foreach (var scope in method.Scopes)
         {
@@ -126,7 +132,7 @@ internal static class TACMethodPrinter
         }
     }
 
-    private static void DumpVars(this ILMethod method, StreamWriter writer)
+    private static void DumpVars(this IlMethod method, StreamWriter writer)
     {
         foreach (var v in method.FormatLocalVars().Concat(method.FormatTempVars()).Concat(method.FormatErrVars()))
         {
@@ -134,7 +140,7 @@ internal static class TACMethodPrinter
         }
     }
 
-    private static void DumpTAC(this ILMethod method, StreamWriter writer)
+    private static void DumpTAC(this IlMethod method, StreamWriter writer)
     {
         if (method.Body is null) return;
 
@@ -144,7 +150,7 @@ internal static class TACMethodPrinter
         }
     }
 
-    public static void DumpAllTo(this ILMethod method, StreamWriter writer)
+    public static void DumpAllTo(this IlMethod method, StreamWriter writer)
     {
         writer.AutoFlush = true;
         method.DumpMethodSignature(writer);

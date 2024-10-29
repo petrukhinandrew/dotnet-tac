@@ -1,39 +1,39 @@
 using System.Diagnostics;
 using TACBuilder.BodyBuilder;
+using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
 namespace TACBuilder;
 
-class BlockTacBuilder(MethodBuilder methodBuilder, ILBasicBlock meta)
+class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
 {
-    public ILBasicBlock Meta => meta;
+    public IlBasicBlock Meta => meta;
 
     public bool BuiltAtLeastOnce => _builtAtLeastOnce;
     internal bool _builtAtLeastOnce = false;
-    internal ILExpr? _switchRegister;
+    internal IlExpr? _switchRegister;
     internal int? _switchBranch;
     internal readonly ILInstr _firstInstr = meta.Entry;
     internal ILInstr CurInstr = meta.Entry;
 
-    private EvaluationStack<ILExpr> _entryStackState =
+    private EvaluationStack<IlExpr> _entryStackState =
         meta.StackErrType is null ? new() : new([methodBuilder.GetNewErr(meta.StackErrType)]);
 
-    private EvaluationStack<ILExpr> _stack =
+    private EvaluationStack<IlExpr> _stack =
         meta.StackErrType is null ? new() : new([methodBuilder.GetNewErr(meta.StackErrType)]);
 
     private HashSet<BlockTacBuilder> _preds = new();
     private HashSet<BlockTacBuilder> _succs = new();
     public List<BlockTacBuilder> Successors => _succs.ToList();
 
-    private readonly Dictionary<ILMerged, ILExpr> _extraAssignments = new();
-    public readonly List<ILStmt> TacLines = new();
+    private readonly Dictionary<IlMerged, IlExpr> _extraAssignments = new();
+    public readonly List<IlStmt> TacLines = new();
 
-    public List<ILLocal> Locals => methodBuilder.Locals;
-    public List<ILLValue> Params => methodBuilder.Params;
-    public Dictionary<int, TempVar> Temps => methodBuilder.Temps;
-    public int ILFirst => _firstInstr.idx;
+    public List<IlLocalVar> Locals => methodBuilder.LocalVars;
+    public List<IlValue> Params => methodBuilder.Params;
+    public int IlFirst => _firstInstr.idx;
 
     public void ConnectSuccsAndPreds(List<BlockTacBuilder> succs, List<BlockTacBuilder> preds)
     {
@@ -43,16 +43,17 @@ class BlockTacBuilder(MethodBuilder methodBuilder, ILBasicBlock meta)
 
     public bool StackInitIsTheSame()
     {
-        if (_preds.Count == 0) return true;
-        EvaluationStack<ILExpr> copy = EvaluationStack<ILExpr>.CopyOf(_entryStackState);
+        if ( _preds.Count == 0) return true;
+        EvaluationStack<IlExpr> copy = EvaluationStack<IlExpr>.CopyOf(_entryStackState);
 
         var stacks = _preds.Where(bb => bb._builtAtLeastOnce)
-            .Select((p, i) => (i, EvaluationStack<ILExpr>.CopyOf(p._stack))).ToList();
-        List<ILExpr> newStack = new();
+            .Select((p, i) => (i, EvaluationStack<IlExpr>.CopyOf(p._stack))).ToList();
+        List<IlExpr> newStack = new();
         var stackLengths = stacks.Select(p => p.Item2.Count).ToList();
         if (stacks.All(s => s.Item2.Count == 0)) return true;
         if (stackLengths.Max() != stackLengths.Min())
-            Debug.Assert(stackLengths.Max() == stackLengths.Min(), meta.MethodMeta.Name + meta.MethodMeta.Parameters.Count);
+            Debug.Assert(stackLengths.Max() == stackLengths.Min(),
+                meta.MethodMeta.Name + meta.MethodMeta.Parameters.Count);
         for (int j = 0; j < stackLengths.Max(); j++)
         {
             var values = stacks.Select(s => s.Item2.Pop()).ToList();
@@ -62,7 +63,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, ILBasicBlock meta)
                 continue;
             }
 
-            ILMerged tmp = methodBuilder.GetMerged(ILFirst, j);
+            IlMerged tmp = methodBuilder.GetMerged(IlFirst, j);
             tmp.MergeOf(values);
             foreach (var (i, p) in _preds.Select((v, i) => (i, v)))
             {
@@ -73,34 +74,34 @@ class BlockTacBuilder(MethodBuilder methodBuilder, ILBasicBlock meta)
         }
 
         newStack.Reverse();
-        _entryStackState = new EvaluationStack<ILExpr>(newStack);
+        _entryStackState = new EvaluationStack<IlExpr>(newStack);
         return copy.SequenceEqual(_entryStackState);
     }
 
     public void ResetStackToInitial()
     {
-        _stack = EvaluationStack<ILExpr>.CopyOf(_entryStackState);
+        _stack = EvaluationStack<IlExpr>.CopyOf(_entryStackState);
     }
 
     public void InsertExtraAssignments()
     {
-        var pos = TacLines.FindIndex(l => l is ILBranchStmt);
+        var pos = TacLines.FindIndex(l => l is IlBranchStmt);
         pos = pos == -1 ? TacLines.Count : pos;
         TacLines.InsertRange(pos,
             _extraAssignments.OrderBy(p => p.Key.ToString())
                 .Select(p => new ILAssignStmt(p.Key, p.Value)));
     }
 
-    public ILExpr Pop()
+    public IlExpr Pop()
     {
         return _stack.Pop();
     }
 
-    // TODO check expr Type, if < ILInt => push ((ILInt) expr)
-    public void Push(ILExpr expr, int optInstrIdx = -1)
+    // TODO coercion
+    public void Push(IlExpr expr, int optInstrIdx = -1)
     {
         var instrIdx = optInstrIdx == -1 ? CurInstr.idx : optInstrIdx;
-        if (expr is ILValue)
+        if (expr is IlValue)
         {
             _stack.Push(expr);
         }
@@ -122,35 +123,28 @@ class BlockTacBuilder(MethodBuilder methodBuilder, ILBasicBlock meta)
         return CurInstr == Meta.Exit;
     }
 
-    public void NewLine(ILStmt line)
+    public void NewLine(IlStmt line)
     {
         TacLines.Add(line);
     }
 
-    public void PushLiteral<T>(T value)
-    {
-        var dump = typeof(T) == typeof(string) ? $"`{value!.ToString()}`" : value?.ToString() ?? "";
-        ILLiteral lit = new ILLiteral(new ILType(typeof(T)), dump);
-        Push(lit, -1);
-    }
-
-    public TempVar GetNewTemp(ILExpr value, int instrIdx)
+    public IlTempVar GetNewTemp(IlExpr value, int instrIdx)
     {
         return methodBuilder.GetNewTemp(value, instrIdx);
     }
 
     public override bool Equals(object? obj)
     {
-        return obj is BlockTacBuilder f && ILFirst == f.ILFirst;
+        return obj is BlockTacBuilder f && IlFirst == f.IlFirst;
     }
 
     public override int GetHashCode()
     {
-        return ILFirst;
+        return IlFirst;
     }
 
     public override string ToString()
     {
-        return ILFirst.ToString();
+        return IlFirst.ToString();
     }
 }
