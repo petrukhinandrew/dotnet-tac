@@ -1,13 +1,14 @@
+using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 
 namespace TACBuilder.ILTAC.TypeSystem;
 
 // impl 86-87
-public class ILUnaryOperation(ILExpr operand) : ILExpr
+public class IlUnaryOperation(IlExpr operand) : IlExpr
 {
-    public ILExpr Operand => operand;
+    public IlExpr Operand => operand;
 
-    public ILType Type => operand.Type;
+    public IlType Type => operand.Type;
 
     public new string ToString()
     {
@@ -15,30 +16,30 @@ public class ILUnaryOperation(ILExpr operand) : ILExpr
     }
 }
 
-public class ILBinaryOperation(ILExpr lhs, ILExpr rhs, string op = " binop ") : ILExpr
+public class IlBinaryOperation(IlExpr lhs, IlExpr rhs, string op = " binop ") : IlExpr
 {
-    public ILType Type => lhs.Type;
+    public IlType Type => lhs.Type;
 
-    public ILExpr Lhs => lhs;
-    public ILExpr Rhs => rhs;
-    public new string ToString() => lhs.ToString() + op + rhs.ToString();
+    public IlExpr Lhs => lhs;
+    public IlExpr Rhs => rhs;
+    public new string ToString() => $"{Lhs.ToString()} {op} {Rhs.ToString()}";
 }
 
-public class ILNewDefaultExpr(ILType type) : ILExpr
+public class IlInitExpr(IlType type) : IlExpr
 {
-    public ILType Type => type;
+    public IlType Type => type;
 
     public override string ToString()
     {
-        return $"new {Type}(default)";
+        return $"init {Type}";
     }
 }
 
 // TODO separate from ctor call
-public class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
+public class IlNewExpr(IlType type, IlExpr[] args) : IlExpr
 {
-    public ILType Type => type;
-    public ILExpr[] Args = args;
+    public IlType Type => type;
+    public IlExpr[] Args = args;
 
     public override string ToString()
     {
@@ -46,10 +47,10 @@ public class ILNewExpr(ILType type, ILExpr[] args) : ILExpr
     }
 }
 
-public class ILSizeOfExpr(ILType type) : ILExpr
+public class IlSizeOfExpr(IlType type) : IlExpr
 {
-    public ILType Type => new ILType(typeof(int));
-    public ILType Arg => type;
+    public IlType Type => new IlType(typeof(int));
+    public IlType Arg => type;
 
     public override string ToString()
     {
@@ -57,10 +58,10 @@ public class ILSizeOfExpr(ILType type) : ILExpr
     }
 }
 
-public class ILNewArrayExpr(ILType type, ILExpr size) : ILExpr
+public class IlNewArrayExpr(IlType type, IlExpr size) : IlExpr
 {
-    public ILType Type => type;
-    public ILExpr Size => size;
+    public IlType Type => type;
+    public IlExpr Size => size;
 
     public override string ToString()
     {
@@ -68,12 +69,41 @@ public class ILNewArrayExpr(ILType type, ILExpr size) : ILExpr
     }
 }
 
-public class ILArrayAccess(ILExpr arrRef, ILExpr idx) : ILLValue
+public class IlFieldAccess(IlField field, IlExpr? instance = null) : IlValue
 {
-    public ILType Type => arrRef.Type;
-    public ILExpr Index => idx;
+    public IlField Field => field;
+    public IlType DeclaringType => field.DeclaringType;
+    public string Name => field.Name;
+    public bool IsStatic => field.IsStatic;
+    public IlExpr? Receiver => instance;
+    public IlType Type => field.Type;
 
-    public string Name => ToString();
+    public override string ToString()
+    {
+        if (!IsStatic && Receiver == null) throw new Exception("instance ilField with null receiver");
+        return IsStatic switch
+        {
+            true => $"{DeclaringType.Name}.{Name}",
+            false => $"{Receiver!.ToString()}.{Name}"
+        };
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is IlFieldAccess f && Field == f.Field;
+    }
+
+    public override int GetHashCode()
+    {
+        return Field.GetHashCode();
+    }
+}
+
+public class IlArrayAccess(IlExpr arrRef, IlExpr idx) : IlValue
+{
+    public IlType Type => arrRef.Type;
+    public IlExpr Array => arrRef;
+    public IlExpr Index => idx;
 
     public override string ToString()
     {
@@ -81,81 +111,77 @@ public class ILArrayAccess(ILExpr arrRef, ILExpr idx) : ILLValue
     }
 }
 
-public class ILArrayLength(ILExpr arr) : ILExpr
+public class IlArrayLength(IlExpr array) : IlExpr
 {
-    private ILExpr _arr = arr;
-    private ILType _type = new ILType(typeof(int));
-    public ILType Type => _type;
+    public IlExpr Array => array;
+    public IlType Type { get; } = new(typeof(int));
 
     public override string ToString()
     {
-        return _arr.ToString() + ".Length";
+        return Array.ToString() + ".Length";
     }
 }
 
-public abstract class ILCastExpr(ILType targetType, ILExpr target) : ILExpr
+public abstract class IlCastExpr(IlType targetType, IlExpr target) : IlExpr
 {
-    protected ILType _targetType = targetType;
-    protected ILExpr _target = target;
-    public ILType Type => _targetType;
+    public IlType Type => targetType;
+    public IlExpr Target => target;
 
     public override string ToString()
     {
-        return $"({_targetType}) {_target.ToString()}";
+        return $"({Type}) {Target.ToString()}";
     }
 }
 
-public class ILConvExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
+public class IlConvExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
 {
 }
 
-public class ILBoxExpr(ILValue value) : ILCastExpr(new ILType(typeof(object)), value)
+public class IlBoxExpr(IlValue value) : IlCastExpr(new IlType(typeof(object)), value)
 {
 }
 
-public class ILUnboxExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
+public class IlUnboxExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
 {
 }
 
-public class ILCastClassExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
+public class IlCastClassExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
 {
 }
 
-public class ILCondCastExpr(ILType targetType, ILExpr value) : ILCastExpr(targetType, value)
+public class IlIsInstExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
 {
     public override string ToString()
     {
-        return string.Format("{0} as {1}", _target.ToString(), _targetType.ToString());
+        return $"{Target.ToString()} as {Type.ToString()}";
     }
 }
 
-public interface ILRefExpr : ILLValue
+public interface ILRefExpr : IlValue
 {
-    public ILExpr Value { get; }
+    public IlExpr Value { get; }
 }
 
-public interface ILDerefExpr : ILLValue
-{
-}
+public interface ILDerefExpr : IlValue;
 
-public class PointerExprTypeResolver
+public abstract class PointerExprTypeResolver
 {
-    public static ILDerefExpr DerefAs(ILExpr instance, ILType type)
+    public static ILDerefExpr DerefAs(IlExpr instance, IlType type)
     {
         return instance.Type.IsManaged switch
         {
-            true => new ILManagedDeref(instance, type),
+            true => new IlManagedDeref(instance, type),
 
-            _ => new ILUnmanagedDeref(instance, type)
+            _ => new IlUnmanagedDeref(instance, type)
         };
     }
 }
 
-public class ILManagedRef(ILExpr value) : ILRefExpr
+public class IlManagedRef(IlExpr value) : ILRefExpr
 {
-    public ILExpr Value => value;
+    public IlExpr Value => value;
 
-    public ILType Type => value.Type; //new ILManagedPointer(Value.Type.ReflectedType, Value.Type);
+    public IlType Type => value.Type; //new ILManagedPointer(Value.Type.ReflectedType, Value.Type);
 
     public override string ToString()
     {
@@ -164,11 +190,11 @@ public class ILManagedRef(ILExpr value) : ILRefExpr
 }
 // TODO check &int64 |-> int* ~> *v
 
-public class ILUnmanagedRef(ILExpr value) : ILRefExpr
+public class IlUnmanagedRef(IlExpr value) : ILRefExpr
 {
-    public ILExpr Value => value;
+    public IlExpr Value => value;
 
-    public ILType Type => value.Type; //new ILUnmanagedPointer(Value.Type.ReflectedType, Value.Type);
+    public IlType Type => value.Type; //new ILUnmanagedPointer(Value.Type.ReflectedType, Value.Type);
 
     public override string ToString()
     {
@@ -176,37 +202,37 @@ public class ILUnmanagedRef(ILExpr value) : ILRefExpr
     }
 }
 
-public class ILManagedDeref(ILExpr byRefVal, ILType resType) : ILDerefExpr
+public class IlManagedDeref(IlExpr byRefVal, IlType resType) : ILDerefExpr
 {
-    private ILExpr Value = byRefVal;
-    public ILType Type => resType;
+    public IlExpr Value => byRefVal;
+    public IlType Type => resType;
 
     public override string ToString()
     {
-        return "*" + Value.ToString();
+        return "*" + byRefVal.ToString();
     }
 }
 
-public class ILUnmanagedDeref(ILExpr pointedVal, ILType resType) : ILDerefExpr
+public class IlUnmanagedDeref(IlExpr pointedVal, IlType resType) : ILDerefExpr
 {
-    private ILExpr Value = pointedVal;
-    public ILType Type => resType;
+    public IlExpr Value => pointedVal;
+    public IlType Type => resType;
 
     public override string ToString()
     {
-        return "*" + Value.ToString();
+        return "*" + pointedVal.ToString();
     }
 }
 
-public class ILStackAlloc(ILExpr size) : ILExpr
+public class IlStackAlloc(IlExpr size) : IlExpr
 {
-    public ILType Type =>
-        new ILType(typeof(nint)); //new ILUnmanagedPointer(Array.Empty<byte>().GetType(), new ILType(typeof(byte)));
+    public IlType Type =>
+        new IlType(typeof(nint)); //new ILUnmanagedPointer(Array.Empty<byte>().GetType(), new Type(typeof(byte)));
 
-    private readonly ILExpr _size = size;
+    public IlExpr Size => size;
 
     public override string ToString()
     {
-        return "stackalloc " + _size.ToString();
+        return "stackalloc " + Size.ToString();
     }
 }

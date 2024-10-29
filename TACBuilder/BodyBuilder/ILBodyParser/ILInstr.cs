@@ -93,13 +93,13 @@ public abstract record ILInstrOperand
 
     public record ResolvedString(string value) : ILInstrOperand;
 
-    public record ResolvedField(ILField value) : ILInstrOperand;
+    public record ResolvedField(IlField value) : ILInstrOperand;
 
-    public record ResolvedType(ILType value) : ILInstrOperand;
+    public record ResolvedType(IlType value) : ILInstrOperand;
 
     public record ResolvedSignature(byte[] value) : ILInstrOperand;
 
-    public record ResolvedMethod(ILMethod value) : ILInstrOperand;
+    public record ResolvedMethod(IlMethod value) : ILInstrOperand;
 
-    public record ResolvedMember(ILMember value) : ILInstrOperand;
+    public record ResolvedMember(IlMember value) : ILInstrOperand;
 }

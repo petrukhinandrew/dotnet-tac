@@ -1,26 +1,26 @@
 using System.Diagnostics;
 using System.Reflection;
+using TACBuilder.Serialization;
 
 namespace TACBuilder.ILReflection;
 
-public static class ILInstanceBuilder
+public static class IlInstanceBuilder
 {
     private static readonly ILConstructQueue _queue = new();
     private static readonly ILCache _cache = new();
     private static readonly AssemblyCache _assemblyCache = new();
-    // private static int Indexer = 0;
     internal static readonly List<Func<Assembly, bool>> AssemblyFilters = new();
     internal static readonly List<Func<Type, bool>> TypeFilters = new();
     internal static readonly List<Func<MethodBase, bool>> MethodFilters = new();
 
-    public static ILAssembly BuildFrom(string assemblyPath)
+    public static IlAssembly BuildFrom(string assemblyPath)
     {
         var meta = GetAssembly(assemblyPath);
         Construct();
         return meta;
     }
 
-    public static ILAssembly BuildFrom(AssemblyName assemblyName)
+    public static IlAssembly BuildFrom(AssemblyName assemblyName)
     {
         var meta = GetAssembly(assemblyName);
         Construct();
@@ -50,42 +50,50 @@ public static class ILInstanceBuilder
         }
     }
 
-    public static List<ILAssembly> GetAssemblies()
+    public static List<IlAssembly> GetAssemblies()
     {
         return _cache.GetAssemblies();
     }
 
-    internal static ILAssembly GetAssembly(Assembly assembly)
+    public static List<IlCacheable> GetFreshInstances()
+    {
+        IlCacheable[] instances = new IlCacheable[_queue.FreshInstances.Count];
+        _queue.FreshInstances.CopyTo(instances, 0);
+        _queue.DropFreshInstances();
+        return instances.ToList();
+    }
+
+    internal static IlAssembly GetAssembly(Assembly assembly)
     {
         if (_cache.TryGetAssembly(assembly, out var meta)) return meta;
-        var newAssembly = new ILAssembly(assembly);
+        var newAssembly = new IlAssembly(assembly);
         _cache.AddAssembly(assembly, newAssembly);
         _queue.Enqueue(newAssembly);
         return newAssembly;
     }
 
-    internal static ILAssembly GetAssembly(string assemblyPath)
+    internal static IlAssembly GetAssembly(string assemblyPath)
     {
         var asm = _assemblyCache.Get(assemblyPath);
         return GetAssembly(asm);
     }
 
-    internal static ILAssembly GetAssembly(AssemblyName assemblyName)
+    internal static IlAssembly GetAssembly(AssemblyName assemblyName)
     {
         var asm = _assemblyCache.Get(assemblyName);
         return GetAssembly(asm);
     }
 
-    internal static ILType GetType(Type type)
+    internal static IlType GetType(Type type)
     {
         if (_cache.TryGetType(type, out var meta)) return meta;
-        var newType = new ILType(type);
+        var newType = new IlType(type);
         _cache.AddType(type, newType);
         _queue.Enqueue(newType);
         return newType;
     }
 
-    internal static ILType GetType(MethodBase source, int token)
+    internal static IlType GetType(MethodBase source, int token)
     {
         var args = SafeGenericArgs(source);
         try
@@ -100,16 +108,16 @@ public static class ILInstanceBuilder
         }
     }
 
-    internal static ILMethod GetMethod(MethodBase method)
+    internal static IlMethod GetMethod(MethodBase method)
     {
         if (_cache.TryGetMethod(method, out var meta)) return meta;
-        var newMethod = new ILMethod(method);
+        var newMethod = new IlMethod(method);
         _cache.AddMethod(method, newMethod);
         _queue.Enqueue(newMethod);
         return newMethod;
     }
 
-    internal static ILMethod GetMethod(MethodBase source, int token)
+    internal static IlMethod GetMethod(MethodBase source, int token)
     {
         var args = SafeGenericArgs(source);
         try
@@ -124,44 +132,44 @@ public static class ILInstanceBuilder
         }
     }
 
-    internal static ILMethod.IParameter GetThisParameter(ILType ilType)
+    internal static IlMethod.IParameter GetThisParameter(IlType ilType)
     {
-        var instance = new ILMethod.This(ilType);
+        var instance = new IlMethod.This(ilType);
         _queue.Enqueue(instance);
         return instance;
     }
 
-    internal static ILMethod.Parameter GetMethodParameter(ParameterInfo parameter, int index)
+    internal static IlMethod.Parameter GetMethodParameter(ParameterInfo parameter, int index)
     {
-        var instance = new ILMethod.Parameter(parameter, index);
+        var instance = new IlMethod.Parameter(parameter, index);
         _queue.Enqueue(instance);
         return instance;
     }
 
-    internal static ILMethod.ILBody GetMethodIlBody(ILMethod method)
+    internal static IlMethod.IlBody GetMethodIlBody(IlMethod method)
     {
-        var instance = new ILMethod.ILBody(method);
+        var instance = new IlMethod.IlBody(method);
         _queue.Enqueue(instance);
         return instance;
     }
 
-    internal static ILMethod.TACBody GetMethodTacBody(ILMethod method)
+    internal static IlMethod.TacBody GetMethodTacBody(IlMethod method)
     {
-        var instance = new ILMethod.TACBody(method);
+        var instance = new IlMethod.TacBody(method);
         _queue.Enqueue(instance);
         return instance;
     }
 
-    internal static ILField GetField(FieldInfo field)
+    internal static IlField GetField(FieldInfo field)
     {
         if (_cache.TryGetField(field, out var meta)) return meta;
-        var newField = new ILField(field);
+        var newField = new IlField(field);
         _cache.AddField(field, newField);
         _queue.Enqueue(newField);
         return newField;
     }
 
-    internal static ILField GetField(MethodBase source, int token)
+    internal static IlField GetField(MethodBase source, int token)
     {
         var args = SafeGenericArgs(source);
         try
@@ -176,16 +184,16 @@ public static class ILInstanceBuilder
         }
     }
 
-    internal static ILAttribute GetAttribute(CustomAttributeData attr)
+    internal static IlAttribute GetAttribute(CustomAttributeData attr)
     {
         if (_cache.TryGetAttribute(attr, out var meta)) return meta;
-        var newAttr = new ILAttribute(attr);
+        var newAttr = new IlAttribute(attr);
         _cache.AddAttribute(attr, newAttr);
         _queue.Enqueue(newAttr);
         return newAttr;
     }
 
-    private static ILMember GetMember(MemberInfo member)
+    private static IlMember GetMember(MemberInfo member)
     {
         if (member is Type type) return GetType(type);
         if (member is MethodBase method) return GetMethod(method);
@@ -193,7 +201,7 @@ public static class ILInstanceBuilder
         throw new Exception("unexpected member type");
     }
 
-    internal static ILMember GetMember(MethodBase source, int token)
+    internal static IlMember GetMember(MethodBase source, int token)
     {
         var args = SafeGenericArgs(source);
         try
@@ -208,16 +216,16 @@ public static class ILInstanceBuilder
         }
     }
 
-    internal static ILString GetString(MethodBase source, int token)
+    internal static IlString GetString(MethodBase source, int token)
     {
         var value = source.Module.ResolveString(token);
-        return new ILString(value);
+        return new IlString(value);
     }
 
-    internal static ILSignature GetSignature(MethodBase source, int token)
+    internal static IlSignature GetSignature(MethodBase source, int token)
     {
         var value = source.Module.ResolveSignature(token);
-        return new ILSignature(value);
+        return new IlSignature(value);
     }
 
     private static void AssertUnknownMetaComeFromCoreLib(MethodBase source)

@@ -2,16 +2,17 @@ using Microsoft.Extensions.Logging;
 
 namespace TACBuilder.ILReflection;
 
-public abstract class ILCacheable
+public abstract class IlCacheable
 {
-    protected static readonly ILogger Logger = LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.None))
+    protected static readonly ILogger Logger = LoggerFactory
+        .Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.None))
         .CreateLogger("Meta");
 
     public bool IsConstructed { get; private set; } = false;
     public abstract void Construct();
 }
 
-public class ILString(string value) : ILCacheable
+public class IlString(string value) : IlCacheable
 {
     public string Value => value;
     public new bool IsConstructed = true;
@@ -24,14 +25,24 @@ public class ILString(string value) : ILCacheable
     public override void Construct()
     {
     }
+
+    public override int GetHashCode()
+    {
+        return value.GetHashCode();
+    }
 }
 
-public class ILSignature(byte[] value) : ILCacheable
+public class IlSignature(byte[] value) : IlCacheable
 {
     public byte[] Value => value;
     public new bool IsConstructed = true;
 
     public override void Construct()
     {
+    }
+
+    public override int GetHashCode()
+    {
+        return value.GetHashCode();
     }
 }

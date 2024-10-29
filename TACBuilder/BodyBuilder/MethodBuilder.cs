@@ -1,48 +1,47 @@
 using TACBuilder.BodyBuilder;
+using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
 namespace TACBuilder;
 
-class MethodBuilder(ILMethod meta)
+class MethodBuilder(IlMethod method)
 {
-    private readonly ILMethod _meta = meta;
-    public List<ILLocal> Locals => meta.Locals;
+    private readonly IlMethod _method = method;
+    public List<IlLocalVar> LocalVars => method.LocalVars;
 
-    public List<ILLValue> Params = new();
-    public Dictionary<int, TempVar> Temps => meta.Temps;
-    public List<ILExpr> Errs => meta.Errs;
-    public List<EHScope> Scopes => meta.Scopes;
-    public readonly Dictionary<(int, int), ILMerged> Merged = new();
-    public readonly List<ILIndexedStmt> Tac = new();
+    public List<IlValue> Params = new();
+    public Dictionary<int, IlTempVar> Temps => method.Temps;
+    public List<IlLocalVar> Errs => method.Errs;
+    public List<EHScope> Scopes => method.Scopes;
+    public readonly Dictionary<(int, int), IlMerged> Merged = new();
+    public readonly List<IlStmt> Tac = new();
     public Dictionary<int, BlockTacBuilder> BlockTacBuilders = new();
     public Dictionary<int, int?> ilToTacMapping = new();
     public readonly Queue<BlockTacBuilder> Worklist = new();
 
-    public List<ILIndexedStmt>? Build()
+    public List<IlStmt> Build()
     {
-        Params.AddRange(_meta.Parameters.Select(mp => mp switch
+        Params.AddRange(_method.Parameters.Select((mp, index) => mp switch
         {
-            ILMethod.Parameter p => new ILLocal(mp.IlType, p.Name),
-            ILMethod.This t => mp.IlType.IsValueType switch
+            IlMethod.Parameter p => new IlArgument(mp),
+            IlMethod.This t => mp.Type.IsValueType switch
             {
-                true => (ILLValue)new ILManagedRef(new ILLocal(mp.IlType, t.Name)),
-                _ => new ILLocal(mp.IlType, t.Name)
+                true => (IlValue)new IlManagedRef(new IlArgument(mp)),
+                _ => new IlArgument(mp)
             },
-            _ => throw new Exception($"Unknown meta parameter type at {mp}")
+            _ => throw new Exception($"Unknown method parameter type at {mp}")
         }));
-        Locals.AddRange(_meta.LocalVarsType
-            .Select((l, i) => new ILLocal(l, NamingUtil.LocalVar(i))).ToList());
 
-        if (!_meta.HasMethodBody) return null;
+        if (!_method.HasMethodBody) return [];
         InitBlockBuilders();
 
         ProcessIL();
         foreach (var m in Merged.Values)
         {
             var temp = GetNewTemp(m, Temps.Keys.Max() + 1);
-            m.MakeTemp(temp.ToString());
+            m.MakeTemp(temp);
         }
 
         foreach (var bb in BlockTacBuilders)
@@ -58,7 +57,7 @@ class MethodBuilder(ILMethod meta)
 
     private void InitBlockBuilders()
     {
-        BlockTacBuilders = _meta.BasicBlocks.ToDictionary(bb => bb.Entry.idx, bb => new BlockTacBuilder(this, bb));
+        BlockTacBuilders = _method.BasicBlocks.ToDictionary(bb => bb.Entry.idx, bb => new BlockTacBuilder(this, bb));
 
         foreach (var blockBuilder in BlockTacBuilders.Values)
         {
@@ -73,7 +72,7 @@ class MethodBuilder(ILMethod meta)
     {
         Worklist.Clear();
 
-        foreach (var blockIdx in _meta.StartBlocksIndices)
+        foreach (var blockIdx in _method.StartBlocksIndices)
         {
             Worklist.Enqueue(BlockTacBuilders[blockIdx]);
         }
@@ -94,7 +93,7 @@ class MethodBuilder(ILMethod meta)
     private void ComposeTac()
     {
         int lineNum = 0;
-        var successors = _meta.BasicBlocks.ToDictionary(bb => bb.Entry.idx, bb => bb.Successors);
+        var successors = _method.BasicBlocks.ToDictionary(bb => bb.Entry.idx, bb => bb.Successors);
         foreach (var ilIdx in successors.Keys.OrderBy(k => k))
         {
             ilToTacMapping[ilIdx] = null;
@@ -103,22 +102,22 @@ class MethodBuilder(ILMethod meta)
         var tacBlocksIndexed = BlockTacBuilders.OrderBy(b => b.Key).ToList();
         foreach (var (i, bb) in tacBlocksIndexed.Select((e, i) => (i, e.Value)))
         {
-            ilToTacMapping[bb.ILFirst] = lineNum;
+            ilToTacMapping[bb.IlFirst] = lineNum;
             foreach (var line in bb.TacLines)
             {
-                Tac.Add(new ILIndexedStmt(lineNum++, line));
+                Tac.Add(line);
             }
 
-            if (tacBlocksIndexed.Count > i + 1 && successors.ContainsKey(bb.ILFirst) &&
-                successors[bb.ILFirst].Count > 0 && successors[bb.ILFirst][0] != tacBlocksIndexed[i + 1].Key)
+            if (tacBlocksIndexed.Count > i + 1 && successors.ContainsKey(bb.IlFirst) &&
+                successors[bb.IlFirst].Count > 0 && successors[bb.IlFirst][0] != tacBlocksIndexed[i + 1].Key)
             {
-                Tac.Add(new ILIndexedStmt(lineNum++, new ILGotoStmt(successors[bb.ILFirst][0])));
+                Tac.Add(new IlGotoStmt(successors[bb.IlFirst][0]));
             }
         }
 
         foreach (var stmt in Tac)
         {
-            if (stmt.Stmt is ILBranchStmt branch)
+            if (stmt is IlBranchStmt branch)
             {
                 branch.Target = (int)ilToTacMapping[branch.Target]!;
             }
@@ -126,30 +125,27 @@ class MethodBuilder(ILMethod meta)
     }
 
     // TODO put merge here
-    internal TempVar GetNewTemp(ILExpr value, int instrIdx)
+    internal IlTempVar GetNewTemp(IlExpr value, int instrIdx)
     {
-        if (Temps.ContainsKey(instrIdx))
+        if (!Temps.ContainsKey(instrIdx))
         {
-        }
-        else
-        {
-            Temps.Add(instrIdx, new TempVar(Temps.Count, value));
+            Temps.Add(instrIdx, new IlTempVar(Temps.Count, value));
         }
 
         return Temps[instrIdx];
     }
 
-    internal ILExpr GetNewErr(Type type)
+    internal IlExpr GetNewErr(Type type)
     {
-        Errs.Add(new ILLocal(new ILType(type), NamingUtil.ErrVar(Errs.Count)));
+        Errs.Add(new IlLocalVar(new IlType(type), Errs.Count, false));
         return Errs.Last();
     }
 
-    internal ILMerged GetMerged(int blockIdx, int stackDepth)
+    internal IlMerged GetMerged(int blockIdx, int stackDepth)
     {
         if (!Merged.ContainsKey((blockIdx, stackDepth)))
         {
-            Merged.Add((blockIdx, stackDepth), new ILMerged(NamingUtil.MergedVar(Merged.Count)));
+            Merged.Add((blockIdx, stackDepth), new IlMerged(NamingUtil.MergedVar(Merged.Count)));
         }
 
         return Merged[(blockIdx, stackDepth)];

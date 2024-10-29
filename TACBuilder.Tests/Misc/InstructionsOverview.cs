@@ -698,9 +698,9 @@ static unsafe class Misc
         }
     }
 
-    public static void ArgList(__arglist)
+    public static void VarArgCall()
     {
-        ArgIterator args = new ArgIterator(__arglist);
+        VarArg(1, 2, 3, 4);
     }
 
     public delegate void TestDelegate();
