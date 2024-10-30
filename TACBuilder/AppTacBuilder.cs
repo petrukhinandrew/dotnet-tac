@@ -37,8 +37,7 @@ public class AppTacBuilder
         IlInstanceBuilder.AddTypeFilter(type =>
             type.Assembly.Location == rootAssemblyPath);
         IlInstanceBuilder.AddMethodFilter(method =>
-            (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath);
-        IlInstanceBuilder.AddTypeFilter(method => method.Name.StartsWith(methodName));
+            (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath && method.Name.StartsWith(methodName));
     }
 
     public static void FilterMethodsFromSingleMSCoreLibType(string rootAssemblyPath, string typeNamePart)

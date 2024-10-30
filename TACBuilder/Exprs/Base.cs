@@ -33,6 +33,29 @@ public class IlLocalVar(IlType type, int index, bool isPinned) : IlLocal
     }
 }
 
+public class IlTempVar(int index, IlExpr value) : IlValue
+{
+    public int Index => index;
+    public IlExpr Value => value;
+    public IlType Type => value.Type;
+
+    public override string ToString()
+    {
+        return NamingUtil.TempVar(index);
+    }
+}
+
+public class IlErrVar(IlType type, int index) : IlValue
+{
+    public int Index => index;
+    public IlType Type => type;
+
+    public override string ToString()
+    {
+        return NamingUtil.ErrVar(index);
+    }
+}
+
 public class IlArgument(IlMethod.IParameter parameter) : IlLocal
 {
     public IlType Type => parameter.Type;
@@ -136,6 +159,7 @@ public class IlFieldRef(IlField field) : IlConstant
     public IlField Field { get; } = field;
     public IlType Type => IlInstanceBuilder.GetType(typeof(FieldInfo));
 }
+
 // TODO check receiver used
 public class IlMethodRef(IlMethod method, IlExpr? receiver = null) : IlConstant
 {
@@ -158,8 +182,11 @@ public class IlCall(IlMethod method) : IlExpr
     }
 
     public IlType DeclaringType => Method.DeclaringType;
+
     public string Name => Method.Name;
-    public IlType ReturnType => Method.ReturnType ?? new IlType(typeof(void));
+
+    // TODO ctor has no return type
+    public IlType ReturnType => Method.ReturnType ?? IlInstanceBuilder.GetType(typeof(void));
     public List<IlExpr> Args = new();
     public IlType Type => ReturnType;
 

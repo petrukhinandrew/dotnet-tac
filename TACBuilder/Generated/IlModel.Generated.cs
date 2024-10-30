@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
 
 
 
-    protected override long SerializationHash => 6198585110728708119L;
+    protected override long SerializationHash => -8157052343340335439L;
 
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -66,6 +66,7 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlFieldDto.Read, IlFieldDto.Write);
       serializers.Register(IlLocalVarDto.Read, IlLocalVarDto.Write);
       serializers.Register(IlTempVarDto.Read, IlTempVarDto.Write);
+      serializers.Register(IlErrVarDto.Read, IlErrVarDto.Write);
       serializers.Register(IlMethodDto.Read, IlMethodDto.Write);
       serializers.Register(IlDto_Unknown.Read, IlDto_Unknown.Write);
       serializers.Register(IlVarDto_Unknown.Read, IlVarDto_Unknown.Write);
@@ -464,6 +465,91 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
+  /// <p>Generated from: IlModel.kt:75</p>
+  /// </summary>
+  public sealed class IlErrVarDto : IlVarDto
+  {
+    //fields
+    //public fields
+
+    //private fields
+    //primary constructor
+    public IlErrVarDto(
+      [NotNull] CacheKey type,
+      int index
+    ) : base (
+      type,
+      index
+     )
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlErrVarDto> Read = (ctx, reader) =>
+    {
+      var type = CacheKey.Read(ctx, reader);
+      var index = reader.ReadInt();
+      var _result = new IlErrVarDto(type, index);
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlErrVarDto> Write = (ctx, writer, value) =>
+    {
+      CacheKey.Write(ctx, writer, value.Type);
+      writer.Write(value.Index);
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlErrVarDto) obj);
+    }
+    public bool Equals(IlErrVarDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Type, other.Type) && Index == other.Index;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Type.GetHashCode();
+        hash = hash * 31 + Index.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlErrVarDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+        printer.Print("index = "); Index.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
   /// <p>Generated from: IlModel.kt:50</p>
   /// </summary>
   public sealed class IlFieldDto : IlDto
@@ -668,7 +754,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:76</p>
+  /// <p>Generated from: IlModel.kt:78</p>
   /// </summary>
   public sealed class IlMethodDto : IlDto
   {
@@ -682,7 +768,7 @@ namespace org.jacodb.api.net.generated.models
     public bool Resolved {get; private set;}
     [NotNull] public List<IlLocalVarDto> Locals {get; private set;}
     [NotNull] public List<IlTempVarDto> Temps {get; private set;}
-    [NotNull] public List<IlLocalVarDto> Errs {get; private set;}
+    [NotNull] public List<IlErrVarDto> Errs {get; private set;}
     [NotNull] public List<IlStmtDto> Body {get; private set;}
 
     //private fields
@@ -696,7 +782,7 @@ namespace org.jacodb.api.net.generated.models
       bool resolved,
       [NotNull] List<IlLocalVarDto> locals,
       [NotNull] List<IlTempVarDto> temps,
-      [NotNull] List<IlLocalVarDto> errs,
+      [NotNull] List<IlErrVarDto> errs,
       [NotNull] List<IlStmtDto> body
     )
     {
@@ -733,7 +819,7 @@ namespace org.jacodb.api.net.generated.models
       var resolved = reader.ReadBool();
       var locals = ReadIlLocalVarDtoList(ctx, reader);
       var temps = ReadIlTempVarDtoList(ctx, reader);
-      var errs = ReadIlLocalVarDtoList(ctx, reader);
+      var errs = ReadIlErrVarDtoList(ctx, reader);
       var body = ReadIlStmtDtoList(ctx, reader);
       var _result = new IlMethodDto(id, declType, returnType, name, parameters, resolved, locals, temps, errs, body);
       return _result;
@@ -742,6 +828,7 @@ namespace org.jacodb.api.net.generated.models
     public static CtxReadDelegate<List<IlParameterDto>> ReadIlParameterDtoList = IlParameterDto.Read.List();
     public static CtxReadDelegate<List<IlLocalVarDto>> ReadIlLocalVarDtoList = IlLocalVarDto.Read.List();
     public static CtxReadDelegate<List<IlTempVarDto>> ReadIlTempVarDtoList = IlTempVarDto.Read.List();
+    public static CtxReadDelegate<List<IlErrVarDto>> ReadIlErrVarDtoList = IlErrVarDto.Read.List();
     public static CtxReadDelegate<List<IlStmtDto>> ReadIlStmtDtoList = IlStmtDto.Read.List();
 
     public static new CtxWriteDelegate<IlMethodDto> Write = (ctx, writer, value) =>
@@ -754,13 +841,14 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.Resolved);
       WriteIlLocalVarDtoList(ctx, writer, value.Locals);
       WriteIlTempVarDtoList(ctx, writer, value.Temps);
-      WriteIlLocalVarDtoList(ctx, writer, value.Errs);
+      WriteIlErrVarDtoList(ctx, writer, value.Errs);
       WriteIlStmtDtoList(ctx, writer, value.Body);
     };
     public static  CtxWriteDelegate<CacheKey> WriteCacheKeyNullable = CacheKey.Write.NullableClass();
     public static  CtxWriteDelegate<List<IlParameterDto>> WriteIlParameterDtoList = IlParameterDto.Write.List();
     public static  CtxWriteDelegate<List<IlLocalVarDto>> WriteIlLocalVarDtoList = IlLocalVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlTempVarDto>> WriteIlTempVarDtoList = IlTempVarDto.Write.List();
+    public static  CtxWriteDelegate<List<IlErrVarDto>> WriteIlErrVarDtoList = IlErrVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlStmtDto>> WriteIlStmtDtoList = IlStmtDto.Write.List();
 
     //constants

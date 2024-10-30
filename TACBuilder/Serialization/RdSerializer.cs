@@ -42,10 +42,10 @@ public static class RdSerializer
                     resolved: method.IsConstructed,
                     locals: method.LocalVars.Select(v =>
                         new IlLocalVarDto(type: v.Type.GetCacheKey(), index: v.Index, isPinned: v.IsPinned)).ToList(),
-                    temps: method.Temps.Values.Select((v, i) => new IlTempVarDto(index: i, type: v.Type.GetCacheKey()))
+                    temps: method.Temps.Values.Select(v => new IlTempVarDto(index: v.Index, type: v.Type.GetCacheKey()))
                         .ToList(),
                     errs: method.Errs.Select(v =>
-                        new IlLocalVarDto(type: v.Type.GetCacheKey(), index: v.Index, isPinned: v.IsPinned)).ToList(),
+                        new IlErrVarDto(type: v.Type.GetCacheKey(), index: v.Index)).ToList(),
                     body: SerializeMethodBody(method)
                 );
             }
@@ -110,7 +110,8 @@ public static class RdSerializer
             return new IlVarAccessDto(kind: IlVarKind.temp, index: tmp.Index, type: tmp.Type.GetCacheKey());
         if (expr is IlMerged merged)
             return new IlVarAccessDto(kind: IlVarKind.temp, index: merged.Index, type: merged.Type.GetCacheKey());
-
+        if (expr is IlErrVar err)
+            return new IlVarAccessDto(kind: IlVarKind.err, index: err.Index, type: err.Type.GetCacheKey());
         if (expr is IlArgument arg)
             return new IlArgAccessDto(index: arg.Index, type: arg.Type.GetCacheKey());
         if (expr is IlCall call)

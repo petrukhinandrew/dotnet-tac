@@ -144,7 +144,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
     public List<IlLocalVar> LocalVars = new();
     public Dictionary<int, IlTempVar> Temps = new();
-    public List<IlLocalVar> Errs = new();
+    public List<IlErrVar> Errs = new();
     public List<EHScope> Scopes = new();
 
     private IlBody _ilBody;
@@ -226,17 +226,5 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     public override int GetHashCode()
     {
         return _methodBase.GetHashCode();
-    }
-}
-
-public class IlTempVar(int index, IlExpr value) : IlValue
-{
-    public int Index => index;
-    public IlExpr Value => value;
-    public IlType Type => value.Type;
-
-    public override string ToString()
-    {
-        return NamingUtil.TempVar(index);
     }
 }

@@ -88,8 +88,7 @@ internal static class TACMethodPrinter
 
         foreach (var mapping in typeGroupping)
         {
-            string buf = string.Format("{0} {1}", mapping.Key.ToString(),
-                string.Join(", ", mapping.Value.Select(nameGen)));
+            string buf = $"{mapping.Key} {string.Join(", ", mapping.Value.Select(nameGen))}";
             res.Add(buf);
         }
 

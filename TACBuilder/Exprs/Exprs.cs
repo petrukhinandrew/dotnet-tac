@@ -49,7 +49,7 @@ public class IlNewExpr(IlType type, IlExpr[] args) : IlExpr
 
 public class IlSizeOfExpr(IlType type) : IlExpr
 {
-    public IlType Type => new IlType(typeof(int));
+    public IlType Type => IlInstanceBuilder.GetType(typeof(int));
     public IlType Arg => type;
 
     public override string ToString()
@@ -137,7 +137,7 @@ public class IlConvExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType
 {
 }
 
-public class IlBoxExpr(IlValue value) : IlCastExpr(new IlType(typeof(object)), value)
+public class IlBoxExpr(IlValue value) : IlCastExpr(IlInstanceBuilder.GetType(typeof(object)), value)
 {
 }
 
@@ -153,7 +153,7 @@ public class IlIsInstExpr(IlType targetType, IlExpr value) : IlCastExpr(targetTy
 {
     public override string ToString()
     {
-        return $"{Target.ToString()} as {Type.ToString()}";
+        return $"{Target.ToString()} as {Type}";
     }
 }
 
@@ -227,7 +227,8 @@ public class IlUnmanagedDeref(IlExpr pointedVal, IlType resType) : ILDerefExpr
 public class IlStackAlloc(IlExpr size) : IlExpr
 {
     public IlType Type =>
-        new IlType(typeof(nint)); //new ILUnmanagedPointer(Array.Empty<byte>().GetType(), new Type(typeof(byte)));
+        IlInstanceBuilder
+            .GetType(typeof(nint)); //new ILUnmanagedPointer(Array.Empty<byte>().GetType(), new Type(typeof(byte)));
 
     public IlExpr Size => size;
 
