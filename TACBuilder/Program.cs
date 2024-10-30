@@ -29,7 +29,8 @@ class Program
         {
             var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
             var appTacBuilder = new AppTacBuilder(path);
-            AppTacBuilder.FilterMethodsFromRootAsm(path);
+            // AppTacBuilder.FilterMethodsFromRootAsm(path);
+            AppTacBuilder.FilterSingleMethodFromRootAsm(path, "TernaryOp");
             appTacBuilder.Build();
             var builtAsms = appTacBuilder.BuiltAssemblies;
             var writer = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true);

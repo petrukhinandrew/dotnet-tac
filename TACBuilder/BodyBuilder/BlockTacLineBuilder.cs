@@ -251,7 +251,8 @@ namespace TACBuilder
                     case "ldind.u4":
                     {
                         IlExpr addr = blockBuilder.Pop();
-                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(int)));
+                        ILDerefExpr deref =
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(int)));
                         blockBuilder.Push(deref);
                         break;
                     }
@@ -259,28 +260,32 @@ namespace TACBuilder
                     case "ldind.i8":
                     {
                         IlExpr addr = blockBuilder.Pop();
-                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(long)));
+                        ILDerefExpr deref =
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(long)));
                         blockBuilder.Push(deref);
                         break;
                     }
                     case "ldind.r4":
                     {
                         IlExpr addr = blockBuilder.Pop();
-                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(NFloat)));
+                        ILDerefExpr deref =
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(NFloat)));
                         blockBuilder.Push(deref);
                         break;
                     }
                     case "ldind.r8":
                     {
                         IlExpr addr = blockBuilder.Pop();
-                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(NFloat)));
+                        ILDerefExpr deref =
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(NFloat)));
                         blockBuilder.Push(deref);
                         break;
                     }
                     case "ldind.i":
                     {
                         IlExpr addr = blockBuilder.Pop();
-                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(nint)));
+                        ILDerefExpr deref =
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(nint)));
                         blockBuilder.Push(deref);
                         break;
                     }
@@ -288,7 +293,8 @@ namespace TACBuilder
                     case "ldind.ref":
                     {
                         IlExpr addr = blockBuilder.Pop();
-                        ILDerefExpr deref = PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(object)));
+                        ILDerefExpr deref =
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(object)));
                         blockBuilder.Push(deref);
                         break;
                     }
@@ -310,7 +316,8 @@ namespace TACBuilder
                         IlExpr val = blockBuilder.Pop();
                         IlExpr addr = blockBuilder.Pop();
                         blockBuilder.NewLine(
-                            new ILAssignStmt(PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(int))), val));
+                            new ILAssignStmt(
+                                PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(int))), val));
                         break;
                     }
                     case "stind.r4":
@@ -318,7 +325,7 @@ namespace TACBuilder
                         IlExpr val = blockBuilder.Pop();
                         IlValue addr = (IlValue)blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(
-                            PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(float))),
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(float))),
                             val));
                         break;
                     }
@@ -327,7 +334,7 @@ namespace TACBuilder
                         var val = blockBuilder.Pop();
                         var addr = blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(
-                            PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(double))),
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(double))),
                             val));
                         break;
                     }
@@ -336,7 +343,7 @@ namespace TACBuilder
                         var val = blockBuilder.Pop();
                         var addr = blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(
-                            PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(nint))),
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(nint))),
                             val));
                         break;
                     }
@@ -345,7 +352,7 @@ namespace TACBuilder
                         IlExpr val = blockBuilder.Pop();
                         IlValue addr = (IlValue)blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(
-                            PointerExprTypeResolver.DerefAs(addr, new IlType(typeof(object))),
+                            PointerExprTypeResolver.DerefAs(addr, IlInstanceBuilder.GetType(typeof(object))),
                             val));
                         break;
                     }
@@ -708,8 +715,8 @@ namespace TACBuilder
                     {
                         IlType arrIlType = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         IlExpr sizeExpr = blockBuilder.Pop();
-                        if (!Equals(sizeExpr.Type, new IlType(typeof(int))) &&
-                            !Equals(sizeExpr.Type, new IlType(typeof(nint))))
+                        if (!Equals(sizeExpr.Type, IlInstanceBuilder.GetType(typeof(int))) &&
+                            !Equals(sizeExpr.Type, IlInstanceBuilder.GetType(typeof(nint))))
                         {
                             throw new Exception("expected arr size of type int32 or native int, got " +
                                                 sizeExpr.Type);
@@ -787,28 +794,28 @@ namespace TACBuilder
                     case "conv.i4":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(int)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(int)), value);
                         blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.i8":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(long)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(long)), value);
                         blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.r4":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(float)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(float)), value);
                         blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.r8":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(double)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(double)), value);
                         blockBuilder.Push(conv);
                         break;
                     }
@@ -817,35 +824,35 @@ namespace TACBuilder
                     case "conv.u4":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(uint)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(uint)), value);
                         blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.u8":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(ulong)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(ulong)), value);
                         blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.i":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(nint)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(nint)), value);
                         blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.u":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(nuint)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(nuint)), value);
                         blockBuilder.Push(conv);
                         break;
                     }
                     case "conv.r.un":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(NFloat)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(NFloat)), value);
                         blockBuilder.Push(conv);
                         break;
                     }
@@ -873,7 +880,7 @@ namespace TACBuilder
                     case "conv.ovf.u.un":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        IlConvExpr conv = new IlConvExpr(new IlType(typeof(nint)), value);
+                        IlConvExpr conv = new IlConvExpr(IlInstanceBuilder.GetType(typeof(nint)), value);
                         blockBuilder.Push(conv);
                         break;
                     }

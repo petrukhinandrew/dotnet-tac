@@ -1,3 +1,4 @@
+using System.Runtime;
 using TACBuilder.BodyBuilder;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
@@ -13,12 +14,11 @@ class MethodBuilder(IlMethod method)
 
     public List<IlValue> Params = new();
     public Dictionary<int, IlTempVar> Temps => method.Temps;
-    public List<IlLocalVar> Errs => method.Errs;
+    public List<IlErrVar> Errs => method.Errs;
     public List<EHScope> Scopes => method.Scopes;
     public readonly Dictionary<(int, int), IlMerged> Merged = new();
     public readonly List<IlStmt> Tac = new();
     public Dictionary<int, BlockTacBuilder> BlockTacBuilders = new();
-    public Dictionary<int, int?> ilToTacMapping = new();
     public readonly Queue<BlockTacBuilder> Worklist = new();
 
     public List<IlStmt> Build()
@@ -92,7 +92,7 @@ class MethodBuilder(IlMethod method)
 
     private void ComposeTac()
     {
-        int lineNum = 0;
+        Dictionary<int, int?> ilToTacMapping = new();
         var successors = _method.BasicBlocks.ToDictionary(bb => bb.Entry.idx, bb => bb.Successors);
         foreach (var ilIdx in successors.Keys.OrderBy(k => k))
         {
@@ -102,7 +102,7 @@ class MethodBuilder(IlMethod method)
         var tacBlocksIndexed = BlockTacBuilders.OrderBy(b => b.Key).ToList();
         foreach (var (i, bb) in tacBlocksIndexed.Select((e, i) => (i, e.Value)))
         {
-            ilToTacMapping[bb.IlFirst] = lineNum;
+            ilToTacMapping[bb.IlFirst] = Tac.Count;
             foreach (var line in bb.TacLines)
             {
                 Tac.Add(line);
@@ -137,7 +137,7 @@ class MethodBuilder(IlMethod method)
 
     internal IlExpr GetNewErr(Type type)
     {
-        Errs.Add(new IlLocalVar(new IlType(type), Errs.Count, false));
+        Errs.Add(new IlErrVar(IlInstanceBuilder.GetType(type), Errs.Count));
         return Errs.Last();
     }
 

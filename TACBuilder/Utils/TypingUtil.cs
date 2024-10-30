@@ -12,7 +12,7 @@ public static class TypingUtil
             res = meetTypes(res.BaseType, type.BaseType);
         }
 
-        return new IlType(res);
+        return IlInstanceBuilder.GetType(res);
     }
 
     private static Type meetTypes(Type? left, Type? right)
@@ -26,6 +26,7 @@ public static class TypingUtil
     class UnmanagedCheck<T> where T : unmanaged
     {
     }
+
     // TODO introduce same thing inside TypeMeta
     public static bool IsUnmanaged(this Type t)
     {

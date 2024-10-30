@@ -113,13 +113,8 @@ public class CFG
                     _succsessors[leader.idx].Add(cur.idx + 1);
                     _predecessors[cur.idx + 1].Add(leader.idx);
                 }
-
-                // continue;
             }
-            else if (cur is not ILInstr.Instr
-                     {
-                         opCode.FlowControl: FlowControl.Throw or FlowControl.Return
-                     })
+            else if (cur is not ILInstr.Instr { opCode.FlowControl: FlowControl.Throw or FlowControl.Return })
             {
                 _succsessors[leader.idx].Add(cur.idx + 1);
                 _predecessors[cur.idx + 1].Add(leader.idx);
