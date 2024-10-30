@@ -15,6 +15,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
     internal bool _builtAtLeastOnce = false;
     internal IlExpr? _switchRegister;
     internal int? _switchBranch;
+
     internal readonly ILInstr _firstInstr = meta.Entry;
     internal ILInstr CurInstr = meta.Entry;
 

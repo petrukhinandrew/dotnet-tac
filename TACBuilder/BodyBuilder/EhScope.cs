@@ -2,9 +2,9 @@ using TACBuilder.Utils;
 
 namespace TACBuilder.BodyBuilder;
 
-public abstract class EHScope
+public abstract class EhScope
 {
-    public static EHScope FromClause(ehClause clause)
+    public static EhScope FromClause(ehClause clause)
     {
         return clause.ehcType switch
         {
@@ -16,59 +16,58 @@ public abstract class EHScope
         };
     }
 
-    public struct ILScopeLocation
+    public struct ScopeLocation : IEquatable<ScopeLocation>
     {
-        public ILInstr tb, te, hb, he;
+        public int tb, te, hb, he;
 
-        public static ILScopeLocation FromClause(ehClause clause)
+        public static ScopeLocation FromClause(ehClause clause)
         {
             return new()
             {
-                tb = clause.tryBegin,
-                te = clause.tryEnd,
-                hb = clause.handlerBegin,
-                he = clause.handlerEnd,
+                tb = clause.tryBegin.idx,
+                te = clause.tryEnd.idx,
+                hb = clause.handlerBegin.idx,
+                he = clause.handlerEnd.idx,
             };
         }
 
-        public override string ToString() => string.Join(" ", new int[tb.idx, te.idx, hb.idx, he.idx]);
-
-        public override bool Equals(object? obj)
-        {
-            return obj is ILScopeLocation l && tb.idx == l.tb.idx && te.idx == l.te.idx &&
-                   hb.idx == l.hb.idx && he.idx == l.he.idx;
-        }
+        public override string ToString() => $"loc: {tb} {te} {hb} {he}";
 
         public override int GetHashCode()
         {
             return (tb, te, hb, he).GetHashCode();
         }
+
+        public bool Equals(ScopeLocation other)
+        {
+            return tb.Equals(other.tb) && te.Equals(other.te) && hb.Equals(other.hb) && he.Equals(other.he);
+        }
     }
 
-    public ILScopeLocation ilLoc, tacLoc = new();
+    public ScopeLocation ilLoc, tacLoc = new();
 }
 
-public abstract class EHScopeWithVarIdx(Type type) : EHScope
+// TODO check if still needed
+public abstract class EhScopeWithVarIdx(Type type) : EhScope
 {
     public int ErrIdx;
 
     public readonly Type Type = type;
-    // public BlockTacBuilder.BlockTacBuilder HandlerFrame;
 }
 
-class CatchScope(Type type) : EHScopeWithVarIdx(type)
+class CatchScope(Type type) : EhScopeWithVarIdx(type)
 {
     public new static CatchScope FromClause(ehClause clause)
     {
         return new CatchScope((clause.ehcType as rewriterEhcType.CatchEH)!.type)
         {
-            ilLoc = ILScopeLocation.FromClause(clause)
+            ilLoc = ScopeLocation.FromClause(clause)
         };
     }
 
     public override string ToString()
     {
-        return $"catch {tacLoc.ToString()}";
+        return $"catch: {tacLoc.ToString()}";
     }
 
     public override bool Equals(object? obj)
@@ -82,25 +81,24 @@ class CatchScope(Type type) : EHScopeWithVarIdx(type)
     }
 }
 
-public class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
+public class FilterScope() : EhScopeWithVarIdx(typeof(Exception))
 {
-    public ILInstr fb;
-    // public BlockTacBuilder.BlockTacBuilder FilterFrame;
+    public int fb;
+    public int fbt;
 
     public new static FilterScope FromClause(ehClause clause)
     {
         FilterScope scope = new FilterScope
         {
-            ilLoc = ILScopeLocation.FromClause(clause),
-            fb = (clause.ehcType as rewriterEhcType.FilterEH)!.instr
+            ilLoc = ScopeLocation.FromClause(clause),
+            fb = (clause.ehcType as rewriterEhcType.FilterEH)!.instr.idx
         };
         return scope;
     }
 
     public override string ToString()
     {
-        return string.Format("filter {5} {0} {1} {2} {3} {4}", tacLoc.tb, tacLoc.te, fb, tacLoc.hb, tacLoc.he,
-            NamingUtil.ErrVar(ErrIdx));
+        return $"filter: {tacLoc.ToString()} {fbt}";
     }
 
     public override bool Equals(object? obj)
@@ -114,13 +112,13 @@ public class FilterScope() : EHScopeWithVarIdx(typeof(Exception))
     }
 }
 
-class FaultScope : EHScope
+class FaultScope : EhScope
 {
     public new static FaultScope FromClause(ehClause clause)
     {
         return new FaultScope()
         {
-            ilLoc = ILScopeLocation.FromClause(clause)
+            ilLoc = ScopeLocation.FromClause(clause)
         };
     }
 
@@ -140,13 +138,13 @@ class FaultScope : EHScope
     }
 }
 
-class FinallyScope : EHScope
+class FinallyScope : EhScope
 {
     public new static FinallyScope FromClause(ehClause clause)
     {
         return new FinallyScope
         {
-            ilLoc = ILScopeLocation.FromClause(clause)
+            ilLoc = ScopeLocation.FromClause(clause)
         };
     }
 

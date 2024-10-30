@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
 
 
 
-    protected override long SerializationHash => -8157052343340335439L;
+    protected override long SerializationHash => -1706758733721535707L;
 
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -67,9 +67,14 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlLocalVarDto.Read, IlLocalVarDto.Write);
       serializers.Register(IlTempVarDto.Read, IlTempVarDto.Write);
       serializers.Register(IlErrVarDto.Read, IlErrVarDto.Write);
+      serializers.Register(IlCatchScopeDto.Read, IlCatchScopeDto.Write);
+      serializers.Register(IlFilterScopeDto.Read, IlFilterScopeDto.Write);
+      serializers.Register(IlFaultScopeDto.Read, IlFaultScopeDto.Write);
+      serializers.Register(IlFinallyScopeDto.Read, IlFinallyScopeDto.Write);
       serializers.Register(IlMethodDto.Read, IlMethodDto.Write);
       serializers.Register(IlDto_Unknown.Read, IlDto_Unknown.Write);
       serializers.Register(IlVarDto_Unknown.Read, IlVarDto_Unknown.Write);
+      serializers.Register(IlEhScopeDto_Unknown.Read, IlEhScopeDto_Unknown.Write);
 
       serializers.RegisterToplevelOnce(typeof(IlRoot), IlRoot.RegisterDeclaredTypesSerializers);
     }
@@ -374,6 +379,103 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
+  /// <p>Generated from: IlModel.kt:82</p>
+  /// </summary>
+  public sealed class IlCatchScopeDto : IlEhScopeDto
+  {
+    //fields
+    //public fields
+
+    //private fields
+    //primary constructor
+    public IlCatchScopeDto(
+      int tb,
+      int te,
+      int hb,
+      int he
+    ) : base (
+      tb,
+      te,
+      hb,
+      he
+     )
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlCatchScopeDto> Read = (ctx, reader) =>
+    {
+      var tb = reader.ReadInt();
+      var te = reader.ReadInt();
+      var hb = reader.ReadInt();
+      var he = reader.ReadInt();
+      var _result = new IlCatchScopeDto(tb, te, hb, he);
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlCatchScopeDto> Write = (ctx, writer, value) =>
+    {
+      writer.Write(value.Tb);
+      writer.Write(value.Te);
+      writer.Write(value.Hb);
+      writer.Write(value.He);
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCatchScopeDto) obj);
+    }
+    public bool Equals(IlCatchScopeDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Tb == other.Tb && Te == other.Te && Hb == other.Hb && He == other.He;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Tb.GetHashCode();
+        hash = hash * 31 + Te.GetHashCode();
+        hash = hash * 31 + Hb.GetHashCode();
+        hash = hash * 31 + He.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCatchScopeDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("tb = "); Tb.PrintEx(printer); printer.Println();
+        printer.Print("te = "); Te.PrintEx(printer); printer.Println();
+        printer.Print("hb = "); Hb.PrintEx(printer); printer.Println();
+        printer.Print("he = "); He.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
   /// <p>Generated from: IlModel.kt:34</p>
   /// </summary>
   public abstract class IlDto{
@@ -465,7 +567,146 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:75</p>
+  /// <p>Generated from: IlModel.kt:76</p>
+  /// </summary>
+  public abstract class IlEhScopeDto : IlDto
+  {
+    //fields
+    //public fields
+    public int Tb {get; private set;}
+    public int Te {get; private set;}
+    public int Hb {get; private set;}
+    public int He {get; private set;}
+
+    //private fields
+    //primary constructor
+    protected IlEhScopeDto(
+      int tb,
+      int te,
+      int hb,
+      int he
+    )
+    {
+      Tb = tb;
+      Te = te;
+      Hb = hb;
+      He = he;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlEhScopeDto> Read = Polymorphic<IlEhScopeDto>.ReadAbstract(IlEhScopeDto_Unknown.Read);
+
+    public static new CtxWriteDelegate<IlEhScopeDto> Write = Polymorphic<IlEhScopeDto>.Write;
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    //hash code trait
+    //pretty print
+    //toString
+  }
+
+
+  public sealed class IlEhScopeDto_Unknown : IlEhScopeDto
+  {
+    //fields
+    //public fields
+
+    //private fields
+    //primary constructor
+    public IlEhScopeDto_Unknown(
+      int tb,
+      int te,
+      int hb,
+      int he
+    ) : base (
+      tb,
+      te,
+      hb,
+      he
+     )
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlEhScopeDto_Unknown> Read = (ctx, reader) =>
+    {
+      var tb = reader.ReadInt();
+      var te = reader.ReadInt();
+      var hb = reader.ReadInt();
+      var he = reader.ReadInt();
+      var _result = new IlEhScopeDto_Unknown(tb, te, hb, he);
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlEhScopeDto_Unknown> Write = (ctx, writer, value) =>
+    {
+      writer.Write(value.Tb);
+      writer.Write(value.Te);
+      writer.Write(value.Hb);
+      writer.Write(value.He);
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlEhScopeDto_Unknown) obj);
+    }
+    public bool Equals(IlEhScopeDto_Unknown other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Tb == other.Tb && Te == other.Te && Hb == other.Hb && He == other.He;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Tb.GetHashCode();
+        hash = hash * 31 + Te.GetHashCode();
+        hash = hash * 31 + Hb.GetHashCode();
+        hash = hash * 31 + He.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlEhScopeDto_Unknown (");
+      using (printer.IndentCookie()) {
+        printer.Print("tb = "); Tb.PrintEx(printer); printer.Println();
+        printer.Print("te = "); Te.PrintEx(printer); printer.Println();
+        printer.Print("hb = "); Hb.PrintEx(printer); printer.Println();
+        printer.Print("he = "); He.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:74</p>
   /// </summary>
   public sealed class IlErrVarDto : IlVarDto
   {
@@ -536,6 +777,103 @@ namespace org.jacodb.api.net.generated.models
       using (printer.IndentCookie()) {
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
         printer.Print("index = "); Index.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:87</p>
+  /// </summary>
+  public sealed class IlFaultScopeDto : IlEhScopeDto
+  {
+    //fields
+    //public fields
+
+    //private fields
+    //primary constructor
+    public IlFaultScopeDto(
+      int tb,
+      int te,
+      int hb,
+      int he
+    ) : base (
+      tb,
+      te,
+      hb,
+      he
+     )
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlFaultScopeDto> Read = (ctx, reader) =>
+    {
+      var tb = reader.ReadInt();
+      var te = reader.ReadInt();
+      var hb = reader.ReadInt();
+      var he = reader.ReadInt();
+      var _result = new IlFaultScopeDto(tb, te, hb, he);
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlFaultScopeDto> Write = (ctx, writer, value) =>
+    {
+      writer.Write(value.Tb);
+      writer.Write(value.Te);
+      writer.Write(value.Hb);
+      writer.Write(value.He);
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlFaultScopeDto) obj);
+    }
+    public bool Equals(IlFaultScopeDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Tb == other.Tb && Te == other.Te && Hb == other.Hb && He == other.He;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Tb.GetHashCode();
+        hash = hash * 31 + Te.GetHashCode();
+        hash = hash * 31 + Hb.GetHashCode();
+        hash = hash * 31 + He.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlFaultScopeDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("tb = "); Tb.PrintEx(printer); printer.Println();
+        printer.Print("te = "); Te.PrintEx(printer); printer.Println();
+        printer.Print("hb = "); Hb.PrintEx(printer); printer.Println();
+        printer.Print("he = "); He.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -662,6 +1000,207 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
+  /// <p>Generated from: IlModel.kt:84</p>
+  /// </summary>
+  public sealed class IlFilterScopeDto : IlEhScopeDto
+  {
+    //fields
+    //public fields
+    public int Fb {get; private set;}
+
+    //private fields
+    //primary constructor
+    public IlFilterScopeDto(
+      int fb,
+      int tb,
+      int te,
+      int hb,
+      int he
+    ) : base (
+      tb,
+      te,
+      hb,
+      he
+     )
+    {
+      Fb = fb;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlFilterScopeDto> Read = (ctx, reader) =>
+    {
+      var tb = reader.ReadInt();
+      var te = reader.ReadInt();
+      var hb = reader.ReadInt();
+      var he = reader.ReadInt();
+      var fb = reader.ReadInt();
+      var _result = new IlFilterScopeDto(fb, tb, te, hb, he);
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlFilterScopeDto> Write = (ctx, writer, value) =>
+    {
+      writer.Write(value.Tb);
+      writer.Write(value.Te);
+      writer.Write(value.Hb);
+      writer.Write(value.He);
+      writer.Write(value.Fb);
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlFilterScopeDto) obj);
+    }
+    public bool Equals(IlFilterScopeDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Fb == other.Fb && Tb == other.Tb && Te == other.Te && Hb == other.Hb && He == other.He;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Fb.GetHashCode();
+        hash = hash * 31 + Tb.GetHashCode();
+        hash = hash * 31 + Te.GetHashCode();
+        hash = hash * 31 + Hb.GetHashCode();
+        hash = hash * 31 + He.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlFilterScopeDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("fb = "); Fb.PrintEx(printer); printer.Println();
+        printer.Print("tb = "); Tb.PrintEx(printer); printer.Println();
+        printer.Print("te = "); Te.PrintEx(printer); printer.Println();
+        printer.Print("hb = "); Hb.PrintEx(printer); printer.Println();
+        printer.Print("he = "); He.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:88</p>
+  /// </summary>
+  public sealed class IlFinallyScopeDto : IlEhScopeDto
+  {
+    //fields
+    //public fields
+
+    //private fields
+    //primary constructor
+    public IlFinallyScopeDto(
+      int tb,
+      int te,
+      int hb,
+      int he
+    ) : base (
+      tb,
+      te,
+      hb,
+      he
+     )
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlFinallyScopeDto> Read = (ctx, reader) =>
+    {
+      var tb = reader.ReadInt();
+      var te = reader.ReadInt();
+      var hb = reader.ReadInt();
+      var he = reader.ReadInt();
+      var _result = new IlFinallyScopeDto(tb, te, hb, he);
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlFinallyScopeDto> Write = (ctx, writer, value) =>
+    {
+      writer.Write(value.Tb);
+      writer.Write(value.Te);
+      writer.Write(value.Hb);
+      writer.Write(value.He);
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlFinallyScopeDto) obj);
+    }
+    public bool Equals(IlFinallyScopeDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Tb == other.Tb && Te == other.Te && Hb == other.Hb && He == other.He;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Tb.GetHashCode();
+        hash = hash * 31 + Te.GetHashCode();
+        hash = hash * 31 + Hb.GetHashCode();
+        hash = hash * 31 + He.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlFinallyScopeDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("tb = "); Tb.PrintEx(printer); printer.Println();
+        printer.Print("te = "); Te.PrintEx(printer); printer.Println();
+        printer.Print("hb = "); Hb.PrintEx(printer); printer.Println();
+        printer.Print("he = "); He.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
   /// <p>Generated from: IlModel.kt:69</p>
   /// </summary>
   public sealed class IlLocalVarDto : IlVarDto
@@ -754,7 +1293,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:78</p>
+  /// <p>Generated from: IlModel.kt:91</p>
   /// </summary>
   public sealed class IlMethodDto : IlDto
   {
@@ -769,6 +1308,7 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public List<IlLocalVarDto> Locals {get; private set;}
     [NotNull] public List<IlTempVarDto> Temps {get; private set;}
     [NotNull] public List<IlErrVarDto> Errs {get; private set;}
+    [NotNull] public List<IlEhScopeDto> EhScopes {get; private set;}
     [NotNull] public List<IlStmtDto> Body {get; private set;}
 
     //private fields
@@ -783,6 +1323,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] List<IlLocalVarDto> locals,
       [NotNull] List<IlTempVarDto> temps,
       [NotNull] List<IlErrVarDto> errs,
+      [NotNull] List<IlEhScopeDto> ehScopes,
       [NotNull] List<IlStmtDto> body
     )
     {
@@ -792,6 +1333,7 @@ namespace org.jacodb.api.net.generated.models
       if (locals == null) throw new ArgumentNullException("locals");
       if (temps == null) throw new ArgumentNullException("temps");
       if (errs == null) throw new ArgumentNullException("errs");
+      if (ehScopes == null) throw new ArgumentNullException("ehScopes");
       if (body == null) throw new ArgumentNullException("body");
 
       Id = id;
@@ -803,6 +1345,7 @@ namespace org.jacodb.api.net.generated.models
       Locals = locals;
       Temps = temps;
       Errs = errs;
+      EhScopes = ehScopes;
       Body = body;
     }
     //secondary constructor
@@ -820,8 +1363,9 @@ namespace org.jacodb.api.net.generated.models
       var locals = ReadIlLocalVarDtoList(ctx, reader);
       var temps = ReadIlTempVarDtoList(ctx, reader);
       var errs = ReadIlErrVarDtoList(ctx, reader);
+      var ehScopes = ReadIlEhScopeDtoList(ctx, reader);
       var body = ReadIlStmtDtoList(ctx, reader);
-      var _result = new IlMethodDto(id, declType, returnType, name, parameters, resolved, locals, temps, errs, body);
+      var _result = new IlMethodDto(id, declType, returnType, name, parameters, resolved, locals, temps, errs, ehScopes, body);
       return _result;
     };
     public static CtxReadDelegate<CacheKey> ReadCacheKeyNullable = CacheKey.Read.NullableClass();
@@ -829,6 +1373,7 @@ namespace org.jacodb.api.net.generated.models
     public static CtxReadDelegate<List<IlLocalVarDto>> ReadIlLocalVarDtoList = IlLocalVarDto.Read.List();
     public static CtxReadDelegate<List<IlTempVarDto>> ReadIlTempVarDtoList = IlTempVarDto.Read.List();
     public static CtxReadDelegate<List<IlErrVarDto>> ReadIlErrVarDtoList = IlErrVarDto.Read.List();
+    public static CtxReadDelegate<List<IlEhScopeDto>> ReadIlEhScopeDtoList = IlEhScopeDto.Read.List();
     public static CtxReadDelegate<List<IlStmtDto>> ReadIlStmtDtoList = IlStmtDto.Read.List();
 
     public static new CtxWriteDelegate<IlMethodDto> Write = (ctx, writer, value) =>
@@ -842,6 +1387,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlLocalVarDtoList(ctx, writer, value.Locals);
       WriteIlTempVarDtoList(ctx, writer, value.Temps);
       WriteIlErrVarDtoList(ctx, writer, value.Errs);
+      WriteIlEhScopeDtoList(ctx, writer, value.EhScopes);
       WriteIlStmtDtoList(ctx, writer, value.Body);
     };
     public static  CtxWriteDelegate<CacheKey> WriteCacheKeyNullable = CacheKey.Write.NullableClass();
@@ -849,6 +1395,7 @@ namespace org.jacodb.api.net.generated.models
     public static  CtxWriteDelegate<List<IlLocalVarDto>> WriteIlLocalVarDtoList = IlLocalVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlTempVarDto>> WriteIlTempVarDtoList = IlTempVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlErrVarDto>> WriteIlErrVarDtoList = IlErrVarDto.Write.List();
+    public static  CtxWriteDelegate<List<IlEhScopeDto>> WriteIlEhScopeDtoList = IlEhScopeDto.Write.List();
     public static  CtxWriteDelegate<List<IlStmtDto>> WriteIlStmtDtoList = IlStmtDto.Write.List();
 
     //constants
@@ -867,7 +1414,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Id, other.Id) && Equals(DeclType, other.DeclType) && Equals(ReturnType, other.ReturnType) && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && Body.SequenceEqual(other.Body);
+      return Equals(Id, other.Id) && Equals(DeclType, other.DeclType) && Equals(ReturnType, other.ReturnType) && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && Body.SequenceEqual(other.Body);
     }
     //hash code trait
     public override int GetHashCode()
@@ -883,6 +1430,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + Locals.ContentHashCode();
         hash = hash * 31 + Temps.ContentHashCode();
         hash = hash * 31 + Errs.ContentHashCode();
+        hash = hash * 31 + EhScopes.ContentHashCode();
         hash = hash * 31 + Body.ContentHashCode();
         return hash;
       }
@@ -901,6 +1449,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("locals = "); Locals.PrintEx(printer); printer.Println();
         printer.Print("temps = "); Temps.PrintEx(printer); printer.Println();
         printer.Print("errs = "); Errs.PrintEx(printer); printer.Println();
+        printer.Print("ehScopes = "); EhScopes.PrintEx(printer); printer.Println();
         printer.Print("body = "); Body.PrintEx(printer); printer.Println();
       }
       printer.Print(")");

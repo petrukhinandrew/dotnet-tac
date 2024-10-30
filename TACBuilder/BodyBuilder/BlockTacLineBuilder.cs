@@ -146,30 +146,30 @@ namespace TACBuilder
                     {
                         IlExpr obj = blockBuilder.Pop();
                         blockBuilder.ClearStack();
-                        blockBuilder.NewLine(new ILEHStmt("throw", obj));
+                        blockBuilder.NewLine(new IlThrowStmt(obj));
                         return false;
                     }
                     case "rethrow":
                     {
-                        blockBuilder.NewLine(new ILEHStmt("rethrow"));
+                        blockBuilder.NewLine(new IlRethrowStmt());
                         break;
                     }
                     case "endfault":
                     {
-                        blockBuilder.NewLine(new ILEHStmt("endfault"));
+                        blockBuilder.NewLine(new IlEndFaultStmt());
                         blockBuilder.ClearStack();
                         return false;
                     }
                     case "endfinally":
                     {
-                        blockBuilder.NewLine(new ILEHStmt("endfinally"));
+                        blockBuilder.NewLine(new IlEndFinallyStmt());
                         blockBuilder.ClearStack();
                         return false;
                     }
                     case "endfilter":
                     {
                         IlExpr value = blockBuilder.Pop();
-                        blockBuilder.NewLine(new ILEHStmt("endfilter", value));
+                        blockBuilder.NewLine(new IlEndFilterStmt(value));
                         return true;
                     }
                     case "localloc":
