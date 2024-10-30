@@ -153,7 +153,7 @@ internal static class TACMethodPrinter
     {
         writer.AutoFlush = true;
         method.DumpMethodSignature(writer);
-        // call.DumpEHS(writer);
+        method.DumpEHS(writer);
         method.DumpVars(writer);
         method.DumpTAC(writer);
         writer.WriteLine();

@@ -76,21 +76,48 @@ public class IlIfStmt(IlExpr cond, int target) : IlBranchStmt(target)
     }
 }
 
-// TODO remake required
-public class ILEHStmt(string value, IlExpr thrown) : IlStmt()
-{
-    public ILEHStmt(string value) : this(value, new IlNullConst())
-    {
-    }
+public abstract class IlEhStmt : IlStmt;
 
-    public string Value => value;
-    private IlExpr _thrown = thrown;
+public class IlThrowStmt(IlExpr value) : IlEhStmt
+{
+    public IlExpr Value => value;
 
     public override string ToString()
     {
-        if (_thrown is IlNullConst)
-            return Value;
-        else
-            return $"{Value} {_thrown.ToString()}";
+        return $"throw {Value.ToString()}";
+    }
+}
+
+public class IlRethrowStmt : IlEhStmt
+{
+    public override string ToString()
+    {
+        return "rethrow";
+    }
+}
+
+public class IlEndFilterStmt(IlExpr value) : IlEhStmt
+{
+    public IlExpr Value => value;
+
+    public override string ToString()
+    {
+        return "endfilter";
+    }
+}
+
+public class IlEndFinallyStmt : IlEhStmt
+{
+    public override string ToString()
+    {
+        return "endfinally";
+    }
+}
+
+public class IlEndFaultStmt : IlEhStmt
+{
+    public override string ToString()
+    {
+        return "endfault";
     }
 }

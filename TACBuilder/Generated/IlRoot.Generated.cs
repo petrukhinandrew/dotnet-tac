@@ -36,7 +36,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlRoot.kt:5</p>
+  /// <p>Generated from: IlRoot.kt:21</p>
   /// </summary>
   public class IlRoot : RdExtBase
   {

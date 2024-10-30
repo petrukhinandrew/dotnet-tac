@@ -29,8 +29,8 @@ class Program
         {
             var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
             var appTacBuilder = new AppTacBuilder(path);
-            // AppTacBuilder.FilterMethodsFromRootAsm(path);
-            AppTacBuilder.FilterSingleMethodFromRootAsm(path, "TernaryOp");
+            AppTacBuilder.FilterMethodsFromRootAsm(path);
+            // AppTacBuilder.FilterSingleMethodFromRootAsm(path, "NestedFinally");
             appTacBuilder.Build();
             var builtAsms = appTacBuilder.BuiltAssemblies;
             var writer = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true);

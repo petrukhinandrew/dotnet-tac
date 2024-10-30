@@ -1,4 +1,5 @@
 using org.jacodb.api.net.generated.models;
+using TACBuilder.BodyBuilder;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 using TACBuilder.ILTAC.TypeSystem;
@@ -46,6 +47,24 @@ public static class RdSerializer
                         .ToList(),
                     errs: method.Errs.Select(v =>
                         new IlErrVarDto(type: v.Type.GetCacheKey(), index: v.Index)).ToList(),
+                    ehScopes: method.Scopes.Select(scope =>
+                    {
+                        IlEhScopeDto res = scope switch
+                        {
+                            FilterScope filterScope => new IlFilterScopeDto(tb: filterScope.tacLoc.tb,
+                                te: filterScope.tacLoc.te, hb: filterScope.tacLoc.hb, he: filterScope.tacLoc.he,
+                                fb: filterScope.fbt),
+                            CatchScope catchScope => new IlCatchScopeDto(tb: catchScope.tacLoc.tb,
+                                te: catchScope.tacLoc.te, hb: catchScope.tacLoc.hb, he: catchScope.tacLoc.he),
+
+                            FinallyScope finallyScope => new IlFinallyScopeDto(tb: finallyScope.tacLoc.tb,
+                                te: finallyScope.tacLoc.te, hb: finallyScope.tacLoc.hb, he: finallyScope.tacLoc.he),
+                            FaultScope faultScope => new IlFaultScopeDto(tb: faultScope.tacLoc.tb,
+                                te: faultScope.tacLoc.te, hb: faultScope.tacLoc.hb, he: faultScope.tacLoc.he),
+                            _ => throw new NotImplementedException(),
+                        };
+                        return res;
+                    }).ToList(),
                     body: SerializeMethodBody(method)
                 );
             }
@@ -72,31 +91,33 @@ public static class RdSerializer
                 rhs: SerializeExpr(assignStmt.Rhs));
 
         if (stmt is IlCallStmt callStmt)
-        {
             return
                 new IlCallStmtDto(
                     (IlCallDto)callStmt.Call.SerializeExpr()); // itll be always like this, should be decided by cache
-        }
 
         if (stmt is IlReturnStmt returnStmt)
-        {
             return new IlReturnStmtDto(returnStmt.RetVal?.SerializeExpr());
-        }
 
         if (stmt is IlGotoStmt gotoStmt)
-        {
             return new IlGotoStmtDto(gotoStmt.Target);
-        }
 
         if (stmt is IlIfStmt ifStmt)
-        {
-            return new IlIfStmtDto(ifStmt.Target, ifStmt.Condition.SerializeExpr());
-        }
+            return new IlIfStmtDto(target: ifStmt.Target, cond: ifStmt.Condition.SerializeExpr());
 
-        if (stmt is ILEHStmt)
-        {
-            return new IlEhStmtDto();
-        }
+        if (stmt is IlThrowStmt throwStmt)
+            return new IlThrowStmtDto(throwStmt.Value.SerializeExpr());
+
+        if (stmt is IlRethrowStmt)
+            return new IlRethrowStmtDto();
+
+        if (stmt is IlEndFinallyStmt)
+            return new IlEndFinallyStmtDto();
+
+        if (stmt is IlEndFaultStmt)
+            return new IlEndFaultStmtDto();
+
+        if (stmt is IlEndFilterStmt endFilterStmt)
+            return new IlEndFilterStmtDto(endFilterStmt.Value.SerializeExpr());
 
         throw new Exception($"{stmt} stmt serialization not yet supported");
     }

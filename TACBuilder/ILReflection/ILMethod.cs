@@ -109,6 +109,10 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             }
 
             method._tacBody = IlInstanceBuilder.GetMethodTacBody(method);
+            foreach (var clause in _bodyParser.EhClauses)
+            {
+                method.Scopes.Add(EhScope.FromClause(clause));
+            }
         }
     }
 
@@ -145,7 +149,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     public List<IlLocalVar> LocalVars = new();
     public Dictionary<int, IlTempVar> Temps = new();
     public List<IlErrVar> Errs = new();
-    public List<EHScope> Scopes = new();
+    public List<EhScope> Scopes = new();
 
     private IlBody _ilBody;
     private TacBody? _tacBody;
@@ -204,7 +208,6 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
         if (HasMethodBody)
         {
-            // TODO new instance for local var type
             Logger.LogDebug("Resolving body of {Type} {Name}", DeclaringType.Name, Name);
             foreach (var locVar in _methodBase.GetMethodBody().LocalVariables.OrderBy(localVar => localVar.LocalIndex))
             {

@@ -15,7 +15,7 @@ class MethodBuilder(IlMethod method)
     public List<IlValue> Params = new();
     public Dictionary<int, IlTempVar> Temps => method.Temps;
     public List<IlErrVar> Errs => method.Errs;
-    public List<EHScope> Scopes => method.Scopes;
+    public List<EhScope> EhScopes => method.Scopes;
     public readonly Dictionary<(int, int), IlMerged> Merged = new();
     public readonly List<IlStmt> Tac = new();
     public Dictionary<int, BlockTacBuilder> BlockTacBuilders = new();
@@ -50,8 +50,6 @@ class MethodBuilder(IlMethod method)
         }
 
         ComposeTac();
-        // TODO
-        // Debug.Assert(Tac.Last().Stmt is ILReturnStmt or ILEHStmt {Value: "throw"});
         return Tac;
     }
 
@@ -94,7 +92,7 @@ class MethodBuilder(IlMethod method)
     {
         Dictionary<int, int?> ilToTacMapping = new();
         var successors = _method.BasicBlocks.ToDictionary(bb => bb.Entry.idx, bb => bb.Successors);
-        foreach (var ilIdx in successors.Keys.OrderBy(k => k))
+        foreach (var ilIdx in successors.Keys.Concat(_method.BasicBlocks.Select(bb => bb.Exit.idx)).OrderBy(k => k))
         {
             ilToTacMapping[ilIdx] = null;
         }
@@ -108,6 +106,7 @@ class MethodBuilder(IlMethod method)
                 Tac.Add(line);
             }
 
+            ilToTacMapping[bb.Meta.Exit.idx] = Tac.Count;
             if (tacBlocksIndexed.Count > i + 1 && successors.ContainsKey(bb.IlFirst) &&
                 successors[bb.IlFirst].Count > 0 && successors[bb.IlFirst][0] != tacBlocksIndexed[i + 1].Key)
             {
@@ -121,6 +120,20 @@ class MethodBuilder(IlMethod method)
             {
                 branch.Target = (int)ilToTacMapping[branch.Target]!;
             }
+        }
+
+        foreach (var scope in method.Scopes)
+        {
+            if (scope is FilterScope filterScope && ilToTacMapping.TryGetValue(filterScope.fb, out var fbv) != null)
+                filterScope.fbt = (int)fbv!;
+            if (ilToTacMapping.TryGetValue(scope.ilLoc.tb, out var tbv))
+                scope.tacLoc.tb = (int)tbv!;
+            if (ilToTacMapping.TryGetValue(scope.ilLoc.te, out var tev))
+                scope.tacLoc.te = (int)tev!;
+            if (ilToTacMapping.TryGetValue(scope.ilLoc.hb, out var hbv))
+                scope.tacLoc.hb = (int)hbv!;
+            if (ilToTacMapping.TryGetValue(scope.ilLoc.he, out var hev))
+                scope.tacLoc.he = (int)hev!;
         }
     }
 

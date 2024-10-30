@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
 
 
 
-    protected override long SerializationHash => -5104574478636749870L;
+    protected override long SerializationHash => -7271216282343879510L;
 
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -95,7 +95,11 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlAssignStmtDto.Read, IlAssignStmtDto.Write);
       serializers.Register(IlCallStmtDto.Read, IlCallStmtDto.Write);
       serializers.Register(IlReturnStmtDto.Read, IlReturnStmtDto.Write);
-      serializers.Register(IlEhStmtDto.Read, IlEhStmtDto.Write);
+      serializers.Register(IlThrowStmtDto.Read, IlThrowStmtDto.Write);
+      serializers.Register(IlRethrowStmtDto.Read, IlRethrowStmtDto.Write);
+      serializers.Register(IlEndFinallyStmtDto.Read, IlEndFinallyStmtDto.Write);
+      serializers.Register(IlEndFaultStmtDto.Read, IlEndFaultStmtDto.Write);
+      serializers.Register(IlEndFilterStmtDto.Read, IlEndFilterStmtDto.Write);
       serializers.Register(IlGotoStmtDto.Read, IlGotoStmtDto.Write);
       serializers.Register(IlIfStmtDto.Read, IlIfStmtDto.Write);
       serializers.Register(IlArgAccessDto.Read, IlArgAccessDto.Write);
@@ -108,6 +112,7 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlRefExprDto_Unknown.Read, IlRefExprDto_Unknown.Write);
       serializers.Register(IlDerefExprDto_Unknown.Read, IlDerefExprDto_Unknown.Write);
       serializers.Register(IlStmtDto_Unknown.Read, IlStmtDto_Unknown.Write);
+      serializers.Register(IlEhStmtDto_Unknown.Read, IlEhStmtDto_Unknown.Write);
       serializers.Register(IlBranchStmtDto_Unknown.Read, IlBranchStmtDto_Unknown.Write);
 
       serializers.RegisterToplevelOnce(typeof(IlRoot), IlRoot.RegisterDeclaredTypesSerializers);
@@ -142,7 +147,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:143</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:153</p>
   /// </summary>
   public sealed class IlArgAccessDto : IlValueDto
   {
@@ -774,15 +779,22 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:128</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:137</p>
   /// </summary>
   public abstract class IlBranchStmtDto : IlStmtDto
   {
     //fields
     //public fields
+    public int Target {get; private set;}
 
     //private fields
     //primary constructor
+    protected IlBranchStmtDto(
+      int target
+    )
+    {
+      Target = target;
+    }
     //secondary constructor
     //deconstruct trait
     //statics
@@ -809,18 +821,27 @@ namespace org.jacodb.api.net.generated.models
 
     //private fields
     //primary constructor
+    public IlBranchStmtDto_Unknown(
+      int target
+    ) : base (
+      target
+     )
+    {
+    }
     //secondary constructor
     //deconstruct trait
     //statics
 
     public static new CtxReadDelegate<IlBranchStmtDto_Unknown> Read = (ctx, reader) =>
     {
-      var _result = new IlBranchStmtDto_Unknown();
+      var target = reader.ReadInt();
+      var _result = new IlBranchStmtDto_Unknown(target);
       return _result;
     };
 
     public static new CtxWriteDelegate<IlBranchStmtDto_Unknown> Write = (ctx, writer, value) =>
     {
+      writer.Write(value.Target);
     };
 
     //constants
@@ -839,13 +860,14 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return true;
+      return Target == other.Target;
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
+        hash = hash * 31 + Target.GetHashCode();
         return hash;
       }
     }
@@ -853,6 +875,9 @@ namespace org.jacodb.api.net.generated.models
     public void Print(PrettyPrinter printer)
     {
       printer.Println("IlBranchStmtDto_Unknown (");
+      using (printer.IndentCookie()) {
+        printer.Print("target = "); Target.PrintEx(printer); printer.Println();
+      }
       printer.Print(")");
     }
     //toString
@@ -1769,7 +1794,7 @@ namespace org.jacodb.api.net.generated.models
   /// <summary>
   /// <p>Generated from: IlMethodBodyModel.kt:126</p>
   /// </summary>
-  public sealed class IlEhStmtDto : IlStmtDto
+  public abstract class IlEhStmtDto : IlStmtDto
   {
     //fields
     //public fields
@@ -1780,13 +1805,39 @@ namespace org.jacodb.api.net.generated.models
     //deconstruct trait
     //statics
 
-    public static new CtxReadDelegate<IlEhStmtDto> Read = (ctx, reader) =>
+    public static new CtxReadDelegate<IlEhStmtDto> Read = Polymorphic<IlEhStmtDto>.ReadAbstract(IlEhStmtDto_Unknown.Read);
+
+    public static new CtxWriteDelegate<IlEhStmtDto> Write = Polymorphic<IlEhStmtDto>.Write;
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    //hash code trait
+    //pretty print
+    //toString
+  }
+
+
+  public sealed class IlEhStmtDto_Unknown : IlEhStmtDto
+  {
+    //fields
+    //public fields
+
+    //private fields
+    //primary constructor
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlEhStmtDto_Unknown> Read = (ctx, reader) =>
     {
-      var _result = new IlEhStmtDto();
+      var _result = new IlEhStmtDto_Unknown();
       return _result;
     };
 
-    public static new CtxWriteDelegate<IlEhStmtDto> Write = (ctx, writer, value) =>
+    public static new CtxWriteDelegate<IlEhStmtDto_Unknown> Write = (ctx, writer, value) =>
     {
     };
 
@@ -1800,9 +1851,9 @@ namespace org.jacodb.api.net.generated.models
       if (ReferenceEquals(null, obj)) return false;
       if (ReferenceEquals(this, obj)) return true;
       if (obj.GetType() != GetType()) return false;
-      return Equals((IlEhStmtDto) obj);
+      return Equals((IlEhStmtDto_Unknown) obj);
     }
-    public bool Equals(IlEhStmtDto other)
+    public bool Equals(IlEhStmtDto_Unknown other)
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
@@ -1819,7 +1870,220 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("IlEhStmtDto (");
+      printer.Println("IlEhStmtDto_Unknown (");
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:132</p>
+  /// </summary>
+  public sealed class IlEndFaultStmtDto : IlEhStmtDto
+  {
+    //fields
+    //public fields
+
+    //private fields
+    //primary constructor
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlEndFaultStmtDto> Read = (ctx, reader) =>
+    {
+      var _result = new IlEndFaultStmtDto();
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlEndFaultStmtDto> Write = (ctx, writer, value) =>
+    {
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlEndFaultStmtDto) obj);
+    }
+    public bool Equals(IlEndFaultStmtDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return true;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlEndFaultStmtDto (");
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:133</p>
+  /// </summary>
+  public sealed class IlEndFilterStmtDto : IlEhStmtDto
+  {
+    //fields
+    //public fields
+    [NotNull] public IlExprDto Value {get; private set;}
+
+    //private fields
+    //primary constructor
+    public IlEndFilterStmtDto(
+      [NotNull] IlExprDto value
+    )
+    {
+      if (value == null) throw new ArgumentNullException("value");
+
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlEndFilterStmtDto> Read = (ctx, reader) =>
+    {
+      var value = IlExprDto.Read(ctx, reader);
+      var _result = new IlEndFilterStmtDto(value);
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlEndFilterStmtDto> Write = (ctx, writer, value) =>
+    {
+      IlExprDto.Write(ctx, writer, value.Value);
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlEndFilterStmtDto) obj);
+    }
+    public bool Equals(IlEndFilterStmtDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Value, other.Value);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlEndFilterStmtDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:131</p>
+  /// </summary>
+  public sealed class IlEndFinallyStmtDto : IlEhStmtDto
+  {
+    //fields
+    //public fields
+
+    //private fields
+    //primary constructor
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlEndFinallyStmtDto> Read = (ctx, reader) =>
+    {
+      var _result = new IlEndFinallyStmtDto();
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlEndFinallyStmtDto> Write = (ctx, writer, value) =>
+    {
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlEndFinallyStmtDto) obj);
+    }
+    public bool Equals(IlEndFinallyStmtDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return true;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlEndFinallyStmtDto (");
       printer.Print(")");
     }
     //toString
@@ -2217,21 +2481,21 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:130</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:141</p>
   /// </summary>
   public sealed class IlGotoStmtDto : IlBranchStmtDto
   {
     //fields
     //public fields
-    public int Target {get; private set;}
 
     //private fields
     //primary constructor
     public IlGotoStmtDto(
       int target
-    )
+    ) : base (
+      target
+     )
     {
-      Target = target;
     }
     //secondary constructor
     //deconstruct trait
@@ -2296,25 +2560,25 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:134</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:144</p>
   /// </summary>
   public sealed class IlIfStmtDto : IlBranchStmtDto
   {
     //fields
     //public fields
-    public int Target {get; private set;}
     [NotNull] public IlExprDto Cond {get; private set;}
 
     //private fields
     //primary constructor
     public IlIfStmtDto(
-      int target,
-      [NotNull] IlExprDto cond
-    )
+      [NotNull] IlExprDto cond,
+      int target
+    ) : base (
+      target
+     )
     {
       if (cond == null) throw new ArgumentNullException("cond");
 
-      Target = target;
       Cond = cond;
     }
     //secondary constructor
@@ -2325,7 +2589,7 @@ namespace org.jacodb.api.net.generated.models
     {
       var target = reader.ReadInt();
       var cond = IlExprDto.Read(ctx, reader);
-      var _result = new IlIfStmtDto(target, cond);
+      var _result = new IlIfStmtDto(cond, target);
       return _result;
     };
 
@@ -2351,15 +2615,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Target == other.Target && Equals(Cond, other.Cond);
+      return Equals(Cond, other.Cond) && Target == other.Target;
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Target.GetHashCode();
         hash = hash * 31 + Cond.GetHashCode();
+        hash = hash * 31 + Target.GetHashCode();
         return hash;
       }
     }
@@ -2368,8 +2632,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlIfStmtDto (");
       using (printer.IndentCookie()) {
-        printer.Print("target = "); Target.PrintEx(printer); printer.Println();
         printer.Print("cond = "); Cond.PrintEx(printer); printer.Println();
+        printer.Print("target = "); Target.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -3476,6 +3740,72 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:130</p>
+  /// </summary>
+  public sealed class IlRethrowStmtDto : IlEhStmtDto
+  {
+    //fields
+    //public fields
+
+    //private fields
+    //primary constructor
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlRethrowStmtDto> Read = (ctx, reader) =>
+    {
+      var _result = new IlRethrowStmtDto();
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlRethrowStmtDto> Write = (ctx, writer, value) =>
+    {
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlRethrowStmtDto) obj);
+    }
+    public bool Equals(IlRethrowStmtDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return true;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlRethrowStmtDto (");
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
   /// <p>Generated from: IlMethodBodyModel.kt:122</p>
   /// </summary>
   public sealed class IlReturnStmtDto : IlStmtDto
@@ -3898,6 +4228,87 @@ namespace org.jacodb.api.net.generated.models
       using (printer.IndentCookie()) {
         printer.Print("value = "); Value.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:127</p>
+  /// </summary>
+  public sealed class IlThrowStmtDto : IlEhStmtDto
+  {
+    //fields
+    //public fields
+    [NotNull] public IlExprDto Value {get; private set;}
+
+    //private fields
+    //primary constructor
+    public IlThrowStmtDto(
+      [NotNull] IlExprDto value
+    )
+    {
+      if (value == null) throw new ArgumentNullException("value");
+
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlThrowStmtDto> Read = (ctx, reader) =>
+    {
+      var value = IlExprDto.Read(ctx, reader);
+      var _result = new IlThrowStmtDto(value);
+      return _result;
+    };
+
+    public static new CtxWriteDelegate<IlThrowStmtDto> Write = (ctx, writer, value) =>
+    {
+      IlExprDto.Write(ctx, writer, value.Value);
+    };
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlThrowStmtDto) obj);
+    }
+    public bool Equals(IlThrowStmtDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Value, other.Value);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlThrowStmtDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -4461,7 +4872,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:146</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:156</p>
   /// </summary>
   public sealed class IlVarAccessDto : IlValueDto
   {
@@ -4554,7 +4965,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:138</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:148</p>
   /// </summary>
   public enum IlVarKind {
     local,
