@@ -1,6 +1,7 @@
 ﻿// #define CONSOLE_SERIALIZER
 
 #define RD_SERIALIZER
+using System.Runtime.InteropServices;
 using TACBuilder.Serialization;
 
 namespace TACBuilder;
@@ -9,6 +10,7 @@ class Program
 {
     static void Main(string[] args)
     {
+        // TODO need logs on what asm is being resolved, how many types already resolved and total number of types
         AppTacBuilder builder;
         if (args.Contains("--rd"))
         {
@@ -25,19 +27,27 @@ class Program
             });
             connection.Connect(8083);
         }
-        else
+        else if (args.Contains("--console"))
         {
             var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
             var appTacBuilder = new AppTacBuilder(path);
-            AppTacBuilder.FilterMethodsFromRootAsm(path);
+            // AppTacBuilder.FilterMethodsFromRootAsm(path);
             // AppTacBuilder.FilterSingleMethodFromRootAsm(path, "NestedFinally");
             appTacBuilder.Build();
             var builtAsms = appTacBuilder.BuiltAssemblies;
-            var writer = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true);
-            var serializer = new ConsoleTacSerializer(builtAsms, writer);
-            serializer.Serialize();
-            writer.Flush();
-            writer.Close();
+            // var writer = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true);
+            // var serializer = new ConsoleTacSerializer(builtAsms, writer);
+            // serializer.Serialize();
+            // writer.Flush();
+            // writer.Close();
+        }
+        else
+        {
+            var f = (int)1;
+            var d = (double)1;
+            var x = d + f;
+            Console.WriteLine(f.GetType().IsAssignableTo(d.GetType()));
+
         }
     }
 }

@@ -217,7 +217,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
             _ilBody = IlInstanceBuilder.GetMethodIlBody(this);
         }
-
+        // TODO may be improper decision
         IsConstructed = true;
     }
 

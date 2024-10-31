@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -48,16 +49,18 @@ namespace TACBuilder
                     case "refanytype":
                     case "refanyval":
                     case "jmp":
-                    case "calli":
-                    case "ldelem.i":
                     case "initblk":
                     case "cpobj":
                     case "cpblk":
-                    case "arglist":
                         throw new Exception("not implemented " + ((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name);
-
+                    case "arglist":
+                    {
+                        blockBuilder.Push(new IlArgListRef(blockBuilder.Meta.MethodMeta));
+                        break;
+                    }
                     case "constrained.":
                     case "volatile.":
+                    case "readonly.":
                     case "nop":
                     case "break": break;
 
@@ -101,24 +104,28 @@ namespace TACBuilder
                     {
                         IlExpr value = blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[0], value));
+                        blockBuilder.Locals[0].Value = value;
                         break;
                     }
                     case "stloc.1":
                     {
                         IlExpr value = blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[1], value));
+                        blockBuilder.Locals[1].Value = value;
                         break;
                     }
                     case "stloc.2":
                     {
                         IlExpr value = blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[2], value));
+                        blockBuilder.Locals[2].Value = value;
                         break;
                     }
                     case "stloc.3":
                     {
                         IlExpr value = blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[3], value));
+                        blockBuilder.Locals[3].Value = value;
                         break;
                     }
                     case "stloc.s":
@@ -126,6 +133,7 @@ namespace TACBuilder
                         int idx = ((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value;
                         IlExpr value = blockBuilder.Pop();
                         blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[idx], value));
+                        blockBuilder.Locals[idx].Value = value;
                         break;
                     }
                     case "starg":
@@ -559,6 +567,31 @@ namespace TACBuilder
 
                         break;
                     }
+                    case "calli":
+                    {
+                        byte[] ilMethod =
+                            ((ILInstrOperand.ResolvedSignature)blockBuilder.CurInstr.arg).value;
+                        // TODO Local{Local{Local { ref} }} situation possible
+                        // TODO ref/deref possible
+                        // IlArg possible RuntimeHelpers DispatchTailCalls
+                        IlMethodRef ftn = blockBuilder.Pop() switch
+                        {
+                            IlMethodRef methodRef => methodRef,
+                            IlVar v => (IlMethodRef)v.Value
+                        };
+                        IlCall ilCall = new IlCall(ftn.Method);
+                        ilCall.LoadArgs(blockBuilder.Pop);
+                        if (ilCall.Returns())
+                        {
+                            var tmp = blockBuilder.GetNewTemp(ilCall, blockBuilder.CurInstr.idx);
+                            blockBuilder.NewLine(new ILAssignStmt(tmp, ilCall));
+                            blockBuilder.Push(tmp);
+                        }
+                        else
+                            blockBuilder.NewLine(new IlCallStmt(ilCall));
+
+                        break;
+                    }
                     case "ret":
                     {
                         var methodMeta = blockBuilder.Meta.MethodMeta!;
@@ -610,6 +643,8 @@ namespace TACBuilder
                     {
                         IlExpr rhs = blockBuilder.Pop();
                         IlExpr lhs = blockBuilder.Pop();
+                        if (lhs.Type == null)
+                            Console.WriteLine("suka");
                         IlBinaryOperation op = new IlBinaryOperation(lhs, rhs);
                         blockBuilder.Push(op);
                         break;
@@ -742,6 +777,7 @@ namespace TACBuilder
                             new IlInitExpr(ilType)));
                         break;
                     }
+                    case "ldelem.i":
                     case "ldelem.i1":
                     case "ldelem.i2":
                     case "ldelem.i4":
@@ -928,10 +964,12 @@ namespace TACBuilder
 
         private static void InlineInitArray(this BlockTacBuilder blockBuilder, List<IlExpr> args)
         {
+            // TODO check array of UInt32 size
             if (args.First() is IlValue newArr && args.Last() is IlFieldRef fieldRef)
             {
                 try
                 {
+                    // TODO replace with IlVar (seems like local possible)
                     IlNewArrayExpr expr = (newArr as IlTempVar)?.Value as IlNewArrayExpr ??
                                           throw new Exception("expected temp var");
                     IlIntConst arrSize = (IlIntConst)expr.Size;
@@ -967,15 +1005,20 @@ namespace TACBuilder
             throw new Exception("bad static array init");
         }
 
+        // TODO need proper coercion, will be reused in stack push or so
+        // bad constant type System.DateTimeParse+DS
+        // System.Exception: bad constant type System.Globalization.HebrewNumber+HS
         private static IlConstant GetConstant(object value)
         {
             if (value is byte bt) return new IlByteConst(bt);
+            if (value is char c) return new IlIntConst(c);
             if (value is int i) return new IlIntConst(i);
             if (value is long l) return new IlLongConst(l);
             if (value is float f) return new IlFloatConst(f);
             if (value is double d) return new IlDoubleConst(d);
             if (value is bool b) return new IlBoolConst(b);
-            throw new Exception($"bad constant type {value}");
+            if (value is nint n) return new IlLongConst(n);
+            throw new Exception($"bad constant type {value.GetType()}");
         }
     }
 }
