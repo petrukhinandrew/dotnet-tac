@@ -23,33 +23,44 @@ class MethodBuilder(IlMethod method)
 
     public List<IlStmt> Build()
     {
-        Params.AddRange(_method.Parameters.Select((mp, index) => mp switch
+        try
         {
-            IlMethod.Parameter p => new IlArgument(mp),
-            IlMethod.This t => mp.Type.IsValueType switch
+            Params.AddRange(_method.Parameters.Select((mp, index) => mp switch
             {
-                true => (IlValue)new IlManagedRef(new IlArgument(mp)),
-                _ => new IlArgument(mp)
-            },
-            _ => throw new Exception($"Unknown method parameter type at {mp}")
-        }));
+                IlMethod.Parameter p => new IlArgument(mp),
+                IlMethod.This t => mp.Type.IsValueType switch
+                {
+                    true => (IlValue)new IlManagedRef(new IlArgument(mp)),
+                    _ => new IlArgument(mp)
+                },
+                _ => throw new Exception($"Unknown method parameter type at {mp}")
+            }));
 
-        if (!_method.HasMethodBody) return [];
-        InitBlockBuilders();
+            if (!_method.HasMethodBody) return [];
+            InitBlockBuilders();
 
-        ProcessIL();
-        foreach (var m in Merged.Values)
+            ProcessIL();
+            foreach (var m in Merged.Values)
+            {
+                var temp = GetNewTemp(m, Temps.Count == 0 ? 0 : Temps.Keys.Max() + 1);
+                m.MakeTemp(temp);
+            }
+
+            foreach (var bb in BlockTacBuilders)
+            {
+                bb.Value.InsertExtraAssignments();
+            }
+
+            ComposeTac();
+        }
+        catch (Exception e)
         {
-            var temp = GetNewTemp(m, Temps.Keys.Max() + 1);
-            m.MakeTemp(temp);
+            Console.WriteLine(e.Message);
+            Console.WriteLine(
+                $"method body tac build failed for {_method.DeclaringType?.Name ?? "unknown decltype"} {_method.Name}");
+            return [];
         }
 
-        foreach (var bb in BlockTacBuilders)
-        {
-            bb.Value.InsertExtraAssignments();
-        }
-
-        ComposeTac();
         return Tac;
     }
 

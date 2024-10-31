@@ -16,6 +16,7 @@ public class AppTacBuilder
 
     public void Build()
     {
+
         var rootAssemblyMeta = IlInstanceBuilder.BuildFrom(_path);
         BuiltAssemblies.AddRange(IlInstanceBuilder.GetAssemblies());
     }

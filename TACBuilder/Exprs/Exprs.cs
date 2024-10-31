@@ -16,13 +16,30 @@ public class IlUnaryOperation(IlExpr operand) : IlExpr
     }
 }
 
-public class IlBinaryOperation(IlExpr lhs, IlExpr rhs, string op = " binop ") : IlExpr
+public class IlBinaryOperation : IlExpr
 {
-    public IlType Type => lhs.Type;
+    private readonly IlExpr _lhs;
+    private readonly IlExpr _rhs;
+    private readonly string _op;
 
-    public IlExpr Lhs => lhs;
-    public IlExpr Rhs => rhs;
-    public new string ToString() => $"{Lhs.ToString()} {op} {Rhs.ToString()}";
+    public IlBinaryOperation(IlExpr lhs, IlExpr rhs, string op = " binop ")
+    {
+        _lhs = lhs;
+        _rhs = rhs;
+        _op = op;
+        if (_lhs.Type == null)
+        {
+            Console.WriteLine("kek");
+        }
+
+        Type = lhs.Type;
+    }
+
+    public IlType Type { get; }
+
+    public IlExpr Lhs => _lhs;
+    public IlExpr Rhs => _rhs;
+    public new string ToString() => $"{Lhs.ToString()} {_op} {Rhs.ToString()}";
 }
 
 public class IlInitExpr(IlType type) : IlExpr

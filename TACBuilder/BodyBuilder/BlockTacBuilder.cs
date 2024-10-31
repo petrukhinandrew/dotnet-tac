@@ -66,7 +66,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
 
             IlMerged tmp = methodBuilder.GetMerged(IlFirst, j);
             tmp.MergeOf(values);
-            foreach (var (i, p) in _preds.Select((v, i) => (i, v)))
+            foreach (var (i, p) in _preds.Where(bb => bb._builtAtLeastOnce).Select((v, i) => (i, v)))
             {
                 p._extraAssignments[tmp] = values[i];
             }

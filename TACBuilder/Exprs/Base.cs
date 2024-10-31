@@ -1,4 +1,5 @@
 using System.Reflection;
+using JetBrains.Lifetimes;
 using TACBuilder.ILReflection;
 using TACBuilder.Utils;
 
@@ -15,9 +16,16 @@ public interface IlValue : IlExpr;
 
 public interface IlLocal : IlValue;
 
-public class IlLocalVar(IlType type, int index, bool isPinned) : IlLocal
+public interface IlVar : IlLocal
 {
-    public IlType Type => type;
+    public IlType Type { get; }
+    public IlExpr? Value { get; }
+}
+
+public class IlLocalVar(IlType type, int index, bool isPinned, IlExpr? value = null) : IlVar
+{
+    public new IlType Type => type;
+    public IlExpr? Value { get; set; } = value;
     public int Index => index;
     public new string ToString() => NamingUtil.LocalVar(index);
     public bool IsPinned => isPinned;
@@ -33,7 +41,7 @@ public class IlLocalVar(IlType type, int index, bool isPinned) : IlLocal
     }
 }
 
-public class IlTempVar(int index, IlExpr value) : IlValue
+public class IlTempVar(int index, IlExpr value) : IlVar
 {
     public int Index => index;
     public IlExpr Value => value;
@@ -45,10 +53,11 @@ public class IlTempVar(int index, IlExpr value) : IlValue
     }
 }
 
-public class IlErrVar(IlType type, int index) : IlValue
+public class IlErrVar(IlType type, int index) : IlVar
 {
     public int Index => index;
-    public IlType Type => type;
+    public new IlType Type => type;
+    public IlExpr? Value { get; }
 
     public override string ToString()
     {
@@ -158,6 +167,11 @@ public class IlFieldRef(IlField field) : IlConstant
 {
     public IlField Field { get; } = field;
     public IlType Type => IlInstanceBuilder.GetType(typeof(FieldInfo));
+}
+
+public class IlArgListRef(IlMethod method) : IlConstant
+{
+    public IlType Type => IlInstanceBuilder.GetType(typeof(RuntimeArgumentHandle));
 }
 
 // TODO check receiver used
