@@ -216,7 +216,7 @@ namespace TACBuilder
                     {
                         IlField ilField = ((ILInstrOperand.ResolvedField)blockBuilder.CurInstr.arg).value;
                         IlFieldAccess ilFieldAccess = new IlFieldAccess(ilField);
-                        if (ilField.Type!.BaseType.IsUnmanaged())
+                        if (ilField.Type!.IsUnmanaged)
                         {
                             blockBuilder.Push(new IlUnmanagedRef(ilFieldAccess));
                         }
@@ -597,7 +597,7 @@ namespace TACBuilder
                         var methodMeta = blockBuilder.Meta.MethodMeta!;
 
                         IlExpr? retVal = null;
-                        if (methodMeta.ReturnType != null && methodMeta.ReturnType.BaseType != typeof(void))
+                        if (methodMeta.ReturnType != null && !Equals(methodMeta.ReturnType, IlInstanceBuilder.GetType(typeof(void))))
                             retVal = blockBuilder.Pop();
                         blockBuilder.NewLine(
                             new IlReturnStmt(retVal)

@@ -8,7 +8,7 @@ public class IlType(Type type) : IlMember(type)
 {
     private readonly Type _type = type;
     public Type BaseType => _type;
-    public new bool IsConstructed = false;
+    public new bool IsConstructed;
 
     private const BindingFlags BindingFlags =
         System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic |
@@ -56,13 +56,14 @@ public class IlType(Type type) : IlMember(type)
     public int MetadataToken => _type.MetadataToken;
     public List<IlAttribute> Attributes { get; } = new();
     public List<IlType> GenericArgs { get; private set; } = new();
-    public HashSet<IlMethod> Methods { get; private set; } = new();
-    public HashSet<IlField> Fields { get; private set; } = new();
+    public HashSet<IlMethod> Methods { get; } = new();
+    public HashSet<IlField> Fields { get; } = new();
     public new string Name => _type.Name;
     public Type Type => _type;
     public bool IsValueType => _type.IsValueType;
     public bool IsManaged => !_type.IsUnmanaged();
     public bool IsGenericParameter => _type.IsGenericParameter;
+    public bool IsUnmanaged => _type.IsUnmanaged();
 
     internal void EnsureFieldAttached(IlField ilField)
     {
