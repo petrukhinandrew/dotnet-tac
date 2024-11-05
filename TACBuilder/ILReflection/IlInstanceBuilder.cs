@@ -1,6 +1,5 @@
-using System.Diagnostics;
 using System.Reflection;
-using TACBuilder.Serialization;
+using System.Reflection.Metadata;
 
 namespace TACBuilder.ILReflection;
 
@@ -44,9 +43,9 @@ public static class IlInstanceBuilder
 
     private static void Construct()
     {
-        while (_queue.TryDequeue(out var meta))
+        while (_queue.TryDequeue(out var instance))
         {
-            meta.Construct();
+            instance.Construct();
         }
     }
 

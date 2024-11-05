@@ -5,7 +5,7 @@ namespace TACBuilder.ILReflection;
 
 public class IlAssembly(Assembly assembly) : IlCacheable
 {
-    private readonly Assembly _assembly = assembly;
+    public readonly Assembly _assembly = assembly;
     public string? Name { get; private set; }
     public string? Location { get; private set; }
     public HashSet<IlType> Types { get; } = new();
@@ -17,7 +17,7 @@ public class IlAssembly(Assembly assembly) : IlCacheable
         Name = _assembly.GetName().FullName;
         Location = _assembly.Location;
         Logger.LogInformation("Constructed {Name}", Name);
-        if (IlInstanceBuilder.AssemblyFilters.Any(f => !f(_assembly))) return;
+        if (IlInstanceBuilder.AssemblyFilters.All(f => !f(_assembly))) return;
 
         var types = _assembly.GetTypes().Where(t => t.IsGenericTypeDefinition || !t.IsGenericType);
         foreach (var type in types)

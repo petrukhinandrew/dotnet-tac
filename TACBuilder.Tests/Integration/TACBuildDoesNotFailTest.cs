@@ -33,7 +33,7 @@ public class TACBuildDoesNotFailTest
             _testOutputHelper.WriteLine(path);
             _testOutputHelper.WriteLine(Environment.CurrentDirectory);
             var appTacBuilder =
-                new AppTacBuilder(path);
+                new AppTacBuilder();
         }
         catch (Exception ex)
         {
@@ -49,7 +49,7 @@ public class TACBuildDoesNotFailTest
             var path = getPublishPathFor("TACBuilder.Tests.dll");
             AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "Vector128");
             var appTacBuilder =
-                new AppTacBuilder(path);
+                new AppTacBuilder();
         }
         catch (Exception ex)
         {

@@ -1,5 +1,10 @@
 using System.Collections.Concurrent;
+using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
+using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using TACBuilder.BodyBuilder;
@@ -58,6 +63,9 @@ namespace TACBuilder
                         blockBuilder.Push(new IlArgListRef(blockBuilder.Meta.MethodMeta));
                         break;
                     }
+                    case "tail.":
+                    case "unaligned.":
+                    case "no.":
                     case "constrained.":
                     case "volatile.":
                     case "readonly.":
@@ -569,35 +577,38 @@ namespace TACBuilder
                     }
                     case "calli":
                     {
-                        byte[] ilMethod =
-                            ((ILInstrOperand.ResolvedSignature)blockBuilder.CurInstr.arg).value;
-                        // TODO Local{Local{Local { ref} }} situation possible
-                        // TODO ref/deref possible
-                        // IlArg possible RuntimeHelpers DispatchTailCalls
-                        IlMethodRef ftn = blockBuilder.Pop() switch
+                        unsafe
                         {
-                            IlMethodRef methodRef => methodRef,
-                            IlVar v => (IlMethodRef)v.Value
-                        };
-                        IlCall ilCall = new IlCall(ftn.Method);
-                        ilCall.LoadArgs(blockBuilder.Pop);
-                        if (ilCall.Returns())
-                        {
-                            var tmp = blockBuilder.GetNewTemp(ilCall, blockBuilder.CurInstr.idx);
-                            blockBuilder.NewLine(new ILAssignStmt(tmp, ilCall));
-                            blockBuilder.Push(tmp);
-                        }
-                        else
-                            blockBuilder.NewLine(new IlCallStmt(ilCall));
+                            byte[] standaloneSig =
+                                ((ILInstrOperand.ResolvedSignature)blockBuilder.CurInstr.arg).value;
+                            // TODO
+                            // uint paramCount = BitConverter.ToUInt32(standaloneSig, 1);
+                            // List<IlExpr> args = new();
+                            // for (int i = 0; i < paramCount; i++) args.Add(blockBuilder.Pop());
+                            // args.Reverse();
 
-                        break;
+
+                            // var calli = new IlCallIndirect();
+                            // ilCall.LoadArgs(blockBuilder.Pop);
+                            // if (ilCall.Returns())
+                            // {
+                            //     var tmp = blockBuilder.GetNewTemp(ilCall, blockBuilder.CurInstr.idx);
+                            //     blockBuilder.NewLine(new ILAssignStmt(tmp, ilCall));
+                            //     blockBuilder.Push(tmp);
+                            // }
+                            // else
+                            //     blockBuilder.NewLine(new IlCallStmt(ilCall));
+
+                            break;
+                        }
                     }
                     case "ret":
                     {
                         var methodMeta = blockBuilder.Meta.MethodMeta!;
 
                         IlExpr? retVal = null;
-                        if (methodMeta.ReturnType != null && !Equals(methodMeta.ReturnType, IlInstanceBuilder.GetType(typeof(void))))
+                        if (methodMeta.ReturnType != null &&
+                            !Equals(methodMeta.ReturnType, IlInstanceBuilder.GetType(typeof(void))))
                             retVal = blockBuilder.Pop();
                         blockBuilder.NewLine(
                             new IlReturnStmt(retVal)
@@ -750,13 +761,6 @@ namespace TACBuilder
                     {
                         IlType arrIlType = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         IlExpr sizeExpr = blockBuilder.Pop();
-                        if (!Equals(sizeExpr.Type, IlInstanceBuilder.GetType(typeof(int))) &&
-                            !Equals(sizeExpr.Type, IlInstanceBuilder.GetType(typeof(nint))))
-                        {
-                            throw new Exception("expected arr size of type int32 or native int, got " +
-                                                sizeExpr.Type);
-                        }
-
                         IlExpr arrExpr = new IlNewArrayExpr(
                             arrIlType,
                             sizeExpr);
@@ -938,10 +942,9 @@ namespace TACBuilder
                     }
                     case "box":
                     {
-                        // TODO use typeMeta
                         IlType ilType = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                         IlValue value = (IlValue)blockBuilder.Pop();
-                        IlExpr boxed = new IlBoxExpr(value);
+                        IlExpr boxed = new IlBoxExpr(value, ilType);
                         blockBuilder.Push(boxed);
                         break;
                     }
@@ -969,9 +972,10 @@ namespace TACBuilder
             {
                 try
                 {
-                    // TODO replace with IlVar (seems like local possible)
-                    IlNewArrayExpr expr = (newArr as IlTempVar)?.Value as IlNewArrayExpr ??
-                                          throw new Exception("expected temp var");
+                    IlNewArrayExpr expr = (newArr as IlVar)?.Value as IlNewArrayExpr ??
+                                          throw new Exception("expected var");
+                    Debug.Assert(expr.Size.Type.BaseType.IsAssignableTo(typeof(int)) ||
+                                 expr.Size.Type.BaseType.IsAssignableTo(typeof(nint)));
                     IlIntConst arrSize = (IlIntConst)expr.Size;
                     Type arrType = expr.Type.BaseType;
                     var tmp = Array.CreateInstance(arrType, arrSize.Value);
@@ -1018,6 +1022,7 @@ namespace TACBuilder
             if (value is double d) return new IlDoubleConst(d);
             if (value is bool b) return new IlBoolConst(b);
             if (value is nint n) return new IlLongConst(n);
+            if (value.GetType().IsEnum) return new IlEnumValue(value);
             throw new Exception($"bad constant type {value.GetType()}");
         }
     }

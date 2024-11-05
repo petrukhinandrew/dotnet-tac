@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 
 namespace TACBuilder.ILReflection;
 
+
 public abstract class IlCacheable
 {
     protected static readonly ILogger Logger = LoggerFactory
@@ -21,21 +22,6 @@ public class IlString(string value) : IlCacheable
     {
         return Value;
     }
-
-    public override void Construct()
-    {
-    }
-
-    public override int GetHashCode()
-    {
-        return value.GetHashCode();
-    }
-}
-
-public class IlSignature(byte[] value) : IlCacheable
-{
-    public byte[] Value => value;
-    public new bool IsConstructed = true;
 
     public override void Construct()
     {

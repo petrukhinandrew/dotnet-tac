@@ -74,20 +74,6 @@ internal class AsmLoadContext : AssemblyLoadContext, IDisposable
 
         return null;
     }
-    // TODO use in asmName resolver
-    // public string ResolvePathFromName(AssemblyName name)
-    // {
-    //     foreach (var resolver in _resolvers.Values)
-    //     {
-    //         var path = resolver.ResolveAssemblyToPath(name);
-    //         if (path != null)
-    //         {
-    //             return path;
-    //         }
-    //     }
-    //
-    //     throw new Exception("cannot resolve path for " + name.FullName);
-    // }
 
     public void Dispose()
     {
