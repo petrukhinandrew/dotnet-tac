@@ -6,18 +6,10 @@ namespace TACBuilder;
 
 public class AppTacBuilder
 {
-    private string _path;
-
-    public AppTacBuilder(string rootAssemblyPath)
+    public void Build(string asmPath)
     {
-        _path = rootAssemblyPath;
-        Debug.Assert(File.Exists(rootAssemblyPath));
-    }
-
-    public void Build()
-    {
-
-        var rootAssemblyMeta = IlInstanceBuilder.BuildFrom(_path);
+        Debug.Assert(File.Exists(asmPath));
+        IlInstanceBuilder.BuildFrom(asmPath);
         BuiltAssemblies.AddRange(IlInstanceBuilder.GetAssemblies());
     }
 
@@ -38,7 +30,8 @@ public class AppTacBuilder
         IlInstanceBuilder.AddTypeFilter(type =>
             type.Assembly.Location == rootAssemblyPath);
         IlInstanceBuilder.AddMethodFilter(method =>
-            (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath && method.Name.StartsWith(methodName));
+            (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath &&
+            method.Name.StartsWith(methodName));
     }
 
     public static void FilterMethodsFromSingleMSCoreLibType(string rootAssemblyPath, string typeNamePart)

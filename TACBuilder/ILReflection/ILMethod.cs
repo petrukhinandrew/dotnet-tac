@@ -196,7 +196,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         }
 
         DeclaringType.EnsureMethodAttached(this);
-        if (IlInstanceBuilder.MethodFilters.Any(f => !f(_methodBase))) return;
+        if (IlInstanceBuilder.MethodFilters.All(f => !f(_methodBase))) return;
         try
         {
             HasMethodBody = _methodBase.GetMethodBody() != null;

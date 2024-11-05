@@ -31,7 +31,7 @@ public class IlType(Type type) : IlMember(type)
         }
 
         DeclaringAssembly.EnsureTypeAttached(this);
-        if (IlInstanceBuilder.TypeFilters.Any(f => !f(_type))) return;
+        if (IlInstanceBuilder.TypeFilters.All(f => !f(_type))) return;
 
         var fields = _type.GetFields(BindingFlags);
         foreach (var field in fields)

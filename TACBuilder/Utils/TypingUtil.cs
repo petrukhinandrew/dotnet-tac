@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using System.Reflection;
 using TACBuilder.ILReflection;
 
 namespace TACBuilder.Utils;
@@ -66,18 +64,18 @@ public static class TypingUtil
         if (left == null || right == null) return typeof(object);
         if (left.IsAssignableTo(right) || left.IsImplicitPrimitiveConvertibleTo(right)) return right;
         if (right.IsAssignableTo(left) || right.IsImplicitPrimitiveConvertibleTo(left)) return left;
-        var worklist = new Queue<Type>();
+        var workList = new Queue<Type>();
         if (left.BaseType != null)
-            worklist.Enqueue(left.BaseType);
+            workList.Enqueue(left.BaseType);
 
         if (right.BaseType != null)
-            worklist.Enqueue(right.BaseType);
+            workList.Enqueue(right.BaseType);
         foreach (var li in left.GetInterfaces())
-            worklist.Enqueue(li);
+            workList.Enqueue(li);
         foreach (var ri in right.GetInterfaces())
-            worklist.Enqueue(ri);
+            workList.Enqueue(ri);
         Type? bestCandidate = null;
-        while (worklist.TryDequeue(out var candidate))
+        while (workList.TryDequeue(out var candidate))
         {
             if (left.IsAssignableTo(candidate) && right.IsAssignableTo(candidate))
                 if (bestCandidate == null || candidate.IsAssignableTo(bestCandidate))
@@ -91,11 +89,12 @@ public static class TypingUtil
     {
     }
 
-    // TODO introduce same thing inside TypeMeta
     public static bool IsUnmanaged(this Type t)
     {
         try
         {
+
+            // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
             typeof(UnmanagedCheck<>).MakeGenericType(t);
             return true;
         }

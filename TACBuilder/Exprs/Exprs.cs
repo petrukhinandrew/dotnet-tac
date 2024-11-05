@@ -154,7 +154,7 @@ public class IlConvExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType
 {
 }
 
-public class IlBoxExpr(IlValue value) : IlCastExpr(IlInstanceBuilder.GetType(typeof(object)), value)
+public class IlBoxExpr(IlValue value, IlType targetType) : IlCastExpr(targetType, value)
 {
 }
 
@@ -179,7 +179,10 @@ public interface ILRefExpr : IlValue
     public IlExpr Value { get; }
 }
 
-public interface ILDerefExpr : IlValue;
+public interface ILDerefExpr : IlValue
+{
+    public IlExpr Value { get; }
+}
 
 public abstract class PointerExprTypeResolver
 {

@@ -157,6 +157,13 @@ public class IlBoolConst(bool value) : IlConstant
     public bool Value => value;
 }
 
+// TODO idk how thandle this
+public class IlEnumValue(object value) : IlConstant
+{
+    public IlType Type { get; } = IlInstanceBuilder.GetType(value.GetType());
+    public object Value => value;
+}
+
 public class IlTypeRef(IlType type) : IlConstant
 {
     public IlType ReferencedType => type;
@@ -181,6 +188,11 @@ public class IlMethodRef(IlMethod method, IlExpr? receiver = null) : IlConstant
     public IlMethod Method => method;
 }
 
+public class IlCallIndirect(IlExpr ftn, List<IlExpr> args) : IlExpr
+{
+    public IlType Type { get; }
+}
+
 public class IlCall(IlMethod method) : IlExpr
 {
     public IlMethod Method => method;
@@ -191,11 +203,8 @@ public class IlCall(IlMethod method) : IlExpr
         {
             Args.Add(pop());
         }
-
         Args.Reverse();
     }
-
-    public IlType DeclaringType => Method.DeclaringType;
 
     public string Name => Method.Name;
 
@@ -219,7 +228,7 @@ public class IlCall(IlMethod method) : IlExpr
 
     public bool IsInitializeArray()
     {
-        return DeclaringType.Name.Contains("RuntimeHelpers") && Name == "InitializeArray";
+        return method.DeclaringType.Name.Contains("RuntimeHelpers") && Name == "InitializeArray";
     }
 
     public bool Returns()

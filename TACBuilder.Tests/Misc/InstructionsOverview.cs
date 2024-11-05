@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 
 #pragma warning disable CS0219
@@ -710,6 +711,12 @@ static unsafe class Misc
         InstanceChild child = new();
         TestDelegate testDelegate = child.Do;
         testDelegate();
+    }
+
+    public static void CallIndirect(Action action, Func<int, Func<double, int>> complexMethod)
+    {
+        action();
+        int res = complexMethod(1)(2.0);
     }
 }
 
