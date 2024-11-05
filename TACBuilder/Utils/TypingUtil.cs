@@ -1,3 +1,7 @@
+using System.Collections;
+using System.Collections.ObjectModel;
+using System.Reflection;
+using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 
 namespace TACBuilder.Utils;
@@ -93,7 +97,6 @@ public static class TypingUtil
     {
         try
         {
-
             // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
             typeof(UnmanagedCheck<>).MakeGenericType(t);
             return true;
@@ -102,5 +105,41 @@ public static class TypingUtil
         {
             return false;
         }
+    }
+
+    public static IlConstant ResolveConstant(object? obj)
+    {
+        if (obj == null) return new IlNullConst();
+        if (obj is string strValue) return new IlStringConst(strValue);
+        if (obj is bool boolValue) return new IlBoolConst(boolValue);
+        if (obj is byte byteValue) return new IlByteConst(byteValue);
+        if (obj is char charValue) return new IlIntConst(charValue);
+        if (obj is short shortValue) return new IlIntConst(shortValue);
+        if (obj is int intValue) return new IlIntConst(intValue);
+        if (obj is long longValue) return new IlLongConst(longValue);
+        if (obj is float floatValue) return new IlFloatConst(floatValue);
+        if (obj is double doubleValue) return new IlDoubleConst(doubleValue);
+        if (obj is nint nintValue) return new IlLongConst(nintValue);
+        if (obj is Type type) return new IlTypeRef(IlInstanceBuilder.GetType(type));
+        if (obj is MethodBase method) return new IlMethodRef(IlInstanceBuilder.GetMethod(method));
+        if (obj is ReadOnlyCollection<CustomAttributeTypedArgument> coll) return resolveArrayConst(coll);
+        if (obj is CustomAttributeTypedArgument attr) return ResolveConstant(attr.Value);
+        if (obj.GetType().IsArray || obj is IEnumerable) return resolveArrayConst(obj);
+        if (obj.GetType().IsEnum) return new IlEnumValue(obj);
+        throw new Exception("unexpected const of type " + obj.GetType().Name);
+    }
+
+    // TODO test multi-dimensional array
+    private static IlArrayConst resolveArrayConst(object obj)
+    {
+        var a = obj as ICollection;
+        var values = new List<IlConstant>();
+        foreach (var v in a)
+        {
+            values.Add(ResolveConstant(v));
+        }
+
+        if (a == null) throw new Exception("unexpected array constant " + obj);
+        return new IlArrayConst(values[0].Type, values);
     }
 }

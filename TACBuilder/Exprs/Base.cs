@@ -164,6 +164,12 @@ public class IlEnumValue(object value) : IlConstant
     public object Value => value;
 }
 
+public class IlArrayConst(IlType memberType, IEnumerable<IlConstant> values) : IlConstant
+{
+    public IlType Type { get; } = memberType;
+    public List<IlConstant> Values => values.ToList();
+}
+
 public class IlTypeRef(IlType type) : IlConstant
 {
     public IlType ReferencedType => type;
@@ -203,6 +209,7 @@ public class IlCall(IlMethod method) : IlExpr
         {
             Args.Add(pop());
         }
+
         Args.Reverse();
     }
 

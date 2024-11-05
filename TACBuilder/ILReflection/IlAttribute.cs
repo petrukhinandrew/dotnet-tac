@@ -1,31 +1,43 @@
 using System.Reflection;
+using TACBuilder.Exprs;
+using TACBuilder.Utils;
 
 namespace TACBuilder.ILReflection;
 
 public class IlAttribute(CustomAttributeData attribute) : IlCacheable
 {
-    public class Argument(IlType ilType, object? value)
+    public class Argument(IlType ilType, IlConstant value)
     {
         public IlType IlType => ilType;
-        public object? Value => value;
+        public IlConstant Value => value;
     }
 
-    private readonly CustomAttributeData _attribute = attribute;
     public IlType? Type { get; private set; }
     public List<IlType> GenericArgs { get; } = new();
+    public Dictionary<string, Argument> NamedArguments { get; } = new();
     public List<Argument> ConstructorArguments { get; } = new();
 
     public override void Construct()
     {
-        Type = IlInstanceBuilder.GetType(_attribute.AttributeType);
-        foreach (var arg in _attribute.AttributeType.GetGenericArguments())
+        Type = IlInstanceBuilder.GetType(attribute.AttributeType);
+        foreach (var arg in attribute.AttributeType.GetGenericArguments())
         {
             GenericArgs.Add(IlInstanceBuilder.GetType(arg));
         }
 
-        foreach (var arg in _attribute.ConstructorArguments)
+        foreach (var arg in attribute.ConstructorArguments)
         {
-            ConstructorArguments.Add(new Argument(IlInstanceBuilder.GetType(arg.ArgumentType), arg.Value));
+            if (arg.Value == null) continue;
+            ConstructorArguments.Add(new Argument(IlInstanceBuilder.GetType(arg.Value.GetType()),
+                TypingUtil.ResolveConstant(arg.Value)));
+        }
+
+        foreach (var arg in attribute.NamedArguments)
+        {
+            var typed = arg.TypedValue;
+            if (typed.Value == null) continue;
+            NamedArguments.Add(arg.MemberName, new Argument(IlInstanceBuilder.GetType(typed.Value.GetType()),
+                TypingUtil.ResolveConstant(typed.Value)));
         }
     }
 }

@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Metadata;
 
@@ -185,11 +186,9 @@ public static class IlInstanceBuilder
 
     internal static IlAttribute GetAttribute(CustomAttributeData attr)
     {
-        if (_cache.TryGetAttribute(attr, out var meta)) return meta;
-        var newAttr = new IlAttribute(attr);
-        _cache.AddAttribute(attr, newAttr);
-        _queue.Enqueue(newAttr);
-        return newAttr;
+        var instance = new IlAttribute(attr);
+        _queue.Enqueue(instance);
+        return instance;
     }
 
     private static IlMember GetMember(MemberInfo member)
