@@ -9,7 +9,6 @@ internal class ILCache
     public readonly Dictionary<Type, IlType> _types = new();
     public readonly Dictionary<MethodBase, IlMethod> _methods = new();
     public readonly Dictionary<FieldInfo, IlField> _fields = new();
-    public readonly Dictionary<CustomAttributeData, IlAttribute> _attributes = new();
 
     public void AddAssembly(Assembly key, IlAssembly value)
     {
@@ -54,15 +53,5 @@ internal class ILCache
     public bool TryGetField(FieldInfo key, [MaybeNullWhen(false)] out IlField value)
     {
         return _fields.TryGetValue(key, out value);
-    }
-
-    public void AddAttribute(CustomAttributeData key, IlAttribute value)
-    {
-        _attributes[key] = value;
-    }
-
-    public bool TryGetAttribute(CustomAttributeData key, [MaybeNullWhen(false)] out IlAttribute value)
-    {
-        return _attributes.TryGetValue(key, out value);
     }
 }

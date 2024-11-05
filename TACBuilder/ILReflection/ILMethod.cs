@@ -17,7 +17,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public string? Name { get; }
         public int Position { get; }
         public IlType Type { get; }
-        public List<IlType> Attributes { get; }
+        public List<IlAttribute> Attributes { get; }
         public object? DefaultValue { get; }
     }
 
@@ -27,7 +27,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public int Position => index;
         public string FullName => fullName();
         public IlType Type { get; private set; }
-        public List<IlType> Attributes { get; } = new();
+        public List<IlAttribute> Attributes { get; private set; }
         public object? DefaultValue { get; private set; }
 
         private bool IsOut => parameterInfo.IsOut;
@@ -38,11 +38,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         {
             Type = IlInstanceBuilder.GetType(parameterInfo.ParameterType);
             DefaultValue = parameterInfo.DefaultValue;
-            var attributes = parameterInfo.CustomAttributes;
-            foreach (var attribute in attributes)
-            {
-                Attributes.Add(IlInstanceBuilder.GetType(attribute.AttributeType));
-            }
+            Attributes = parameterInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
         }
 
         private string fullName()
@@ -69,11 +65,12 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public string Name => "this";
         public int Position => 0;
         public IlType Type => ilType;
-        public List<IlType> Attributes { get; } = new();
+        public List<IlAttribute> Attributes { get; } = new();
         public object? DefaultValue => null;
 
         public override void Construct()
         {
+            // TODO check may have attr
         }
 
         public override string ToString()
@@ -128,7 +125,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     }
 
     public IlType? DeclaringType { get; private set; }
-    public List<IlType> Attributes { get; } = new();
+    public List<IlAttribute> Attributes { get; private set; }
     public List<IlType> GenericArgs { get; } = new();
     public IlType? ReturnType { get; private set; }
     public List<IParameter> Parameters { get; } = new();
@@ -163,11 +160,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     {
         DeclaringType = IlInstanceBuilder.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
         Logger.LogInformation("Constructing {Type} {Name}", DeclaringType.Name, Name);
-        var attributes = _methodBase.CustomAttributes;
-        foreach (var attribute in attributes)
-        {
-            Attributes.Add(IlInstanceBuilder.GetType(attribute.AttributeType));
-        }
+        Attributes = _methodBase.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
         if (_methodBase.IsGenericMethod)
         {
@@ -217,6 +210,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
             _ilBody = IlInstanceBuilder.GetMethodIlBody(this);
         }
+
         // TODO may be improper decision
         IsConstructed = true;
     }

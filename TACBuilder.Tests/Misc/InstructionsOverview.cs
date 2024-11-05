@@ -7,14 +7,28 @@ using System.Runtime.CompilerServices;
 #pragma warning disable
 namespace Usvm.IL.Test.Instructions;
 
+[AttributeUsage(AttributeTargets.All)]
 public class CustomAttribute(string value) : Attribute
 {
-    public string Value => value;
+    public string Value { get; } = value;
+    public int[] Array { get; set; }
 }
 
-[Custom("lolkek")]
+[AttributeUsage(AttributeTargets.Method)]
+public class ApproxAttribute(string typeName, string methodName) : Attribute
+{
+    public string MethodName { get; } = methodName;
+    public string TypeName { get; } = typeName;
+}
+
+[Custom("lolkek", Array = [1, 2])]
 public class CustomAttrUsage
 {
+    [Approx("lolType", "kekMethod")]
+    public void MethodExample()
+    {
+
+    }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryConvertFromSaturating<TOther>(TOther value, out int result)
         where TOther : INumberBase<TOther>
@@ -222,7 +236,7 @@ static class ConditionsTests
     public static void CharMethod(char x)
     {
         char z = 'a';
-        z = (char) (x + z);
+        z = (char)(x + z);
         Console.WriteLine(z);
     }
 

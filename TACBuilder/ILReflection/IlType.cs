@@ -24,11 +24,7 @@ public class IlType(Type type) : IlMember(type)
             GenericArgs = _type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList();
         }
 
-        var attributes = _type.CustomAttributes;
-        foreach (var attribute in attributes)
-        {
-            Attributes.Add(IlInstanceBuilder.GetAttribute(attribute));
-        }
+        Attributes = _type.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
         DeclaringAssembly.EnsureTypeAttached(this);
         if (IlInstanceBuilder.TypeFilters.All(f => !f(_type))) return;
@@ -54,7 +50,7 @@ public class IlType(Type type) : IlMember(type)
     public int AsmToken => _type.Assembly.GetHashCode();
     public int ModuleToken => _type.Module.MetadataToken;
     public int MetadataToken => _type.MetadataToken;
-    public List<IlAttribute> Attributes { get; } = new();
+    public List<IlAttribute> Attributes { get; private set; }
     public List<IlType> GenericArgs { get; private set; } = new();
     public HashSet<IlMethod> Methods { get; } = new();
     public HashSet<IlField> Fields { get; } = new();
@@ -102,13 +98,15 @@ public class IlField(FieldInfo fieldInfo) : IlMember(fieldInfo)
     public new string Name => _fieldInfo.Name;
     public int ModuleToken => _fieldInfo.Module.MetadataToken;
     public int MetadataToken => _fieldInfo.MetadataToken;
-    public new bool IsConstructed = false;
     public object? GetValue(object? value) => _fieldInfo.GetValue(value);
+    public List<IlAttribute> Attributes { get; private set; }
+    public new bool IsConstructed = false;
 
     public override void Construct()
     {
         DeclaringType = IlInstanceBuilder.GetType((_fieldInfo.ReflectedType ?? _fieldInfo.DeclaringType)!);
         Type = IlInstanceBuilder.GetType(_fieldInfo.FieldType);
+        Attributes = _fieldInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
         DeclaringType.EnsureFieldAttached(this);
         IsConstructed = true;
     }
