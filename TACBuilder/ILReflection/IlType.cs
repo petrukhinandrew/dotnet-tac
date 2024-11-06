@@ -1,8 +1,42 @@
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
+using TACBuilder.Exprs;
 using TACBuilder.Utils;
 
 namespace TACBuilder.ILReflection;
+
+public class IlValueType(Type type) : IlType(type);
+
+public class IlPrimitiveType(Type type) : IlValueType(type);
+
+public class IlEnumType(Type type) : IlValueType(type)
+{
+    public IlType UnderlyingType = IlInstanceBuilder.GetType(Enum.GetUnderlyingType(type));
+    public Dictionary<string, IlConstant> NameToValueMapping = new();
+
+    public override void Construct()
+    {
+        Debug.Assert(Type.IsEnum);
+        base.Construct();
+        foreach (var value in Enum.GetValues(Type))
+        {
+            var name = Enum.GetName(Type, value) ?? "";
+            NameToValueMapping.Add(name, TypingUtil.ResolveConstant(value, Type));
+        }
+    }
+}
+
+public class IlStructType(Type type) : IlValueType(type);
+
+public class IlReferenceType(Type type) : IlType(type);
+
+public class IlArrayType(Type type) : IlReferenceType(type)
+{
+    public IlType ElementType => IlInstanceBuilder.GetType(Type.GetElementType()!);
+}
+
+public class IlClassType(Type type) : IlReferenceType(type);
 
 public class IlType(Type type) : IlMember(type)
 {
@@ -55,7 +89,7 @@ public class IlType(Type type) : IlMember(type)
     public HashSet<IlMethod> Methods { get; } = new();
     public HashSet<IlField> Fields { get; } = new();
     public new string Name => _type.Name;
-    public Type Type => _type;
+    protected Type Type => _type;
     public bool IsValueType => _type.IsValueType;
     public bool IsManaged => !_type.IsUnmanaged();
     public bool IsGenericParameter => _type.IsGenericParameter;

@@ -87,10 +87,19 @@ public static class IlInstanceBuilder
     internal static IlType GetType(Type type)
     {
         if (_cache.TryGetType(type, out var meta)) return meta;
-        var newType = new IlType(type);
+        var newType = CreateIlType(type);
         _cache.AddType(type, newType);
         _queue.Enqueue(newType);
         return newType;
+    }
+
+    private static IlType CreateIlType(Type type)
+    {
+        if (type.IsPrimitive) return new IlPrimitiveType(type);
+        if (type.IsEnum) return new IlEnumType(type);
+        if (type.IsValueType) return new IlStructType(type);
+        if (type.IsArray) return new IlArrayType(type);
+        return new IlClassType(type);
     }
 
     internal static IlType GetType(MethodBase source, int token)

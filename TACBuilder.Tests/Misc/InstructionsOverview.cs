@@ -21,14 +21,33 @@ public class ApproxAttribute(string typeName, string methodName) : Attribute
     public string TypeName { get; } = typeName;
 }
 
+public enum ForAttr
+{
+    None = 0,
+    Some = 1,
+    All = 2
+}
+
+[AttributeUsage(AttributeTargets.All)]
+public class WithEnumAttribute(ForAttr forAttr, Type approxType) : Attribute
+{
+    public ForAttr Another { get; set; }
+}
+
 [Custom("lolkek", Array = [1, 2])]
+[WithEnum(ForAttr.Some, typeof(WithEnumAttribute), Another = ForAttr.All)]
 public class CustomAttrUsage
 {
     [Approx("lolType", "kekMethod")]
     public void MethodExample()
     {
-
+        var e = ForAttr.Some;
+        if (Enum.IsDefined(typeof(ForAttr), e))
+        {
+            var another = ForAttr.All;
+        }
     }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool TryConvertFromSaturating<TOther>(TOther value, out int result)
         where TOther : INumberBase<TOther>

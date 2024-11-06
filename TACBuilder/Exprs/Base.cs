@@ -157,11 +157,10 @@ public class IlBoolConst(bool value) : IlConstant
     public bool Value => value;
 }
 
-// TODO idk how thandle this
-public class IlEnumValue(object value) : IlConstant
+public class IlEnumConst(IlType enumType, IlConstant underlyingValue) : IlConstant
 {
-    public IlType Type { get; } = IlInstanceBuilder.GetType(value.GetType());
-    public object Value => value;
+    public IlType Type => enumType;
+    public IlConstant Value => underlyingValue;
 }
 
 public class IlArrayConst(IlType memberType, IEnumerable<IlConstant> values) : IlConstant
@@ -205,9 +204,9 @@ public class IlCall(IlMethod method) : IlExpr
 
     public void LoadArgs(Func<IlExpr> pop)
     {
-        for (int i = 0; i < Method.Parameters.Count; i++)
+        foreach (var t in Method.Parameters)
         {
-            Args.Add(pop());
+            Args.Add(pop().WithTypeEnsured(t.Type));
         }
 
         Args.Reverse();
@@ -240,7 +239,7 @@ public class IlCall(IlMethod method) : IlExpr
 
     public bool Returns()
     {
-        return ReturnType.Type != typeof(void);
+        return !Equals(ReturnType, IlInstanceBuilder.GetType(typeof(void)));
     }
 
     public override bool Equals(object? obj)
