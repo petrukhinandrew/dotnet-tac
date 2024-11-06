@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
 
 
 
-    protected override long SerializationHash => -1706758733721535707L;
+    protected override long SerializationHash => -8431306000670948402L;
 
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -64,6 +64,7 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlAsmDto.Read, IlAsmDto.Write);
       serializers.Register(IlTypeDto.Read, IlTypeDto.Write);
       serializers.Register(IlFieldDto.Read, IlFieldDto.Write);
+      serializers.Register(IlAttrDto.Read, IlAttrDto.Write);
       serializers.Register(IlLocalVarDto.Read, IlLocalVarDto.Write);
       serializers.Register(IlTempVarDto.Read, IlTempVarDto.Write);
       serializers.Register(IlErrVarDto.Read, IlErrVarDto.Write);
@@ -379,7 +380,116 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:82</p>
+  /// <p>Generated from: IlModel.kt:73</p>
+  /// </summary>
+  public sealed class IlAttrDto : IlDto
+  {
+    //fields
+    //public fields
+    [NotNull] public CacheKey AttrType {get; private set;}
+    [NotNull] public List<IlConstDto> CtorArgs {get; private set;}
+    [NotNull] public List<string> NamedArgsNames {get; private set;}
+    [NotNull] public List<IlConstDto> NamedArgsValues {get; private set;}
+
+    //private fields
+    //primary constructor
+    public IlAttrDto(
+      [NotNull] CacheKey attrType,
+      [NotNull] List<IlConstDto> ctorArgs,
+      [NotNull] List<string> namedArgsNames,
+      [NotNull] List<IlConstDto> namedArgsValues
+    )
+    {
+      if (attrType == null) throw new ArgumentNullException("attrType");
+      if (ctorArgs == null) throw new ArgumentNullException("ctorArgs");
+      if (namedArgsNames == null) throw new ArgumentNullException("namedArgsNames");
+      if (namedArgsValues == null) throw new ArgumentNullException("namedArgsValues");
+
+      AttrType = attrType;
+      CtorArgs = ctorArgs;
+      NamedArgsNames = namedArgsNames;
+      NamedArgsValues = namedArgsValues;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlAttrDto> Read = (ctx, reader) =>
+    {
+      var attrType = CacheKey.Read(ctx, reader);
+      var ctorArgs = ReadIlConstDtoList(ctx, reader);
+      var namedArgsNames = ReadStringList(ctx, reader);
+      var namedArgsValues = ReadIlConstDtoList(ctx, reader);
+      var _result = new IlAttrDto(attrType, ctorArgs, namedArgsNames, namedArgsValues);
+      return _result;
+    };
+    public static CtxReadDelegate<List<IlConstDto>> ReadIlConstDtoList = IlConstDto.Read.List();
+    public static CtxReadDelegate<List<string>> ReadStringList = JetBrains.Rd.Impl.Serializers.ReadString.List();
+
+    public static new CtxWriteDelegate<IlAttrDto> Write = (ctx, writer, value) =>
+    {
+      CacheKey.Write(ctx, writer, value.AttrType);
+      WriteIlConstDtoList(ctx, writer, value.CtorArgs);
+      WriteStringList(ctx, writer, value.NamedArgsNames);
+      WriteIlConstDtoList(ctx, writer, value.NamedArgsValues);
+    };
+    public static  CtxWriteDelegate<List<IlConstDto>> WriteIlConstDtoList = IlConstDto.Write.List();
+    public static  CtxWriteDelegate<List<string>> WriteStringList = JetBrains.Rd.Impl.Serializers.WriteString.List();
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlAttrDto) obj);
+    }
+    public bool Equals(IlAttrDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(AttrType, other.AttrType) && CtorArgs.SequenceEqual(other.CtorArgs) && NamedArgsNames.SequenceEqual(other.NamedArgsNames) && NamedArgsValues.SequenceEqual(other.NamedArgsValues);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + AttrType.GetHashCode();
+        hash = hash * 31 + CtorArgs.ContentHashCode();
+        hash = hash * 31 + NamedArgsNames.ContentHashCode();
+        hash = hash * 31 + NamedArgsValues.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlAttrDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("attrType = "); AttrType.PrintEx(printer); printer.Println();
+        printer.Print("ctorArgs = "); CtorArgs.PrintEx(printer); printer.Println();
+        printer.Print("namedArgsNames = "); NamedArgsNames.PrintEx(printer); printer.Println();
+        printer.Print("namedArgsValues = "); NamedArgsValues.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:93</p>
   /// </summary>
   public sealed class IlCatchScopeDto : IlEhScopeDto
   {
@@ -567,7 +677,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:76</p>
+  /// <p>Generated from: IlModel.kt:87</p>
   /// </summary>
   public abstract class IlEhScopeDto : IlDto
   {
@@ -706,7 +816,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:74</p>
+  /// <p>Generated from: IlModel.kt:85</p>
   /// </summary>
   public sealed class IlErrVarDto : IlVarDto
   {
@@ -791,7 +901,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:87</p>
+  /// <p>Generated from: IlModel.kt:98</p>
   /// </summary>
   public sealed class IlFaultScopeDto : IlEhScopeDto
   {
@@ -888,7 +998,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:50</p>
+  /// <p>Generated from: IlModel.kt:51</p>
   /// </summary>
   public sealed class IlFieldDto : IlDto
   {
@@ -899,6 +1009,7 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public CacheKey FieldType {get; private set;}
     public bool IsStatic {get; private set;}
     [NotNull] public string Name {get; private set;}
+    [NotNull] public List<IlAttrDto> Attrs {get; private set;}
 
     //private fields
     //primary constructor
@@ -907,19 +1018,22 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] CacheKey declType,
       [NotNull] CacheKey fieldType,
       bool isStatic,
-      [NotNull] string name
+      [NotNull] string name,
+      [NotNull] List<IlAttrDto> attrs
     )
     {
       if (id == null) throw new ArgumentNullException("id");
       if (declType == null) throw new ArgumentNullException("declType");
       if (fieldType == null) throw new ArgumentNullException("fieldType");
       if (name == null) throw new ArgumentNullException("name");
+      if (attrs == null) throw new ArgumentNullException("attrs");
 
       Id = id;
       DeclType = declType;
       FieldType = fieldType;
       IsStatic = isStatic;
       Name = name;
+      Attrs = attrs;
     }
     //secondary constructor
     //deconstruct trait
@@ -932,9 +1046,11 @@ namespace org.jacodb.api.net.generated.models
       var fieldType = CacheKey.Read(ctx, reader);
       var isStatic = reader.ReadBool();
       var name = reader.ReadString();
-      var _result = new IlFieldDto(id, declType, fieldType, isStatic, name);
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var _result = new IlFieldDto(id, declType, fieldType, isStatic, name, attrs);
       return _result;
     };
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
 
     public static new CtxWriteDelegate<IlFieldDto> Write = (ctx, writer, value) =>
     {
@@ -943,7 +1059,9 @@ namespace org.jacodb.api.net.generated.models
       CacheKey.Write(ctx, writer, value.FieldType);
       writer.Write(value.IsStatic);
       writer.Write(value.Name);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
     };
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
 
     //constants
 
@@ -961,7 +1079,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Id, other.Id) && Equals(DeclType, other.DeclType) && Equals(FieldType, other.FieldType) && IsStatic == other.IsStatic && Name == other.Name;
+      return Equals(Id, other.Id) && Equals(DeclType, other.DeclType) && Equals(FieldType, other.FieldType) && IsStatic == other.IsStatic && Name == other.Name && Attrs.SequenceEqual(other.Attrs);
     }
     //hash code trait
     public override int GetHashCode()
@@ -973,6 +1091,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + FieldType.GetHashCode();
         hash = hash * 31 + IsStatic.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
         return hash;
       }
     }
@@ -986,6 +1105,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("fieldType = "); FieldType.PrintEx(printer); printer.Println();
         printer.Print("isStatic = "); IsStatic.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -1000,7 +1120,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:84</p>
+  /// <p>Generated from: IlModel.kt:95</p>
   /// </summary>
   public sealed class IlFilterScopeDto : IlEhScopeDto
   {
@@ -1104,7 +1224,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:88</p>
+  /// <p>Generated from: IlModel.kt:99</p>
   /// </summary>
   public sealed class IlFinallyScopeDto : IlEhScopeDto
   {
@@ -1201,7 +1321,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:69</p>
+  /// <p>Generated from: IlModel.kt:80</p>
   /// </summary>
   public sealed class IlLocalVarDto : IlVarDto
   {
@@ -1293,7 +1413,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:91</p>
+  /// <p>Generated from: IlModel.kt:102</p>
   /// </summary>
   public sealed class IlMethodDto : IlDto
   {
@@ -1302,6 +1422,7 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public CacheKey Id {get; private set;}
     [Nullable] public CacheKey DeclType {get; private set;}
     [Nullable] public CacheKey ReturnType {get; private set;}
+    [NotNull] public List<IlAttrDto> Attrs {get; private set;}
     [NotNull] public string Name {get; private set;}
     [NotNull] public List<IlParameterDto> Parameters {get; private set;}
     public bool Resolved {get; private set;}
@@ -1317,6 +1438,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] CacheKey id,
       [Nullable] CacheKey declType,
       [Nullable] CacheKey returnType,
+      [NotNull] List<IlAttrDto> attrs,
       [NotNull] string name,
       [NotNull] List<IlParameterDto> parameters,
       bool resolved,
@@ -1328,6 +1450,7 @@ namespace org.jacodb.api.net.generated.models
     )
     {
       if (id == null) throw new ArgumentNullException("id");
+      if (attrs == null) throw new ArgumentNullException("attrs");
       if (name == null) throw new ArgumentNullException("name");
       if (parameters == null) throw new ArgumentNullException("parameters");
       if (locals == null) throw new ArgumentNullException("locals");
@@ -1339,6 +1462,7 @@ namespace org.jacodb.api.net.generated.models
       Id = id;
       DeclType = declType;
       ReturnType = returnType;
+      Attrs = attrs;
       Name = name;
       Parameters = parameters;
       Resolved = resolved;
@@ -1357,6 +1481,7 @@ namespace org.jacodb.api.net.generated.models
       var id = CacheKey.Read(ctx, reader);
       var declType = ReadCacheKeyNullable(ctx, reader);
       var returnType = ReadCacheKeyNullable(ctx, reader);
+      var attrs = ReadIlAttrDtoList(ctx, reader);
       var name = reader.ReadString();
       var parameters = ReadIlParameterDtoList(ctx, reader);
       var resolved = reader.ReadBool();
@@ -1365,10 +1490,11 @@ namespace org.jacodb.api.net.generated.models
       var errs = ReadIlErrVarDtoList(ctx, reader);
       var ehScopes = ReadIlEhScopeDtoList(ctx, reader);
       var body = ReadIlStmtDtoList(ctx, reader);
-      var _result = new IlMethodDto(id, declType, returnType, name, parameters, resolved, locals, temps, errs, ehScopes, body);
+      var _result = new IlMethodDto(id, declType, returnType, attrs, name, parameters, resolved, locals, temps, errs, ehScopes, body);
       return _result;
     };
     public static CtxReadDelegate<CacheKey> ReadCacheKeyNullable = CacheKey.Read.NullableClass();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
     public static CtxReadDelegate<List<IlParameterDto>> ReadIlParameterDtoList = IlParameterDto.Read.List();
     public static CtxReadDelegate<List<IlLocalVarDto>> ReadIlLocalVarDtoList = IlLocalVarDto.Read.List();
     public static CtxReadDelegate<List<IlTempVarDto>> ReadIlTempVarDtoList = IlTempVarDto.Read.List();
@@ -1381,6 +1507,7 @@ namespace org.jacodb.api.net.generated.models
       CacheKey.Write(ctx, writer, value.Id);
       WriteCacheKeyNullable(ctx, writer, value.DeclType);
       WriteCacheKeyNullable(ctx, writer, value.ReturnType);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
       writer.Write(value.Name);
       WriteIlParameterDtoList(ctx, writer, value.Parameters);
       writer.Write(value.Resolved);
@@ -1391,6 +1518,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlStmtDtoList(ctx, writer, value.Body);
     };
     public static  CtxWriteDelegate<CacheKey> WriteCacheKeyNullable = CacheKey.Write.NullableClass();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
     public static  CtxWriteDelegate<List<IlParameterDto>> WriteIlParameterDtoList = IlParameterDto.Write.List();
     public static  CtxWriteDelegate<List<IlLocalVarDto>> WriteIlLocalVarDtoList = IlLocalVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlTempVarDto>> WriteIlTempVarDtoList = IlTempVarDto.Write.List();
@@ -1414,7 +1542,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Id, other.Id) && Equals(DeclType, other.DeclType) && Equals(ReturnType, other.ReturnType) && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && Body.SequenceEqual(other.Body);
+      return Equals(Id, other.Id) && Equals(DeclType, other.DeclType) && Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && Body.SequenceEqual(other.Body);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1424,6 +1552,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + Id.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + (ReturnType != null ? ReturnType.GetHashCode() : 0);
+        hash = hash * 31 + Attrs.ContentHashCode();
         hash = hash * 31 + Name.GetHashCode();
         hash = hash * 31 + Parameters.ContentHashCode();
         hash = hash * 31 + Resolved.GetHashCode();
@@ -1443,6 +1572,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("id = "); Id.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("returnType = "); ReturnType.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
         printer.Print("parameters = "); Parameters.PrintEx(printer); printer.Println();
         printer.Print("resolved = "); Resolved.PrintEx(printer); printer.Println();
@@ -1465,7 +1595,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:58</p>
+  /// <p>Generated from: IlModel.kt:60</p>
   /// </summary>
   public sealed class IlParameterDto : IPrintable, IEquatable<IlParameterDto>
   {
@@ -1475,6 +1605,7 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public CacheKey Type {get; private set;}
     [NotNull] public string Name {get; private set;}
     [Nullable] public string DefaultValue {get; private set;}
+    [NotNull] public List<IlAttrDto> Attrs {get; private set;}
 
     //private fields
     //primary constructor
@@ -1482,25 +1613,29 @@ namespace org.jacodb.api.net.generated.models
       int index,
       [NotNull] CacheKey type,
       [NotNull] string name,
-      [Nullable] string defaultValue
+      [Nullable] string defaultValue,
+      [NotNull] List<IlAttrDto> attrs
     )
     {
       if (type == null) throw new ArgumentNullException("type");
       if (name == null) throw new ArgumentNullException("name");
+      if (attrs == null) throw new ArgumentNullException("attrs");
 
       Index = index;
       Type = type;
       Name = name;
       DefaultValue = defaultValue;
+      Attrs = attrs;
     }
     //secondary constructor
     //deconstruct trait
-    public void Deconstruct(out int index, [NotNull] out CacheKey type, [NotNull] out string name, [Nullable] out string defaultValue)
+    public void Deconstruct(out int index, [NotNull] out CacheKey type, [NotNull] out string name, [Nullable] out string defaultValue, [NotNull] out List<IlAttrDto> attrs)
     {
       index = Index;
       type = Type;
       name = Name;
       defaultValue = DefaultValue;
+      attrs = Attrs;
     }
     //statics
 
@@ -1510,10 +1645,12 @@ namespace org.jacodb.api.net.generated.models
       var type = CacheKey.Read(ctx, reader);
       var name = reader.ReadString();
       var defaultValue = ReadStringNullable(ctx, reader);
-      var _result = new IlParameterDto(index, type, name, defaultValue);
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var _result = new IlParameterDto(index, type, name, defaultValue, attrs);
       return _result;
     };
     public static CtxReadDelegate<string> ReadStringNullable = JetBrains.Rd.Impl.Serializers.ReadString.NullableClass();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
 
     public static CtxWriteDelegate<IlParameterDto> Write = (ctx, writer, value) =>
     {
@@ -1521,8 +1658,10 @@ namespace org.jacodb.api.net.generated.models
       CacheKey.Write(ctx, writer, value.Type);
       writer.Write(value.Name);
       WriteStringNullable(ctx, writer, value.DefaultValue);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
     };
     public static  CtxWriteDelegate<string> WriteStringNullable = JetBrains.Rd.Impl.Serializers.WriteString.NullableClass();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
 
     //constants
 
@@ -1540,7 +1679,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Index == other.Index && Equals(Type, other.Type) && Name == other.Name && Equals(DefaultValue, other.DefaultValue);
+      return Index == other.Index && Equals(Type, other.Type) && Name == other.Name && Equals(DefaultValue, other.DefaultValue) && Attrs.SequenceEqual(other.Attrs);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1551,6 +1690,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + Type.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
         hash = hash * 31 + (DefaultValue != null ? DefaultValue.GetHashCode() : 0);
+        hash = hash * 31 + Attrs.ContentHashCode();
         return hash;
       }
     }
@@ -1563,6 +1703,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
         printer.Print("defaultValue = "); DefaultValue.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -1577,7 +1718,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:73</p>
+  /// <p>Generated from: IlModel.kt:84</p>
   /// </summary>
   public sealed class IlTempVarDto : IlVarDto
   {
@@ -1674,6 +1815,7 @@ namespace org.jacodb.api.net.generated.models
     public bool IsGenericParam {get; private set;}
     public bool IsValueType {get; private set;}
     public bool IsManaged {get; private set;}
+    [NotNull] public List<IlAttrDto> Attrs {get; private set;}
 
     //private fields
     //primary constructor
@@ -1683,12 +1825,14 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] List<CacheKey> genericArgs,
       bool isGenericParam,
       bool isValueType,
-      bool isManaged
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs
     )
     {
       if (id == null) throw new ArgumentNullException("id");
       if (name == null) throw new ArgumentNullException("name");
       if (genericArgs == null) throw new ArgumentNullException("genericArgs");
+      if (attrs == null) throw new ArgumentNullException("attrs");
 
       Id = id;
       Name = name;
@@ -1696,6 +1840,7 @@ namespace org.jacodb.api.net.generated.models
       IsGenericParam = isGenericParam;
       IsValueType = isValueType;
       IsManaged = isManaged;
+      Attrs = attrs;
     }
     //secondary constructor
     //deconstruct trait
@@ -1709,10 +1854,12 @@ namespace org.jacodb.api.net.generated.models
       var isGenericParam = reader.ReadBool();
       var isValueType = reader.ReadBool();
       var isManaged = reader.ReadBool();
-      var _result = new IlTypeDto(id, name, genericArgs, isGenericParam, isValueType, isManaged);
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var _result = new IlTypeDto(id, name, genericArgs, isGenericParam, isValueType, isManaged, attrs);
       return _result;
     };
     public static CtxReadDelegate<List<CacheKey>> ReadCacheKeyList = CacheKey.Read.List();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
 
     public static new CtxWriteDelegate<IlTypeDto> Write = (ctx, writer, value) =>
     {
@@ -1722,8 +1869,10 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsValueType);
       writer.Write(value.IsManaged);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
     };
     public static  CtxWriteDelegate<List<CacheKey>> WriteCacheKeyList = CacheKey.Write.List();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
 
     //constants
 
@@ -1741,7 +1890,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Id, other.Id) && Name == other.Name && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged;
+      return Equals(Id, other.Id) && Name == other.Name && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1754,6 +1903,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsValueType.GetHashCode();
         hash = hash * 31 + IsManaged.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
         return hash;
       }
     }
@@ -1768,6 +1918,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
         printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -1782,7 +1933,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlModel.kt:64</p>
+  /// <p>Generated from: IlModel.kt:68</p>
   /// </summary>
   public abstract class IlVarDto : IlDto
   {
