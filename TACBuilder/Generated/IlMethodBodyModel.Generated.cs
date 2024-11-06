@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
 
 
 
-    protected override long SerializationHash => -7271216282343879510L;
+    protected override long SerializationHash => -2692739442657292118L;
 
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -66,6 +66,7 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlLongConstDto.Read, IlLongConstDto.Write);
       serializers.Register(IlFloatConstDto.Read, IlFloatConstDto.Write);
       serializers.Register(IlDoubleConstDto.Read, IlDoubleConstDto.Write);
+      serializers.Register(IlArrayConstDto.Read, IlArrayConstDto.Write);
       serializers.Register(IlNullDto.Read, IlNullDto.Write);
       serializers.Register(IlBoolConstDto.Read, IlBoolConstDto.Write);
       serializers.Register(IlStringConstDto.Read, IlStringConstDto.Write);
@@ -147,7 +148,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:153</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:155</p>
   /// </summary>
   public sealed class IlArgAccessDto : IlValueDto
   {
@@ -233,7 +234,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:68</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:70</p>
   /// </summary>
   public sealed class IlArrayAccessDto : IlValueDto
   {
@@ -329,7 +330,97 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:77</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:37</p>
+  /// </summary>
+  public sealed class IlArrayConstDto : IlConstDto
+  {
+    //fields
+    //public fields
+    [NotNull] public List<IlConstDto> Values {get; private set;}
+
+    //private fields
+    //primary constructor
+    public IlArrayConstDto(
+      [NotNull] List<IlConstDto> values,
+      [NotNull] CacheKey type
+    ) : base (
+      type
+     )
+    {
+      if (values == null) throw new ArgumentNullException("values");
+
+      Values = values;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+
+    public static new CtxReadDelegate<IlArrayConstDto> Read = (ctx, reader) =>
+    {
+      var type = CacheKey.Read(ctx, reader);
+      var values = ReadIlConstDtoList(ctx, reader);
+      var _result = new IlArrayConstDto(values, type);
+      return _result;
+    };
+    public static CtxReadDelegate<List<IlConstDto>> ReadIlConstDtoList = IlConstDto.Read.List();
+
+    public static new CtxWriteDelegate<IlArrayConstDto> Write = (ctx, writer, value) =>
+    {
+      CacheKey.Write(ctx, writer, value.Type);
+      WriteIlConstDtoList(ctx, writer, value.Values);
+    };
+    public static  CtxWriteDelegate<List<IlConstDto>> WriteIlConstDtoList = IlConstDto.Write.List();
+
+    //constants
+
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlArrayConstDto) obj);
+    }
+    public bool Equals(IlArrayConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Values.SequenceEqual(other.Values) && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Values.ContentHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlArrayConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("values = "); Values.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+
+
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:79</p>
   /// </summary>
   public sealed class IlArrayLengthExprDto : IlExprDto
   {
@@ -417,7 +508,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:113</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:115</p>
   /// </summary>
   public sealed class IlAssignStmtDto : IlStmtDto
   {
@@ -506,7 +597,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:48</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:50</p>
   /// </summary>
   public sealed class IlBinaryOpDto : IlExprDto
   {
@@ -602,7 +693,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:39</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:41</p>
   /// </summary>
   public sealed class IlBoolConstDto : IlConstDto
   {
@@ -688,7 +779,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:89</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:91</p>
   /// </summary>
   public sealed class IlBoxExprDto : IlCastExprDto
   {
@@ -779,7 +870,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:137</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:139</p>
   /// </summary>
   public abstract class IlBranchStmtDto : IlStmtDto
   {
@@ -977,7 +1068,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:78</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:80</p>
   /// </summary>
   public sealed class IlCallDto : IlExprDto
   {
@@ -1075,7 +1166,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:118</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:120</p>
   /// </summary>
   public sealed class IlCallStmtDto : IlStmtDto
   {
@@ -1156,7 +1247,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:91</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:93</p>
   /// </summary>
   public sealed class IlCastClassExprDto : IlCastExprDto
   {
@@ -1247,7 +1338,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:83</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:85</p>
   /// </summary>
   public abstract class IlCastExprDto : IlExprDto
   {
@@ -1492,7 +1583,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:88</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:90</p>
   /// </summary>
   public sealed class IlConvExprDto : IlCastExprDto
   {
@@ -1583,7 +1674,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:98</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:100</p>
   /// </summary>
   public abstract class IlDerefExprDto : IlValueDto
   {
@@ -1792,7 +1883,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:126</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:128</p>
   /// </summary>
   public abstract class IlEhStmtDto : IlStmtDto
   {
@@ -1884,7 +1975,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:132</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:134</p>
   /// </summary>
   public sealed class IlEndFaultStmtDto : IlEhStmtDto
   {
@@ -1950,7 +2041,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:133</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:135</p>
   /// </summary>
   public sealed class IlEndFilterStmtDto : IlEhStmtDto
   {
@@ -2031,7 +2122,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:131</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:133</p>
   /// </summary>
   public sealed class IlEndFinallyStmtDto : IlEhStmtDto
   {
@@ -2210,7 +2301,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:64</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:66</p>
   /// </summary>
   public sealed class IlFieldAccessDto : IlValueDto
   {
@@ -2307,7 +2398,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:45</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:47</p>
   /// </summary>
   public sealed class IlFieldRefDto : IlConstDto
   {
@@ -2481,7 +2572,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:141</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:143</p>
   /// </summary>
   public sealed class IlGotoStmtDto : IlBranchStmtDto
   {
@@ -2560,7 +2651,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:144</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:146</p>
   /// </summary>
   public sealed class IlIfStmtDto : IlBranchStmtDto
   {
@@ -2648,7 +2739,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:53</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:55</p>
   /// </summary>
   public sealed class IlInitExprDto : IlExprDto
   {
@@ -2813,7 +2904,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:92</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:94</p>
   /// </summary>
   public sealed class IlIsInstExprDto : IlCastExprDto
   {
@@ -2990,7 +3081,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:104</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:106</p>
   /// </summary>
   public sealed class IlManagedDerefExprDto : IlDerefExprDto
   {
@@ -3075,7 +3166,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:102</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:104</p>
   /// </summary>
   public sealed class IlManagedRefExprDto : IlRefExprDto
   {
@@ -3160,7 +3251,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:44</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:46</p>
   /// </summary>
   public sealed class IlMethodRefDto : IlConstDto
   {
@@ -3248,7 +3339,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:73</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:75</p>
   /// </summary>
   public sealed class IlNewArrayExprDto : IlExprDto
   {
@@ -3336,7 +3427,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:55</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:57</p>
   /// </summary>
   public sealed class IlNewExprDto : IlExprDto
   {
@@ -3426,7 +3517,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:38</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:40</p>
   /// </summary>
   public sealed class IlNullDto : IlConstDto
   {
@@ -3617,7 +3708,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:95</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:97</p>
   /// </summary>
   public abstract class IlRefExprDto : IlValueDto
   {
@@ -3740,7 +3831,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:130</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:132</p>
   /// </summary>
   public sealed class IlRethrowStmtDto : IlEhStmtDto
   {
@@ -3806,7 +3897,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:122</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:124</p>
   /// </summary>
   public sealed class IlReturnStmtDto : IlStmtDto
   {
@@ -3887,7 +3978,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:59</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:61</p>
   /// </summary>
   public sealed class IlSizeOfExprDto : IlExprDto
   {
@@ -3975,7 +4066,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:107</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:109</p>
   /// </summary>
   public sealed class IlStackAllocExprDto : IlExprDto
   {
@@ -4063,7 +4154,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:111</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:113</p>
   /// </summary>
   public abstract class IlStmtDto{
     //fields
@@ -4154,7 +4245,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:40</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:42</p>
   /// </summary>
   public sealed class IlStringConstDto : IlConstDto
   {
@@ -4242,7 +4333,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:127</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:129</p>
   /// </summary>
   public sealed class IlThrowStmtDto : IlEhStmtDto
   {
@@ -4323,7 +4414,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:43</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:45</p>
   /// </summary>
   public sealed class IlTypeRefDto : IlConstDto
   {
@@ -4411,7 +4502,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:47</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:49</p>
   /// </summary>
   public sealed class IlUnaryOpDto : IlExprDto
   {
@@ -4499,7 +4590,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:90</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:92</p>
   /// </summary>
   public sealed class IlUnboxExprDto : IlCastExprDto
   {
@@ -4590,7 +4681,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:105</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:107</p>
   /// </summary>
   public sealed class IlUnmanagedDerefExprDto : IlDerefExprDto
   {
@@ -4675,7 +4766,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:103</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:105</p>
   /// </summary>
   public sealed class IlUnmanagedRefExprDto : IlRefExprDto
   {
@@ -4872,7 +4963,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:156</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:158</p>
   /// </summary>
   public sealed class IlVarAccessDto : IlValueDto
   {
@@ -4965,7 +5056,7 @@ namespace org.jacodb.api.net.generated.models
 
 
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:148</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:150</p>
   /// </summary>
   public enum IlVarKind {
     local,

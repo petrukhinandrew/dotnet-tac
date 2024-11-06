@@ -22,14 +22,16 @@ public static class RdSerializer
             }
             else if (instance is IlType type)
             {
-                dto = new IlTypeDto(type.GetCacheKey(), type.Name,
-                    type.GenericArgs.Select(a => a.GetCacheKey()).ToList(), type.IsGenericParameter, type.IsValueType,
-                    type.IsManaged);
+                dto = new IlTypeDto(id: type.GetCacheKey(), name: type.Name,
+                    genericArgs: type.GenericArgs.Select(a => a.GetCacheKey()).ToList(),
+                    isGenericParam: type.IsGenericParameter, isValueType: type.IsValueType,
+                    isManaged: type.IsManaged,
+                    attrs: type.Attributes.Select(a => a.SerializeAttr()).ToList());
             }
             else if (instance is IlField field)
             {
                 dto = new IlFieldDto(field.GetCacheKey(), field.DeclaringType.GetCacheKey(), field.Type.GetCacheKey(),
-                    field.IsStatic, field.Name);
+                    field.IsStatic, field.Name, field.Attributes.Select(a => a.SerializeAttr()).ToList());
             }
             else if (instance is IlMethod method)
             {
@@ -37,9 +39,11 @@ public static class RdSerializer
                     id: method.GetCacheKey(),
                     declType: method.DeclaringType?.GetCacheKey(),
                     returnType: method.ReturnType?.GetCacheKey(),
+                    attrs: method.Attributes.Select(a => a.SerializeAttr()).ToList(),
                     name: method.Name,
                     parameters: method.Parameters
-                        .Select(p => new IlParameterDto(p.Position, p.Type.GetCacheKey(), p.Name, null)).ToList(),
+                        .Select(p => new IlParameterDto(p.Position, p.Type.GetCacheKey(), p.Name, null,
+                            attrs: p.Attributes.Select(a => a.SerializeAttr()).ToList())).ToList(),
                     resolved: method.IsConstructed,
                     locals: method.LocalVars.Select(v =>
                         new IlLocalVarDto(type: v.Type.GetCacheKey(), index: v.Index, isPinned: v.IsPinned)).ToList(),
@@ -124,9 +128,10 @@ public static class RdSerializer
 
     private static IlExprDto SerializeExpr(this IlExpr expr)
     {
+        if (expr is IlConstant constant)
+            return constant.SerializeConst();
         if (expr is IlLocalVar localVar)
             return new IlVarAccessDto(kind: IlVarKind.local, index: localVar.Index, type: localVar.Type.GetCacheKey());
-
         if (expr is IlTempVar tmp)
             return new IlVarAccessDto(kind: IlVarKind.temp, index: tmp.Index, type: tmp.Type.GetCacheKey());
         if (expr is IlMerged merged)
@@ -135,32 +140,11 @@ public static class RdSerializer
             return new IlVarAccessDto(kind: IlVarKind.err, index: err.Index, type: err.Type.GetCacheKey());
         if (expr is IlArgument arg)
             return new IlArgAccessDto(index: arg.Index, type: arg.Type.GetCacheKey());
+
         if (expr is IlCall call)
             return new IlCallDto(method: call.Method.GetCacheKey(), args: call.Args.Select(SerializeExpr).ToList(),
                 type: new CacheKey(0, 0, 0));
-        if (expr is IlByteConst byteConst)
-            return new IlByteConstDto(value: byteConst.Value, type: byteConst.Type.GetCacheKey());
-        if (expr is IlIntConst intConst)
-            return new IlIntConstDto(value: intConst.Value, type: intConst.Type.GetCacheKey());
-        if (expr is IlLongConst longConst)
-            return new IlLongConstDto(value: longConst.Value, type: longConst.Type.GetCacheKey());
-        if (expr is IlFloatConst floatConst)
-            return new IlFloatConstDto(value: floatConst.Value, type: floatConst.Type.GetCacheKey());
-        if (expr is IlDoubleConst doubleConst)
-            return new IlDoubleConstDto(value: doubleConst.Value, type: doubleConst.Type.GetCacheKey());
-        if (expr is IlStringConst stringConst)
-            return new IlStringConstDto(value: stringConst.Value, type: stringConst.Type.GetCacheKey());
-        if (expr is IlNullConst nullConst)
-            return new IlNullDto(nullConst.Type.GetCacheKey());
-        if (expr is IlBoolConst boolConst)
-            return new IlBoolConstDto(value: boolConst.Value, type: boolConst.Type.GetCacheKey());
-        if (expr is IlTypeRef typeRef)
-            return new IlTypeRefDto(referencedType: typeRef.ReferencedType.GetCacheKey(),
-                type: typeRef.Type.GetCacheKey());
-        if (expr is IlFieldRef fieldRef)
-            return new IlFieldRefDto(field: fieldRef.Field.GetCacheKey(), type: fieldRef.Type.GetCacheKey());
-        if (expr is IlMethodRef methodRef)
-            return new IlMethodRefDto(method: methodRef.Method.GetCacheKey(), type: methodRef.Type.GetCacheKey());
+
         if (expr is IlUnaryOperation unaryOp)
             return new IlUnaryOpDto(type: unaryOp.Type.GetCacheKey(), operand: unaryOp.Operand.SerializeExpr());
         if (expr is IlBinaryOperation binaryOp)
@@ -214,6 +198,48 @@ public static class RdSerializer
             return new IlUnmanagedDerefExprDto(value: unmanagedDeref.Value.SerializeExpr(),
                 type: unmanagedDeref.Type.GetCacheKey());
         throw new Exception($"{expr} expr of type {expr.GetType()} serialization not yet supported");
+    }
+
+    private static IlConstDto SerializeConst(this IlConstant constant)
+    {
+        if (constant is IlByteConst byteConst)
+            return new IlByteConstDto(value: byteConst.Value, type: byteConst.Type.GetCacheKey());
+        if (constant is IlIntConst intConst)
+            return new IlIntConstDto(value: intConst.Value, type: intConst.Type.GetCacheKey());
+        if (constant is IlLongConst longConst)
+            return new IlLongConstDto(value: longConst.Value, type: longConst.Type.GetCacheKey());
+        if (constant is IlFloatConst floatConst)
+            return new IlFloatConstDto(value: floatConst.Value, type: floatConst.Type.GetCacheKey());
+        if (constant is IlDoubleConst doubleConst)
+            return new IlDoubleConstDto(value: doubleConst.Value, type: doubleConst.Type.GetCacheKey());
+        if (constant is IlStringConst stringConst)
+            return new IlStringConstDto(value: stringConst.Value, type: stringConst.Type.GetCacheKey());
+        if (constant is IlNullConst nullConst)
+            return new IlNullDto(nullConst.Type.GetCacheKey());
+        if (constant is IlBoolConst boolConst)
+            return new IlBoolConstDto(value: boolConst.Value, type: boolConst.Type.GetCacheKey());
+        if (constant is IlTypeRef typeRef)
+            return new IlTypeRefDto(referencedType: typeRef.ReferencedType.GetCacheKey(),
+                type: typeRef.Type.GetCacheKey());
+        if (constant is IlFieldRef fieldRef)
+            return new IlFieldRefDto(field: fieldRef.Field.GetCacheKey(), type: fieldRef.Type.GetCacheKey());
+        if (constant is IlMethodRef methodRef)
+            return new IlMethodRefDto(method: methodRef.Method.GetCacheKey(), type: methodRef.Type.GetCacheKey());
+        if (constant is IlArrayConst arrayConst)
+            return new IlArrayConstDto(type: arrayConst.Type.GetCacheKey(),
+                values: arrayConst.Values.Select(v => v.SerializeConst()).ToList());
+        throw new Exception($"{constant} const of type {constant.GetType()} serialization not yet supported");
+    }
+
+    private static IlAttrDto SerializeAttr(this IlAttribute attr)
+    {
+        var namedFlatten = attr.NamedArguments.ToList();
+        return new IlAttrDto(
+            attrType: attr.Type.GetCacheKey(),
+            ctorArgs: attr.ConstructorArguments.Select(arg => arg.Value.SerializeConst()).ToList(),
+            namedArgsNames: namedFlatten.Select(p => p.Key).ToList(),
+            namedArgsValues: namedFlatten.Select(p => p.Value.Value.SerializeConst()).ToList()
+        );
     }
 }
 
