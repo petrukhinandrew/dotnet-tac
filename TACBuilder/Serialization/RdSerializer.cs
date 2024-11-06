@@ -170,7 +170,7 @@ public static class RdSerializer
             return new IlArrayLengthExprDto(lengthExpr.Array.SerializeExpr(), lengthExpr.Type.GetCacheKey());
         if (expr is IlStackAlloc stackAlloc)
             return new IlStackAllocExprDto(size: stackAlloc.Size.SerializeExpr(), type: stackAlloc.Type.GetCacheKey());
-        if (expr is IlConvExpr convExpr)
+        if (expr is IlConvCastExpr convExpr)
             return new IlConvExprDto(convExpr.Type.GetCacheKey(), convExpr.Target.SerializeExpr(),
                 convExpr.Type.GetCacheKey());
         if (expr is IlBoxExpr boxExpr)
@@ -179,9 +179,6 @@ public static class RdSerializer
         if (expr is IlUnboxExpr unboxExpr)
             return new IlBoxExprDto(unboxExpr.Type.GetCacheKey(), unboxExpr.Target.SerializeExpr(),
                 unboxExpr.Type.GetCacheKey());
-        if (expr is IlCastClassExpr castClassExpr)
-            return new IlCastClassExprDto(castClassExpr.Type.GetCacheKey(), castClassExpr.Target.SerializeExpr(),
-                castClassExpr.Type.GetCacheKey());
         if (expr is IlIsInstExpr isInstExpr)
             return new IlIsInstExprDto(isInstExpr.Type.GetCacheKey(), isInstExpr.Target.SerializeExpr(),
                 isInstExpr.Type.GetCacheKey());

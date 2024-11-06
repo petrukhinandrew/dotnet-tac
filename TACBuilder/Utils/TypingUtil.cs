@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
+using TACBuilder.ILTAC.TypeSystem;
 
 namespace TACBuilder.Utils;
 
@@ -107,30 +108,43 @@ public static class TypingUtil
         }
     }
 
-    public static IlConstant ResolveConstant(object? obj)
+    public static IlConstant ResolveConstant(object? obj, Type? baseEnum = null)
     {
         if (obj == null) return new IlNullConst();
-        if (obj is string strValue) return new IlStringConst(strValue);
-        if (obj is bool boolValue) return new IlBoolConst(boolValue);
-        if (obj is byte byteValue) return new IlByteConst(byteValue);
-        if (obj is char charValue) return new IlIntConst(charValue);
-        if (obj is short shortValue) return new IlIntConst(shortValue);
-        if (obj is int intValue) return new IlIntConst(intValue);
-        if (obj is long longValue) return new IlLongConst(longValue);
-        if (obj is float floatValue) return new IlFloatConst(floatValue);
-        if (obj is double doubleValue) return new IlDoubleConst(doubleValue);
-        if (obj is nint nintValue) return new IlLongConst(nintValue);
-        if (obj is Type type) return new IlTypeRef(IlInstanceBuilder.GetType(type));
-        if (obj is MethodBase method) return new IlMethodRef(IlInstanceBuilder.GetMethod(method));
-        if (obj is ReadOnlyCollection<CustomAttributeTypedArgument> coll) return resolveArrayConst(coll);
-        if (obj is CustomAttributeTypedArgument attr) return ResolveConstant(attr.Value);
-        if (obj.GetType().IsArray || obj is IEnumerable) return resolveArrayConst(obj);
-        if (obj.GetType().IsEnum) return new IlEnumValue(obj);
-        throw new Exception("unexpected const of type " + obj.GetType().Name);
+        if (baseEnum is { IsEnum: true })
+        {
+            return new IlEnumConst(IlInstanceBuilder.GetType(baseEnum), ResolveConstant(obj));
+        }
+
+        if (obj.GetType().IsEnum)
+        {
+            return new IlEnumConst(IlInstanceBuilder.GetType(obj.GetType()),
+                ResolveConstant(Convert.ChangeType(obj, obj.GetType().GetEnumUnderlyingType())));
+        }
+
+        var resultConst = obj switch
+        {
+            string strValue => new IlStringConst(strValue),
+            bool boolValue => new IlBoolConst(boolValue),
+            byte byteValue => new IlByteConst(byteValue),
+            char charValue => new IlIntConst(charValue),
+            short shortValue => new IlIntConst(shortValue),
+            int intValue => new IlIntConst(intValue),
+            long longValue => new IlLongConst(longValue),
+            float floatValue => new IlFloatConst(floatValue),
+            double doubleValue => new IlDoubleConst(doubleValue),
+            nint nintValue => new IlLongConst(nintValue),
+            Type type => new IlTypeRef(IlInstanceBuilder.GetType(type)),
+            MethodBase method => new IlMethodRef(IlInstanceBuilder.GetMethod(method)),
+            CustomAttributeTypedArgument attr => ResolveConstant(attr.Value),
+            ReadOnlyCollection<CustomAttributeTypedArgument> coll => ResolveArrayConst(coll),
+            _ => null
+        };
+        if (resultConst == null && (obj.GetType().IsArray || obj is IEnumerable)) return ResolveArrayConst(obj);
+        return resultConst ?? throw new Exception("unexpected const of type " + obj.GetType().Name);
     }
 
-    // TODO test multi-dimensional array
-    private static IlArrayConst resolveArrayConst(object obj)
+    private static IlArrayConst ResolveArrayConst(object obj)
     {
         var a = obj as ICollection;
         var values = new List<IlConstant>();
@@ -141,5 +155,12 @@ public static class TypingUtil
 
         if (a == null) throw new Exception("unexpected array constant " + obj);
         return new IlArrayConst(values[0].Type, values);
+    }
+
+    public static IlExpr WithTypeEnsured(this IlExpr expr, IlType expectedType)
+    {
+        // TODO constants optimisations
+        if (Equals(expr.Type, expectedType)) return expr;
+        return new IlConvCastExpr(expectedType, expr);
     }
 }

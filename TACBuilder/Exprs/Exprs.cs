@@ -150,7 +150,7 @@ public abstract class IlCastExpr(IlType targetType, IlExpr target) : IlExpr
     }
 }
 
-public class IlConvExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
+public class IlConvCastExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
 {
 }
 
@@ -159,10 +159,6 @@ public class IlBoxExpr(IlValue value, IlType targetType) : IlCastExpr(targetType
 }
 
 public class IlUnboxExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
-{
-}
-
-public class IlCastClassExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
 {
 }
 
