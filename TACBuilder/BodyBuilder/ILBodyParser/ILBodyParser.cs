@@ -154,8 +154,7 @@ public class ILBodyParser(MethodBase methodBase)
                 case OperandType.InlineString:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedString(IlInstanceBuilder.GetString(_methodBase, token)
-                        .Value);
+                    instr.arg = new ILInstrOperand.ResolvedString(IlInstanceBuilder.GetString(_methodBase, token));
                     break;
                 }
                 case OperandType.InlineSig:
@@ -163,7 +162,7 @@ public class ILBodyParser(MethodBase methodBase)
                     var token = BitConverter.ToInt32(_il, offset);
 
                     instr.arg = new ILInstrOperand.ResolvedSignature(
-                        IlInstanceBuilder.GetSignature(_methodBase, token).Value);
+                        IlInstanceBuilder.GetSignature(_methodBase, token));
 
                     break;
                 }

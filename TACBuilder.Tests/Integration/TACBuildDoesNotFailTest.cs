@@ -29,7 +29,7 @@ public class TACBuildDoesNotFailTest
         try
         {
             var path = getPublishPathFor("TACBuilder.Tests.dll");
-            AppTacBuilder.FilterMethodsFromRootAsm(path);
+            AppTacBuilder.IncludeRootAsm(path);
             _testOutputHelper.WriteLine(path);
             _testOutputHelper.WriteLine(Environment.CurrentDirectory);
             var appTacBuilder =

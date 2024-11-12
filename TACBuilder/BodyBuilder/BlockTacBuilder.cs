@@ -44,7 +44,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
 
     public bool StackInitIsTheSame()
     {
-        if ( _preds.Count == 0) return true;
+        if (_preds.Count == 0) return true;
         EvaluationStack<IlExpr> copy = EvaluationStack<IlExpr>.CopyOf(_entryStackState);
 
         var stacks = _preds.Where(bb => bb._builtAtLeastOnce)
@@ -98,19 +98,18 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
         return _stack.Pop();
     }
 
-    // TODO coercion
     public void Push(IlExpr expr, int optInstrIdx = -1)
     {
         var instrIdx = optInstrIdx == -1 ? CurInstr.idx : optInstrIdx;
         if (expr is IlValue)
         {
-            _stack.Push(expr);
+            _stack.Push(expr.Coerced());
         }
         else
         {
             var tmp = GetNewTemp(expr, instrIdx);
             NewLine(new ILAssignStmt(tmp, expr));
-            _stack.Push(tmp);
+            _stack.Push(tmp.Coerced());
         }
     }
 

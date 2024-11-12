@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.Tracing;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using TACBuilder.Exprs;
@@ -6,12 +7,44 @@ using TACBuilder.Utils;
 
 namespace TACBuilder.ILReflection;
 
+public class IlPointerType(Type baseType) : IlType(baseType)
+{
+    public override bool IsManaged => false;
+    public override bool IsUnmanaged => true;
+    public IlType PointedType => IlInstanceBuilder.GetType(Type.GetElementType() ?? throw new("123"));
+}
+
 public class IlValueType(Type type) : IlType(type);
 
-public class IlPrimitiveType(Type type) : IlValueType(type);
+public class IlPrimitiveType(Type type) : IlValueType(type)
+{
+    public override bool IsManaged => false;
+    public override bool IsUnmanaged => true;
+
+    public new IlPrimitiveType ExpectedStackType()
+    {
+        if (Type == typeof(IntPtr) || Type == typeof(UIntPtr))
+            return (IlPrimitiveType)
+                IlInstanceBuilder.GetType(Type);
+        return (IlPrimitiveType)(Type.GetTypeCode(Type) switch
+        {
+            TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 => IlInstanceBuilder.GetType(typeof(int)),
+            TypeCode.Int64 => IlInstanceBuilder.GetType(typeof(long)),
+            TypeCode.Byte or TypeCode.Char or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(
+                typeof(uint)),
+            TypeCode.UInt64 => IlInstanceBuilder.GetType(typeof(ulong)),
+            TypeCode.Single => IlInstanceBuilder.GetType(typeof(float)),
+            TypeCode.Double => IlInstanceBuilder.GetType(typeof(double)),
+            _ => throw new NotSupportedException("unhandled primitive stackc type " + ToString()),
+        });
+    }
+}
 
 public class IlEnumType(Type type) : IlValueType(type)
 {
+    public override bool IsManaged => false;
+    public override bool IsUnmanaged => true;
+
     public IlType UnderlyingType = IlInstanceBuilder.GetType(Enum.GetUnderlyingType(type));
     public Dictionary<string, IlConstant> NameToValueMapping = new();
 
@@ -22,14 +55,25 @@ public class IlEnumType(Type type) : IlValueType(type)
         foreach (var value in Enum.GetValues(Type))
         {
             var name = Enum.GetName(Type, value) ?? "";
-            NameToValueMapping.Add(name, TypingUtil.ResolveConstant(value, Type));
+            NameToValueMapping.TryAdd(name, TypingUtil.ResolveConstant(value, Type));
         }
     }
 }
 
 public class IlStructType(Type type) : IlValueType(type);
 
-public class IlReferenceType(Type type) : IlType(type);
+public class IlReferenceType(Type type) : IlType(type)
+{
+    public override bool IsManaged => true;
+    public override bool IsUnmanaged => false;
+}
+
+public class IlManagedReference(Type type) : IlReferenceType(type)
+{
+    public override bool IsManaged => true;
+    public override bool IsUnmanaged => false;
+    public IlType ReferencedType => IlInstanceBuilder.GetType(Type.GetElementType()!);
+}
 
 public class IlArrayType(Type type) : IlReferenceType(type)
 {
@@ -41,7 +85,6 @@ public class IlClassType(Type type) : IlReferenceType(type);
 public class IlType(Type type) : IlMember(type)
 {
     private readonly Type _type = type;
-    public Type BaseType => _type;
     public new bool IsConstructed;
 
     private const BindingFlags BindingFlags =
@@ -80,6 +123,47 @@ public class IlType(Type type) : IlMember(type)
         IsConstructed = true;
     }
 
+    public IlType ExpectedStackType()
+    {
+        return this;
+    }
+
+    public IlArrayType MakeArrayType()
+    {
+        return (IlArrayType)IlInstanceBuilder.GetType(Type.MakeArrayType());
+    }
+
+    public IlType MeetWith(IlType another)
+    {
+        return IlInstanceBuilder.GetType(MeetTypes(Type, another.Type));
+    }
+
+    private static Type MeetTypes(Type? left, Type? right)
+    {
+        if (left == null || right == null) return typeof(object);
+        if (left.IsAssignableTo(right) || left.IsImplicitPrimitiveConvertibleTo(right)) return right;
+        if (right.IsAssignableTo(left) || right.IsImplicitPrimitiveConvertibleTo(left)) return left;
+        var workList = new Queue<Type>();
+        if (left.BaseType != null)
+            workList.Enqueue(left.BaseType);
+
+        if (right.BaseType != null)
+            workList.Enqueue(right.BaseType);
+        foreach (var li in left.GetInterfaces())
+            workList.Enqueue(li);
+        foreach (var ri in right.GetInterfaces())
+            workList.Enqueue(ri);
+        Type? bestCandidate = null;
+        while (workList.TryDequeue(out var candidate))
+        {
+            if (left.IsAssignableTo(candidate) && right.IsAssignableTo(candidate))
+                if (bestCandidate == null || candidate.IsAssignableTo(bestCandidate))
+                    bestCandidate = candidate;
+        }
+
+        return bestCandidate ?? MeetTypes(left.BaseType, right.BaseType);
+    }
+
     public IlAssembly DeclaringAssembly { get; private set; }
     public int AsmToken => _type.Assembly.GetHashCode();
     public int ModuleToken => _type.Module.MetadataToken;
@@ -89,11 +173,11 @@ public class IlType(Type type) : IlMember(type)
     public HashSet<IlMethod> Methods { get; } = new();
     public HashSet<IlField> Fields { get; } = new();
     public new string Name => _type.Name;
-    protected Type Type => _type;
+    public Type Type => _type;
     public bool IsValueType => _type.IsValueType;
-    public bool IsManaged => !_type.IsUnmanaged();
+    public virtual bool IsManaged => !_type.IsUnmanaged();
     public bool IsGenericParameter => _type.IsGenericParameter;
-    public bool IsUnmanaged => _type.IsUnmanaged();
+    public virtual bool IsUnmanaged => _type.IsUnmanaged();
 
     internal void EnsureFieldAttached(IlField ilField)
     {

@@ -18,7 +18,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public int Position { get; }
         public IlType Type { get; }
         public List<IlAttribute> Attributes { get; }
-        public object? DefaultValue { get; }
+        public IlConstant DefaultValue { get; }
     }
 
     public class Parameter(ParameterInfo parameterInfo, int index) : IlCacheable, IParameter
@@ -26,19 +26,23 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public string Name { get; private set; } = parameterInfo.Name ?? NamingUtil.ArgVar(index);
         public int Position => index;
         public string FullName => fullName();
-        public IlType Type { get; private set; }
-        public List<IlAttribute> Attributes { get; private set; }
-        public object? DefaultValue { get; private set; }
+        public IlType Type { get; } = IlInstanceBuilder.GetType(parameterInfo.ParameterType);
 
+        public List<IlAttribute> Attributes { get; } =
+            parameterInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
+
+        public IlConstant DefaultValue { get; } = TypingUtil.ResolveConstant(parameterInfo.DefaultValue);
+        public new bool IsConstructed = true;
         private bool IsOut => parameterInfo.IsOut;
         private bool IsIn => parameterInfo.IsIn;
         private bool IsRetVal => parameterInfo.IsRetval;
 
         public override void Construct()
         {
-            Type = IlInstanceBuilder.GetType(parameterInfo.ParameterType);
-            DefaultValue = parameterInfo.DefaultValue;
-            Attributes = parameterInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
+            // Type = IlInstanceBuilder.GetType(parameterInfo.ParameterType);
+            // DefaultValue = parameterInfo.DefaultValue;
+            // Attributes = parameterInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
+            // IsConstructed = true;
         }
 
         private string fullName()
@@ -66,11 +70,12 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public int Position => 0;
         public IlType Type => ilType;
         public List<IlAttribute> Attributes { get; } = new();
-        public object? DefaultValue => null;
+        public IlConstant DefaultValue => TypingUtil.ResolveConstant(null);
 
         public override void Construct()
         {
             // TODO check may have attr
+            IsConstructed = true;
         }
 
         public override string ToString()
@@ -158,6 +163,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
     public override void Construct()
     {
+        if (IsConstructed) return;
         DeclaringType = IlInstanceBuilder.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
         Logger.LogInformation("Constructing {Type} {Name}", DeclaringType.Name, Name);
         Attributes = _methodBase.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
@@ -171,8 +177,8 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             }
         }
 
-        if (_methodBase is MethodInfo methodInfo && methodInfo.ReturnType != typeof(void))
-            ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
+        if (_methodBase is MethodInfo methodInfo && methodInfo.ReturnType != typeof(void)) ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
+
         Debug.Assert(Parameters.Count == 0);
         if (!_methodBase.IsStatic)
         {

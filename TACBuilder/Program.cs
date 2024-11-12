@@ -1,6 +1,7 @@
 ﻿// #define CONSOLE_SERIALIZER
 #define RD_SERIALIZER
 
+using System.Reflection;
 using System.Reflection.Emit;
 using TACBuilder.Serialization;
 
@@ -19,7 +20,8 @@ class Program
             var connection = new RdConnection(req =>
             {
                 Console.WriteLine(req.RootAsm);
-                AppTacBuilder.FilterMethodsFromRootAsm(req.RootAsm);
+                AppTacBuilder.IncludeRootAsm(req.RootAsm);
+                // AppTacBuilder.FilterMethodsFromSingleMSCoreLibType();
                 builder.Build(req.RootAsm);
                 var instances = AppTacBuilder.GetFreshInstances();
                 var serialized = RdSerializer.Serialize(instances);
@@ -30,8 +32,10 @@ class Program
         else if (args.Contains("--console"))
         {
             var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
-            AppTacBuilder.FilterMethodsFromRootAsm(path);
-            // AppTacBuilder.FilterSingleMethodFromRootAsm(path, "NestedFinally");
+            Console.WriteLine(path);
+            AppTacBuilder.IncludeRootAsm(path);
+            // AppTacBuilder.IncludeMsCoreLib();
+            // AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "BlobEncoder");
             builder.Build(path);
             var builtAsms = builder.BuiltAssemblies;
             // var writer = new StreamWriter(Console.OpenStandardOutput(), leaveOpen: true);
@@ -40,6 +44,7 @@ class Program
             // writer.Flush();
             // writer.Close();
         }
+
     }
 }
 

@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 using TACBuilder.ILTAC.TypeSystem;
@@ -11,16 +13,16 @@ public static class TypingUtil
 {
     public static IlType Merge(List<IlType> types)
     {
-        var res = types.First().BaseType;
+        var res = types.First();
         foreach (var type in types.Skip(1))
         {
-            res = MeetTypes(res, type.BaseType);
+            res = res.MeetWith(type);
         }
 
-        return IlInstanceBuilder.GetType(res);
+        return res;
     }
 
-    private static bool IsImplicitPrimitiveConvertibleTo(this Type src, Type target)
+    public static bool IsImplicitPrimitiveConvertibleTo(this Type src, Type target)
     {
         if (!src.IsPrimitive || !target.IsPrimitive) return false;
         var conversionMapping = new Dictionary<Type, List<Type>>
@@ -64,31 +66,6 @@ public static class TypingUtil
         return conversionMapping.TryGetValue(src, out var possible) && possible.Contains(target);
     }
 
-    private static Type MeetTypes(Type? left, Type? right)
-    {
-        if (left == null || right == null) return typeof(object);
-        if (left.IsAssignableTo(right) || left.IsImplicitPrimitiveConvertibleTo(right)) return right;
-        if (right.IsAssignableTo(left) || right.IsImplicitPrimitiveConvertibleTo(left)) return left;
-        var workList = new Queue<Type>();
-        if (left.BaseType != null)
-            workList.Enqueue(left.BaseType);
-
-        if (right.BaseType != null)
-            workList.Enqueue(right.BaseType);
-        foreach (var li in left.GetInterfaces())
-            workList.Enqueue(li);
-        foreach (var ri in right.GetInterfaces())
-            workList.Enqueue(ri);
-        Type? bestCandidate = null;
-        while (workList.TryDequeue(out var candidate))
-        {
-            if (left.IsAssignableTo(candidate) && right.IsAssignableTo(candidate))
-                if (bestCandidate == null || candidate.IsAssignableTo(bestCandidate))
-                    bestCandidate = candidate;
-        }
-
-        return bestCandidate ?? MeetTypes(left.BaseType, right.BaseType);
-    }
 
     class UnmanagedCheck<T> where T : unmanaged
     {
@@ -110,15 +87,15 @@ public static class TypingUtil
 
     public static IlConstant ResolveConstant(object? obj, Type? baseEnum = null)
     {
-        if (obj == null) return new IlNullConst();
+        if (obj == null || obj is DBNull) return new IlNullConst();
         if (baseEnum is { IsEnum: true })
         {
-            return new IlEnumConst(IlInstanceBuilder.GetType(baseEnum), ResolveConstant(obj));
+            return new IlEnumConst((IlEnumType)IlInstanceBuilder.GetType(baseEnum), ResolveConstant(obj));
         }
 
         if (obj.GetType().IsEnum)
         {
-            return new IlEnumConst(IlInstanceBuilder.GetType(obj.GetType()),
+            return new IlEnumConst((IlEnumType)IlInstanceBuilder.GetType(obj.GetType()),
                 ResolveConstant(Convert.ChangeType(obj, obj.GetType().GetEnumUnderlyingType())));
         }
 
@@ -126,11 +103,15 @@ public static class TypingUtil
         {
             string strValue => new IlStringConst(strValue),
             bool boolValue => new IlBoolConst(boolValue),
+            sbyte sbyteValue => new IlByteConst((byte)sbyteValue),
             byte byteValue => new IlByteConst(byteValue),
             char charValue => new IlIntConst(charValue),
             short shortValue => new IlIntConst(shortValue),
+            ushort ushortValue => new IlIntConst((short)ushortValue), // TODO
             int intValue => new IlIntConst(intValue),
+            uint uintValue => new IlIntConst((int)uintValue), // TODO
             long longValue => new IlLongConst(longValue),
+            ulong ulongValue => new IlLongConst((long)ulongValue),
             float floatValue => new IlFloatConst(floatValue),
             double doubleValue => new IlDoubleConst(doubleValue),
             nint nintValue => new IlLongConst(nintValue),
@@ -146,7 +127,7 @@ public static class TypingUtil
 
     private static IlArrayConst ResolveArrayConst(object obj)
     {
-        var a = obj as ICollection;
+        var a = obj as ICollection ?? throw new Exception("expected collection, got " + obj.GetType());
         var values = new List<IlConstant>();
         foreach (var v in a)
         {
@@ -154,7 +135,7 @@ public static class TypingUtil
         }
 
         if (a == null) throw new Exception("unexpected array constant " + obj);
-        return new IlArrayConst(values[0].Type, values);
+        return new IlArrayConst((IlInstanceBuilder.GetType(obj.GetType()) as IlArrayType)!, values);
     }
 
     public static IlExpr WithTypeEnsured(this IlExpr expr, IlType expectedType)
@@ -162,5 +143,13 @@ public static class TypingUtil
         // TODO constants optimisations
         if (Equals(expr.Type, expectedType)) return expr;
         return new IlConvCastExpr(expectedType, expr);
+    }
+
+    public static IlExpr Coerced(this IlExpr expr)
+    {
+        if (expr.Type == null)
+            Console.WriteLine("lolekke");
+        var coercedType = expr.Type.ExpectedStackType();
+        return expr.WithTypeEnsured(coercedType);
     }
 }
