@@ -3,6 +3,7 @@
 
 using System.Reflection;
 using System.Reflection.Emit;
+using TACBuilder.ILReflection;
 using TACBuilder.Serialization;
 
 namespace TACBuilder;
@@ -28,6 +29,14 @@ class Program
                 return serialized;
             });
             connection.Connect(8083);
+        }
+        else if (args.Contains("--dynamic-tests"))
+        {
+            var asm = new AssemblyMock().Build();
+            var name = asm.GetName();
+            AppTacBuilder.IncludeRootAsm(name);
+            builder.Build(asm);
+            var builtAsms = builder.BuiltAssemblies;
         }
         else if (args.Contains("--console"))
         {

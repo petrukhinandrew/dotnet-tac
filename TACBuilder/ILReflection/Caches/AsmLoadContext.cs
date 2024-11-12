@@ -1,4 +1,6 @@
 using System.Reflection;
+using System.Reflection.Emit;
+using System.Reflection.Metadata;
 using System.Runtime.Loader;
 
 namespace TACBuilder.ILReflection;
@@ -78,5 +80,61 @@ internal class AsmLoadContext : AssemblyLoadContext, IDisposable
     public void Dispose()
     {
         AppDomain.CurrentDomain.AssemblyResolve -= OnAssemblyResolve;
+    }
+}
+
+class AssemblyMock
+{
+    public AssemblyBuilder Builder;
+    public AsmLoadContext Context = new();
+    public ModuleBuilder Module;
+    public List<TypeBuilder> Types = new();
+
+    public AssemblyMock()
+    {
+        var scope = Context.EnterContextualReflection();
+        using (scope)
+        {
+            Builder = AssemblyBuilder.DefineDynamicAssembly(new AssemblyName(Guid.NewGuid().ToString()),
+                AssemblyBuilderAccess.RunAndCollect);
+            Module = Builder.DefineDynamicModule("MainModule");
+        }
+    }
+
+    public Type AddType(TypeBuilder typeBuilder)
+    {
+        var dummy_method = typeBuilder.DefineMethod("Dummy", MethodAttributes.Public | MethodAttributes.Static);
+        AddDummyMethod(dummy_method);
+        var calli_test_method_builder = typeBuilder.DefineMethod("calli_test", MethodAttributes.Public | MethodAttributes.Static);
+        AddMethod(calli_test_method_builder, dummy_method);
+        return typeBuilder.CreateType();
+    }
+
+    public void AddDummyMethod(System.Reflection.Emit.MethodBuilder methodBuilder)
+    {
+        methodBuilder.SetReturnType(typeof(double));
+        methodBuilder.SetParameters(typeof(int));
+        var ilBuilder = methodBuilder.GetILGenerator();
+        ilBuilder.Emit(OpCodes.Ldarg_0);
+        ilBuilder.Emit(OpCodes.Ret);
+    }
+
+    public void AddMethod(System.Reflection.Emit.MethodBuilder methodBuilder, System.Reflection.Emit.MethodBuilder callTarget)
+    {
+        var callTargetSig = Module.GetSignatureMetadataToken(
+            SignatureHelper.GetMethodSigHelper(Module, typeof(double), [typeof(int)])
+        );
+        var ilBuilder = methodBuilder.GetILGenerator();
+        methodBuilder.SetReturnType(typeof(double));
+        ilBuilder.Emit(OpCodes.Ldc_I4_4);
+        ilBuilder.Emit(OpCodes.Ldftn, callTarget);
+        ilBuilder.Emit(OpCodes.Calli, callTargetSig);
+        ilBuilder.Emit(OpCodes.Ret);
+    }
+
+    public Assembly Build()
+    {
+        AddType(Module.DefineType("type1"));
+        return Builder;
     }
 }

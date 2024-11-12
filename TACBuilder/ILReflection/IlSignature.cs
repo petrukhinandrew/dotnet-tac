@@ -25,7 +25,11 @@ public class IlSignature : IlCacheable
 
     public unsafe IlSignature(byte[] rawBytes, MethodBase src)
     {
-        src.Module.Assembly.TryGetRawMetadata(out var blob, out var length);
+        byte* blob;
+        int length;
+        // TODO ochen' vadjno, tak ploho
+        if (!src.Module.Assembly.TryGetRawMetadata(out blob, out length))
+            Assembly.GetExecutingAssembly().TryGetRawMetadata(out blob, out length);
         MetadataReader reader = new MetadataReader(blob, length);
         var decoder =
             new SignatureDecoder<Type, Type[]>(new SigTypeProdiver(src), reader, src.GetGenericArguments());

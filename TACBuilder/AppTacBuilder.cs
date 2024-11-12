@@ -7,6 +7,12 @@ namespace TACBuilder;
 
 public class AppTacBuilder
 {
+    public void Build(Assembly assembly)
+    {
+        IlInstanceBuilder.BuildFrom(assembly);
+        BuiltAssemblies.AddRange(IlInstanceBuilder.GetAssemblies());
+    }
+
     public void Build(string asmPath)
     {
         Debug.Assert(File.Exists(asmPath));
@@ -29,6 +35,15 @@ public class AppTacBuilder
             type.Assembly.Location == rootAssemblyPath);
         IlInstanceBuilder.AddMethodFilter(method =>
             (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath);
+    }
+
+    public static void IncludeRootAsm(AssemblyName asmName)
+    {
+        IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.GetName().FullName == asmName.FullName);
+        IlInstanceBuilder.AddTypeFilter(type =>
+            type.Assembly.GetName().FullName == asmName.FullName);
+        IlInstanceBuilder.AddMethodFilter(method =>
+            (method.ReflectedType ?? method.DeclaringType)!.Assembly.GetName().FullName == asmName.FullName);
     }
 
     public static void IncludeMsCoreLib()

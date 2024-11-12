@@ -27,6 +27,13 @@ public static class IlInstanceBuilder
         return meta;
     }
 
+    internal static IlAssembly BuildFrom(Assembly assembly)
+    {
+        var meta = GetAssembly(assembly);
+        Construct();
+        return meta;
+    }
+
     public static void AddAssemblyFilter(Func<Assembly, bool> filter)
     {
         AssemblyFilters.Add(filter);
