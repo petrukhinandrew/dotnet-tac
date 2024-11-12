@@ -32,6 +32,16 @@ public class ILAssignStmt(IlValue lhs, IlExpr rhs) : IlStmt()
     }
 }
 
+public class IlCalliStmt(IlCallIndirect expr) : IlStmt
+{
+    public IlCallIndirect Call => expr;
+
+    public override string ToString()
+    {
+        return expr.ToString();
+    }
+}
+
 public class IlCallStmt(IlCall expr) : IlStmt()
 {
     public IlCall Call => expr;

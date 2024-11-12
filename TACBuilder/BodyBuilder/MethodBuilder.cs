@@ -25,7 +25,7 @@ class MethodBuilder(IlMethod method)
     {
         try
         {
-            Params.AddRange(_method.Parameters.Select((mp, index) => mp switch
+            Params.AddRange(_method.Parameters.Select((mp, index) =>  mp switch // new IlArgument(mp)
             {
                 IlMethod.Parameter p => new IlArgument(mp),
                 IlMethod.This t => mp.Type.IsValueType switch
@@ -34,7 +34,8 @@ class MethodBuilder(IlMethod method)
                     _ => new IlArgument(mp)
                 },
                 _ => throw new Exception($"Unknown method parameter type at {mp}")
-            }));
+            }
+        ));
 
             if (!_method.HasMethodBody) return [];
             InitBlockBuilders();
@@ -53,11 +54,15 @@ class MethodBuilder(IlMethod method)
 
             ComposeTac();
         }
+        catch (InstructionNotHandled e)
+        {
+            Console.WriteLine(e.Message + " found at " + method);
+            return [];
+        }
         catch (Exception e)
         {
-            Console.WriteLine(e.Message);
-            Console.WriteLine(
-                $"method body tac build failed for {_method.DeclaringType?.Name ?? "unknown decltype"} {_method.Name}");
+            Console.WriteLine(e.Message + " found at " + method);
+            Console.WriteLine(e.StackTrace);
             return [];
         }
 
@@ -135,7 +140,7 @@ class MethodBuilder(IlMethod method)
 
         foreach (var scope in method.Scopes)
         {
-            if (scope is FilterScope filterScope && ilToTacMapping.TryGetValue(filterScope.fb, out var fbv) != null)
+            if (scope is FilterScope filterScope && ilToTacMapping.TryGetValue(filterScope.fb, out var fbv))
                 filterScope.fbt = (int)fbv!;
             if (ilToTacMapping.TryGetValue(scope.ilLoc.tb, out var tbv))
                 scope.tacLoc.tb = (int)tbv!;
@@ -148,7 +153,6 @@ class MethodBuilder(IlMethod method)
         }
     }
 
-    // TODO put merge here
     internal IlTempVar GetNewTemp(IlExpr value, int instrIdx)
     {
         if (!Temps.ContainsKey(instrIdx))

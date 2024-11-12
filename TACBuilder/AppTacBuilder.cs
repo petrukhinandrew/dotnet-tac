@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Reflection;
 using TACBuilder.ILReflection;
 
 
@@ -13,15 +14,31 @@ public class AppTacBuilder
         BuiltAssemblies.AddRange(IlInstanceBuilder.GetAssemblies());
     }
 
+    public void Build(AssemblyName asmName)
+    {
+        IlInstanceBuilder.BuildFrom(asmName);
+        BuiltAssemblies.AddRange(IlInstanceBuilder.GetAssemblies());
+    }
+
     public List<IlAssembly> BuiltAssemblies { get; } = new();
 
-    public static void FilterMethodsFromRootAsm(string rootAssemblyPath)
+    public static void IncludeRootAsm(string rootAssemblyPath)
     {
         IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
         IlInstanceBuilder.AddTypeFilter(type =>
             type.Assembly.Location == rootAssemblyPath);
         IlInstanceBuilder.AddMethodFilter(method =>
             (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath);
+    }
+
+    public static void IncludeMsCoreLib()
+    {
+        IlInstanceBuilder.AddAssemblyFilter(assembly =>
+            assembly.GetName().FullName.StartsWith("System.Private.CoreLib"));
+        IlInstanceBuilder.AddTypeFilter(type =>
+            type.Assembly.GetName().FullName.StartsWith("System.Private.CoreLib"));
+        IlInstanceBuilder.AddMethodFilter(method =>
+            (method.ReflectedType ?? method.DeclaringType)!.Assembly.FullName.StartsWith("System.Private.CoreLib"));
     }
 
     public static void FilterSingleMethodFromRootAsm(string rootAssemblyPath, string methodName)

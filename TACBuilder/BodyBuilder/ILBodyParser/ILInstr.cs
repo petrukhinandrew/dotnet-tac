@@ -46,6 +46,7 @@ public abstract class ILInstr
     public sealed class SwitchArg(int value) : ILInstr
     {
         public int Value => value;
+
         public override string ToString()
         {
             return "SwitchArg";
@@ -91,13 +92,13 @@ public abstract record ILInstrOperand
         }
     }
 
-    public record ResolvedString(string value) : ILInstrOperand;
+    public record ResolvedString(IlString value) : ILInstrOperand;
 
     public record ResolvedField(IlField value) : ILInstrOperand;
 
     public record ResolvedType(IlType value) : ILInstrOperand;
 
-    public record ResolvedSignature(byte[] value) : ILInstrOperand;
+    public record ResolvedSignature(IlSignature value) : ILInstrOperand;
 
     public record ResolvedMethod(IlMethod value) : ILInstrOperand;
 

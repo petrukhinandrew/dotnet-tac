@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using JetBrains.Lifetimes;
 using TACBuilder.ILReflection;
 using TACBuilder.Utils;
@@ -157,15 +158,15 @@ public class IlBoolConst(bool value) : IlConstant
     public bool Value => value;
 }
 
-public class IlEnumConst(IlType enumType, IlConstant underlyingValue) : IlConstant
+public class IlEnumConst(IlEnumType enumType, IlConstant underlyingValue) : IlConstant
 {
     public IlType Type => enumType;
     public IlConstant Value => underlyingValue;
 }
 
-public class IlArrayConst(IlType memberType, IEnumerable<IlConstant> values) : IlConstant
+public class IlArrayConst(IlArrayType arrayType, IEnumerable<IlConstant> values) : IlConstant
 {
-    public IlType Type { get; } = memberType;
+    public IlType Type => arrayType;
     public List<IlConstant> Values => values.ToList();
 }
 
@@ -193,9 +194,14 @@ public class IlMethodRef(IlMethod method, IlExpr? receiver = null) : IlConstant
     public IlMethod Method => method;
 }
 
-public class IlCallIndirect(IlExpr ftn, List<IlExpr> args) : IlExpr
+public class IlCallIndirect(IlSignature signature, IlExpr ftn, List<IlExpr> args) : IlExpr
 {
-    public IlType Type { get; }
+    public IlType? Type => signature.ReturnType;
+
+    public override string ToString()
+    {
+        return $"calli {ftn.ToString()} ({string.Join(",", args.Select(a => a.ToString()))})";
+    }
 }
 
 public class IlCall(IlMethod method) : IlExpr
@@ -207,6 +213,7 @@ public class IlCall(IlMethod method) : IlExpr
         foreach (var t in Method.Parameters)
         {
             Args.Add(pop().WithTypeEnsured(t.Type));
+            // RuntimeHelpers.InitializeArray();
         }
 
         Args.Reverse();

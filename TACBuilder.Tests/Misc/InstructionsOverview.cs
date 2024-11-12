@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Numerics;
 using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
@@ -5,6 +6,7 @@ using System.Runtime.CompilerServices;
 #pragma warning disable CS0219
 #pragma warning disable CS8500
 #pragma warning disable
+
 namespace Usvm.IL.Test.Instructions;
 
 [AttributeUsage(AttributeTargets.All)]
@@ -354,6 +356,7 @@ static class NewInstTests
 
         Instance[] wtf = [new Instance(), new Instance(2), new Instance(kek[1])];
         int kl = kek.Length;
+        TestEnum[] enumArr = [TestEnum.A, TestEnum.B, TestEnum.C];
     }
 
     public static (int, int) Tuple()
@@ -448,6 +451,49 @@ static unsafe class UnsafeTest
         return res % 2 == 0;
     }
 
+    public static void StructArrayRef(ref TestStruct[] arr)
+    {
+        arr[1] = new TestStruct() {A = 5};
+    }
+
+    private class LdelemaClass(LdelemaClass? a = null)
+    {
+        public LdelemaClass? Value => a;
+    }
+
+    private static void LdelemA(ref LdelemaClass[] table, int minLength)
+    {
+        LdelemaClass[] newTable = new LdelemaClass[minLength];
+        LdelemaClass locker = new LdelemaClass();
+        //
+        // The lock is necessary to avoid a race with ThreadLocal.Dispose. GrowTable has to point all
+        // LinkedSlot instances referenced in the old table to reference the new table. Without locking,
+        // Dispose could use a stale SlotArray reference and clear out a slot in the old array only, while
+        // the value continues to be referenced from the new (larger) array.
+        //
+        lock (locker)
+        {
+            for (int i = 0; i < table.Length; i++)
+            {
+                LdelemaClass? linkedSlot = table[i].Value;
+                // if (linkedSlot != null && linkedSlot._slotArray != null)
+                // {
+                //     linkedSlot._slotArray = newTable;
+                newTable[i] = table[i];
+                // }
+            }
+        }
+
+        table = newTable;
+    }
+
+    public static void objArr(ref object?[] args)
+    {
+        foreach (var o in args)
+        {
+            Console.WriteLine(o);
+        }
+    }
     public static void ArrayRef()
     {
         unsafe

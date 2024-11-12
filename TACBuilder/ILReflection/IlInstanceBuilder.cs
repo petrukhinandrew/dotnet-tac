@@ -95,6 +95,8 @@ public static class IlInstanceBuilder
 
     private static IlType CreateIlType(Type type)
     {
+        if (type.IsPointer) return new IlPointerType(type);
+        if (type.IsByRef) return new IlManagedReference(type);
         if (type.IsPrimitive) return new IlPrimitiveType(type);
         if (type.IsEnum) return new IlEnumType(type);
         if (type.IsValueType) return new IlStructType(type);
@@ -232,7 +234,7 @@ public static class IlInstanceBuilder
     internal static IlSignature GetSignature(MethodBase source, int token)
     {
         var value = source.Module.ResolveSignature(token);
-        return new IlSignature(value);
+        return new IlSignature(value, source);
     }
 
     private static void AssertUnknownMetaComeFromCoreLib(MethodBase source)

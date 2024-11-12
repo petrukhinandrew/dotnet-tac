@@ -75,7 +75,7 @@ public class IlSizeOfExpr(IlType type) : IlExpr
     }
 }
 
-public class IlNewArrayExpr(IlType type, IlExpr size) : IlExpr
+public class IlNewArrayExpr(IlArrayType type, IlExpr size) : IlExpr
 {
     public IlType Type => type;
     public IlExpr Size => size;
@@ -118,7 +118,9 @@ public class IlFieldAccess(IlField field, IlExpr? instance = null) : IlValue
 
 public class IlArrayAccess(IlExpr arrRef, IlExpr idx) : IlValue
 {
-    public IlType Type => arrRef.Type;
+    public IlType Type => (arrRef.Type as IlArrayType)?.ElementType ??
+                          throw new Exception($"not an array type: {arrRef} with {arrRef.Type}");
+
     public IlExpr Array => arrRef;
     public IlExpr Index => idx;
 
@@ -131,7 +133,7 @@ public class IlArrayAccess(IlExpr arrRef, IlExpr idx) : IlValue
 public class IlArrayLength(IlExpr array) : IlExpr
 {
     public IlExpr Array => array;
-    public IlType Type { get; } = new(typeof(int));
+    public IlType Type => IlInstanceBuilder.GetType(typeof(int));
 
     public override string ToString()
     {
@@ -182,13 +184,13 @@ public interface ILDerefExpr : IlValue
 
 public abstract class PointerExprTypeResolver
 {
-    public static ILDerefExpr DerefAs(IlExpr instance, IlType type)
+    public static ILDerefExpr Deref(IlExpr instance, IlType? expectedType = null)
     {
         return instance.Type.IsManaged switch
         {
-            true => new IlManagedDeref(instance, type),
+            true => new IlManagedDeref(instance),
 
-            _ => new IlUnmanagedDeref(instance, type)
+            _ => new IlUnmanagedDeref(instance, expectedType!)
         };
     }
 }
@@ -197,20 +199,21 @@ public class IlManagedRef(IlExpr value) : ILRefExpr
 {
     public IlExpr Value => value;
 
-    public IlType Type => value.Type; //new ILManagedPointer(Value.Type.ReflectedType, Value.Type);
+    // TODO
+    public IlType Type => new IlManagedReference(value.Type.Type.MakeByRefType());
 
     public override string ToString()
     {
         return "&" + Value.ToString();
     }
 }
-// TODO check &int64 |-> int* ~> *v
 
 public class IlUnmanagedRef(IlExpr value) : ILRefExpr
 {
     public IlExpr Value => value;
 
-    public IlType Type => value.Type; //new ILUnmanagedPointer(Value.Type.ReflectedType, Value.Type);
+    // TODO
+    public IlType Type => new IlPointerType(value.Type.Type.MakePointerType());
 
     public override string ToString()
     {
@@ -218,10 +221,10 @@ public class IlUnmanagedRef(IlExpr value) : ILRefExpr
     }
 }
 
-public class IlManagedDeref(IlExpr byRefVal, IlType resType) : ILDerefExpr
+public class IlManagedDeref(IlExpr byRefVal) : ILDerefExpr
 {
     public IlExpr Value => byRefVal;
-    public IlType Type => resType;
+    public IlType Type => ((IlManagedReference)byRefVal.Type).ReferencedType;
 
     public override string ToString()
     {
@@ -229,14 +232,25 @@ public class IlManagedDeref(IlExpr byRefVal, IlType resType) : ILDerefExpr
     }
 }
 
-public class IlUnmanagedDeref(IlExpr pointedVal, IlType resType) : ILDerefExpr
+public class IlUnmanagedDeref : ILDerefExpr
 {
-    public IlExpr Value => pointedVal;
-    public IlType Type => resType;
+    public IlUnmanagedDeref(IlExpr pointedVal, IlType expectedType)
+    {
+        Value = pointedVal;
+        if (Value.Type is IlPrimitiveType)
+        {
+            Type = expectedType;
+        }
+        else if (Value.Type is IlPointerType pointerType) Type = pointerType.PointedType;
+        else throw new Exception($"unexpected pointer type: {Value.Type}");
+    }
+
+    public IlExpr Value { get; }
+    public IlType Type { get; }
 
     public override string ToString()
     {
-        return "*" + pointedVal.ToString();
+        return "*" + Value.ToString();
     }
 }
 
