@@ -615,7 +615,7 @@ static class BlockTacLineBuilder
                     IlExpr? retVal = null;
                     if (methodMeta.ReturnType != null &&
                         !Equals(methodMeta.ReturnType, IlInstanceBuilder.GetType(typeof(void))))
-                        retVal = blockBuilder.Pop();
+                        retVal = blockBuilder.Pop().WithTypeEnsured(methodMeta.ReturnType);
                     blockBuilder.NewLine(
                         new IlReturnStmt(retVal)
                     );

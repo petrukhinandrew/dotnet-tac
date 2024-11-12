@@ -197,10 +197,11 @@ public class IlMethodRef(IlMethod method, IlExpr? receiver = null) : IlConstant
 public class IlCallIndirect(IlSignature signature, IlExpr ftn, List<IlExpr> args) : IlExpr
 {
     public IlType? Type => signature.ReturnType;
-
+    public IlExpr Callee => ftn;
+    public List<IlExpr> Arguments => args;
     public override string ToString()
     {
-        return $"calli {ftn.ToString()} ({string.Join(",", args.Select(a => a.ToString()))})";
+        return $"calli {ftn.ToString()} ({string.Join(",", Arguments.Select(a => a.ToString()))})";
     }
 }
 
