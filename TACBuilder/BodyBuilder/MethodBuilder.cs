@@ -26,17 +26,17 @@ class MethodBuilder(IlMethod method)
     {
         try
         {
-            Params.AddRange(_method.Parameters.Select((mp, index) =>  mp switch // new IlArgument(mp)
-            {
-                IlMethod.Parameter p => new IlArgument(mp),
-                IlMethod.This t => mp.Type.IsValueType switch
+            Params.AddRange(_method.Parameters.Select((mp, index) => mp switch // new IlArgument(mp)
                 {
-                    true => (IlValue)new IlManagedRef(new IlArgument(mp)),
-                    _ => new IlArgument(mp)
-                },
-                _ => throw new Exception($"Unknown method parameter type at {mp}")
-            }
-        ));
+                    IlMethod.Parameter p => new IlArgument(mp),
+                    IlMethod.This t => mp.Type.IsValueType switch
+                    {
+                        true => (IlValue)new IlManagedRef(new IlArgument(mp)),
+                        _ => new IlArgument(mp)
+                    },
+                    _ => throw new Exception($"Unknown method parameter type at {mp}")
+                }
+            ));
 
             if (!_method.HasMethodBody) return [];
             InitBlockBuilders();
@@ -55,15 +55,9 @@ class MethodBuilder(IlMethod method)
 
             ComposeTac();
         }
-        catch (InstructionNotHandled e)
+        catch (KnownBug kb)
         {
-            Console.WriteLine(e.Message + " found at " + method);
-            return [];
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message + " found at " + method);
-            Console.WriteLine(e.StackTrace);
+            Console.WriteLine(kb.Message + " found at " + (method.DeclaringType?.Type.ToString() ?? " ") + " " + method);
             return [];
         }
 

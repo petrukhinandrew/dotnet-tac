@@ -21,18 +21,17 @@ public class IlPrimitiveType(Type type) : IlValueType(type)
     public override bool IsManaged => false;
     public override bool IsUnmanaged => true;
 
-    public new IlPrimitiveType ExpectedStackType()
+    public override IlPrimitiveType ExpectedStackType()
     {
         if (Type == typeof(IntPtr) || Type == typeof(UIntPtr))
             return (IlPrimitiveType)
                 IlInstanceBuilder.GetType(Type);
         return (IlPrimitiveType)(Type.GetTypeCode(Type) switch
         {
-            TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 => IlInstanceBuilder.GetType(typeof(int)),
-            TypeCode.Int64 => IlInstanceBuilder.GetType(typeof(long)),
+            TypeCode.Boolean or TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(int)),
+            TypeCode.UInt64 or TypeCode.Int64  => IlInstanceBuilder.GetType(typeof(long)),
             TypeCode.Byte or TypeCode.Char or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(
                 typeof(uint)),
-            TypeCode.UInt64 => IlInstanceBuilder.GetType(typeof(ulong)),
             TypeCode.Single => IlInstanceBuilder.GetType(typeof(float)),
             TypeCode.Double => IlInstanceBuilder.GetType(typeof(double)),
             _ => throw new NotSupportedException("unhandled primitive stackc type " + ToString()),
@@ -123,7 +122,7 @@ public class IlType(Type type) : IlMember(type)
         IsConstructed = true;
     }
 
-    public IlType ExpectedStackType()
+    public virtual IlType ExpectedStackType()
     {
         return this;
     }

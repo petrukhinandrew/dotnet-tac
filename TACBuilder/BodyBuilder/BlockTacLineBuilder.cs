@@ -59,8 +59,8 @@ static class BlockTacLineBuilder
                 case "initblk":
                 case "cpobj":
                 case "cpblk":
-                    throw new InstructionNotHandled("not implemented " +
-                                                    ((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name);
+                    throw new KnownBug("not implemented " +
+                                       ((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name);
                 case "arglist":
                 {
                     blockBuilder.Push(new IlArgListRef(blockBuilder.Meta.MethodMeta));
@@ -953,8 +953,8 @@ static class BlockTacLineBuilder
                 case "box":
                 {
                     IlType ilType = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
-                    IlValue value = (IlValue)blockBuilder.Pop();
-                    IlExpr boxed = new IlBoxExpr(value, ilType);
+                    IlExpr value = blockBuilder.Pop();
+                    IlExpr boxed = new IlBoxExpr(ilType, value);
                     blockBuilder.Push(boxed);
                     break;
                 }
@@ -962,7 +962,7 @@ static class BlockTacLineBuilder
                 case "unbox.any":
                 {
                     IlType ilType = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
-                    IlValue obj = (IlValue)blockBuilder.Pop();
+                    IlExpr obj = blockBuilder.Pop();
                     IlExpr unboxed = new IlUnboxExpr(ilType, obj);
                     blockBuilder.Push(unboxed);
                     break;
@@ -981,35 +981,27 @@ static class BlockTacLineBuilder
         var args = rawArgs.ArrayInitCastDiscarded();
         if (args.First() is IlValue newArr && args.Last() is IlFieldRef fieldRef)
         {
+            var arrVar = newArr as IlVar ?? throw new Exception("expected var, got " + newArr.Type);
+            if (arrVar.Value is IlNewExpr newExpr) throw new KnownBug("inline multidimensional array");
+            IlNewArrayExpr expr = arrVar.Value as IlNewArrayExpr ??
+                                  throw new Exception("expected NewArray, got " + arrVar.Value!.Type);
+            IlIntConst arrSize = (IlIntConst)expr.Size;
+            Type elemType = ((IlArrayType)expr.Type).ElementType.Type;
+            var tmp = Array.CreateInstance(elemType, arrSize.Value);
+            GCHandle handle = GCHandle.Alloc(tmp, GCHandleType.Pinned);
             try
             {
-                IlNewArrayExpr expr = (newArr as IlVar)?.Value as IlNewArrayExpr ??
-                                      throw new Exception("expected var, got " + newArr.Type);
-                // Debug.Assert(expr.Size.Type.BaseType.IsAssignableTo(typeof(int)) ||
-                //              expr.Size.Type.BaseType.IsAssignableTo(typeof(nint)));
-                IlIntConst arrSize = (IlIntConst)expr.Size;
-                Type elemType = ((IlArrayType)expr.Type).ElementType.Type;
-                var tmp = Array.CreateInstance(elemType, arrSize.Value);
-                GCHandle handle = GCHandle.Alloc(tmp, GCHandleType.Pinned);
-                try
-                {
-                    Marshal.StructureToPtr(fieldRef.Field.GetValue(null)!, handle.AddrOfPinnedObject(), false);
-                }
-                finally
-                {
-                    handle.Free();
-                }
-
-                List<object> list = [.. tmp];
-                var arrConst = new IlArrayConst((IlArrayType)IlInstanceBuilder.GetType(elemType.MakeArrayType()),
-                    list.Select(obj => TypingUtil.ResolveConstant(obj, elemType.IsEnum ? elemType : null)));
-                blockBuilder.NewLine(new ILAssignStmt(newArr, arrConst));
+                Marshal.StructureToPtr(fieldRef.Field.GetValue(null)!, handle.AddrOfPinnedObject(), false);
             }
-            catch (Exception e)
+            finally
             {
-                Console.WriteLine(e);
+                handle.Free();
             }
 
+            List<object> list = [.. tmp];
+            var arrConst = new IlArrayConst((IlArrayType)IlInstanceBuilder.GetType(elemType.MakeArrayType()),
+                list.Select(obj => TypingUtil.ResolveConstant(obj, elemType.IsEnum ? elemType : null)));
+            blockBuilder.NewLine(new ILAssignStmt(newArr, arrConst));
             return;
         }
 

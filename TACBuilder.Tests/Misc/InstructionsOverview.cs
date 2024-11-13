@@ -344,8 +344,9 @@ static class NewInstTests
 
     public static void ByValue()
     {
-        TestEnum te = TestEnum.A;
-        TestStruct ts = new() { A = 1, B = 2, C = 3, E = te };
+        TestEnum[] te = [TestEnum.A, TestEnum.B, TestEnum.C, TestEnum.C];
+        var teValue = te[0];
+        TestStruct ts = new() { A = 1, B = 2, C = 3, E = teValue };
         (int, int) tt = (1, 1);
         ts.A += tt.Item1;
         ts.C += tt.Item2;
@@ -459,12 +460,12 @@ static unsafe class UnsafeTest
         arr[1] = new TestStruct() { A = 5 };
     }
 
-    private class LdelemaClass(LdelemaClass? a = null)
+    public class LdelemaClass(LdelemaClass? a = null)
     {
         public LdelemaClass? Value => a;
     }
 
-    private static void LdelemA(ref LdelemaClass[] table, int minLength)
+    public static void LdelemA(ref LdelemaClass[] table, int minLength)
     {
         LdelemaClass[] newTable = new LdelemaClass[minLength];
         LdelemaClass locker = new LdelemaClass();
