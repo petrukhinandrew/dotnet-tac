@@ -337,6 +337,11 @@ class InstanceChild() : Instance(2)
 
 static class NewInstTests
 {
+    public static void Test1()
+    {
+        TestStruct instance;
+    }
+
     public static void ByValue()
     {
         TestEnum te = TestEnum.A;
@@ -451,7 +456,7 @@ static unsafe class UnsafeTest
 
     public static void StructArrayRef(ref TestStruct[] arr)
     {
-        arr[1] = new TestStruct() {A = 5};
+        arr[1] = new TestStruct() { A = 5 };
     }
 
     private class LdelemaClass(LdelemaClass? a = null)
@@ -492,6 +497,7 @@ static unsafe class UnsafeTest
             Console.WriteLine(o);
         }
     }
+
     public static void ArrayRef()
     {
         unsafe
@@ -875,5 +881,15 @@ static class GenericUsage
         list.AddRange([1, 2]);
         List<List<int>> list2 = new();
         list2.Add(list);
+    }
+}
+
+public class Kek
+{
+    private int lol;
+
+    public Kek(int x)
+    {
+        lol = x;
     }
 }

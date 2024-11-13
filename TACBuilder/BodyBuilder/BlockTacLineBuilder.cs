@@ -31,6 +31,8 @@ static class BlockTacLineBuilder
         blockBuilder.CurInstr = blockBuilder._firstInstr;
         while (true)
         {
+            // TODO check if it is proper
+            if (blockBuilder.CurInstr is ILInstr.Back) return true;
             if (blockBuilder.CurInstr is ILInstr.SwitchArg switchBranch)
             {
                 ILInstrOperand.Target target = (ILInstrOperand.Target)switchBranch.arg;
@@ -57,7 +59,8 @@ static class BlockTacLineBuilder
                 case "initblk":
                 case "cpobj":
                 case "cpblk":
-                    throw new InstructionNotHandled("not implemented " + ((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name);
+                    throw new InstructionNotHandled("not implemented " +
+                                                    ((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name);
                 case "arglist":
                 {
                     blockBuilder.Push(new IlArgListRef(blockBuilder.Meta.MethodMeta));
@@ -739,8 +742,8 @@ static class BlockTacLineBuilder
                 case "brfalse.s":
                 case "brfalse":
                 {
-                    IlExpr rhs = new IlBoolConst(false);
                     IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = TypingUtil.GetBrFalseConst(lhs);
                     ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     ILInstr fb = blockBuilder.CurInstr.next;
                     blockBuilder.NewLine(new IlIfStmt(

@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using TACBuilder.ILReflection;
 using TACBuilder.Serialization;
+using TACBuilder.Utils;
 
 namespace TACBuilder;
 
@@ -32,7 +33,7 @@ class Program
         }
         else if (args.Contains("--dynamic-tests"))
         {
-            var asm = new AssemblyMock().Build();
+            var asm = new CalliDynamicAsmBuilder().Build();
             var name = asm.GetName();
             AppTacBuilder.IncludeRootAsm(name);
             builder.Build(asm);
@@ -43,7 +44,7 @@ class Program
             var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
             Console.WriteLine(path);
             AppTacBuilder.IncludeRootAsm(path);
-            // AppTacBuilder.IncludeMsCoreLib();
+            AppTacBuilder.IncludeMsCoreLib();
             // AppTacBuilder.FilterMethodsFromSingleMSCoreLibType(path, "BlobEncoder");
             builder.Build(path);
             var builtAsms = builder.BuiltAssemblies;
