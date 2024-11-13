@@ -156,7 +156,7 @@ public class IlConvCastExpr(IlType targetType, IlExpr value) : IlCastExpr(target
 {
 }
 
-public class IlBoxExpr(IlValue value, IlType targetType) : IlCastExpr(targetType, value)
+public class IlBoxExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
 {
 }
 

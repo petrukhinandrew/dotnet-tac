@@ -1,5 +1,3 @@
 namespace TACBuilder.BodyBuilder;
 
-public class InstructionNotHandled(string msg) : Exception(msg)
-{
-}
+public class KnownBug(string msg): Exception(msg);

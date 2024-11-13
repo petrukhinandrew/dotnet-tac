@@ -157,11 +157,11 @@ public static class TypingUtil
     public static IlExpr GetBrFalseConst(IlExpr expr)
     {
         var t = expr.Type;
+        if (t is IlPrimitiveType)
+            t = expr.Coerced().Type;
         if (t is IlEnumType enumType) t = enumType.UnderlyingType;
         if (t is IlReferenceType or IlPointerType) return new IlNullConst();
         if (t.Equals(IlInstanceBuilder.GetType(typeof(bool)))) return new IlBoolConst(false);
-        if (t.Equals(IlInstanceBuilder.GetType(typeof(int)))) return new IlIntConst(0);
-        if (t.Equals(IlInstanceBuilder.GetType(typeof(long)))) return new IlLongConst(0);
-        throw new Exception("unexpected brfalse type " + t);
+        return new IlIntConst(0);
     }
 }
