@@ -53,14 +53,14 @@ public class IlInitExpr(IlType type) : IlExpr
 }
 
 // TODO separate from ctor call
-public class IlNewExpr(IlType type, IlExpr[] args) : IlExpr
+public class IlNewExpr(IlType type, IlCall ctorCall) : IlExpr
 {
     public IlType Type => type;
-    public IlExpr[] Args = args;
+    public IlCall ConstructorCall => ctorCall;
 
     public override string ToString()
     {
-        return "new " + Type + " (" + string.Join(", ", Args.Select(a => a.ToString())) + ")";
+        return "new " + ConstructorCall;
     }
 }
 

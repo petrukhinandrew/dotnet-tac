@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using TACBuilder.BodyBuilder;
 using TACBuilder.Exprs;
@@ -31,7 +32,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public List<IlAttribute> Attributes { get; } =
             parameterInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
-        public IlConstant DefaultValue { get; } = TypingUtil.ResolveConstant(parameterInfo.DefaultValue);
+        public IlConstant DefaultValue { get; } = IlConstant.From(parameterInfo.DefaultValue);
         public new bool IsConstructed = true;
         private bool IsOut => parameterInfo.IsOut;
         private bool IsIn => parameterInfo.IsIn;
@@ -70,7 +71,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public int Position => 0;
         public IlType Type => ilType;
         public List<IlAttribute> Attributes { get; } = new();
-        public IlConstant DefaultValue => TypingUtil.ResolveConstant(null);
+        public IlConstant DefaultValue => IlConstant.From(null);
 
         public override void Construct()
         {
@@ -110,11 +111,12 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
                 bb.AttachToMethod(method);
             }
 
-            method._tacBody = IlInstanceBuilder.GetMethodTacBody(method);
             foreach (var clause in _bodyParser.EhClauses)
             {
                 method.Scopes.Add(EhScope.FromClause(clause));
             }
+
+            method._tacBody = IlInstanceBuilder.GetMethodTacBody(method);
         }
     }
 
@@ -177,18 +179,25 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             }
         }
 
-        if (_methodBase is MethodInfo methodInfo && methodInfo.ReturnType != typeof(void)) ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
+        if (_methodBase is MethodInfo methodInfo && methodInfo.ReturnType != typeof(void))
+            ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
 
         Debug.Assert(Parameters.Count == 0);
-        if (!_methodBase.IsStatic)
+
+        var explicitThis = _methodBase.CallingConvention.HasFlag(CallingConventions.ExplicitThis);
+        if (_methodBase.CallingConvention.HasFlag(CallingConventions.HasThis))
         {
-            Parameters.Add(IlInstanceBuilder.GetThisParameter(DeclaringType));
+            HasThis = true;
+            var thisParamType = explicitThis
+                ? IlInstanceBuilder.GetType(_methodBase.GetParameters()[0].ParameterType)
+                : DeclaringType;
+            Parameters.Add(IlInstanceBuilder.GetThisParameter(thisParamType));
         }
 
-        HasThis = Parameters.Count == 1;
         var methodParams = _methodBase.GetParameters()
-            .OrderBy(parameter => parameter.Position);
+            .OrderBy(parameter => parameter.Position).ToList();
 
+        if (explicitThis) methodParams = methodParams.Skip(1).ToList();
         foreach (var methodParam in methodParams)
         {
             Parameters.Add(IlInstanceBuilder.GetMethodParameter(methodParam, Parameters.Count));

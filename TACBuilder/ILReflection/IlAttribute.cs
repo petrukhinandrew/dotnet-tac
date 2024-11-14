@@ -29,7 +29,7 @@ public class IlAttribute(CustomAttributeData attribute) : IlCacheable
         {
             if (arg.Value == null) continue;
             ConstructorArguments.Add(new Argument(IlInstanceBuilder.GetType(arg.ArgumentType),
-                TypingUtil.ResolveConstant(arg.Value, arg.ArgumentType.IsEnum ? arg.ArgumentType : null)));
+                IlConstant.From(arg.Value)));
         }
 
         foreach (var arg in attribute.NamedArguments)
@@ -37,7 +37,7 @@ public class IlAttribute(CustomAttributeData attribute) : IlCacheable
             var typed = arg.TypedValue;
             if (typed.Value == null) continue;
             NamedArguments.Add(arg.MemberName, new Argument(IlInstanceBuilder.GetType(typed.ArgumentType),
-                TypingUtil.ResolveConstant(typed.Value, typed.ArgumentType.IsEnum ? typed.ArgumentType : null)));
+                IlConstant.From(typed.Value)));
         }
     }
 }
