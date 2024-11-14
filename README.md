@@ -16,3 +16,10 @@
 - handling instance..ctor as another stmt / expr
 - introduce special instances for raw mem access (initobj handling for example)
 - defaul ctor, ctor call, other instance init methods separation
+
+
+now type stuff is in 
+1. TypingUtil
+2. IlPrimitiveType
+3. return type checks
+4. 

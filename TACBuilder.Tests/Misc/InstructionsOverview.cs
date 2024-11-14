@@ -377,15 +377,49 @@ static class NewInstTests
 
 static unsafe class UnsafeTest
 {
-    unsafe struct LocalUnsafeStruct;
-
-    public static void kek<T>()
+    internal struct AnotherStruct(int v)
     {
+        public AnotherStruct() : this(3)
+        {
+        }
+
+        public int Kek { get; } = v;
+    }
+
+    internal struct LocalUnsafeStruct()
+    {
+        public int a;
+        public double b;
+        public AnotherStruct anotherStruct;
+
+        public LocalUnsafeStruct(int x) : this()
+        {
+            a = x;
+            anotherStruct = new AnotherStruct();
+        }
+
+        public LocalUnsafeStruct(double x) : this(3)
+        {
+            b = x;
+        }
+    }
+
+    public static void kek()
+    {
+        var t = new LocalUnsafeStruct(1);
+        LocalUnsafeStruct anotherT;
+        anotherT = new LocalUnsafeStruct(2.0);
+    }
+
+    public static LocalUnsafeStruct StructUsage(LocalUnsafeStruct s)
+    {
+        return s;
     }
 
     public static void LdStObj()
     {
         LocalUnsafeStruct a, b;
+        a = new();
         LocalUnsafeStruct* ptr;
         ptr = &b;
         *ptr = a;
@@ -892,5 +926,21 @@ public class Kek
     public Kek(int x)
     {
         lol = x;
+    }
+}
+
+public static class Extensions
+{
+    public static List<T> Flatten<T>(this IEnumerable<IEnumerable<T>> collection)
+    {
+        List<T> list = new();
+        return list;
+    }
+
+    public static void FlattenUsage()
+    {
+        List<List<string>> list = new();
+        list.Add(new List<string>());
+        var another = list.Flatten();
     }
 }
