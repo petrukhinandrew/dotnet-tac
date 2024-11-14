@@ -119,3 +119,24 @@ public class Enums
         return 0;
     }
 }
+
+public enum InnerEnum
+{
+    A = 1, B = 2, C = 3
+}
+
+public enum WrappingEnum
+{
+    A = InnerEnum.A, B = InnerEnum.C
+}
+
+public class NestedEnums
+{
+    public static void Misc()
+    {
+        var inner = InnerEnum.A;
+        var wrap = WrappingEnum.A;
+        if (inner != (InnerEnum)wrap)
+            Console.WriteLine($"inner {inner} neq wrapper {wrap}");
+    }
+}

@@ -153,7 +153,7 @@ public static class RdSerializer
         if (expr is IlInitExpr initExpr)
             return new IlInitExprDto(initExpr.Type.GetCacheKey());
         if (expr is IlNewExpr ctorExpr)
-            return new IlNewExprDto(ctorExpr.Args.Select(SerializeExpr).ToList(),
+            return new IlNewExprDto(ctorExpr.ConstructorCall.Args.Select(SerializeExpr).ToList(),
                 ctorExpr.Type.GetCacheKey());
         if (expr is IlSizeOfExpr sizeOfExpr)
             return new IlSizeOfExprDto(type: sizeOfExpr.Type.GetCacheKey(), targetType: sizeOfExpr.Arg.GetCacheKey());
@@ -199,11 +199,11 @@ public static class RdSerializer
 
     private static IlConstDto SerializeConst(this IlConstant constant)
     {
-        if (constant is IlByteConst byteConst)
+        if (constant is IlUint8Const byteConst)
             return new IlByteConstDto(value: byteConst.Value, type: byteConst.Type.GetCacheKey());
-        if (constant is IlIntConst intConst)
+        if (constant is IlInt32Const intConst)
             return new IlIntConstDto(value: intConst.Value, type: intConst.Type.GetCacheKey());
-        if (constant is IlLongConst longConst)
+        if (constant is IlInt64Const longConst)
             return new IlLongConstDto(value: longConst.Value, type: longConst.Type.GetCacheKey());
         if (constant is IlFloatConst floatConst)
             return new IlFloatConstDto(value: floatConst.Value, type: floatConst.Type.GetCacheKey());

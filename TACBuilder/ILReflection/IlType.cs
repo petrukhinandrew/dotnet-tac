@@ -28,13 +28,15 @@ public class IlPrimitiveType(Type type) : IlValueType(type)
                 IlInstanceBuilder.GetType(Type);
         return (IlPrimitiveType)(Type.GetTypeCode(Type) switch
         {
-            TypeCode.Boolean or TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(int)),
-            TypeCode.UInt64 or TypeCode.Int64  => IlInstanceBuilder.GetType(typeof(long)),
-            TypeCode.Byte or TypeCode.Char or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(
-                typeof(uint)),
+            TypeCode.Boolean => IlInstanceBuilder.GetType(typeof(bool)),
+            TypeCode.Char => IlInstanceBuilder.GetType(typeof(char)),
+            TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 => IlInstanceBuilder.GetType(typeof(int)),
+            TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(uint)),
+            TypeCode.Int64  => IlInstanceBuilder.GetType(typeof(long)),
+            TypeCode.UInt64 => IlInstanceBuilder.GetType(typeof(ulong)),
             TypeCode.Single => IlInstanceBuilder.GetType(typeof(float)),
             TypeCode.Double => IlInstanceBuilder.GetType(typeof(double)),
-            _ => throw new NotSupportedException("unhandled primitive stackc type " + ToString()),
+            _ => throw new NotSupportedException("unhandled primitive stack type " + ToString()),
         });
     }
 }
@@ -54,11 +56,11 @@ public class IlEnumType(Type type) : IlValueType(type)
         foreach (var value in Enum.GetValues(Type))
         {
             var name = Enum.GetName(Type, value) ?? "";
-            NameToValueMapping.TryAdd(name, TypingUtil.ResolveConstant(value, Type));
+            NameToValueMapping.TryAdd(name, IlConstant.From(value));
         }
     }
 }
-
+// TODO add null value getter for such thing 
 public class IlStructType(Type type) : IlValueType(type);
 
 public class IlReferenceType(Type type) : IlType(type)
