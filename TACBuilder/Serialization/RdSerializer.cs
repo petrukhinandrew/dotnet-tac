@@ -150,11 +150,11 @@ public static class RdSerializer
         if (expr is IlBinaryOperation binaryOp)
             return new IlBinaryOpDto(type: binaryOp.Type.GetCacheKey(), lhs: binaryOp.Lhs.SerializeExpr(),
                 rhs: binaryOp.Rhs.SerializeExpr());
-        if (expr is IlInitExpr initExpr)
-            return new IlInitExprDto(initExpr.Type.GetCacheKey());
-        if (expr is IlNewExpr ctorExpr)
-            return new IlNewExprDto(ctorExpr.ConstructorCall.Args.Select(SerializeExpr).ToList(),
-                ctorExpr.Type.GetCacheKey());
+        // if (expr is IlInitExpr initExpr)
+        //     return new IlInitExprDto(initExpr.Type.GetCacheKey());
+        // if (expr is IlNewExpr ctorExpr)
+        //     return new IlNewExprDto(ctorExpr.ConstructorCall.Args.Select(SerializeExpr).ToList(),
+                // ctorExpr.Type.GetCacheKey());
         if (expr is IlSizeOfExpr sizeOfExpr)
             return new IlSizeOfExprDto(type: sizeOfExpr.Type.GetCacheKey(), targetType: sizeOfExpr.Arg.GetCacheKey());
         if (expr is IlNewArrayExpr newArrayExpr)

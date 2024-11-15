@@ -547,14 +547,15 @@ static class BlockTacLineBuilder
                 {
                     IlMethod ilMethod =
                         ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
-                    
+
                     List<IlExpr> args = new();
                     foreach (var t in ilMethod.Parameters)
                     {
                         args.Add(blockBuilder.Pop().WithTypeEnsured(t.Type));
                     }
+
                     args.Reverse();
-                    
+
                     var ilCall = new IlCall(ilMethod, args);
                     if (ilCall.IsInitializeArray())
                     {
@@ -577,14 +578,15 @@ static class BlockTacLineBuilder
                 {
                     IlMethod ilMethod =
                         ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
-                    
+
                     List<IlExpr> args = new();
                     foreach (var t in ilMethod.Parameters)
                     {
                         args.Add(blockBuilder.Pop().WithTypeEnsured(t.Type));
                     }
+
                     args.Reverse();
-                    
+
                     IlCall ilCall = new IlCall(ilMethod, args);
 
                     if (ilCall.Returns())
@@ -766,6 +768,7 @@ static class BlockTacLineBuilder
                     IlType objIlType = ilMethod.DeclaringType!;
                     var newInstance = blockBuilder.GetNewTemp(new IlNullConst(), blockBuilder.CurInstr.idx);
                     blockBuilder.Push(newInstance);
+                    blockBuilder.NewLine(new ILAssignStmt(newInstance, new IlNewExpr(objIlType)));
                     List<IlExpr> args = new();
                     foreach (var parameter in ilMethod.Parameters)
                     {
@@ -774,7 +777,8 @@ static class BlockTacLineBuilder
 
                     args.Reverse();
                     var ctorCall = new IlCall(ilMethod, args);
-                    blockBuilder.Push(new IlNewExpr(objIlType, ctorCall));
+                    blockBuilder.NewLine(new IlCallStmt(ctorCall));
+                    blockBuilder.Push(newInstance);
                     break;
                 }
                 case "newarr":
@@ -798,7 +802,7 @@ static class BlockTacLineBuilder
                     IlType ilType = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
                     IlExpr addr = blockBuilder.Pop();
                     blockBuilder.NewLine(new ILAssignStmt(PointerExprTypeResolver.Deref(addr, ilType),
-                        new IlInitExpr(ilType)));
+                        new IlNewExpr(ilType)));
                     break;
                 }
                 case "ldelem.i":
@@ -993,9 +997,9 @@ static class BlockTacLineBuilder
         if (args.First() is IlValue newArr && args.Last() is IlFieldRef fieldRef)
         {
             var arrVar = newArr as IlVar ?? throw new Exception("expected var, got " + newArr.Type);
-            if (arrVar.Value is IlNewExpr newExpr) throw new KnownBug("inline multidimensional array");
             IlNewArrayExpr expr = arrVar.Value as IlNewArrayExpr ??
-                                  throw new Exception("expected NewArray, got " + arrVar.Value!.Type);
+                                  throw new KnownBug("inline multidimensional array, got " +
+                                                     (arrVar.Value?.Type.ToString() ?? "null") + " instead of NewArrayExpr");;
             IlInt32Const arrSize = (IlInt32Const)expr.Size;
             Type elemType = ((IlArrayType)expr.Type).ElementType.Type;
             var tmp = Array.CreateInstance(elemType, arrSize.Value);
