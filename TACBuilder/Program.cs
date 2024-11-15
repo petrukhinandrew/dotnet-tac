@@ -42,7 +42,7 @@ class Program
             var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
             Console.WriteLine(path);
             AppTacBuilder.IncludeRootAsm(path);
-            // AppTacBuilder.IncludeMsCoreLib();
+            AppTacBuilder.IncludeMsCoreLib();
             builder.Build(path);
             var builtAsms = builder.BuiltAssemblies;
         }

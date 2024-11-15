@@ -30,7 +30,11 @@ public class CFG
         MarkupBlocks();
         AttachMetaInfoToBlocks();
         if (!CheckAllBlockHaveSuccessors())
-            Debug.Assert(CheckAllBlockHaveSuccessors(), "found block without a successor");
+            Debug.Assert(false, "found block without a successor");
+        if (!CheckEhClausesToBlocksMapping(out var pos))
+        {
+            Debug.Assert(false, "found eh clause bad mapping of type " + pos);
+        }
     }
 
     private bool CheckAllBlockHaveSuccessors()
@@ -44,6 +48,21 @@ public class CFG
         }
 
         return _blocks.All(bb => bb.Successors.Count > 0 || AcceptableExitInstr(bb.Exit));
+    }
+
+    private bool CheckEhClausesToBlocksMapping(out int clausePos)
+    {
+        clausePos = -1;
+        foreach (var clause in _ehClauses)
+        {
+            if (_blocks.All(b => b.Entry.idx != clause.tryBegin.idx)) clausePos = 0;
+            if (_blocks.All(b => b.Exit.idx != clause.tryEnd.idx)) clausePos = 1;
+            if (_blocks.All(b => b.Entry.idx != clause.handlerBegin.idx)) clausePos = 2;
+            if (_blocks.All(b => b.Exit.idx != clause.handlerEnd.idx)) clausePos = 3;
+            if (clausePos != -1) return false;
+        }
+
+        return true;
     }
 
     private void CollectLeaders()
@@ -72,6 +91,7 @@ public class CFG
         {
             Debug.Assert(clause.handlerBegin is not null);
             _leaders.Add(clause.handlerBegin);
+            _leaders.Add(clause.tryBegin);
             if (clause.ehcType is rewriterEhcType.CatchEH catchEh)
             {
                 _errTypeMapping[clause.handlerBegin.idx] = catchEh.type;

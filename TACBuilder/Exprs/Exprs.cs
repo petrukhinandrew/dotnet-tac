@@ -42,25 +42,12 @@ public class IlBinaryOperation : IlExpr
     public new string ToString() => $"{Lhs.ToString()} {_op} {Rhs.ToString()}";
 }
 
-public class IlInitExpr(IlType type) : IlExpr
+public class IlNewExpr(IlType type) : IlExpr
 {
     public IlType Type => type;
-
     public override string ToString()
     {
-        return $"init {Type}";
-    }
-}
-
-// TODO separate from ctor call
-public class IlNewExpr(IlType type, IlCall ctorCall) : IlExpr
-{
-    public IlType Type => type;
-    public IlCall ConstructorCall => ctorCall;
-
-    public override string ToString()
-    {
-        return "new " + ConstructorCall;
+        return "new " + Type;
     }
 }
 
