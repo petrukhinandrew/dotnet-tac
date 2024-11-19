@@ -26,13 +26,13 @@ class MethodBuilder(IlMethod method)
     {
         try
         {
-            Params.AddRange(_method.Parameters.Select((mp, index) => mp switch // new IlArgument(mp)
+            Params.AddRange(_method.Parameters.Select((mp, index) => mp switch // new IlCall.Argument(mp)
                 {
-                    IlMethod.Parameter p => new IlArgument(mp),
+                    IlMethod.Parameter p => new IlCall.Argument(mp),
                     IlMethod.This t => mp.Type.IsValueType switch
                     {
-                        true => (IlValue)new IlManagedRef(new IlArgument(mp)),
-                        _ => new IlArgument(mp)
+                        true => (IlValue)new IlManagedRef(new IlCall.Argument(mp)),
+                        _ => new IlCall.Argument(mp)
                     },
                     _ => throw new Exception($"Unknown method parameter type at {mp}")
                 }

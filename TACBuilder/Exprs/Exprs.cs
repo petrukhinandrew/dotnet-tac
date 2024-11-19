@@ -1,5 +1,6 @@
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
+using TACBuilder.Utils;
 
 namespace TACBuilder.ILTAC.TypeSystem;
 
@@ -45,20 +46,10 @@ public class IlBinaryOperation : IlExpr
 public class IlNewExpr(IlType type) : IlExpr
 {
     public IlType Type => type;
+
     public override string ToString()
     {
         return "new " + Type;
-    }
-}
-
-public class IlSizeOfExpr(IlType type) : IlExpr
-{
-    public IlType Type => IlInstanceBuilder.GetType(typeof(int));
-    public IlType Arg => type;
-
-    public override string ToString()
-    {
-        return "sizeof " + Arg.ToString();
     }
 }
 
@@ -117,6 +108,17 @@ public class IlArrayAccess(IlExpr arrRef, IlExpr idx) : IlValue
     }
 }
 
+public class IlSizeOfExpr(IlType type) : IlExpr
+{
+    public IlType Type => IlInstanceBuilder.GetType(typeof(int));
+    public IlType Arg => type;
+
+    public override string ToString()
+    {
+        return "sizeof " + Arg.ToString();
+    }
+}
+
 public class IlArrayLength(IlExpr array) : IlExpr
 {
     public IlExpr Array => array;
@@ -125,119 +127,6 @@ public class IlArrayLength(IlExpr array) : IlExpr
     public override string ToString()
     {
         return Array.ToString() + ".Length";
-    }
-}
-
-public abstract class IlCastExpr(IlType targetType, IlExpr target) : IlExpr
-{
-    public IlType Type => targetType;
-    public IlExpr Target => target;
-
-    public override string ToString()
-    {
-        return $"({Type}) {Target.ToString()}";
-    }
-}
-
-public class IlConvCastExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
-{
-}
-
-public class IlBoxExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
-{
-}
-
-public class IlUnboxExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
-{
-}
-
-public class IlIsInstExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
-{
-    public override string ToString()
-    {
-        return $"{Target.ToString()} as {Type}";
-    }
-}
-
-public interface ILRefExpr : IlValue
-{
-    public IlExpr Value { get; }
-}
-
-public interface ILDerefExpr : IlValue
-{
-    public IlExpr Value { get; }
-}
-
-public abstract class PointerExprTypeResolver
-{
-    public static ILDerefExpr Deref(IlExpr instance, IlType? expectedType = null)
-    {
-        return instance.Type.IsManaged switch
-        {
-            true => new IlManagedDeref(instance),
-
-            _ => new IlUnmanagedDeref(instance, expectedType!)
-        };
-    }
-}
-
-public class IlManagedRef(IlExpr value) : ILRefExpr
-{
-    public IlExpr Value => value;
-
-    // TODO
-    public IlType Type => new IlManagedReference(value.Type.Type.MakeByRefType());
-
-    public override string ToString()
-    {
-        return "&" + Value.ToString();
-    }
-}
-
-public class IlUnmanagedRef(IlExpr value) : ILRefExpr
-{
-    public IlExpr Value => value;
-
-    // TODO
-    public IlType Type => new IlPointerType(value.Type.Type.MakePointerType());
-
-    public override string ToString()
-    {
-        return "&" + Value.ToString();
-    }
-}
-
-public class IlManagedDeref(IlExpr byRefVal) : ILDerefExpr
-{
-    public IlExpr Value => byRefVal;
-    public IlType Type => ((IlManagedReference)byRefVal.Type).ReferencedType;
-
-    public override string ToString()
-    {
-        return "*" + byRefVal.ToString();
-    }
-}
-
-public class IlUnmanagedDeref : ILDerefExpr
-{
-    public IlUnmanagedDeref(IlExpr pointedVal, IlType expectedType)
-    {
-        Value = pointedVal;
-        if (Value.Type is IlPrimitiveType)
-        {
-            Type = expectedType;
-        }
-        else if (Value.Type is IlPointerType pointerType) Type = pointerType.PointedType;
-        else throw new Exception($"unexpected pointer type: {Value.Type}");
-    }
-
-    public IlExpr Value { get; }
-    public IlType Type { get; }
-
-    public override string ToString()
-    {
-        return "*" + Value.ToString();
     }
 }
 
@@ -253,4 +142,9 @@ public class IlStackAlloc(IlExpr size) : IlExpr
     {
         return "stackalloc " + Size.ToString();
     }
+}
+
+public class IlArgListRef(IlMethod method) : IlConstant
+{
+    public IlType Type => IlInstanceBuilder.GetType(typeof(RuntimeArgumentHandle));
 }
