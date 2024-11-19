@@ -138,7 +138,7 @@ public static class RdSerializer
             return new IlVarAccessDto(kind: IlVarKind.temp, index: merged.Index, type: merged.Type.GetCacheKey());
         if (expr is IlErrVar err)
             return new IlVarAccessDto(kind: IlVarKind.err, index: err.Index, type: err.Type.GetCacheKey());
-        if (expr is IlArgument arg)
+        if (expr is IlCall.Argument arg)
             return new IlArgAccessDto(index: arg.Index, type: arg.Type.GetCacheKey());
 
         if (expr is IlCall call)
