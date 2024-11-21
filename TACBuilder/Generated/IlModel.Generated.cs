@@ -34,8 +34,8 @@ using JetBrains.Rd.Text;
 
 namespace org.jacodb.api.net.generated.models
 {
-
-
+  
+  
   /// <summary>
   /// <p>Generated from: IlModel.kt:23</p>
   /// </summary>
@@ -43,7 +43,7 @@ namespace org.jacodb.api.net.generated.models
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     private IlModel(
@@ -53,18 +53,22 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     //deconstruct trait
     //statics
-
-
-
-    protected override long SerializationHash => -8431306000670948402L;
-
+    
+    
+    
+    protected override long SerializationHash => 2093933720375650673L;
+    
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
     {
-      serializers.Register(IlAsmDto.Read, IlAsmDto.Write);
-      serializers.Register(IlTypeDto.Read, IlTypeDto.Write);
-      serializers.Register(IlFieldDto.Read, IlFieldDto.Write);
+      serializers.Register(IlPointerTypeDto.Read, IlPointerTypeDto.Write);
+      serializers.Register(IlPrimitiveTypeDto.Read, IlPrimitiveTypeDto.Write);
+      serializers.Register(IlEnumTypeDto.Read, IlEnumTypeDto.Write);
+      serializers.Register(IlStructTypeDto.Read, IlStructTypeDto.Write);
+      serializers.Register(IlClassTypeDto.Read, IlClassTypeDto.Write);
+      serializers.Register(IlArrayTypeDto.Read, IlArrayTypeDto.Write);
       serializers.Register(IlAttrDto.Read, IlAttrDto.Write);
+      serializers.Register(IlFieldDto.Read, IlFieldDto.Write);
       serializers.Register(IlLocalVarDto.Read, IlLocalVarDto.Write);
       serializers.Register(IlTempVarDto.Read, IlTempVarDto.Write);
       serializers.Register(IlErrVarDto.Read, IlErrVarDto.Write);
@@ -73,21 +77,25 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlFaultScopeDto.Read, IlFaultScopeDto.Write);
       serializers.Register(IlFinallyScopeDto.Read, IlFinallyScopeDto.Write);
       serializers.Register(IlMethodDto.Read, IlMethodDto.Write);
+      serializers.Register(IlSignatureDto.Read, IlSignatureDto.Write);
       serializers.Register(IlDto_Unknown.Read, IlDto_Unknown.Write);
+      serializers.Register(IlTypeDto_Unknown.Read, IlTypeDto_Unknown.Write);
+      serializers.Register(IlValueTypeDto_Unknown.Read, IlValueTypeDto_Unknown.Write);
+      serializers.Register(IlReferenceTypeDto_Unknown.Read, IlReferenceTypeDto_Unknown.Write);
       serializers.Register(IlVarDto_Unknown.Read, IlVarDto_Unknown.Write);
       serializers.Register(IlEhScopeDto_Unknown.Read, IlEhScopeDto_Unknown.Write);
-
+      
       serializers.RegisterToplevelOnce(typeof(IlRoot), IlRoot.RegisterDeclaredTypesSerializers);
     }
-
+    
     public IlModel(Lifetime lifetime, IProtocol protocol) : this()
     {
       Identify(protocol.Identities, RdId.Root.Mix("IlModel"));
       Bind(lifetime, protocol, "IlModel");
     }
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -106,47 +114,100 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:30</p>
+  /// <p>Generated from: IlModel.kt:60</p>
   /// </summary>
-  public sealed class AsmCacheKey : IPrintable, IEquatable<AsmCacheKey>
+  public sealed class IlArrayTypeDto : IlReferenceTypeDto
   {
     //fields
     //public fields
-    public int Asm {get; private set;}
-
+    [NotNull] public TypeId ElementType {get; private set;}
+    
     //private fields
     //primary constructor
-    public AsmCacheKey(
-      int asm
-    )
+    public IlArrayTypeDto(
+      [NotNull] TypeId elementType,
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
+    ) : base (
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
     {
-      Asm = asm;
+      if (elementType == null) throw new ArgumentNullException("elementType");
+      
+      ElementType = elementType;
     }
     //secondary constructor
     //deconstruct trait
-    public void Deconstruct(out int asm)
-    {
-      asm = Asm;
-    }
     //statics
-
-    public static CtxReadDelegate<AsmCacheKey> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlArrayTypeDto> Read = (ctx, reader) => 
     {
-      var asm = reader.ReadInt();
-      var _result = new AsmCacheKey(asm);
+      var asmName = reader.ReadString();
+      var namespaceName = reader.ReadString();
+      var name = reader.ReadString();
+      var declType = ReadTypeIdNullable(ctx, reader);
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var isGenericParam = reader.ReadBool();
+      var isValueType = reader.ReadBool();
+      var isManaged = reader.ReadBool();
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var fields = ReadIlFieldDtoList(ctx, reader);
+      var methods = ReadIlMethodDtoList(ctx, reader);
+      var elementType = TypeId.Read(ctx, reader);
+      var _result = new IlArrayTypeDto(elementType, asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
-
-    public static CtxWriteDelegate<AsmCacheKey> Write = (ctx, writer, value) =>
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
+    public static CtxReadDelegate<List<IlFieldDto>> ReadIlFieldDtoList = IlFieldDto.Read.List();
+    public static CtxReadDelegate<List<IlMethodDto>> ReadIlMethodDtoList = IlMethodDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlArrayTypeDto> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.Asm);
+      writer.Write(value.AsmName);
+      writer.Write(value.NamespaceName);
+      writer.Write(value.Name);
+      WriteTypeIdNullable(ctx, writer, value.DeclType);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsGenericParam);
+      writer.Write(value.IsValueType);
+      writer.Write(value.IsManaged);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      WriteIlFieldDtoList(ctx, writer, value.Fields);
+      WriteIlMethodDtoList(ctx, writer, value.Methods);
+      TypeId.Write(ctx, writer, value.ElementType);
     };
-
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
+    public static  CtxWriteDelegate<List<IlFieldDto>> WriteIlFieldDtoList = IlFieldDto.Write.List();
+    public static  CtxWriteDelegate<List<IlMethodDto>> WriteIlMethodDtoList = IlMethodDto.Write.List();
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -155,29 +216,51 @@ namespace org.jacodb.api.net.generated.models
       if (ReferenceEquals(null, obj)) return false;
       if (ReferenceEquals(this, obj)) return true;
       if (obj.GetType() != GetType()) return false;
-      return Equals((AsmCacheKey) obj);
+      return Equals((IlArrayTypeDto) obj);
     }
-    public bool Equals(AsmCacheKey other)
+    public bool Equals(IlArrayTypeDto other)
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Asm == other.Asm;
+      return Equals(ElementType, other.ElementType) && AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Asm.GetHashCode();
+        hash = hash * 31 + ElementType.GetHashCode();
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + NamespaceName.GetHashCode();
+        hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
+        hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsGenericParam.GetHashCode();
+        hash = hash * 31 + IsValueType.GetHashCode();
+        hash = hash * 31 + IsManaged.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + Fields.ContentHashCode();
+        hash = hash * 31 + Methods.ContentHashCode();
         return hash;
       }
     }
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("AsmCacheKey (");
+      printer.Println("IlArrayTypeDto (");
       using (printer.IndentCookie()) {
-        printer.Print("asm = "); Asm.PrintEx(printer); printer.Println();
+        printer.Print("elementType = "); ElementType.PrintEx(printer); printer.Println();
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
+        printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
+        printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("fields = "); Fields.PrintEx(printer); printer.Println();
+        printer.Print("methods = "); Methods.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -189,212 +272,24 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:24</p>
-  /// </summary>
-  public sealed class CacheKey : IPrintable, IEquatable<CacheKey>
-  {
-    //fields
-    //public fields
-    public int Asm {get; private set;}
-    public int Mod {get; private set;}
-    public int Inst {get; private set;}
-
-    //private fields
-    //primary constructor
-    public CacheKey(
-      int asm,
-      int mod,
-      int inst
-    )
-    {
-      Asm = asm;
-      Mod = mod;
-      Inst = inst;
-    }
-    //secondary constructor
-    //deconstruct trait
-    public void Deconstruct(out int asm, out int mod, out int inst)
-    {
-      asm = Asm;
-      mod = Mod;
-      inst = Inst;
-    }
-    //statics
-
-    public static CtxReadDelegate<CacheKey> Read = (ctx, reader) =>
-    {
-      var asm = reader.ReadInt();
-      var mod = reader.ReadInt();
-      var inst = reader.ReadInt();
-      var _result = new CacheKey(asm, mod, inst);
-      return _result;
-    };
-
-    public static CtxWriteDelegate<CacheKey> Write = (ctx, writer, value) =>
-    {
-      writer.Write(value.Asm);
-      writer.Write(value.Mod);
-      writer.Write(value.Inst);
-    };
-
-    //constants
-
-    //custom body
-    //methods
-    //equals trait
-    public override bool Equals(object obj)
-    {
-      if (ReferenceEquals(null, obj)) return false;
-      if (ReferenceEquals(this, obj)) return true;
-      if (obj.GetType() != GetType()) return false;
-      return Equals((CacheKey) obj);
-    }
-    public bool Equals(CacheKey other)
-    {
-      if (ReferenceEquals(null, other)) return false;
-      if (ReferenceEquals(this, other)) return true;
-      return Asm == other.Asm && Mod == other.Mod && Inst == other.Inst;
-    }
-    //hash code trait
-    public override int GetHashCode()
-    {
-      unchecked {
-        var hash = 0;
-        hash = hash * 31 + Asm.GetHashCode();
-        hash = hash * 31 + Mod.GetHashCode();
-        hash = hash * 31 + Inst.GetHashCode();
-        return hash;
-      }
-    }
-    //pretty print
-    public void Print(PrettyPrinter printer)
-    {
-      printer.Println("CacheKey (");
-      using (printer.IndentCookie()) {
-        printer.Print("asm = "); Asm.PrintEx(printer); printer.Println();
-        printer.Print("mod = "); Mod.PrintEx(printer); printer.Println();
-        printer.Print("inst = "); Inst.PrintEx(printer); printer.Println();
-      }
-      printer.Print(")");
-    }
-    //toString
-    public override string ToString()
-    {
-      var printer = new SingleLinePrettyPrinter();
-      Print(printer);
-      return printer.ToString();
-    }
-  }
-
-
-  /// <summary>
-  /// <p>Generated from: IlModel.kt:36</p>
-  /// </summary>
-  public sealed class IlAsmDto : IlDto
-  {
-    //fields
-    //public fields
-    [NotNull] public AsmCacheKey Id {get; private set;}
-    [NotNull] public string Location {get; private set;}
-
-    //private fields
-    //primary constructor
-    public IlAsmDto(
-      [NotNull] AsmCacheKey id,
-      [NotNull] string location
-    )
-    {
-      if (id == null) throw new ArgumentNullException("id");
-      if (location == null) throw new ArgumentNullException("location");
-
-      Id = id;
-      Location = location;
-    }
-    //secondary constructor
-    //deconstruct trait
-    //statics
-
-    public static new CtxReadDelegate<IlAsmDto> Read = (ctx, reader) =>
-    {
-      var id = AsmCacheKey.Read(ctx, reader);
-      var location = reader.ReadString();
-      var _result = new IlAsmDto(id, location);
-      return _result;
-    };
-
-    public static new CtxWriteDelegate<IlAsmDto> Write = (ctx, writer, value) =>
-    {
-      AsmCacheKey.Write(ctx, writer, value.Id);
-      writer.Write(value.Location);
-    };
-
-    //constants
-
-    //custom body
-    //methods
-    //equals trait
-    public override bool Equals(object obj)
-    {
-      if (ReferenceEquals(null, obj)) return false;
-      if (ReferenceEquals(this, obj)) return true;
-      if (obj.GetType() != GetType()) return false;
-      return Equals((IlAsmDto) obj);
-    }
-    public bool Equals(IlAsmDto other)
-    {
-      if (ReferenceEquals(null, other)) return false;
-      if (ReferenceEquals(this, other)) return true;
-      return Equals(Id, other.Id) && Location == other.Location;
-    }
-    //hash code trait
-    public override int GetHashCode()
-    {
-      unchecked {
-        var hash = 0;
-        hash = hash * 31 + Id.GetHashCode();
-        hash = hash * 31 + Location.GetHashCode();
-        return hash;
-      }
-    }
-    //pretty print
-    public void Print(PrettyPrinter printer)
-    {
-      printer.Println("IlAsmDto (");
-      using (printer.IndentCookie()) {
-        printer.Print("id = "); Id.PrintEx(printer); printer.Println();
-        printer.Print("location = "); Location.PrintEx(printer); printer.Println();
-      }
-      printer.Print(")");
-    }
-    //toString
-    public override string ToString()
-    {
-      var printer = new SingleLinePrettyPrinter();
-      Print(printer);
-      return printer.ToString();
-    }
-  }
-
-
-  /// <summary>
-  /// <p>Generated from: IlModel.kt:73</p>
+  /// <p>Generated from: IlModel.kt:63</p>
   /// </summary>
   public sealed class IlAttrDto : IlDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey AttrType {get; private set;}
+    [NotNull] public TypeId AttrType {get; private set;}
     [NotNull] public List<IlConstDto> CtorArgs {get; private set;}
     [NotNull] public List<string> NamedArgsNames {get; private set;}
     [NotNull] public List<IlConstDto> NamedArgsValues {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlAttrDto(
-      [NotNull] CacheKey attrType,
+      [NotNull] TypeId attrType,
       [NotNull] List<IlConstDto> ctorArgs,
       [NotNull] List<string> namedArgsNames,
       [NotNull] List<IlConstDto> namedArgsValues
@@ -404,7 +299,7 @@ namespace org.jacodb.api.net.generated.models
       if (ctorArgs == null) throw new ArgumentNullException("ctorArgs");
       if (namedArgsNames == null) throw new ArgumentNullException("namedArgsNames");
       if (namedArgsValues == null) throw new ArgumentNullException("namedArgsValues");
-
+      
       AttrType = attrType;
       CtorArgs = ctorArgs;
       NamedArgsNames = namedArgsNames;
@@ -413,10 +308,10 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlAttrDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlAttrDto> Read = (ctx, reader) => 
     {
-      var attrType = CacheKey.Read(ctx, reader);
+      var attrType = TypeId.Read(ctx, reader);
       var ctorArgs = ReadIlConstDtoList(ctx, reader);
       var namedArgsNames = ReadStringList(ctx, reader);
       var namedArgsValues = ReadIlConstDtoList(ctx, reader);
@@ -425,19 +320,19 @@ namespace org.jacodb.api.net.generated.models
     };
     public static CtxReadDelegate<List<IlConstDto>> ReadIlConstDtoList = IlConstDto.Read.List();
     public static CtxReadDelegate<List<string>> ReadStringList = JetBrains.Rd.Impl.Serializers.ReadString.List();
-
-    public static new CtxWriteDelegate<IlAttrDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlAttrDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.AttrType);
+      TypeId.Write(ctx, writer, value.AttrType);
       WriteIlConstDtoList(ctx, writer, value.CtorArgs);
       WriteStringList(ctx, writer, value.NamedArgsNames);
       WriteIlConstDtoList(ctx, writer, value.NamedArgsValues);
     };
     public static  CtxWriteDelegate<List<IlConstDto>> WriteIlConstDtoList = IlConstDto.Write.List();
     public static  CtxWriteDelegate<List<string>> WriteStringList = JetBrains.Rd.Impl.Serializers.WriteString.List();
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -486,16 +381,16 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:93</p>
+  /// <p>Generated from: IlModel.kt:103</p>
   /// </summary>
   public sealed class IlCatchScopeDto : IlEhScopeDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlCatchScopeDto(
@@ -508,14 +403,14 @@ namespace org.jacodb.api.net.generated.models
       te,
       hb,
       he
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlCatchScopeDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlCatchScopeDto> Read = (ctx, reader) => 
     {
       var tb = reader.ReadInt();
       var te = reader.ReadInt();
@@ -524,17 +419,17 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlCatchScopeDto(tb, te, hb, he);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlCatchScopeDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlCatchScopeDto> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Tb);
       writer.Write(value.Te);
       writer.Write(value.Hb);
       writer.Write(value.He);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -583,27 +478,176 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:34</p>
+  /// <p>Generated from: IlModel.kt:59</p>
+  /// </summary>
+  public sealed class IlClassTypeDto : IlReferenceTypeDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlClassTypeDto(
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
+    ) : base (
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlClassTypeDto> Read = (ctx, reader) => 
+    {
+      var asmName = reader.ReadString();
+      var namespaceName = reader.ReadString();
+      var name = reader.ReadString();
+      var declType = ReadTypeIdNullable(ctx, reader);
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var isGenericParam = reader.ReadBool();
+      var isValueType = reader.ReadBool();
+      var isManaged = reader.ReadBool();
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var fields = ReadIlFieldDtoList(ctx, reader);
+      var methods = ReadIlMethodDtoList(ctx, reader);
+      var _result = new IlClassTypeDto(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      return _result;
+    };
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
+    public static CtxReadDelegate<List<IlFieldDto>> ReadIlFieldDtoList = IlFieldDto.Read.List();
+    public static CtxReadDelegate<List<IlMethodDto>> ReadIlMethodDtoList = IlMethodDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlClassTypeDto> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.AsmName);
+      writer.Write(value.NamespaceName);
+      writer.Write(value.Name);
+      WriteTypeIdNullable(ctx, writer, value.DeclType);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsGenericParam);
+      writer.Write(value.IsValueType);
+      writer.Write(value.IsManaged);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      WriteIlFieldDtoList(ctx, writer, value.Fields);
+      WriteIlMethodDtoList(ctx, writer, value.Methods);
+    };
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
+    public static  CtxWriteDelegate<List<IlFieldDto>> WriteIlFieldDtoList = IlFieldDto.Write.List();
+    public static  CtxWriteDelegate<List<IlMethodDto>> WriteIlMethodDtoList = IlMethodDto.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlClassTypeDto) obj);
+    }
+    public bool Equals(IlClassTypeDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + NamespaceName.GetHashCode();
+        hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
+        hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsGenericParam.GetHashCode();
+        hash = hash * 31 + IsValueType.GetHashCode();
+        hash = hash * 31 + IsManaged.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + Fields.ContentHashCode();
+        hash = hash * 31 + Methods.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlClassTypeDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
+        printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
+        printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("fields = "); Fields.PrintEx(printer); printer.Println();
+        printer.Print("methods = "); Methods.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:29</p>
   /// </summary>
   public abstract class IlDto{
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static CtxReadDelegate<IlDto> Read = Polymorphic<IlDto>.ReadAbstract(IlDto_Unknown.Read);
-
+    
     public static CtxWriteDelegate<IlDto> Write = Polymorphic<IlDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -611,31 +655,31 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlDto_Unknown : IlDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlDto_Unknown> Read = (ctx, reader) => 
     {
       var _result = new IlDto_Unknown();
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlDto_Unknown> Write = (ctx, writer, value) => 
     {
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -674,10 +718,10 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:87</p>
+  /// <p>Generated from: IlModel.kt:97</p>
   /// </summary>
   public abstract class IlEhScopeDto : IlDto
   {
@@ -687,7 +731,7 @@ namespace org.jacodb.api.net.generated.models
     public int Te {get; private set;}
     public int Hb {get; private set;}
     public int He {get; private set;}
-
+    
     //private fields
     //primary constructor
     protected IlEhScopeDto(
@@ -705,13 +749,13 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static new CtxReadDelegate<IlEhScopeDto> Read = Polymorphic<IlEhScopeDto>.ReadAbstract(IlEhScopeDto_Unknown.Read);
-
+    
     public static new CtxWriteDelegate<IlEhScopeDto> Write = Polymorphic<IlEhScopeDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -719,13 +763,13 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlEhScopeDto_Unknown : IlEhScopeDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlEhScopeDto_Unknown(
@@ -738,14 +782,14 @@ namespace org.jacodb.api.net.generated.models
       te,
       hb,
       he
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlEhScopeDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlEhScopeDto_Unknown> Read = (ctx, reader) => 
     {
       var tb = reader.ReadInt();
       var te = reader.ReadInt();
@@ -754,17 +798,17 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlEhScopeDto_Unknown(tb, te, hb, he);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlEhScopeDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlEhScopeDto_Unknown> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Tb);
       writer.Write(value.Te);
       writer.Write(value.Hb);
       writer.Write(value.He);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -813,47 +857,205 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:85</p>
+  /// <p>Generated from: IlModel.kt:51</p>
+  /// </summary>
+  public sealed class IlEnumTypeDto : IlValueTypeDto
+  {
+    //fields
+    //public fields
+    [NotNull] public TypeId UnderlyingType {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlEnumTypeDto(
+      [NotNull] TypeId underlyingType,
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
+    ) : base (
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
+    {
+      if (underlyingType == null) throw new ArgumentNullException("underlyingType");
+      
+      UnderlyingType = underlyingType;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlEnumTypeDto> Read = (ctx, reader) => 
+    {
+      var asmName = reader.ReadString();
+      var namespaceName = reader.ReadString();
+      var name = reader.ReadString();
+      var declType = ReadTypeIdNullable(ctx, reader);
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var isGenericParam = reader.ReadBool();
+      var isValueType = reader.ReadBool();
+      var isManaged = reader.ReadBool();
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var fields = ReadIlFieldDtoList(ctx, reader);
+      var methods = ReadIlMethodDtoList(ctx, reader);
+      var underlyingType = TypeId.Read(ctx, reader);
+      var _result = new IlEnumTypeDto(underlyingType, asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      return _result;
+    };
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
+    public static CtxReadDelegate<List<IlFieldDto>> ReadIlFieldDtoList = IlFieldDto.Read.List();
+    public static CtxReadDelegate<List<IlMethodDto>> ReadIlMethodDtoList = IlMethodDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlEnumTypeDto> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.AsmName);
+      writer.Write(value.NamespaceName);
+      writer.Write(value.Name);
+      WriteTypeIdNullable(ctx, writer, value.DeclType);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsGenericParam);
+      writer.Write(value.IsValueType);
+      writer.Write(value.IsManaged);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      WriteIlFieldDtoList(ctx, writer, value.Fields);
+      WriteIlMethodDtoList(ctx, writer, value.Methods);
+      TypeId.Write(ctx, writer, value.UnderlyingType);
+    };
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
+    public static  CtxWriteDelegate<List<IlFieldDto>> WriteIlFieldDtoList = IlFieldDto.Write.List();
+    public static  CtxWriteDelegate<List<IlMethodDto>> WriteIlMethodDtoList = IlMethodDto.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlEnumTypeDto) obj);
+    }
+    public bool Equals(IlEnumTypeDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(UnderlyingType, other.UnderlyingType) && AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + UnderlyingType.GetHashCode();
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + NamespaceName.GetHashCode();
+        hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
+        hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsGenericParam.GetHashCode();
+        hash = hash * 31 + IsValueType.GetHashCode();
+        hash = hash * 31 + IsManaged.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + Fields.ContentHashCode();
+        hash = hash * 31 + Methods.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlEnumTypeDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("underlyingType = "); UnderlyingType.PrintEx(printer); printer.Println();
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
+        printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
+        printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("fields = "); Fields.PrintEx(printer); printer.Println();
+        printer.Print("methods = "); Methods.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:95</p>
   /// </summary>
   public sealed class IlErrVarDto : IlVarDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlErrVarDto(
-      [NotNull] CacheKey type,
+      [NotNull] TypeId type,
       int index
     ) : base (
       type,
       index
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlErrVarDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlErrVarDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var index = reader.ReadInt();
       var _result = new IlErrVarDto(type, index);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlErrVarDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlErrVarDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Index);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -898,16 +1100,16 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:98</p>
+  /// <p>Generated from: IlModel.kt:108</p>
   /// </summary>
   public sealed class IlFaultScopeDto : IlEhScopeDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlFaultScopeDto(
@@ -920,14 +1122,14 @@ namespace org.jacodb.api.net.generated.models
       te,
       hb,
       he
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlFaultScopeDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlFaultScopeDto> Read = (ctx, reader) => 
     {
       var tb = reader.ReadInt();
       var te = reader.ReadInt();
@@ -936,17 +1138,17 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlFaultScopeDto(tb, te, hb, he);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlFaultScopeDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlFaultScopeDto> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Tb);
       writer.Write(value.Te);
       writer.Write(value.Hb);
       writer.Write(value.He);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -995,41 +1197,33 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:51</p>
+  /// <p>Generated from: IlModel.kt:70</p>
   /// </summary>
   public sealed class IlFieldDto : IlDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey Id {get; private set;}
-    [NotNull] public CacheKey DeclType {get; private set;}
-    [NotNull] public CacheKey FieldType {get; private set;}
+    [NotNull] public TypeId FieldType {get; private set;}
     public bool IsStatic {get; private set;}
     [NotNull] public string Name {get; private set;}
     [NotNull] public List<IlAttrDto> Attrs {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlFieldDto(
-      [NotNull] CacheKey id,
-      [NotNull] CacheKey declType,
-      [NotNull] CacheKey fieldType,
+      [NotNull] TypeId fieldType,
       bool isStatic,
       [NotNull] string name,
       [NotNull] List<IlAttrDto> attrs
     )
     {
-      if (id == null) throw new ArgumentNullException("id");
-      if (declType == null) throw new ArgumentNullException("declType");
       if (fieldType == null) throw new ArgumentNullException("fieldType");
       if (name == null) throw new ArgumentNullException("name");
       if (attrs == null) throw new ArgumentNullException("attrs");
-
-      Id = id;
-      DeclType = declType;
+      
       FieldType = fieldType;
       IsStatic = isStatic;
       Name = name;
@@ -1038,33 +1232,29 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlFieldDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlFieldDto> Read = (ctx, reader) => 
     {
-      var id = CacheKey.Read(ctx, reader);
-      var declType = CacheKey.Read(ctx, reader);
-      var fieldType = CacheKey.Read(ctx, reader);
+      var fieldType = TypeId.Read(ctx, reader);
       var isStatic = reader.ReadBool();
       var name = reader.ReadString();
       var attrs = ReadIlAttrDtoList(ctx, reader);
-      var _result = new IlFieldDto(id, declType, fieldType, isStatic, name, attrs);
+      var _result = new IlFieldDto(fieldType, isStatic, name, attrs);
       return _result;
     };
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
-
-    public static new CtxWriteDelegate<IlFieldDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlFieldDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Id);
-      CacheKey.Write(ctx, writer, value.DeclType);
-      CacheKey.Write(ctx, writer, value.FieldType);
+      TypeId.Write(ctx, writer, value.FieldType);
       writer.Write(value.IsStatic);
       writer.Write(value.Name);
       WriteIlAttrDtoList(ctx, writer, value.Attrs);
     };
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1079,15 +1269,13 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Id, other.Id) && Equals(DeclType, other.DeclType) && Equals(FieldType, other.FieldType) && IsStatic == other.IsStatic && Name == other.Name && Attrs.SequenceEqual(other.Attrs);
+      return Equals(FieldType, other.FieldType) && IsStatic == other.IsStatic && Name == other.Name && Attrs.SequenceEqual(other.Attrs);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Id.GetHashCode();
-        hash = hash * 31 + DeclType.GetHashCode();
         hash = hash * 31 + FieldType.GetHashCode();
         hash = hash * 31 + IsStatic.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
@@ -1100,8 +1288,6 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlFieldDto (");
       using (printer.IndentCookie()) {
-        printer.Print("id = "); Id.PrintEx(printer); printer.Println();
-        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("fieldType = "); FieldType.PrintEx(printer); printer.Println();
         printer.Print("isStatic = "); IsStatic.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
@@ -1117,17 +1303,17 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:95</p>
+  /// <p>Generated from: IlModel.kt:105</p>
   /// </summary>
   public sealed class IlFilterScopeDto : IlEhScopeDto
   {
     //fields
     //public fields
     public int Fb {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlFilterScopeDto(
@@ -1141,15 +1327,15 @@ namespace org.jacodb.api.net.generated.models
       te,
       hb,
       he
-     )
+     ) 
     {
       Fb = fb;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlFilterScopeDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlFilterScopeDto> Read = (ctx, reader) => 
     {
       var tb = reader.ReadInt();
       var te = reader.ReadInt();
@@ -1159,8 +1345,8 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlFilterScopeDto(fb, tb, te, hb, he);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlFilterScopeDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlFilterScopeDto> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Tb);
       writer.Write(value.Te);
@@ -1168,9 +1354,9 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.He);
       writer.Write(value.Fb);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1221,16 +1407,16 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:99</p>
+  /// <p>Generated from: IlModel.kt:109</p>
   /// </summary>
   public sealed class IlFinallyScopeDto : IlEhScopeDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlFinallyScopeDto(
@@ -1243,14 +1429,14 @@ namespace org.jacodb.api.net.generated.models
       te,
       hb,
       he
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlFinallyScopeDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlFinallyScopeDto> Read = (ctx, reader) => 
     {
       var tb = reader.ReadInt();
       var te = reader.ReadInt();
@@ -1259,17 +1445,17 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlFinallyScopeDto(tb, te, hb, he);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlFinallyScopeDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlFinallyScopeDto> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Tb);
       writer.Write(value.Te);
       writer.Write(value.Hb);
       writer.Write(value.He);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1318,52 +1504,52 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:80</p>
+  /// <p>Generated from: IlModel.kt:90</p>
   /// </summary>
   public sealed class IlLocalVarDto : IlVarDto
   {
     //fields
     //public fields
     public bool IsPinned {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlLocalVarDto(
       bool isPinned,
-      [NotNull] CacheKey type,
+      [NotNull] TypeId type,
       int index
     ) : base (
       type,
       index
-     )
+     ) 
     {
       IsPinned = isPinned;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlLocalVarDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlLocalVarDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var index = reader.ReadInt();
       var isPinned = reader.ReadBool();
       var _result = new IlLocalVarDto(isPinned, type, index);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlLocalVarDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlLocalVarDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Index);
       writer.Write(value.IsPinned);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1410,18 +1596,16 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:102</p>
+  /// <p>Generated from: IlModel.kt:112</p>
   /// </summary>
   public sealed class IlMethodDto : IlDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey Id {get; private set;}
-    [Nullable] public CacheKey DeclType {get; private set;}
-    [Nullable] public CacheKey ReturnType {get; private set;}
+    [Nullable] public TypeId ReturnType {get; private set;}
     [NotNull] public List<IlAttrDto> Attrs {get; private set;}
     [NotNull] public string Name {get; private set;}
     [NotNull] public List<IlParameterDto> Parameters {get; private set;}
@@ -1431,13 +1615,11 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public List<IlErrVarDto> Errs {get; private set;}
     [NotNull] public List<IlEhScopeDto> EhScopes {get; private set;}
     [NotNull] public List<IlStmtDto> Body {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlMethodDto(
-      [NotNull] CacheKey id,
-      [Nullable] CacheKey declType,
-      [Nullable] CacheKey returnType,
+      [Nullable] TypeId returnType,
       [NotNull] List<IlAttrDto> attrs,
       [NotNull] string name,
       [NotNull] List<IlParameterDto> parameters,
@@ -1449,7 +1631,6 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] List<IlStmtDto> body
     )
     {
-      if (id == null) throw new ArgumentNullException("id");
       if (attrs == null) throw new ArgumentNullException("attrs");
       if (name == null) throw new ArgumentNullException("name");
       if (parameters == null) throw new ArgumentNullException("parameters");
@@ -1458,9 +1639,7 @@ namespace org.jacodb.api.net.generated.models
       if (errs == null) throw new ArgumentNullException("errs");
       if (ehScopes == null) throw new ArgumentNullException("ehScopes");
       if (body == null) throw new ArgumentNullException("body");
-
-      Id = id;
-      DeclType = declType;
+      
       ReturnType = returnType;
       Attrs = attrs;
       Name = name;
@@ -1475,12 +1654,10 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlMethodDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlMethodDto> Read = (ctx, reader) => 
     {
-      var id = CacheKey.Read(ctx, reader);
-      var declType = ReadCacheKeyNullable(ctx, reader);
-      var returnType = ReadCacheKeyNullable(ctx, reader);
+      var returnType = ReadTypeIdNullable(ctx, reader);
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var name = reader.ReadString();
       var parameters = ReadIlParameterDtoList(ctx, reader);
@@ -1490,10 +1667,10 @@ namespace org.jacodb.api.net.generated.models
       var errs = ReadIlErrVarDtoList(ctx, reader);
       var ehScopes = ReadIlEhScopeDtoList(ctx, reader);
       var body = ReadIlStmtDtoList(ctx, reader);
-      var _result = new IlMethodDto(id, declType, returnType, attrs, name, parameters, resolved, locals, temps, errs, ehScopes, body);
+      var _result = new IlMethodDto(returnType, attrs, name, parameters, resolved, locals, temps, errs, ehScopes, body);
       return _result;
     };
-    public static CtxReadDelegate<CacheKey> ReadCacheKeyNullable = CacheKey.Read.NullableClass();
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
     public static CtxReadDelegate<List<IlParameterDto>> ReadIlParameterDtoList = IlParameterDto.Read.List();
     public static CtxReadDelegate<List<IlLocalVarDto>> ReadIlLocalVarDtoList = IlLocalVarDto.Read.List();
@@ -1501,12 +1678,10 @@ namespace org.jacodb.api.net.generated.models
     public static CtxReadDelegate<List<IlErrVarDto>> ReadIlErrVarDtoList = IlErrVarDto.Read.List();
     public static CtxReadDelegate<List<IlEhScopeDto>> ReadIlEhScopeDtoList = IlEhScopeDto.Read.List();
     public static CtxReadDelegate<List<IlStmtDto>> ReadIlStmtDtoList = IlStmtDto.Read.List();
-
-    public static new CtxWriteDelegate<IlMethodDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlMethodDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Id);
-      WriteCacheKeyNullable(ctx, writer, value.DeclType);
-      WriteCacheKeyNullable(ctx, writer, value.ReturnType);
+      WriteTypeIdNullable(ctx, writer, value.ReturnType);
       WriteIlAttrDtoList(ctx, writer, value.Attrs);
       writer.Write(value.Name);
       WriteIlParameterDtoList(ctx, writer, value.Parameters);
@@ -1517,7 +1692,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlEhScopeDtoList(ctx, writer, value.EhScopes);
       WriteIlStmtDtoList(ctx, writer, value.Body);
     };
-    public static  CtxWriteDelegate<CacheKey> WriteCacheKeyNullable = CacheKey.Write.NullableClass();
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
     public static  CtxWriteDelegate<List<IlParameterDto>> WriteIlParameterDtoList = IlParameterDto.Write.List();
     public static  CtxWriteDelegate<List<IlLocalVarDto>> WriteIlLocalVarDtoList = IlLocalVarDto.Write.List();
@@ -1525,9 +1700,9 @@ namespace org.jacodb.api.net.generated.models
     public static  CtxWriteDelegate<List<IlErrVarDto>> WriteIlErrVarDtoList = IlErrVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlEhScopeDto>> WriteIlEhScopeDtoList = IlEhScopeDto.Write.List();
     public static  CtxWriteDelegate<List<IlStmtDto>> WriteIlStmtDtoList = IlStmtDto.Write.List();
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1542,15 +1717,13 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Id, other.Id) && Equals(DeclType, other.DeclType) && Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && Body.SequenceEqual(other.Body);
+      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && Body.SequenceEqual(other.Body);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Id.GetHashCode();
-        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + (ReturnType != null ? ReturnType.GetHashCode() : 0);
         hash = hash * 31 + Attrs.ContentHashCode();
         hash = hash * 31 + Name.GetHashCode();
@@ -1569,8 +1742,6 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlMethodDto (");
       using (printer.IndentCookie()) {
-        printer.Print("id = "); Id.PrintEx(printer); printer.Println();
-        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("returnType = "); ReturnType.PrintEx(printer); printer.Println();
         printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
@@ -1592,35 +1763,35 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:60</p>
+  /// <p>Generated from: IlModel.kt:77</p>
   /// </summary>
   public sealed class IlParameterDto : IPrintable, IEquatable<IlParameterDto>
   {
     //fields
     //public fields
     public int Index {get; private set;}
-    [NotNull] public CacheKey Type {get; private set;}
+    [NotNull] public TypeId Type {get; private set;}
     [NotNull] public string Name {get; private set;}
-    [Nullable] public string DefaultValue {get; private set;}
+    [Nullable] public IlConstDto DefaultValue {get; private set;}
     [NotNull] public List<IlAttrDto> Attrs {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlParameterDto(
       int index,
-      [NotNull] CacheKey type,
+      [NotNull] TypeId type,
       [NotNull] string name,
-      [Nullable] string defaultValue,
+      [Nullable] IlConstDto defaultValue,
       [NotNull] List<IlAttrDto> attrs
     )
     {
       if (type == null) throw new ArgumentNullException("type");
       if (name == null) throw new ArgumentNullException("name");
       if (attrs == null) throw new ArgumentNullException("attrs");
-
+      
       Index = index;
       Type = type;
       Name = name;
@@ -1629,7 +1800,7 @@ namespace org.jacodb.api.net.generated.models
     }
     //secondary constructor
     //deconstruct trait
-    public void Deconstruct(out int index, [NotNull] out CacheKey type, [NotNull] out string name, [Nullable] out string defaultValue, [NotNull] out List<IlAttrDto> attrs)
+    public void Deconstruct(out int index, [NotNull] out TypeId type, [NotNull] out string name, [Nullable] out IlConstDto defaultValue, [NotNull] out List<IlAttrDto> attrs)
     {
       index = Index;
       type = Type;
@@ -1638,33 +1809,33 @@ namespace org.jacodb.api.net.generated.models
       attrs = Attrs;
     }
     //statics
-
-    public static CtxReadDelegate<IlParameterDto> Read = (ctx, reader) =>
+    
+    public static CtxReadDelegate<IlParameterDto> Read = (ctx, reader) => 
     {
       var index = reader.ReadInt();
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var name = reader.ReadString();
-      var defaultValue = ReadStringNullable(ctx, reader);
+      var defaultValue = ReadIlConstDtoNullable(ctx, reader);
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var _result = new IlParameterDto(index, type, name, defaultValue, attrs);
       return _result;
     };
-    public static CtxReadDelegate<string> ReadStringNullable = JetBrains.Rd.Impl.Serializers.ReadString.NullableClass();
+    public static CtxReadDelegate<IlConstDto> ReadIlConstDtoNullable = IlConstDto.Read.NullableClass();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
-
-    public static CtxWriteDelegate<IlParameterDto> Write = (ctx, writer, value) =>
+    
+    public static CtxWriteDelegate<IlParameterDto> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Index);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Name);
-      WriteStringNullable(ctx, writer, value.DefaultValue);
+      WriteIlConstDtoNullable(ctx, writer, value.DefaultValue);
       WriteIlAttrDtoList(ctx, writer, value.Attrs);
     };
-    public static  CtxWriteDelegate<string> WriteStringNullable = JetBrains.Rd.Impl.Serializers.WriteString.NullableClass();
+    public static  CtxWriteDelegate<IlConstDto> WriteIlConstDtoNullable = IlConstDto.Write.NullableClass();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1715,47 +1886,810 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:84</p>
+  /// <p>Generated from: IlModel.kt:45</p>
   /// </summary>
-  public sealed class IlTempVarDto : IlVarDto
+  public sealed class IlPointerTypeDto : IlTypeDto
   {
     //fields
     //public fields
-
+    [NotNull] public TypeId TargetType {get; private set;}
+    
     //private fields
     //primary constructor
-    public IlTempVarDto(
-      [NotNull] CacheKey type,
-      int index
+    public IlPointerTypeDto(
+      [NotNull] TypeId targetType,
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
     ) : base (
-      type,
-      index
-     )
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
+    {
+      if (targetType == null) throw new ArgumentNullException("targetType");
+      
+      TargetType = targetType;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlPointerTypeDto> Read = (ctx, reader) => 
+    {
+      var asmName = reader.ReadString();
+      var namespaceName = reader.ReadString();
+      var name = reader.ReadString();
+      var declType = ReadTypeIdNullable(ctx, reader);
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var isGenericParam = reader.ReadBool();
+      var isValueType = reader.ReadBool();
+      var isManaged = reader.ReadBool();
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var fields = ReadIlFieldDtoList(ctx, reader);
+      var methods = ReadIlMethodDtoList(ctx, reader);
+      var targetType = TypeId.Read(ctx, reader);
+      var _result = new IlPointerTypeDto(targetType, asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      return _result;
+    };
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
+    public static CtxReadDelegate<List<IlFieldDto>> ReadIlFieldDtoList = IlFieldDto.Read.List();
+    public static CtxReadDelegate<List<IlMethodDto>> ReadIlMethodDtoList = IlMethodDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlPointerTypeDto> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.AsmName);
+      writer.Write(value.NamespaceName);
+      writer.Write(value.Name);
+      WriteTypeIdNullable(ctx, writer, value.DeclType);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsGenericParam);
+      writer.Write(value.IsValueType);
+      writer.Write(value.IsManaged);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      WriteIlFieldDtoList(ctx, writer, value.Fields);
+      WriteIlMethodDtoList(ctx, writer, value.Methods);
+      TypeId.Write(ctx, writer, value.TargetType);
+    };
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
+    public static  CtxWriteDelegate<List<IlFieldDto>> WriteIlFieldDtoList = IlFieldDto.Write.List();
+    public static  CtxWriteDelegate<List<IlMethodDto>> WriteIlMethodDtoList = IlMethodDto.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlPointerTypeDto) obj);
+    }
+    public bool Equals(IlPointerTypeDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(TargetType, other.TargetType) && AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + TargetType.GetHashCode();
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + NamespaceName.GetHashCode();
+        hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
+        hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsGenericParam.GetHashCode();
+        hash = hash * 31 + IsValueType.GetHashCode();
+        hash = hash * 31 + IsManaged.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + Fields.ContentHashCode();
+        hash = hash * 31 + Methods.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlPointerTypeDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("targetType = "); TargetType.PrintEx(printer); printer.Println();
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
+        printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
+        printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("fields = "); Fields.PrintEx(printer); printer.Println();
+        printer.Print("methods = "); Methods.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:50</p>
+  /// </summary>
+  public sealed class IlPrimitiveTypeDto : IlValueTypeDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlPrimitiveTypeDto(
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
+    ) : base (
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlTempVarDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlPrimitiveTypeDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var asmName = reader.ReadString();
+      var namespaceName = reader.ReadString();
+      var name = reader.ReadString();
+      var declType = ReadTypeIdNullable(ctx, reader);
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var isGenericParam = reader.ReadBool();
+      var isValueType = reader.ReadBool();
+      var isManaged = reader.ReadBool();
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var fields = ReadIlFieldDtoList(ctx, reader);
+      var methods = ReadIlMethodDtoList(ctx, reader);
+      var _result = new IlPrimitiveTypeDto(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      return _result;
+    };
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
+    public static CtxReadDelegate<List<IlFieldDto>> ReadIlFieldDtoList = IlFieldDto.Read.List();
+    public static CtxReadDelegate<List<IlMethodDto>> ReadIlMethodDtoList = IlMethodDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlPrimitiveTypeDto> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.AsmName);
+      writer.Write(value.NamespaceName);
+      writer.Write(value.Name);
+      WriteTypeIdNullable(ctx, writer, value.DeclType);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsGenericParam);
+      writer.Write(value.IsValueType);
+      writer.Write(value.IsManaged);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      WriteIlFieldDtoList(ctx, writer, value.Fields);
+      WriteIlMethodDtoList(ctx, writer, value.Methods);
+    };
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
+    public static  CtxWriteDelegate<List<IlFieldDto>> WriteIlFieldDtoList = IlFieldDto.Write.List();
+    public static  CtxWriteDelegate<List<IlMethodDto>> WriteIlMethodDtoList = IlMethodDto.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlPrimitiveTypeDto) obj);
+    }
+    public bool Equals(IlPrimitiveTypeDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + NamespaceName.GetHashCode();
+        hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
+        hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsGenericParam.GetHashCode();
+        hash = hash * 31 + IsValueType.GetHashCode();
+        hash = hash * 31 + IsManaged.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + Fields.ContentHashCode();
+        hash = hash * 31 + Methods.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlPrimitiveTypeDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
+        printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
+        printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("fields = "); Fields.PrintEx(printer); printer.Println();
+        printer.Print("methods = "); Methods.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:57</p>
+  /// </summary>
+  public abstract class IlReferenceTypeDto : IlTypeDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    protected IlReferenceTypeDto(
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
+    ) : base (
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlReferenceTypeDto> Read = Polymorphic<IlReferenceTypeDto>.ReadAbstract(IlReferenceTypeDto_Unknown.Read);
+    
+    public static new CtxWriteDelegate<IlReferenceTypeDto> Write = Polymorphic<IlReferenceTypeDto>.Write;
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    //hash code trait
+    //pretty print
+    //toString
+  }
+  
+  
+  public sealed class IlReferenceTypeDto_Unknown : IlReferenceTypeDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlReferenceTypeDto_Unknown(
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
+    ) : base (
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlReferenceTypeDto_Unknown> Read = (ctx, reader) => 
+    {
+      var asmName = reader.ReadString();
+      var namespaceName = reader.ReadString();
+      var name = reader.ReadString();
+      var declType = ReadTypeIdNullable(ctx, reader);
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var isGenericParam = reader.ReadBool();
+      var isValueType = reader.ReadBool();
+      var isManaged = reader.ReadBool();
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var fields = ReadIlFieldDtoList(ctx, reader);
+      var methods = ReadIlMethodDtoList(ctx, reader);
+      var _result = new IlReferenceTypeDto_Unknown(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      return _result;
+    };
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
+    public static CtxReadDelegate<List<IlFieldDto>> ReadIlFieldDtoList = IlFieldDto.Read.List();
+    public static CtxReadDelegate<List<IlMethodDto>> ReadIlMethodDtoList = IlMethodDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlReferenceTypeDto_Unknown> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.AsmName);
+      writer.Write(value.NamespaceName);
+      writer.Write(value.Name);
+      WriteTypeIdNullable(ctx, writer, value.DeclType);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsGenericParam);
+      writer.Write(value.IsValueType);
+      writer.Write(value.IsManaged);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      WriteIlFieldDtoList(ctx, writer, value.Fields);
+      WriteIlMethodDtoList(ctx, writer, value.Methods);
+    };
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
+    public static  CtxWriteDelegate<List<IlFieldDto>> WriteIlFieldDtoList = IlFieldDto.Write.List();
+    public static  CtxWriteDelegate<List<IlMethodDto>> WriteIlMethodDtoList = IlMethodDto.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlReferenceTypeDto_Unknown) obj);
+    }
+    public bool Equals(IlReferenceTypeDto_Unknown other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + NamespaceName.GetHashCode();
+        hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
+        hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsGenericParam.GetHashCode();
+        hash = hash * 31 + IsValueType.GetHashCode();
+        hash = hash * 31 + IsManaged.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + Fields.ContentHashCode();
+        hash = hash * 31 + Methods.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlReferenceTypeDto_Unknown (");
+      using (printer.IndentCookie()) {
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
+        printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
+        printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("fields = "); Fields.PrintEx(printer); printer.Println();
+        printer.Print("methods = "); Methods.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:125</p>
+  /// </summary>
+  public sealed class IlSignatureDto : IlDto
+  {
+    //fields
+    //public fields
+    [NotNull] public TypeId ReturnType {get; private set;}
+    public bool IsInstance {get; private set;}
+    public int GenericParamCount {get; private set;}
+    [NotNull] public List<TypeId> ParametersTypes {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlSignatureDto(
+      [NotNull] TypeId returnType,
+      bool isInstance,
+      int genericParamCount,
+      [NotNull] List<TypeId> parametersTypes
+    )
+    {
+      if (returnType == null) throw new ArgumentNullException("returnType");
+      if (parametersTypes == null) throw new ArgumentNullException("parametersTypes");
+      
+      ReturnType = returnType;
+      IsInstance = isInstance;
+      GenericParamCount = genericParamCount;
+      ParametersTypes = parametersTypes;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlSignatureDto> Read = (ctx, reader) => 
+    {
+      var returnType = TypeId.Read(ctx, reader);
+      var isInstance = reader.ReadBool();
+      var genericParamCount = reader.ReadInt();
+      var parametersTypes = ReadTypeIdList(ctx, reader);
+      var _result = new IlSignatureDto(returnType, isInstance, genericParamCount, parametersTypes);
+      return _result;
+    };
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
+    
+    public static new CtxWriteDelegate<IlSignatureDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.ReturnType);
+      writer.Write(value.IsInstance);
+      writer.Write(value.GenericParamCount);
+      WriteTypeIdList(ctx, writer, value.ParametersTypes);
+    };
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlSignatureDto) obj);
+    }
+    public bool Equals(IlSignatureDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(ReturnType, other.ReturnType) && IsInstance == other.IsInstance && GenericParamCount == other.GenericParamCount && ParametersTypes.SequenceEqual(other.ParametersTypes);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + ReturnType.GetHashCode();
+        hash = hash * 31 + IsInstance.GetHashCode();
+        hash = hash * 31 + GenericParamCount.GetHashCode();
+        hash = hash * 31 + ParametersTypes.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlSignatureDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("returnType = "); ReturnType.PrintEx(printer); printer.Println();
+        printer.Print("isInstance = "); IsInstance.PrintEx(printer); printer.Println();
+        printer.Print("genericParamCount = "); GenericParamCount.PrintEx(printer); printer.Println();
+        printer.Print("parametersTypes = "); ParametersTypes.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:55</p>
+  /// </summary>
+  public sealed class IlStructTypeDto : IlValueTypeDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlStructTypeDto(
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
+    ) : base (
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlStructTypeDto> Read = (ctx, reader) => 
+    {
+      var asmName = reader.ReadString();
+      var namespaceName = reader.ReadString();
+      var name = reader.ReadString();
+      var declType = ReadTypeIdNullable(ctx, reader);
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var isGenericParam = reader.ReadBool();
+      var isValueType = reader.ReadBool();
+      var isManaged = reader.ReadBool();
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var fields = ReadIlFieldDtoList(ctx, reader);
+      var methods = ReadIlMethodDtoList(ctx, reader);
+      var _result = new IlStructTypeDto(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      return _result;
+    };
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
+    public static CtxReadDelegate<List<IlFieldDto>> ReadIlFieldDtoList = IlFieldDto.Read.List();
+    public static CtxReadDelegate<List<IlMethodDto>> ReadIlMethodDtoList = IlMethodDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlStructTypeDto> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.AsmName);
+      writer.Write(value.NamespaceName);
+      writer.Write(value.Name);
+      WriteTypeIdNullable(ctx, writer, value.DeclType);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsGenericParam);
+      writer.Write(value.IsValueType);
+      writer.Write(value.IsManaged);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      WriteIlFieldDtoList(ctx, writer, value.Fields);
+      WriteIlMethodDtoList(ctx, writer, value.Methods);
+    };
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
+    public static  CtxWriteDelegate<List<IlFieldDto>> WriteIlFieldDtoList = IlFieldDto.Write.List();
+    public static  CtxWriteDelegate<List<IlMethodDto>> WriteIlMethodDtoList = IlMethodDto.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlStructTypeDto) obj);
+    }
+    public bool Equals(IlStructTypeDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + NamespaceName.GetHashCode();
+        hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
+        hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsGenericParam.GetHashCode();
+        hash = hash * 31 + IsValueType.GetHashCode();
+        hash = hash * 31 + IsManaged.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + Fields.ContentHashCode();
+        hash = hash * 31 + Methods.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlStructTypeDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
+        printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
+        printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("fields = "); Fields.PrintEx(printer); printer.Println();
+        printer.Print("methods = "); Methods.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:94</p>
+  /// </summary>
+  public sealed class IlTempVarDto : IlVarDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlTempVarDto(
+      [NotNull] TypeId type,
+      int index
+    ) : base (
+      type,
+      index
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlTempVarDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
       var index = reader.ReadInt();
       var _result = new IlTempVarDto(type, index);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlTempVarDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlTempVarDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Index);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1800,82 +2734,164 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:41</p>
+  /// <p>Generated from: IlModel.kt:31</p>
   /// </summary>
-  public sealed class IlTypeDto : IlDto
+  public abstract class IlTypeDto : IlDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey Id {get; private set;}
+    [NotNull] public string AsmName {get; private set;}
+    [NotNull] public string NamespaceName {get; private set;}
     [NotNull] public string Name {get; private set;}
-    [NotNull] public List<CacheKey> GenericArgs {get; private set;}
+    [Nullable] public TypeId DeclType {get; private set;}
+    [NotNull] public List<TypeId> GenericArgs {get; private set;}
     public bool IsGenericParam {get; private set;}
     public bool IsValueType {get; private set;}
     public bool IsManaged {get; private set;}
     [NotNull] public List<IlAttrDto> Attrs {get; private set;}
-
+    [NotNull] public List<IlFieldDto> Fields {get; private set;}
+    [NotNull] public List<IlMethodDto> Methods {get; private set;}
+    
     //private fields
     //primary constructor
-    public IlTypeDto(
-      [NotNull] CacheKey id,
+    protected IlTypeDto(
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
       [NotNull] string name,
-      [NotNull] List<CacheKey> genericArgs,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
       bool isValueType,
       bool isManaged,
-      [NotNull] List<IlAttrDto> attrs
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
     )
     {
-      if (id == null) throw new ArgumentNullException("id");
+      if (asmName == null) throw new ArgumentNullException("asmName");
+      if (namespaceName == null) throw new ArgumentNullException("namespaceName");
       if (name == null) throw new ArgumentNullException("name");
       if (genericArgs == null) throw new ArgumentNullException("genericArgs");
       if (attrs == null) throw new ArgumentNullException("attrs");
-
-      Id = id;
+      if (fields == null) throw new ArgumentNullException("fields");
+      if (methods == null) throw new ArgumentNullException("methods");
+      
+      AsmName = asmName;
+      NamespaceName = namespaceName;
       Name = name;
+      DeclType = declType;
       GenericArgs = genericArgs;
       IsGenericParam = isGenericParam;
       IsValueType = isValueType;
       IsManaged = isManaged;
       Attrs = attrs;
+      Fields = fields;
+      Methods = methods;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlTypeDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlTypeDto> Read = Polymorphic<IlTypeDto>.ReadAbstract(IlTypeDto_Unknown.Read);
+    
+    public static new CtxWriteDelegate<IlTypeDto> Write = Polymorphic<IlTypeDto>.Write;
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    //hash code trait
+    //pretty print
+    //toString
+  }
+  
+  
+  public sealed class IlTypeDto_Unknown : IlTypeDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlTypeDto_Unknown(
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
+    ) : base (
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
     {
-      var id = CacheKey.Read(ctx, reader);
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlTypeDto_Unknown> Read = (ctx, reader) => 
+    {
+      var asmName = reader.ReadString();
+      var namespaceName = reader.ReadString();
       var name = reader.ReadString();
-      var genericArgs = ReadCacheKeyList(ctx, reader);
+      var declType = ReadTypeIdNullable(ctx, reader);
+      var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isValueType = reader.ReadBool();
       var isManaged = reader.ReadBool();
       var attrs = ReadIlAttrDtoList(ctx, reader);
-      var _result = new IlTypeDto(id, name, genericArgs, isGenericParam, isValueType, isManaged, attrs);
+      var fields = ReadIlFieldDtoList(ctx, reader);
+      var methods = ReadIlMethodDtoList(ctx, reader);
+      var _result = new IlTypeDto_Unknown(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
-    public static CtxReadDelegate<List<CacheKey>> ReadCacheKeyList = CacheKey.Read.List();
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
-
-    public static new CtxWriteDelegate<IlTypeDto> Write = (ctx, writer, value) =>
+    public static CtxReadDelegate<List<IlFieldDto>> ReadIlFieldDtoList = IlFieldDto.Read.List();
+    public static CtxReadDelegate<List<IlMethodDto>> ReadIlMethodDtoList = IlMethodDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlTypeDto_Unknown> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Id);
+      writer.Write(value.AsmName);
+      writer.Write(value.NamespaceName);
       writer.Write(value.Name);
-      WriteCacheKeyList(ctx, writer, value.GenericArgs);
+      WriteTypeIdNullable(ctx, writer, value.DeclType);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsValueType);
       writer.Write(value.IsManaged);
       WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      WriteIlFieldDtoList(ctx, writer, value.Fields);
+      WriteIlMethodDtoList(ctx, writer, value.Methods);
     };
-    public static  CtxWriteDelegate<List<CacheKey>> WriteCacheKeyList = CacheKey.Write.List();
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
-
+    public static  CtxWriteDelegate<List<IlFieldDto>> WriteIlFieldDtoList = IlFieldDto.Write.List();
+    public static  CtxWriteDelegate<List<IlMethodDto>> WriteIlMethodDtoList = IlMethodDto.Write.List();
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1884,41 +2900,49 @@ namespace org.jacodb.api.net.generated.models
       if (ReferenceEquals(null, obj)) return false;
       if (ReferenceEquals(this, obj)) return true;
       if (obj.GetType() != GetType()) return false;
-      return Equals((IlTypeDto) obj);
+      return Equals((IlTypeDto_Unknown) obj);
     }
-    public bool Equals(IlTypeDto other)
+    public bool Equals(IlTypeDto_Unknown other)
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Id, other.Id) && Name == other.Name && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs);
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Id.GetHashCode();
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsValueType.GetHashCode();
         hash = hash * 31 + IsManaged.GetHashCode();
         hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + Fields.ContentHashCode();
+        hash = hash * 31 + Methods.ContentHashCode();
         return hash;
       }
     }
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("IlTypeDto (");
+      printer.Println("IlTypeDto_Unknown (");
       using (printer.IndentCookie()) {
-        printer.Print("id = "); Id.PrintEx(printer); printer.Println();
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
         printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
         printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("fields = "); Fields.PrintEx(printer); printer.Println();
+        printer.Print("methods = "); Methods.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -1930,40 +2954,55 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlModel.kt:68</p>
+  /// <p>Generated from: IlModel.kt:49</p>
   /// </summary>
-  public abstract class IlVarDto : IlDto
+  public abstract class IlValueTypeDto : IlTypeDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey Type {get; private set;}
-    public int Index {get; private set;}
-
+    
     //private fields
     //primary constructor
-    protected IlVarDto(
-      [NotNull] CacheKey type,
-      int index
-    )
+    protected IlValueTypeDto(
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
+    ) : base (
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
     {
-      if (type == null) throw new ArgumentNullException("type");
-
-      Type = type;
-      Index = index;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlVarDto> Read = Polymorphic<IlVarDto>.ReadAbstract(IlVarDto_Unknown.Read);
-
-    public static new CtxWriteDelegate<IlVarDto> Write = Polymorphic<IlVarDto>.Write;
-
+    
+    public static new CtxReadDelegate<IlValueTypeDto> Read = Polymorphic<IlValueTypeDto>.ReadAbstract(IlValueTypeDto_Unknown.Read);
+    
+    public static new CtxWriteDelegate<IlValueTypeDto> Write = Polymorphic<IlValueTypeDto>.Write;
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1971,44 +3010,231 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
-  public sealed class IlVarDto_Unknown : IlVarDto
+  
+  
+  public sealed class IlValueTypeDto_Unknown : IlValueTypeDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
-    public IlVarDto_Unknown(
-      [NotNull] CacheKey type,
-      int index
+    public IlValueTypeDto_Unknown(
+      [NotNull] string asmName,
+      [NotNull] string namespaceName,
+      [NotNull] string name,
+      [Nullable] TypeId declType,
+      [NotNull] List<TypeId> genericArgs,
+      bool isGenericParam,
+      bool isValueType,
+      bool isManaged,
+      [NotNull] List<IlAttrDto> attrs,
+      [NotNull] List<IlFieldDto> fields,
+      [NotNull] List<IlMethodDto> methods
     ) : base (
-      type,
-      index
-     )
+      asmName,
+      namespaceName,
+      name,
+      declType,
+      genericArgs,
+      isGenericParam,
+      isValueType,
+      isManaged,
+      attrs,
+      fields,
+      methods
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlVarDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlValueTypeDto_Unknown> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var asmName = reader.ReadString();
+      var namespaceName = reader.ReadString();
+      var name = reader.ReadString();
+      var declType = ReadTypeIdNullable(ctx, reader);
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var isGenericParam = reader.ReadBool();
+      var isValueType = reader.ReadBool();
+      var isManaged = reader.ReadBool();
+      var attrs = ReadIlAttrDtoList(ctx, reader);
+      var fields = ReadIlFieldDtoList(ctx, reader);
+      var methods = ReadIlMethodDtoList(ctx, reader);
+      var _result = new IlValueTypeDto_Unknown(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      return _result;
+    };
+    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
+    public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
+    public static CtxReadDelegate<List<IlFieldDto>> ReadIlFieldDtoList = IlFieldDto.Read.List();
+    public static CtxReadDelegate<List<IlMethodDto>> ReadIlMethodDtoList = IlMethodDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlValueTypeDto_Unknown> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.AsmName);
+      writer.Write(value.NamespaceName);
+      writer.Write(value.Name);
+      WriteTypeIdNullable(ctx, writer, value.DeclType);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsGenericParam);
+      writer.Write(value.IsValueType);
+      writer.Write(value.IsManaged);
+      WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      WriteIlFieldDtoList(ctx, writer, value.Fields);
+      WriteIlMethodDtoList(ctx, writer, value.Methods);
+    };
+    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
+    public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
+    public static  CtxWriteDelegate<List<IlFieldDto>> WriteIlFieldDtoList = IlFieldDto.Write.List();
+    public static  CtxWriteDelegate<List<IlMethodDto>> WriteIlMethodDtoList = IlMethodDto.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlValueTypeDto_Unknown) obj);
+    }
+    public bool Equals(IlValueTypeDto_Unknown other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + NamespaceName.GetHashCode();
+        hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
+        hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsGenericParam.GetHashCode();
+        hash = hash * 31 + IsValueType.GetHashCode();
+        hash = hash * 31 + IsManaged.GetHashCode();
+        hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + Fields.ContentHashCode();
+        hash = hash * 31 + Methods.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlValueTypeDto_Unknown (");
+      using (printer.IndentCookie()) {
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
+        printer.Print("isValueType = "); IsValueType.PrintEx(printer); printer.Println();
+        printer.Print("isManaged = "); IsManaged.PrintEx(printer); printer.Println();
+        printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("fields = "); Fields.PrintEx(printer); printer.Println();
+        printer.Print("methods = "); Methods.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:85</p>
+  /// </summary>
+  public abstract class IlVarDto : IlDto
+  {
+    //fields
+    //public fields
+    [NotNull] public TypeId Type {get; private set;}
+    public int Index {get; private set;}
+    
+    //private fields
+    //primary constructor
+    protected IlVarDto(
+      [NotNull] TypeId type,
+      int index
+    )
+    {
+      if (type == null) throw new ArgumentNullException("type");
+      
+      Type = type;
+      Index = index;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlVarDto> Read = Polymorphic<IlVarDto>.ReadAbstract(IlVarDto_Unknown.Read);
+    
+    public static new CtxWriteDelegate<IlVarDto> Write = Polymorphic<IlVarDto>.Write;
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    //hash code trait
+    //pretty print
+    //toString
+  }
+  
+  
+  public sealed class IlVarDto_Unknown : IlVarDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlVarDto_Unknown(
+      [NotNull] TypeId type,
+      int index
+    ) : base (
+      type,
+      index
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlVarDto_Unknown> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
       var index = reader.ReadInt();
       var _result = new IlVarDto_Unknown(type, index);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlVarDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlVarDto_Unknown> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Index);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2042,6 +3268,100 @@ namespace org.jacodb.api.net.generated.models
       using (printer.IndentCookie()) {
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
         printer.Print("index = "); Index.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlModel.kt:24</p>
+  /// </summary>
+  public sealed class TypeId : IPrintable, IEquatable<TypeId>
+  {
+    //fields
+    //public fields
+    [NotNull] public string AsmName {get; private set;}
+    [NotNull] public string TypeName {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public TypeId(
+      [NotNull] string asmName,
+      [NotNull] string typeName
+    )
+    {
+      if (asmName == null) throw new ArgumentNullException("asmName");
+      if (typeName == null) throw new ArgumentNullException("typeName");
+      
+      AsmName = asmName;
+      TypeName = typeName;
+    }
+    //secondary constructor
+    //deconstruct trait
+    public void Deconstruct([NotNull] out string asmName, [NotNull] out string typeName)
+    {
+      asmName = AsmName;
+      typeName = TypeName;
+    }
+    //statics
+    
+    public static CtxReadDelegate<TypeId> Read = (ctx, reader) => 
+    {
+      var asmName = reader.ReadString();
+      var typeName = reader.ReadString();
+      var _result = new TypeId(asmName, typeName);
+      return _result;
+    };
+    
+    public static CtxWriteDelegate<TypeId> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.AsmName);
+      writer.Write(value.TypeName);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((TypeId) obj);
+    }
+    public bool Equals(TypeId other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return AsmName == other.AsmName && TypeName == other.TypeName;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + TypeName.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("TypeId (");
+      using (printer.IndentCookie()) {
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("typeName = "); TypeName.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }

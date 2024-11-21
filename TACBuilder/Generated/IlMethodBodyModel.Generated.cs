@@ -34,8 +34,8 @@ using JetBrains.Rd.Text;
 
 namespace org.jacodb.api.net.generated.models
 {
-
-
+  
+  
   /// <summary>
   /// <p>Generated from: IlMethodBodyModel.kt:24</p>
   /// </summary>
@@ -43,7 +43,7 @@ namespace org.jacodb.api.net.generated.models
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     private IlMethodBodyModel(
@@ -53,20 +53,27 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     //deconstruct trait
     //statics
-
-
-
-    protected override long SerializationHash => -2692739442657292118L;
-
+    
+    
+    
+    protected override long SerializationHash => 7606042870190843005L;
+    
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
     {
-      serializers.Register(IlByteConstDto.Read, IlByteConstDto.Write);
-      serializers.Register(IlIntConstDto.Read, IlIntConstDto.Write);
-      serializers.Register(IlLongConstDto.Read, IlLongConstDto.Write);
+      serializers.Register(IlInt8ConstDto.Read, IlInt8ConstDto.Write);
+      serializers.Register(IlUint8ConstDto.Read, IlUint8ConstDto.Write);
+      serializers.Register(IlInt16ConstDto.Read, IlInt16ConstDto.Write);
+      serializers.Register(IlUint16ConstDto.Read, IlUint16ConstDto.Write);
+      serializers.Register(IlInt32ConstDto.Read, IlInt32ConstDto.Write);
+      serializers.Register(IlUint32ConstDto.Read, IlUint32ConstDto.Write);
+      serializers.Register(IlInt64ConstDto.Read, IlInt64ConstDto.Write);
+      serializers.Register(IlUint64ConstDto.Read, IlUint64ConstDto.Write);
       serializers.Register(IlFloatConstDto.Read, IlFloatConstDto.Write);
       serializers.Register(IlDoubleConstDto.Read, IlDoubleConstDto.Write);
+      serializers.Register(IlCharConstDto.Read, IlCharConstDto.Write);
       serializers.Register(IlArrayConstDto.Read, IlArrayConstDto.Write);
+      serializers.Register(IlEnumConstDto.Read, IlEnumConstDto.Write);
       serializers.Register(IlNullDto.Read, IlNullDto.Write);
       serializers.Register(IlBoolConstDto.Read, IlBoolConstDto.Write);
       serializers.Register(IlStringConstDto.Read, IlStringConstDto.Write);
@@ -75,7 +82,6 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlFieldRefDto.Read, IlFieldRefDto.Write);
       serializers.Register(IlUnaryOpDto.Read, IlUnaryOpDto.Write);
       serializers.Register(IlBinaryOpDto.Read, IlBinaryOpDto.Write);
-      serializers.Register(IlInitExprDto.Read, IlInitExprDto.Write);
       serializers.Register(IlNewExprDto.Read, IlNewExprDto.Write);
       serializers.Register(IlSizeOfExprDto.Read, IlSizeOfExprDto.Write);
       serializers.Register(IlFieldAccessDto.Read, IlFieldAccessDto.Write);
@@ -93,8 +99,11 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlManagedDerefExprDto.Read, IlManagedDerefExprDto.Write);
       serializers.Register(IlUnmanagedDerefExprDto.Read, IlUnmanagedDerefExprDto.Write);
       serializers.Register(IlStackAllocExprDto.Read, IlStackAllocExprDto.Write);
+      serializers.Register(IlArgListRefDto.Read, IlArgListRefDto.Write);
+      serializers.Register(IlCalliDto.Read, IlCalliDto.Write);
       serializers.Register(IlAssignStmtDto.Read, IlAssignStmtDto.Write);
       serializers.Register(IlCallStmtDto.Read, IlCallStmtDto.Write);
+      serializers.Register(IlCalliStmtDto.Read, IlCalliStmtDto.Write);
       serializers.Register(IlReturnStmtDto.Read, IlReturnStmtDto.Write);
       serializers.Register(IlThrowStmtDto.Read, IlThrowStmtDto.Write);
       serializers.Register(IlRethrowStmtDto.Read, IlRethrowStmtDto.Write);
@@ -115,18 +124,18 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlStmtDto_Unknown.Read, IlStmtDto_Unknown.Write);
       serializers.Register(IlEhStmtDto_Unknown.Read, IlEhStmtDto_Unknown.Write);
       serializers.Register(IlBranchStmtDto_Unknown.Read, IlBranchStmtDto_Unknown.Write);
-
+      
       serializers.RegisterToplevelOnce(typeof(IlRoot), IlRoot.RegisterDeclaredTypesSerializers);
     }
-
+    
     public IlMethodBodyModel(Lifetime lifetime, IProtocol protocol) : this()
     {
       Identify(protocol.Identities, RdId.Root.Mix("IlMethodBodyModel"));
       Bind(lifetime, protocol, "IlMethodBodyModel");
     }
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -145,48 +154,48 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:155</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:181</p>
   /// </summary>
   public sealed class IlArgAccessDto : IlValueDto
   {
     //fields
     //public fields
     public int Index {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlArgAccessDto(
       int index,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       Index = index;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlArgAccessDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlArgAccessDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var index = reader.ReadInt();
       var _result = new IlArgAccessDto(index, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlArgAccessDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlArgAccessDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Index);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -231,10 +240,98 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:70</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:129</p>
+  /// </summary>
+  public sealed class IlArgListRefDto : IlExprDto
+  {
+    //fields
+    //public fields
+    [NotNull] public InstanceIdRef Method {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlArgListRefDto(
+      [NotNull] InstanceIdRef method,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      if (method == null) throw new ArgumentNullException("method");
+      
+      Method = method;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlArgListRefDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var method = InstanceIdRef.Read(ctx, reader);
+      var _result = new IlArgListRefDto(method, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlArgListRefDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      InstanceIdRef.Write(ctx, writer, value.Method);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlArgListRefDto) obj);
+    }
+    public bool Equals(IlArgListRefDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Method, other.Method) && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Method.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlArgListRefDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("method = "); Method.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:87</p>
   /// </summary>
   public sealed class IlArrayAccessDto : IlValueDto
   {
@@ -242,45 +339,45 @@ namespace org.jacodb.api.net.generated.models
     //public fields
     [NotNull] public IlExprDto Array {get; private set;}
     [NotNull] public IlExprDto Index {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlArrayAccessDto(
       [NotNull] IlExprDto array,
       [NotNull] IlExprDto index,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (array == null) throw new ArgumentNullException("array");
       if (index == null) throw new ArgumentNullException("index");
-
+      
       Array = array;
       Index = index;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlArrayAccessDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlArrayAccessDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var array = IlExprDto.Read(ctx, reader);
       var index = IlExprDto.Read(ctx, reader);
       var _result = new IlArrayAccessDto(array, index, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlArrayAccessDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlArrayAccessDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       IlExprDto.Write(ctx, writer, value.Array);
       IlExprDto.Write(ctx, writer, value.Index);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -327,52 +424,52 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:37</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:53</p>
   /// </summary>
   public sealed class IlArrayConstDto : IlConstDto
   {
     //fields
     //public fields
     [NotNull] public List<IlConstDto> Values {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlArrayConstDto(
       [NotNull] List<IlConstDto> values,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (values == null) throw new ArgumentNullException("values");
-
+      
       Values = values;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlArrayConstDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlArrayConstDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var values = ReadIlConstDtoList(ctx, reader);
       var _result = new IlArrayConstDto(values, type);
       return _result;
     };
     public static CtxReadDelegate<List<IlConstDto>> ReadIlConstDtoList = IlConstDto.Read.List();
-
-    public static new CtxWriteDelegate<IlArrayConstDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlArrayConstDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       WriteIlConstDtoList(ctx, writer, value.Values);
     };
     public static  CtxWriteDelegate<List<IlConstDto>> WriteIlConstDtoList = IlConstDto.Write.List();
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -417,50 +514,50 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:79</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:96</p>
   /// </summary>
   public sealed class IlArrayLengthExprDto : IlExprDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Array {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlArrayLengthExprDto(
       [NotNull] IlExprDto array,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (array == null) throw new ArgumentNullException("array");
-
+      
       Array = array;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlArrayLengthExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlArrayLengthExprDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var array = IlExprDto.Read(ctx, reader);
       var _result = new IlArrayLengthExprDto(array, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlArrayLengthExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlArrayLengthExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       IlExprDto.Write(ctx, writer, value.Array);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -505,10 +602,10 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:115</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:139</p>
   /// </summary>
   public sealed class IlAssignStmtDto : IlStmtDto
   {
@@ -516,7 +613,7 @@ namespace org.jacodb.api.net.generated.models
     //public fields
     [NotNull] public IlValueDto Lhs {get; private set;}
     [NotNull] public IlExprDto Rhs {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlAssignStmtDto(
@@ -526,30 +623,30 @@ namespace org.jacodb.api.net.generated.models
     {
       if (lhs == null) throw new ArgumentNullException("lhs");
       if (rhs == null) throw new ArgumentNullException("rhs");
-
+      
       Lhs = lhs;
       Rhs = rhs;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlAssignStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlAssignStmtDto> Read = (ctx, reader) => 
     {
       var lhs = IlValueDto.Read(ctx, reader);
       var rhs = IlExprDto.Read(ctx, reader);
       var _result = new IlAssignStmtDto(lhs, rhs);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlAssignStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlAssignStmtDto> Write = (ctx, writer, value) => 
     {
       IlValueDto.Write(ctx, writer, value.Lhs);
       IlExprDto.Write(ctx, writer, value.Rhs);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -594,10 +691,10 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:50</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:70</p>
   /// </summary>
   public sealed class IlBinaryOpDto : IlExprDto
   {
@@ -605,45 +702,45 @@ namespace org.jacodb.api.net.generated.models
     //public fields
     [NotNull] public IlExprDto Lhs {get; private set;}
     [NotNull] public IlExprDto Rhs {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlBinaryOpDto(
       [NotNull] IlExprDto lhs,
       [NotNull] IlExprDto rhs,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (lhs == null) throw new ArgumentNullException("lhs");
       if (rhs == null) throw new ArgumentNullException("rhs");
-
+      
       Lhs = lhs;
       Rhs = rhs;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlBinaryOpDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlBinaryOpDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var lhs = IlExprDto.Read(ctx, reader);
       var rhs = IlExprDto.Read(ctx, reader);
       var _result = new IlBinaryOpDto(lhs, rhs, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlBinaryOpDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlBinaryOpDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       IlExprDto.Write(ctx, writer, value.Lhs);
       IlExprDto.Write(ctx, writer, value.Rhs);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -690,48 +787,48 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:41</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:62</p>
   /// </summary>
   public sealed class IlBoolConstDto : IlConstDto
   {
     //fields
     //public fields
     public bool Value {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlBoolConstDto(
       bool value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       Value = value;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlBoolConstDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlBoolConstDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var value = reader.ReadBool();
       var _result = new IlBoolConstDto(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlBoolConstDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlBoolConstDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Value);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -776,51 +873,51 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:91</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:108</p>
   /// </summary>
   public sealed class IlBoxExprDto : IlCastExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlBoxExprDto(
-      [NotNull] CacheKey targetType,
+      [NotNull] TypeId targetType,
       [NotNull] IlExprDto operand,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       targetType,
       operand,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlBoxExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlBoxExprDto> Read = (ctx, reader) => 
     {
-      var targetType = CacheKey.Read(ctx, reader);
+      var targetType = TypeId.Read(ctx, reader);
       var operand = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlBoxExprDto(targetType, operand, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlBoxExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlBoxExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.TargetType);
+      TypeId.Write(ctx, writer, value.TargetType);
       IlExprDto.Write(ctx, writer, value.Operand);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -867,17 +964,17 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:139</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:165</p>
   /// </summary>
   public abstract class IlBranchStmtDto : IlStmtDto
   {
     //fields
     //public fields
     public int Target {get; private set;}
-
+    
     //private fields
     //primary constructor
     protected IlBranchStmtDto(
@@ -889,13 +986,13 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static new CtxReadDelegate<IlBranchStmtDto> Read = Polymorphic<IlBranchStmtDto>.ReadAbstract(IlBranchStmtDto_Unknown.Read);
-
+    
     public static new CtxWriteDelegate<IlBranchStmtDto> Write = Polymorphic<IlBranchStmtDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -903,40 +1000,40 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlBranchStmtDto_Unknown : IlBranchStmtDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlBranchStmtDto_Unknown(
       int target
     ) : base (
       target
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlBranchStmtDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlBranchStmtDto_Unknown> Read = (ctx, reader) => 
     {
       var target = reader.ReadInt();
       var _result = new IlBranchStmtDto_Unknown(target);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlBranchStmtDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlBranchStmtDto_Unknown> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Target);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -979,144 +1076,58 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:32</p>
-  /// </summary>
-  public sealed class IlByteConstDto : IlNumConstDto
-  {
-    //fields
-    //public fields
-    public byte Value {get; private set;}
-
-    //private fields
-    //primary constructor
-    public IlByteConstDto(
-      byte value,
-      [NotNull] CacheKey type
-    ) : base (
-      type
-     )
-    {
-      Value = value;
-    }
-    //secondary constructor
-    //deconstruct trait
-    //statics
-
-    public static new CtxReadDelegate<IlByteConstDto> Read = (ctx, reader) =>
-    {
-      var type = CacheKey.Read(ctx, reader);
-      var value = reader.ReadByte();
-      var _result = new IlByteConstDto(value, type);
-      return _result;
-    };
-
-    public static new CtxWriteDelegate<IlByteConstDto> Write = (ctx, writer, value) =>
-    {
-      CacheKey.Write(ctx, writer, value.Type);
-      writer.Write(value.Value);
-    };
-
-    //constants
-
-    //custom body
-    //methods
-    //equals trait
-    public override bool Equals(object obj)
-    {
-      if (ReferenceEquals(null, obj)) return false;
-      if (ReferenceEquals(this, obj)) return true;
-      if (obj.GetType() != GetType()) return false;
-      return Equals((IlByteConstDto) obj);
-    }
-    public bool Equals(IlByteConstDto other)
-    {
-      if (ReferenceEquals(null, other)) return false;
-      if (ReferenceEquals(this, other)) return true;
-      return Value == other.Value && Equals(Type, other.Type);
-    }
-    //hash code trait
-    public override int GetHashCode()
-    {
-      unchecked {
-        var hash = 0;
-        hash = hash * 31 + Value.GetHashCode();
-        hash = hash * 31 + Type.GetHashCode();
-        return hash;
-      }
-    }
-    //pretty print
-    public void Print(PrettyPrinter printer)
-    {
-      printer.Println("IlByteConstDto (");
-      using (printer.IndentCookie()) {
-        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
-        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
-      }
-      printer.Print(")");
-    }
-    //toString
-    public override string ToString()
-    {
-      var printer = new SingleLinePrettyPrinter();
-      Print(printer);
-      return printer.ToString();
-    }
-  }
-
-
-  /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:80</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:97</p>
   /// </summary>
   public sealed class IlCallDto : IlExprDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey Method {get; private set;}
+    [NotNull] public InstanceIdRef Method {get; private set;}
     [NotNull] public List<IlExprDto> Args {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlCallDto(
-      [NotNull] CacheKey method,
+      [NotNull] InstanceIdRef method,
       [NotNull] List<IlExprDto> args,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (method == null) throw new ArgumentNullException("method");
       if (args == null) throw new ArgumentNullException("args");
-
+      
       Method = method;
       Args = args;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlCallDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlCallDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
-      var method = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
+      var method = InstanceIdRef.Read(ctx, reader);
       var args = ReadIlExprDtoList(ctx, reader);
       var _result = new IlCallDto(method, args, type);
       return _result;
     };
     public static CtxReadDelegate<List<IlExprDto>> ReadIlExprDtoList = IlExprDto.Read.List();
-
-    public static new CtxWriteDelegate<IlCallDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlCallDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
-      CacheKey.Write(ctx, writer, value.Method);
+      TypeId.Write(ctx, writer, value.Type);
+      InstanceIdRef.Write(ctx, writer, value.Method);
       WriteIlExprDtoList(ctx, writer, value.Args);
     };
     public static  CtxWriteDelegate<List<IlExprDto>> WriteIlExprDtoList = IlExprDto.Write.List();
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1163,17 +1174,17 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:120</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:144</p>
   /// </summary>
   public sealed class IlCallStmtDto : IlStmtDto
   {
     //fields
     //public fields
     [NotNull] public IlCallDto Call {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlCallStmtDto(
@@ -1181,27 +1192,27 @@ namespace org.jacodb.api.net.generated.models
     )
     {
       if (call == null) throw new ArgumentNullException("call");
-
+      
       Call = call;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlCallStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlCallStmtDto> Read = (ctx, reader) => 
     {
       var call = IlCallDto.Read(ctx, reader);
       var _result = new IlCallStmtDto(call);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlCallStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlCallStmtDto> Write = (ctx, writer, value) => 
     {
       IlCallDto.Write(ctx, writer, value.Call);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1244,51 +1255,238 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:93</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:132</p>
+  /// </summary>
+  public sealed class IlCalliDto : IlExprDto
+  {
+    //fields
+    //public fields
+    [NotNull] public IlSignatureDto Signature {get; private set;}
+    [NotNull] public IlExprDto Ftn {get; private set;}
+    [NotNull] public List<IlExprDto> Args {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlCalliDto(
+      [NotNull] IlSignatureDto signature,
+      [NotNull] IlExprDto ftn,
+      [NotNull] List<IlExprDto> args,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      if (signature == null) throw new ArgumentNullException("signature");
+      if (ftn == null) throw new ArgumentNullException("ftn");
+      if (args == null) throw new ArgumentNullException("args");
+      
+      Signature = signature;
+      Ftn = ftn;
+      Args = args;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlCalliDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var signature = IlSignatureDto.Read(ctx, reader);
+      var ftn = IlExprDto.Read(ctx, reader);
+      var args = ReadIlExprDtoList(ctx, reader);
+      var _result = new IlCalliDto(signature, ftn, args, type);
+      return _result;
+    };
+    public static CtxReadDelegate<List<IlExprDto>> ReadIlExprDtoList = IlExprDto.Read.List();
+    
+    public static new CtxWriteDelegate<IlCalliDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      IlSignatureDto.Write(ctx, writer, value.Signature);
+      IlExprDto.Write(ctx, writer, value.Ftn);
+      WriteIlExprDtoList(ctx, writer, value.Args);
+    };
+    public static  CtxWriteDelegate<List<IlExprDto>> WriteIlExprDtoList = IlExprDto.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCalliDto) obj);
+    }
+    public bool Equals(IlCalliDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Signature, other.Signature) && Equals(Ftn, other.Ftn) && Args.SequenceEqual(other.Args) && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Signature.GetHashCode();
+        hash = hash * 31 + Ftn.GetHashCode();
+        hash = hash * 31 + Args.ContentHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCalliDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("signature = "); Signature.PrintEx(printer); printer.Println();
+        printer.Print("ftn = "); Ftn.PrintEx(printer); printer.Println();
+        printer.Print("args = "); Args.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:147</p>
+  /// </summary>
+  public sealed class IlCalliStmtDto : IlStmtDto
+  {
+    //fields
+    //public fields
+    [NotNull] public IlCalliDto Calli {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlCalliStmtDto(
+      [NotNull] IlCalliDto calli
+    )
+    {
+      if (calli == null) throw new ArgumentNullException("calli");
+      
+      Calli = calli;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlCalliStmtDto> Read = (ctx, reader) => 
+    {
+      var calli = IlCalliDto.Read(ctx, reader);
+      var _result = new IlCalliStmtDto(calli);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlCalliStmtDto> Write = (ctx, writer, value) => 
+    {
+      IlCalliDto.Write(ctx, writer, value.Calli);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCalliStmtDto) obj);
+    }
+    public bool Equals(IlCalliStmtDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Calli, other.Calli);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Calli.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCalliStmtDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("calli = "); Calli.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:110</p>
   /// </summary>
   public sealed class IlCastClassExprDto : IlCastExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlCastClassExprDto(
-      [NotNull] CacheKey targetType,
+      [NotNull] TypeId targetType,
       [NotNull] IlExprDto operand,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       targetType,
       operand,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlCastClassExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlCastClassExprDto> Read = (ctx, reader) => 
     {
-      var targetType = CacheKey.Read(ctx, reader);
+      var targetType = TypeId.Read(ctx, reader);
       var operand = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlCastClassExprDto(targetType, operand, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlCastClassExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlCastClassExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.TargetType);
+      TypeId.Write(ctx, writer, value.TargetType);
       IlExprDto.Write(ctx, writer, value.Operand);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1335,44 +1533,44 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:85</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:102</p>
   /// </summary>
   public abstract class IlCastExprDto : IlExprDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey TargetType {get; private set;}
+    [NotNull] public TypeId TargetType {get; private set;}
     [NotNull] public IlExprDto Operand {get; private set;}
-
+    
     //private fields
     //primary constructor
     protected IlCastExprDto(
-      [NotNull] CacheKey targetType,
+      [NotNull] TypeId targetType,
       [NotNull] IlExprDto operand,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (targetType == null) throw new ArgumentNullException("targetType");
       if (operand == null) throw new ArgumentNullException("operand");
-
+      
       TargetType = targetType;
       Operand = operand;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static new CtxReadDelegate<IlCastExprDto> Read = Polymorphic<IlCastExprDto>.ReadAbstract(IlCastExprDto_Unknown.Read);
-
+    
     public static new CtxWriteDelegate<IlCastExprDto> Write = Polymorphic<IlCastExprDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1380,48 +1578,48 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlCastExprDto_Unknown : IlCastExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlCastExprDto_Unknown(
-      [NotNull] CacheKey targetType,
+      [NotNull] TypeId targetType,
       [NotNull] IlExprDto operand,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       targetType,
       operand,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlCastExprDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlCastExprDto_Unknown> Read = (ctx, reader) => 
     {
-      var targetType = CacheKey.Read(ctx, reader);
+      var targetType = TypeId.Read(ctx, reader);
       var operand = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlCastExprDto_Unknown(targetType, operand, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlCastExprDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlCastExprDto_Unknown> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.TargetType);
+      TypeId.Write(ctx, writer, value.TargetType);
       IlExprDto.Write(ctx, writer, value.Operand);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1468,35 +1666,121 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:29</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:51</p>
+  /// </summary>
+  public sealed class IlCharConstDto : IlNumConstDto
+  {
+    //fields
+    //public fields
+    public char Value {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlCharConstDto(
+      char value,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlCharConstDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var value = reader.ReadChar();
+      var _result = new IlCharConstDto(value, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlCharConstDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      writer.Write(value.Value);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCharConstDto) obj);
+    }
+    public bool Equals(IlCharConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Value == other.Value && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCharConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:33</p>
   /// </summary>
   public abstract class IlConstDto : IlValueDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     protected IlConstDto(
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static new CtxReadDelegate<IlConstDto> Read = Polymorphic<IlConstDto>.ReadAbstract(IlConstDto_Unknown.Read);
-
+    
     public static new CtxWriteDelegate<IlConstDto> Write = Polymorphic<IlConstDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1504,40 +1788,40 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlConstDto_Unknown : IlConstDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlConstDto_Unknown(
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlConstDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlConstDto_Unknown> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlConstDto_Unknown(type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlConstDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlConstDto_Unknown> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1580,51 +1864,51 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:90</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:107</p>
   /// </summary>
   public sealed class IlConvExprDto : IlCastExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlConvExprDto(
-      [NotNull] CacheKey targetType,
+      [NotNull] TypeId targetType,
       [NotNull] IlExprDto operand,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       targetType,
       operand,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlConvExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlConvExprDto> Read = (ctx, reader) => 
     {
-      var targetType = CacheKey.Read(ctx, reader);
+      var targetType = TypeId.Read(ctx, reader);
       var operand = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlConvExprDto(targetType, operand, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlConvExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlConvExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.TargetType);
+      TypeId.Write(ctx, writer, value.TargetType);
       IlExprDto.Write(ctx, writer, value.Operand);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1671,40 +1955,40 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:100</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:117</p>
   /// </summary>
   public abstract class IlDerefExprDto : IlValueDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Value {get; private set;}
-
+    
     //private fields
     //primary constructor
     protected IlDerefExprDto(
       [NotNull] IlExprDto value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (value == null) throw new ArgumentNullException("value");
-
+      
       Value = value;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static new CtxReadDelegate<IlDerefExprDto> Read = Polymorphic<IlDerefExprDto>.ReadAbstract(IlDerefExprDto_Unknown.Read);
-
+    
     public static new CtxWriteDelegate<IlDerefExprDto> Write = Polymorphic<IlDerefExprDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1712,44 +1996,44 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlDerefExprDto_Unknown : IlDerefExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlDerefExprDto_Unknown(
       [NotNull] IlExprDto value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       value,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlDerefExprDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlDerefExprDto_Unknown> Read = (ctx, reader) => 
     {
       var value = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlDerefExprDto_Unknown(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlDerefExprDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlDerefExprDto_Unknown> Write = (ctx, writer, value) => 
     {
       IlExprDto.Write(ctx, writer, value.Value);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1794,48 +2078,48 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:36</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:49</p>
   /// </summary>
   public sealed class IlDoubleConstDto : IlNumConstDto
   {
     //fields
     //public fields
     public double Value {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlDoubleConstDto(
       double value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       Value = value;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlDoubleConstDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlDoubleConstDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var value = reader.ReadDouble();
       var _result = new IlDoubleConstDto(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlDoubleConstDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlDoubleConstDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Value);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1880,28 +2164,28 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:128</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:154</p>
   /// </summary>
   public abstract class IlEhStmtDto : IlStmtDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static new CtxReadDelegate<IlEhStmtDto> Read = Polymorphic<IlEhStmtDto>.ReadAbstract(IlEhStmtDto_Unknown.Read);
-
+    
     public static new CtxWriteDelegate<IlEhStmtDto> Write = Polymorphic<IlEhStmtDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1909,31 +2193,31 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlEhStmtDto_Unknown : IlEhStmtDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlEhStmtDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlEhStmtDto_Unknown> Read = (ctx, reader) => 
     {
       var _result = new IlEhStmtDto_Unknown();
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlEhStmtDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlEhStmtDto_Unknown> Write = (ctx, writer, value) => 
     {
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -1972,34 +2256,34 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:134</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:160</p>
   /// </summary>
   public sealed class IlEndFaultStmtDto : IlEhStmtDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlEndFaultStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlEndFaultStmtDto> Read = (ctx, reader) => 
     {
       var _result = new IlEndFaultStmtDto();
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlEndFaultStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlEndFaultStmtDto> Write = (ctx, writer, value) => 
     {
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2038,17 +2322,17 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:135</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:161</p>
   /// </summary>
   public sealed class IlEndFilterStmtDto : IlEhStmtDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Value {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlEndFilterStmtDto(
@@ -2056,27 +2340,27 @@ namespace org.jacodb.api.net.generated.models
     )
     {
       if (value == null) throw new ArgumentNullException("value");
-
+      
       Value = value;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlEndFilterStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlEndFilterStmtDto> Read = (ctx, reader) => 
     {
       var value = IlExprDto.Read(ctx, reader);
       var _result = new IlEndFilterStmtDto(value);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlEndFilterStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlEndFilterStmtDto> Write = (ctx, writer, value) => 
     {
       IlExprDto.Write(ctx, writer, value.Value);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2119,34 +2403,34 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:133</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:159</p>
   /// </summary>
   public sealed class IlEndFinallyStmtDto : IlEhStmtDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlEndFinallyStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlEndFinallyStmtDto> Read = (ctx, reader) => 
     {
       var _result = new IlEndFinallyStmtDto();
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlEndFinallyStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlEndFinallyStmtDto> Write = (ctx, writer, value) => 
     {
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2185,36 +2469,132 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:25</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:56</p>
+  /// </summary>
+  public sealed class IlEnumConstDto : IlConstDto
+  {
+    //fields
+    //public fields
+    [NotNull] public TypeId UnderlyingType {get; private set;}
+    [NotNull] public IlConstDto UnderlyingValue {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlEnumConstDto(
+      [NotNull] TypeId underlyingType,
+      [NotNull] IlConstDto underlyingValue,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      if (underlyingType == null) throw new ArgumentNullException("underlyingType");
+      if (underlyingValue == null) throw new ArgumentNullException("underlyingValue");
+      
+      UnderlyingType = underlyingType;
+      UnderlyingValue = underlyingValue;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlEnumConstDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var underlyingType = TypeId.Read(ctx, reader);
+      var underlyingValue = IlConstDto.Read(ctx, reader);
+      var _result = new IlEnumConstDto(underlyingType, underlyingValue, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlEnumConstDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.UnderlyingType);
+      IlConstDto.Write(ctx, writer, value.UnderlyingValue);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlEnumConstDto) obj);
+    }
+    public bool Equals(IlEnumConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(UnderlyingType, other.UnderlyingType) && Equals(UnderlyingValue, other.UnderlyingValue) && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + UnderlyingType.GetHashCode();
+        hash = hash * 31 + UnderlyingValue.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlEnumConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("underlyingType = "); UnderlyingType.PrintEx(printer); printer.Println();
+        printer.Print("underlyingValue = "); UnderlyingValue.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:29</p>
   /// </summary>
   public abstract class IlExprDto{
     //fields
     //public fields
-    [NotNull] public CacheKey Type {get; private set;}
-
+    [NotNull] public TypeId Type {get; private set;}
+    
     //private fields
     //primary constructor
     protected IlExprDto(
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     )
     {
       if (type == null) throw new ArgumentNullException("type");
-
+      
       Type = type;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static CtxReadDelegate<IlExprDto> Read = Polymorphic<IlExprDto>.ReadAbstract(IlExprDto_Unknown.Read);
-
+    
     public static CtxWriteDelegate<IlExprDto> Write = Polymorphic<IlExprDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2222,40 +2602,40 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlExprDto_Unknown : IlExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlExprDto_Unknown(
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlExprDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlExprDto_Unknown> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlExprDto_Unknown(type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlExprDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlExprDto_Unknown> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2298,57 +2678,57 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:66</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:83</p>
   /// </summary>
   public sealed class IlFieldAccessDto : IlValueDto
   {
     //fields
     //public fields
     [Nullable] public IlExprDto Instance {get; private set;}
-    [NotNull] public CacheKey Field {get; private set;}
-
+    [NotNull] public InstanceIdRef Field {get; private set;}
+    
     //private fields
     //primary constructor
     public IlFieldAccessDto(
       [Nullable] IlExprDto instance,
-      [NotNull] CacheKey field,
-      [NotNull] CacheKey type
+      [NotNull] InstanceIdRef field,
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (field == null) throw new ArgumentNullException("field");
-
+      
       Instance = instance;
       Field = field;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlFieldAccessDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlFieldAccessDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var instance = ReadIlExprDtoNullable(ctx, reader);
-      var field = CacheKey.Read(ctx, reader);
+      var field = InstanceIdRef.Read(ctx, reader);
       var _result = new IlFieldAccessDto(instance, field, type);
       return _result;
     };
     public static CtxReadDelegate<IlExprDto> ReadIlExprDtoNullable = IlExprDto.Read.NullableClass();
-
-    public static new CtxWriteDelegate<IlFieldAccessDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlFieldAccessDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       WriteIlExprDtoNullable(ctx, writer, value.Instance);
-      CacheKey.Write(ctx, writer, value.Field);
+      InstanceIdRef.Write(ctx, writer, value.Field);
     };
     public static  CtxWriteDelegate<IlExprDto> WriteIlExprDtoNullable = IlExprDto.Write.NullableClass();
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2395,50 +2775,50 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:47</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:67</p>
   /// </summary>
   public sealed class IlFieldRefDto : IlConstDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey Field {get; private set;}
-
+    [NotNull] public InstanceIdRef Field {get; private set;}
+    
     //private fields
     //primary constructor
     public IlFieldRefDto(
-      [NotNull] CacheKey field,
-      [NotNull] CacheKey type
+      [NotNull] InstanceIdRef field,
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (field == null) throw new ArgumentNullException("field");
-
+      
       Field = field;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlFieldRefDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlFieldRefDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
-      var field = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
+      var field = InstanceIdRef.Read(ctx, reader);
       var _result = new IlFieldRefDto(field, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlFieldRefDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlFieldRefDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
-      CacheKey.Write(ctx, writer, value.Field);
+      TypeId.Write(ctx, writer, value.Type);
+      InstanceIdRef.Write(ctx, writer, value.Field);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2483,48 +2863,48 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:35</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:48</p>
   /// </summary>
   public sealed class IlFloatConstDto : IlNumConstDto
   {
     //fields
     //public fields
     public float Value {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlFloatConstDto(
       float value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       Value = value;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlFloatConstDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlFloatConstDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var value = reader.ReadFloat();
       var _result = new IlFloatConstDto(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlFloatConstDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlFloatConstDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Value);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2569,43 +2949,43 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:143</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:169</p>
   /// </summary>
   public sealed class IlGotoStmtDto : IlBranchStmtDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlGotoStmtDto(
       int target
     ) : base (
       target
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlGotoStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlGotoStmtDto> Read = (ctx, reader) => 
     {
       var target = reader.ReadInt();
       var _result = new IlGotoStmtDto(target);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlGotoStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlGotoStmtDto> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Target);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2648,17 +3028,17 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:146</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:172</p>
   /// </summary>
   public sealed class IlIfStmtDto : IlBranchStmtDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Cond {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlIfStmtDto(
@@ -2666,32 +3046,32 @@ namespace org.jacodb.api.net.generated.models
       int target
     ) : base (
       target
-     )
+     ) 
     {
       if (cond == null) throw new ArgumentNullException("cond");
-
+      
       Cond = cond;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlIfStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlIfStmtDto> Read = (ctx, reader) => 
     {
       var target = reader.ReadInt();
       var cond = IlExprDto.Read(ctx, reader);
       var _result = new IlIfStmtDto(cond, target);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlIfStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlIfStmtDto> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Target);
       IlExprDto.Write(ctx, writer, value.Cond);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2736,127 +3116,48 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:55</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:39</p>
   /// </summary>
-  public sealed class IlInitExprDto : IlExprDto
+  public sealed class IlInt16ConstDto : IlNumConstDto
   {
     //fields
     //public fields
-
+    public short Value {get; private set;}
+    
     //private fields
     //primary constructor
-    public IlInitExprDto(
-      [NotNull] CacheKey type
+    public IlInt16ConstDto(
+      short value,
+      [NotNull] TypeId type
     ) : base (
       type
-     )
-    {
-    }
-    //secondary constructor
-    //deconstruct trait
-    //statics
-
-    public static new CtxReadDelegate<IlInitExprDto> Read = (ctx, reader) =>
-    {
-      var type = CacheKey.Read(ctx, reader);
-      var _result = new IlInitExprDto(type);
-      return _result;
-    };
-
-    public static new CtxWriteDelegate<IlInitExprDto> Write = (ctx, writer, value) =>
-    {
-      CacheKey.Write(ctx, writer, value.Type);
-    };
-
-    //constants
-
-    //custom body
-    //methods
-    //equals trait
-    public override bool Equals(object obj)
-    {
-      if (ReferenceEquals(null, obj)) return false;
-      if (ReferenceEquals(this, obj)) return true;
-      if (obj.GetType() != GetType()) return false;
-      return Equals((IlInitExprDto) obj);
-    }
-    public bool Equals(IlInitExprDto other)
-    {
-      if (ReferenceEquals(null, other)) return false;
-      if (ReferenceEquals(this, other)) return true;
-      return Equals(Type, other.Type);
-    }
-    //hash code trait
-    public override int GetHashCode()
-    {
-      unchecked {
-        var hash = 0;
-        hash = hash * 31 + Type.GetHashCode();
-        return hash;
-      }
-    }
-    //pretty print
-    public void Print(PrettyPrinter printer)
-    {
-      printer.Println("IlInitExprDto (");
-      using (printer.IndentCookie()) {
-        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
-      }
-      printer.Print(")");
-    }
-    //toString
-    public override string ToString()
-    {
-      var printer = new SingleLinePrettyPrinter();
-      Print(printer);
-      return printer.ToString();
-    }
-  }
-
-
-  /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:33</p>
-  /// </summary>
-  public sealed class IlIntConstDto : IlNumConstDto
-  {
-    //fields
-    //public fields
-    public int Value {get; private set;}
-
-    //private fields
-    //primary constructor
-    public IlIntConstDto(
-      int value,
-      [NotNull] CacheKey type
-    ) : base (
-      type
-     )
+     ) 
     {
       Value = value;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlIntConstDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlInt16ConstDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
-      var value = reader.ReadInt();
-      var _result = new IlIntConstDto(value, type);
+      var type = TypeId.Read(ctx, reader);
+      var value = reader.ReadShort();
+      var _result = new IlInt16ConstDto(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlIntConstDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlInt16ConstDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Value);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2865,9 +3166,9 @@ namespace org.jacodb.api.net.generated.models
       if (ReferenceEquals(null, obj)) return false;
       if (ReferenceEquals(this, obj)) return true;
       if (obj.GetType() != GetType()) return false;
-      return Equals((IlIntConstDto) obj);
+      return Equals((IlInt16ConstDto) obj);
     }
-    public bool Equals(IlIntConstDto other)
+    public bool Equals(IlInt16ConstDto other)
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
@@ -2886,7 +3187,7 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("IlIntConstDto (");
+      printer.Println("IlInt16ConstDto (");
       using (printer.IndentCookie()) {
         printer.Print("value = "); Value.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -2901,51 +3202,309 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:94</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:42</p>
+  /// </summary>
+  public sealed class IlInt32ConstDto : IlNumConstDto
+  {
+    //fields
+    //public fields
+    public int Value {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlInt32ConstDto(
+      int value,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlInt32ConstDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var value = reader.ReadInt();
+      var _result = new IlInt32ConstDto(value, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlInt32ConstDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      writer.Write(value.Value);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlInt32ConstDto) obj);
+    }
+    public bool Equals(IlInt32ConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Value == other.Value && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlInt32ConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:45</p>
+  /// </summary>
+  public sealed class IlInt64ConstDto : IlNumConstDto
+  {
+    //fields
+    //public fields
+    public long Value {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlInt64ConstDto(
+      long value,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlInt64ConstDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var value = reader.ReadLong();
+      var _result = new IlInt64ConstDto(value, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlInt64ConstDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      writer.Write(value.Value);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlInt64ConstDto) obj);
+    }
+    public bool Equals(IlInt64ConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Value == other.Value && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlInt64ConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:36</p>
+  /// </summary>
+  public sealed class IlInt8ConstDto : IlNumConstDto
+  {
+    //fields
+    //public fields
+    public byte Value {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlInt8ConstDto(
+      byte value,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlInt8ConstDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var value = reader.ReadByte();
+      var _result = new IlInt8ConstDto(value, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlInt8ConstDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      writer.Write(value.Value);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlInt8ConstDto) obj);
+    }
+    public bool Equals(IlInt8ConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Value == other.Value && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlInt8ConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:111</p>
   /// </summary>
   public sealed class IlIsInstExprDto : IlCastExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlIsInstExprDto(
-      [NotNull] CacheKey targetType,
+      [NotNull] TypeId targetType,
       [NotNull] IlExprDto operand,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       targetType,
       operand,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlIsInstExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlIsInstExprDto> Read = (ctx, reader) => 
     {
-      var targetType = CacheKey.Read(ctx, reader);
+      var targetType = TypeId.Read(ctx, reader);
       var operand = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlIsInstExprDto(targetType, operand, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlIsInstExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlIsInstExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.TargetType);
+      TypeId.Write(ctx, writer, value.TargetType);
       IlExprDto.Write(ctx, writer, value.Operand);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -2992,133 +3551,47 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:34</p>
-  /// </summary>
-  public sealed class IlLongConstDto : IlNumConstDto
-  {
-    //fields
-    //public fields
-    public long Value {get; private set;}
-
-    //private fields
-    //primary constructor
-    public IlLongConstDto(
-      long value,
-      [NotNull] CacheKey type
-    ) : base (
-      type
-     )
-    {
-      Value = value;
-    }
-    //secondary constructor
-    //deconstruct trait
-    //statics
-
-    public static new CtxReadDelegate<IlLongConstDto> Read = (ctx, reader) =>
-    {
-      var type = CacheKey.Read(ctx, reader);
-      var value = reader.ReadLong();
-      var _result = new IlLongConstDto(value, type);
-      return _result;
-    };
-
-    public static new CtxWriteDelegate<IlLongConstDto> Write = (ctx, writer, value) =>
-    {
-      CacheKey.Write(ctx, writer, value.Type);
-      writer.Write(value.Value);
-    };
-
-    //constants
-
-    //custom body
-    //methods
-    //equals trait
-    public override bool Equals(object obj)
-    {
-      if (ReferenceEquals(null, obj)) return false;
-      if (ReferenceEquals(this, obj)) return true;
-      if (obj.GetType() != GetType()) return false;
-      return Equals((IlLongConstDto) obj);
-    }
-    public bool Equals(IlLongConstDto other)
-    {
-      if (ReferenceEquals(null, other)) return false;
-      if (ReferenceEquals(this, other)) return true;
-      return Value == other.Value && Equals(Type, other.Type);
-    }
-    //hash code trait
-    public override int GetHashCode()
-    {
-      unchecked {
-        var hash = 0;
-        hash = hash * 31 + Value.GetHashCode();
-        hash = hash * 31 + Type.GetHashCode();
-        return hash;
-      }
-    }
-    //pretty print
-    public void Print(PrettyPrinter printer)
-    {
-      printer.Println("IlLongConstDto (");
-      using (printer.IndentCookie()) {
-        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
-        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
-      }
-      printer.Print(")");
-    }
-    //toString
-    public override string ToString()
-    {
-      var printer = new SingleLinePrettyPrinter();
-      Print(printer);
-      return printer.ToString();
-    }
-  }
-
-
-  /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:106</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:123</p>
   /// </summary>
   public sealed class IlManagedDerefExprDto : IlDerefExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlManagedDerefExprDto(
       [NotNull] IlExprDto value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       value,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlManagedDerefExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlManagedDerefExprDto> Read = (ctx, reader) => 
     {
       var value = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlManagedDerefExprDto(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlManagedDerefExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlManagedDerefExprDto> Write = (ctx, writer, value) => 
     {
       IlExprDto.Write(ctx, writer, value.Value);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3163,47 +3636,47 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:104</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:121</p>
   /// </summary>
   public sealed class IlManagedRefExprDto : IlRefExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlManagedRefExprDto(
       [NotNull] IlExprDto value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       value,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlManagedRefExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlManagedRefExprDto> Read = (ctx, reader) => 
     {
       var value = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlManagedRefExprDto(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlManagedRefExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlManagedRefExprDto> Write = (ctx, writer, value) => 
     {
       IlExprDto.Write(ctx, writer, value.Value);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3248,50 +3721,50 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:46</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:66</p>
   /// </summary>
   public sealed class IlMethodRefDto : IlConstDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey Method {get; private set;}
-
+    [NotNull] public InstanceIdRef Method {get; private set;}
+    
     //private fields
     //primary constructor
     public IlMethodRefDto(
-      [NotNull] CacheKey method,
-      [NotNull] CacheKey type
+      [NotNull] InstanceIdRef method,
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (method == null) throw new ArgumentNullException("method");
-
+      
       Method = method;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlMethodRefDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlMethodRefDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
-      var method = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
+      var method = InstanceIdRef.Read(ctx, reader);
       var _result = new IlMethodRefDto(method, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlMethodRefDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlMethodRefDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
-      CacheKey.Write(ctx, writer, value.Method);
+      TypeId.Write(ctx, writer, value.Type);
+      InstanceIdRef.Write(ctx, writer, value.Method);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3336,50 +3809,50 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:75</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:92</p>
   /// </summary>
   public sealed class IlNewArrayExprDto : IlExprDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Size {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlNewArrayExprDto(
       [NotNull] IlExprDto size,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (size == null) throw new ArgumentNullException("size");
-
+      
       Size = size;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlNewArrayExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlNewArrayExprDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var size = IlExprDto.Read(ctx, reader);
       var _result = new IlNewArrayExprDto(size, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlNewArrayExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlNewArrayExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       IlExprDto.Write(ctx, writer, value.Size);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3424,52 +3897,43 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:57</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:75</p>
   /// </summary>
   public sealed class IlNewExprDto : IlExprDto
   {
     //fields
     //public fields
-    [NotNull] public List<IlExprDto> Args {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlNewExprDto(
-      [NotNull] List<IlExprDto> args,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
-      if (args == null) throw new ArgumentNullException("args");
-
-      Args = args;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlNewExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlNewExprDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
-      var args = ReadIlExprDtoList(ctx, reader);
-      var _result = new IlNewExprDto(args, type);
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlNewExprDto(type);
       return _result;
     };
-    public static CtxReadDelegate<List<IlExprDto>> ReadIlExprDtoList = IlExprDto.Read.List();
-
-    public static new CtxWriteDelegate<IlNewExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlNewExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
-      WriteIlExprDtoList(ctx, writer, value.Args);
+      TypeId.Write(ctx, writer, value.Type);
     };
-    public static  CtxWriteDelegate<List<IlExprDto>> WriteIlExprDtoList = IlExprDto.Write.List();
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3484,14 +3948,13 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Args.SequenceEqual(other.Args) && Equals(Type, other.Type);
+      return Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Args.ContentHashCode();
         hash = hash * 31 + Type.GetHashCode();
         return hash;
       }
@@ -3501,7 +3964,6 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlNewExprDto (");
       using (printer.IndentCookie()) {
-        printer.Print("args = "); Args.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
@@ -3514,43 +3976,43 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:40</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:61</p>
   /// </summary>
   public sealed class IlNullDto : IlConstDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlNullDto(
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlNullDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlNullDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlNullDto(type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlNullDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlNullDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3593,35 +4055,35 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:30</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:34</p>
   /// </summary>
   public abstract class IlNumConstDto : IlConstDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     protected IlNumConstDto(
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static new CtxReadDelegate<IlNumConstDto> Read = Polymorphic<IlNumConstDto>.ReadAbstract(IlNumConstDto_Unknown.Read);
-
+    
     public static new CtxWriteDelegate<IlNumConstDto> Write = Polymorphic<IlNumConstDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3629,40 +4091,40 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlNumConstDto_Unknown : IlNumConstDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlNumConstDto_Unknown(
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlNumConstDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlNumConstDto_Unknown> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlNumConstDto_Unknown(type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlNumConstDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlNumConstDto_Unknown> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3705,40 +4167,40 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:97</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:114</p>
   /// </summary>
   public abstract class IlRefExprDto : IlValueDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Value {get; private set;}
-
+    
     //private fields
     //primary constructor
     protected IlRefExprDto(
       [NotNull] IlExprDto value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (value == null) throw new ArgumentNullException("value");
-
+      
       Value = value;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static new CtxReadDelegate<IlRefExprDto> Read = Polymorphic<IlRefExprDto>.ReadAbstract(IlRefExprDto_Unknown.Read);
-
+    
     public static new CtxWriteDelegate<IlRefExprDto> Write = Polymorphic<IlRefExprDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3746,44 +4208,44 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlRefExprDto_Unknown : IlRefExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlRefExprDto_Unknown(
       [NotNull] IlExprDto value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       value,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlRefExprDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlRefExprDto_Unknown> Read = (ctx, reader) => 
     {
       var value = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlRefExprDto_Unknown(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlRefExprDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlRefExprDto_Unknown> Write = (ctx, writer, value) => 
     {
       IlExprDto.Write(ctx, writer, value.Value);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3828,34 +4290,34 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:132</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:158</p>
   /// </summary>
   public sealed class IlRethrowStmtDto : IlEhStmtDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlRethrowStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlRethrowStmtDto> Read = (ctx, reader) => 
     {
       var _result = new IlRethrowStmtDto();
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlRethrowStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlRethrowStmtDto> Write = (ctx, writer, value) => 
     {
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3894,17 +4356,17 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:124</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:150</p>
   /// </summary>
   public sealed class IlReturnStmtDto : IlStmtDto
   {
     //fields
     //public fields
     [Nullable] public IlExprDto RetVal {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlReturnStmtDto(
@@ -3916,23 +4378,23 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlReturnStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlReturnStmtDto> Read = (ctx, reader) => 
     {
       var retVal = ReadIlExprDtoNullable(ctx, reader);
       var _result = new IlReturnStmtDto(retVal);
       return _result;
     };
     public static CtxReadDelegate<IlExprDto> ReadIlExprDtoNullable = IlExprDto.Read.NullableClass();
-
-    public static new CtxWriteDelegate<IlReturnStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlReturnStmtDto> Write = (ctx, writer, value) => 
     {
       WriteIlExprDtoNullable(ctx, writer, value.RetVal);
     };
     public static  CtxWriteDelegate<IlExprDto> WriteIlExprDtoNullable = IlExprDto.Write.NullableClass();
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -3975,50 +4437,50 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:61</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:78</p>
   /// </summary>
   public sealed class IlSizeOfExprDto : IlExprDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey TargetType {get; private set;}
-
+    [NotNull] public TypeId TargetType {get; private set;}
+    
     //private fields
     //primary constructor
     public IlSizeOfExprDto(
-      [NotNull] CacheKey targetType,
-      [NotNull] CacheKey type
+      [NotNull] TypeId targetType,
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (targetType == null) throw new ArgumentNullException("targetType");
-
+      
       TargetType = targetType;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlSizeOfExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlSizeOfExprDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
-      var targetType = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
+      var targetType = TypeId.Read(ctx, reader);
       var _result = new IlSizeOfExprDto(targetType, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlSizeOfExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlSizeOfExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
-      CacheKey.Write(ctx, writer, value.TargetType);
+      TypeId.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.TargetType);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4063,50 +4525,50 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:109</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:126</p>
   /// </summary>
   public sealed class IlStackAllocExprDto : IlExprDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Size {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlStackAllocExprDto(
       [NotNull] IlExprDto size,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (size == null) throw new ArgumentNullException("size");
-
+      
       Size = size;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlStackAllocExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlStackAllocExprDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var size = IlExprDto.Read(ctx, reader);
       var _result = new IlStackAllocExprDto(size, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlStackAllocExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlStackAllocExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       IlExprDto.Write(ctx, writer, value.Size);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4151,27 +4613,27 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:113</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:137</p>
   /// </summary>
   public abstract class IlStmtDto{
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static CtxReadDelegate<IlStmtDto> Read = Polymorphic<IlStmtDto>.ReadAbstract(IlStmtDto_Unknown.Read);
-
+    
     public static CtxWriteDelegate<IlStmtDto> Write = Polymorphic<IlStmtDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4179,31 +4641,31 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlStmtDto_Unknown : IlStmtDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlStmtDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlStmtDto_Unknown> Read = (ctx, reader) => 
     {
       var _result = new IlStmtDto_Unknown();
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlStmtDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlStmtDto_Unknown> Write = (ctx, writer, value) => 
     {
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4242,50 +4704,50 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:42</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:63</p>
   /// </summary>
   public sealed class IlStringConstDto : IlConstDto
   {
     //fields
     //public fields
     [NotNull] public string Value {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlStringConstDto(
       [NotNull] string value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (value == null) throw new ArgumentNullException("value");
-
+      
       Value = value;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlStringConstDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlStringConstDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var value = reader.ReadString();
       var _result = new IlStringConstDto(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlStringConstDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlStringConstDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write(value.Value);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4330,17 +4792,17 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:129</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:155</p>
   /// </summary>
   public sealed class IlThrowStmtDto : IlEhStmtDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Value {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlThrowStmtDto(
@@ -4348,27 +4810,27 @@ namespace org.jacodb.api.net.generated.models
     )
     {
       if (value == null) throw new ArgumentNullException("value");
-
+      
       Value = value;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlThrowStmtDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlThrowStmtDto> Read = (ctx, reader) => 
     {
       var value = IlExprDto.Read(ctx, reader);
       var _result = new IlThrowStmtDto(value);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlThrowStmtDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlThrowStmtDto> Write = (ctx, writer, value) => 
     {
       IlExprDto.Write(ctx, writer, value.Value);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4411,50 +4873,50 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:45</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:65</p>
   /// </summary>
   public sealed class IlTypeRefDto : IlConstDto
   {
     //fields
     //public fields
-    [NotNull] public CacheKey ReferencedType {get; private set;}
-
+    [NotNull] public TypeId ReferencedType {get; private set;}
+    
     //private fields
     //primary constructor
     public IlTypeRefDto(
-      [NotNull] CacheKey referencedType,
-      [NotNull] CacheKey type
+      [NotNull] TypeId referencedType,
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (referencedType == null) throw new ArgumentNullException("referencedType");
-
+      
       ReferencedType = referencedType;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlTypeRefDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlTypeRefDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
-      var referencedType = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
+      var referencedType = TypeId.Read(ctx, reader);
       var _result = new IlTypeRefDto(referencedType, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlTypeRefDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlTypeRefDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
-      CacheKey.Write(ctx, writer, value.ReferencedType);
+      TypeId.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.ReferencedType);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4499,50 +4961,394 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:49</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:40</p>
+  /// </summary>
+  public sealed class IlUint16ConstDto : IlNumConstDto
+  {
+    //fields
+    //public fields
+    public ushort Value {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlUint16ConstDto(
+      ushort value,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlUint16ConstDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var value = reader.ReadUShort();
+      var _result = new IlUint16ConstDto(value, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlUint16ConstDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      writer.Write(value.Value);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlUint16ConstDto) obj);
+    }
+    public bool Equals(IlUint16ConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Value == other.Value && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlUint16ConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:43</p>
+  /// </summary>
+  public sealed class IlUint32ConstDto : IlNumConstDto
+  {
+    //fields
+    //public fields
+    public uint Value {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlUint32ConstDto(
+      uint value,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlUint32ConstDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var value = reader.ReadUInt();
+      var _result = new IlUint32ConstDto(value, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlUint32ConstDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      writer.Write(value.Value);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlUint32ConstDto) obj);
+    }
+    public bool Equals(IlUint32ConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Value == other.Value && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlUint32ConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:46</p>
+  /// </summary>
+  public sealed class IlUint64ConstDto : IlNumConstDto
+  {
+    //fields
+    //public fields
+    public ulong Value {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlUint64ConstDto(
+      ulong value,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlUint64ConstDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var value = reader.ReadULong();
+      var _result = new IlUint64ConstDto(value, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlUint64ConstDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      writer.Write(value.Value);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlUint64ConstDto) obj);
+    }
+    public bool Equals(IlUint64ConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Value == other.Value && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlUint64ConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:37</p>
+  /// </summary>
+  public sealed class IlUint8ConstDto : IlNumConstDto
+  {
+    //fields
+    //public fields
+    public byte Value {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlUint8ConstDto(
+      byte value,
+      [NotNull] TypeId type
+    ) : base (
+      type
+     ) 
+    {
+      Value = value;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlUint8ConstDto> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var value = reader.ReadUByte();
+      var _result = new IlUint8ConstDto(value, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlUint8ConstDto> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      writer.Write(value.Value);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlUint8ConstDto) obj);
+    }
+    public bool Equals(IlUint8ConstDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Value == other.Value && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlUint8ConstDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:69</p>
   /// </summary>
   public sealed class IlUnaryOpDto : IlExprDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Operand {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlUnaryOpDto(
       [NotNull] IlExprDto operand,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       if (operand == null) throw new ArgumentNullException("operand");
-
+      
       Operand = operand;
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlUnaryOpDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlUnaryOpDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var operand = IlExprDto.Read(ctx, reader);
       var _result = new IlUnaryOpDto(operand, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlUnaryOpDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlUnaryOpDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       IlExprDto.Write(ctx, writer, value.Operand);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4587,51 +5393,51 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:92</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:109</p>
   /// </summary>
   public sealed class IlUnboxExprDto : IlCastExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlUnboxExprDto(
-      [NotNull] CacheKey targetType,
+      [NotNull] TypeId targetType,
       [NotNull] IlExprDto operand,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       targetType,
       operand,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlUnboxExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlUnboxExprDto> Read = (ctx, reader) => 
     {
-      var targetType = CacheKey.Read(ctx, reader);
+      var targetType = TypeId.Read(ctx, reader);
       var operand = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlUnboxExprDto(targetType, operand, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlUnboxExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlUnboxExprDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.TargetType);
+      TypeId.Write(ctx, writer, value.TargetType);
       IlExprDto.Write(ctx, writer, value.Operand);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4678,47 +5484,47 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:107</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:124</p>
   /// </summary>
   public sealed class IlUnmanagedDerefExprDto : IlDerefExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlUnmanagedDerefExprDto(
       [NotNull] IlExprDto value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       value,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlUnmanagedDerefExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlUnmanagedDerefExprDto> Read = (ctx, reader) => 
     {
       var value = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlUnmanagedDerefExprDto(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlUnmanagedDerefExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlUnmanagedDerefExprDto> Write = (ctx, writer, value) => 
     {
       IlExprDto.Write(ctx, writer, value.Value);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4763,47 +5569,47 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:105</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:122</p>
   /// </summary>
   public sealed class IlUnmanagedRefExprDto : IlRefExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlUnmanagedRefExprDto(
       [NotNull] IlExprDto value,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       value,
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlUnmanagedRefExprDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlUnmanagedRefExprDto> Read = (ctx, reader) => 
     {
       var value = IlExprDto.Read(ctx, reader);
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlUnmanagedRefExprDto(value, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlUnmanagedRefExprDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlUnmanagedRefExprDto> Write = (ctx, writer, value) => 
     {
       IlExprDto.Write(ctx, writer, value.Value);
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4848,35 +5654,35 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:28</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:32</p>
   /// </summary>
   public abstract class IlValueDto : IlExprDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     protected IlValueDto(
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
+    
     public static new CtxReadDelegate<IlValueDto> Read = Polymorphic<IlValueDto>.ReadAbstract(IlValueDto_Unknown.Read);
-
+    
     public static new CtxWriteDelegate<IlValueDto> Write = Polymorphic<IlValueDto>.Write;
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4884,40 +5690,40 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     //toString
   }
-
-
+  
+  
   public sealed class IlValueDto_Unknown : IlValueDto
   {
     //fields
     //public fields
-
+    
     //private fields
     //primary constructor
     public IlValueDto_Unknown(
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
     }
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlValueDto_Unknown> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlValueDto_Unknown> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var _result = new IlValueDto_Unknown(type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlValueDto_Unknown> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlValueDto_Unknown> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -4960,10 +5766,10 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:158</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:184</p>
   /// </summary>
   public sealed class IlVarAccessDto : IlValueDto
   {
@@ -4971,16 +5777,16 @@ namespace org.jacodb.api.net.generated.models
     //public fields
     public IlVarKind Kind {get; private set;}
     public int Index {get; private set;}
-
+    
     //private fields
     //primary constructor
     public IlVarAccessDto(
       IlVarKind kind,
       int index,
-      [NotNull] CacheKey type
+      [NotNull] TypeId type
     ) : base (
       type
-     )
+     ) 
     {
       Kind = kind;
       Index = index;
@@ -4988,25 +5794,25 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     //deconstruct trait
     //statics
-
-    public static new CtxReadDelegate<IlVarAccessDto> Read = (ctx, reader) =>
+    
+    public static new CtxReadDelegate<IlVarAccessDto> Read = (ctx, reader) => 
     {
-      var type = CacheKey.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
       var kind = (IlVarKind)reader.ReadInt();
       var index = reader.ReadInt();
       var _result = new IlVarAccessDto(kind, index, type);
       return _result;
     };
-
-    public static new CtxWriteDelegate<IlVarAccessDto> Write = (ctx, writer, value) =>
+    
+    public static new CtxWriteDelegate<IlVarAccessDto> Write = (ctx, writer, value) => 
     {
-      CacheKey.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.Type);
       writer.Write((int)value.Kind);
       writer.Write(value.Index);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -5053,14 +5859,107 @@ namespace org.jacodb.api.net.generated.models
       return printer.ToString();
     }
   }
-
-
+  
+  
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:150</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:176</p>
   /// </summary>
   public enum IlVarKind {
     local,
     temp,
     err
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:25</p>
+  /// </summary>
+  public sealed class InstanceIdRef : IPrintable, IEquatable<InstanceIdRef>
+  {
+    //fields
+    //public fields
+    [NotNull] public TypeId Type {get; private set;}
+    public int InstanceToken {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public InstanceIdRef(
+      [NotNull] TypeId type,
+      int instanceToken
+    )
+    {
+      if (type == null) throw new ArgumentNullException("type");
+      
+      Type = type;
+      InstanceToken = instanceToken;
+    }
+    //secondary constructor
+    //deconstruct trait
+    public void Deconstruct([NotNull] out TypeId type, out int instanceToken)
+    {
+      type = Type;
+      instanceToken = InstanceToken;
+    }
+    //statics
+    
+    public static CtxReadDelegate<InstanceIdRef> Read = (ctx, reader) => 
+    {
+      var type = TypeId.Read(ctx, reader);
+      var instanceToken = reader.ReadInt();
+      var _result = new InstanceIdRef(type, instanceToken);
+      return _result;
+    };
+    
+    public static CtxWriteDelegate<InstanceIdRef> Write = (ctx, writer, value) => 
+    {
+      TypeId.Write(ctx, writer, value.Type);
+      writer.Write(value.InstanceToken);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((InstanceIdRef) obj);
+    }
+    public bool Equals(InstanceIdRef other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Type, other.Type) && InstanceToken == other.InstanceToken;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Type.GetHashCode();
+        hash = hash * 31 + InstanceToken.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("InstanceIdRef (");
+      using (printer.IndentCookie()) {
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+        printer.Print("instanceToken = "); InstanceToken.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
   }
 }

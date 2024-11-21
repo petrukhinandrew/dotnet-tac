@@ -30,7 +30,7 @@ public class IlManagedRef(IlExpr value) : ILRefExpr
     public IlExpr Value => value;
 
     // TODO
-    public IlType Type => new IlManagedReference(value.Type.Type.MakeByRefType());
+    public IlType Type => new IlPointerType(value.Type.Type);
 
     public override string ToString()
     {
@@ -43,7 +43,7 @@ public class IlUnmanagedRef(IlExpr value) : ILRefExpr
     public IlExpr Value => value;
 
     // TODO
-    public IlType Type => new IlPointerType(value.Type.Type.MakePointerType());
+    public IlType Type => new IlPointerType(value.Type.Type);
 
     public override string ToString()
     {
@@ -54,7 +54,10 @@ public class IlUnmanagedRef(IlExpr value) : ILRefExpr
 public class IlManagedDeref(IlExpr byRefVal) : ILDerefExpr
 {
     public IlExpr Value => byRefVal;
-    public IlType Type => ((IlManagedReference)byRefVal.Type).ReferencedType;
+
+    public IlType Type => byRefVal.Type is IlPointerType managedRef
+        ? managedRef.TargetType
+        : throw new Exception("pointer type expected, got " + Type);
 
     public override string ToString()
     {
@@ -71,7 +74,7 @@ public class IlUnmanagedDeref : ILDerefExpr
         {
             Type = expectedType;
         }
-        else if (Value.Type is IlPointerType pointerType) Type = pointerType.PointedType;
+        else if (Value.Type is IlPointerType pointerType) Type = pointerType.TargetType;
         else throw new Exception($"unexpected pointer type: {Value.Type}");
     }
 

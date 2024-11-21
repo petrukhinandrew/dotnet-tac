@@ -1,9 +1,7 @@
 ﻿// #define CONSOLE_SERIALIZER
+
 #define RD_SERIALIZER
 
-using System.Reflection;
-using System.Reflection.Emit;
-using TACBuilder.ILReflection;
 using TACBuilder.Serialization;
 using TACBuilder.Utils;
 
@@ -13,6 +11,7 @@ class Program
 {
     static void Main(string[] args)
     {
+
         AppTacBuilder builder = new();
         if (args.Contains("--rd"))
         {
@@ -45,6 +44,7 @@ class Program
             AppTacBuilder.IncludeMsCoreLib();
             builder.Build(path);
             var builtAsms = builder.BuiltAssemblies;
+            var serialized = RdSerializer.Serialize(AppTacBuilder.GetFreshInstances());
         }
     }
 }

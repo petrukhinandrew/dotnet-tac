@@ -15,6 +15,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
     public interface IParameter
     {
+        public string? FullName { get; }
         public string? Name { get; }
         public int Position { get; }
         public IlType Type { get; }
@@ -68,6 +69,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     public class This(IlType ilType) : IlCacheable, IParameter
     {
         public string Name => "this";
+        public string FullName => Name;
         public int Position => 0;
         public IlType Type => ilType;
         public List<IlAttribute> Attributes { get; } = new();
@@ -139,6 +141,10 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     public bool HasMethodBody { get; private set; }
     public bool HasThis { get; private set; }
     public new string Name => _methodBase.Name;
+
+    public string Signature =>
+        $"{ReturnType?.FullName ?? ""}{_methodBase.Name}({string.Join(",", Parameters.Select(p => p.FullName))})";
+
     public bool IsGeneric => _methodBase.IsGenericMethod;
     public bool IsStatic => _methodBase.IsStatic;
     public new bool IsConstructed = false;
@@ -157,7 +163,6 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
     private IlBody _ilBody;
     private TacBody? _tacBody;
-
     private CFG _cfg;
     private ILBodyParser _bodyParser;
     public int ModuleToken => _methodBase.MetadataToken;
@@ -179,8 +184,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             }
         }
 
-        if (_methodBase is MethodInfo methodInfo && methodInfo.ReturnType != typeof(void))
-            ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
+        ReturnType = _methodBase is MethodInfo methodInfo ? IlInstanceBuilder.GetType(methodInfo.ReturnType) : IlInstanceBuilder.GetType(typeof(void));
 
         Debug.Assert(Parameters.Count == 0);
 

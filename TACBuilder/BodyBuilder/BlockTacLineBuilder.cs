@@ -764,7 +764,7 @@ static class BlockTacLineBuilder
                 case "newobj":
                 {
                     IlMethod ilMethod = ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
-                    Debug.Assert(ilMethod.ReturnType is null);
+                    Debug.Assert(ilMethod.ReturnType == IlInstanceBuilder.GetType(typeof(void)));
                     IlType objIlType = ilMethod.DeclaringType!;
                     var newInstance = blockBuilder.GetNewTemp(new IlNullConst(), blockBuilder.CurInstr.idx);
                     blockBuilder.Push(newInstance);
@@ -999,7 +999,9 @@ static class BlockTacLineBuilder
             var arrVar = newArr as IlVar ?? throw new Exception("expected var, got " + newArr.Type);
             IlNewArrayExpr expr = arrVar.Value as IlNewArrayExpr ??
                                   throw new KnownBug("inline multidimensional array, got " +
-                                                     (arrVar.Value?.Type.ToString() ?? "null") + " instead of NewArrayExpr");;
+                                                     (arrVar.Value?.Type.ToString() ?? "null") +
+                                                     " instead of NewArrayExpr");
+            ;
             IlInt32Const arrSize = (IlInt32Const)expr.Size;
             Type elemType = ((IlArrayType)expr.Type).ElementType.Type;
             var tmp = Array.CreateInstance(elemType, arrSize.Value);

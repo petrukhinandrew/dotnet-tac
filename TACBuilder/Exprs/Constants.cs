@@ -62,7 +62,7 @@ public interface IlConstant : IlValue
         }
 
         if (collection == null) throw new Exception("unexpected array constant " + collection);
-        return new IlArrayConst((IlInstanceBuilder.GetType(collection.GetType()) as IlArrayType)!, values);
+        return new IlArrayConst((IlInstanceBuilder.GetType(values[0].Type.Type.MakeArrayType()) as IlArrayType)!, values);
     }
 }
 
