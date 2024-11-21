@@ -66,7 +66,9 @@ public static class RdSerializer
                     isValueType: enumType.IsValueType,
                     attrs: attrs,
                     fields: fields,
-                    methods: methods
+                    methods: methods,
+                    names: enumType.NameToValueMapping.Keys.ToList(),
+                    values: enumType.NameToValueMapping.Values.Select(v => v.SerializeConst()).ToList()
                 ),
                 IlPrimitiveType primitiveType => new IlPrimitiveTypeDto(
                     asmName: primitiveType.AsmName,
