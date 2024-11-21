@@ -4,84 +4,9 @@ using System.Reflection;
 using Microsoft.Extensions.Logging;
 using TACBuilder.Exprs;
 using TACBuilder.Utils;
+using Exception = System.Exception;
 
 namespace TACBuilder.ILReflection;
-
-public class IlPointerType(Type baseType) : IlType(baseType)
-{
-    public override bool IsManaged => false;
-    public override bool IsUnmanaged => true;
-    public IlType PointedType => IlInstanceBuilder.GetType(Type.GetElementType() ?? throw new("123"));
-}
-
-public class IlValueType(Type type) : IlType(type);
-
-public class IlPrimitiveType(Type type) : IlValueType(type)
-{
-    public override bool IsManaged => false;
-    public override bool IsUnmanaged => true;
-
-    public override IlPrimitiveType ExpectedStackType()
-    {
-        if (Type == typeof(IntPtr) || Type == typeof(UIntPtr))
-            return (IlPrimitiveType)
-                IlInstanceBuilder.GetType(Type);
-        return (IlPrimitiveType)(Type.GetTypeCode(Type) switch
-        {
-            TypeCode.Boolean => IlInstanceBuilder.GetType(typeof(bool)),
-            TypeCode.Char => IlInstanceBuilder.GetType(typeof(char)),
-            TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 => IlInstanceBuilder.GetType(typeof(int)),
-            TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(uint)),
-            TypeCode.Int64  => IlInstanceBuilder.GetType(typeof(long)),
-            TypeCode.UInt64 => IlInstanceBuilder.GetType(typeof(ulong)),
-            TypeCode.Single => IlInstanceBuilder.GetType(typeof(float)),
-            TypeCode.Double => IlInstanceBuilder.GetType(typeof(double)),
-            _ => throw new NotSupportedException("unhandled primitive stack type " + ToString()),
-        });
-    }
-}
-
-public class IlEnumType(Type type) : IlValueType(type)
-{
-    public override bool IsManaged => false;
-    public override bool IsUnmanaged => true;
-
-    public IlType UnderlyingType = IlInstanceBuilder.GetType(Enum.GetUnderlyingType(type));
-    public Dictionary<string, IlConstant> NameToValueMapping = new();
-
-    public override void Construct()
-    {
-        Debug.Assert(Type.IsEnum);
-        base.Construct();
-        foreach (var value in Enum.GetValues(Type))
-        {
-            var name = Enum.GetName(Type, value) ?? "";
-            NameToValueMapping.TryAdd(name, IlConstant.From(value));
-        }
-    }
-}
-// TODO add null value getter for such thing 
-public class IlStructType(Type type) : IlValueType(type);
-
-public class IlReferenceType(Type type) : IlType(type)
-{
-    public override bool IsManaged => true;
-    public override bool IsUnmanaged => false;
-}
-
-public class IlManagedReference(Type type) : IlReferenceType(type)
-{
-    public override bool IsManaged => true;
-    public override bool IsUnmanaged => false;
-    public IlType ReferencedType => IlInstanceBuilder.GetType(Type.GetElementType()!);
-}
-
-public class IlArrayType(Type type) : IlReferenceType(type)
-{
-    public IlType ElementType => IlInstanceBuilder.GetType(Type.GetElementType()!);
-}
-
-public class IlClassType(Type type) : IlReferenceType(type);
 
 public class IlType(Type type) : IlMember(type)
 {
@@ -97,6 +22,7 @@ public class IlType(Type type) : IlMember(type)
     {
         Logger.LogInformation("Constructing {Name}", Name);
         DeclaringAssembly = IlInstanceBuilder.GetAssembly(_type.Assembly);
+        DeclaringType = _type.DeclaringType == null ? null : IlInstanceBuilder.GetType(_type.DeclaringType);
         if (_type.IsGenericType)
         {
             GenericArgs = _type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList();
@@ -136,12 +62,26 @@ public class IlType(Type type) : IlMember(type)
 
     public IlType MeetWith(IlType another)
     {
-        return IlInstanceBuilder.GetType(MeetTypes(Type, another.Type));
+        return MeeetIlTypes(this, another);
+    }
+
+    private static IlType MeeetIlTypes(IlType? left, IlType? right)
+    {
+        if (left == null || right == null) return IlInstanceBuilder.GetType(typeof(object));
+        if (left is IlPointerType lp && right is IlPointerType rp)
+            return new IlPointerType(MeetTypes(lp.TargetType.Type, rp.TargetType.Type));
+        return IlInstanceBuilder.GetType(MeetTypes(left.Type, right.Type));
     }
 
     private static Type MeetTypes(Type? left, Type? right)
     {
         if (left == null || right == null) return typeof(object);
+        // TODO defn improper, we may want pointer instead of by ref 
+        if (left.IsByRef && right.IsPointer || left.IsPointer && right.IsByRef)
+        {
+            return MeetTypes(left.GetElementType(), right.GetElementType()).MakeByRefType();
+        }
+
         if (left.IsAssignableTo(right) || left.IsImplicitPrimitiveConvertibleTo(right)) return right;
         if (right.IsAssignableTo(left) || right.IsImplicitPrimitiveConvertibleTo(left)) return left;
         var workList = new Queue<Type>();
@@ -167,9 +107,15 @@ public class IlType(Type type) : IlMember(type)
 
     public IlAssembly DeclaringAssembly { get; private set; }
     public int AsmToken => _type.Assembly.GetHashCode();
+    public string AsmName => _type.Assembly.GetName().ToString();
+
+    public string Namespace => _type.Namespace ?? "";
+
+    public string FullName => _type.FullName ?? _type.Name;
     public int ModuleToken => _type.Module.MetadataToken;
     public int MetadataToken => _type.MetadataToken;
     public List<IlAttribute> Attributes { get; private set; }
+    public IlType? DeclaringType { get; private set; }
     public List<IlType> GenericArgs { get; private set; } = new();
     public HashSet<IlMethod> Methods { get; } = new();
     public HashSet<IlField> Fields { get; } = new();
@@ -207,41 +153,72 @@ public class IlType(Type type) : IlMember(type)
     }
 }
 
-public class IlField(FieldInfo fieldInfo) : IlMember(fieldInfo)
+public class IlPointerType(Type targetType) : IlType(targetType)
 {
-    // TODO attributes
-    private readonly FieldInfo _fieldInfo = fieldInfo;
-    public IlType? DeclaringType { get; private set; }
-    public bool IsStatic => _fieldInfo.IsStatic;
-    public IlType? Type { get; private set; }
-    public new string Name => _fieldInfo.Name;
-    public int ModuleToken => _fieldInfo.Module.MetadataToken;
-    public int MetadataToken => _fieldInfo.MetadataToken;
-    public object? GetValue(object? value) => _fieldInfo.GetValue(value);
-    public List<IlAttribute> Attributes { get; private set; }
-    public new bool IsConstructed = false;
+    public override bool IsManaged => false;
+    public override bool IsUnmanaged => true;
+    public IlType TargetType => IlInstanceBuilder.GetType(targetType);
+}
+
+public class IlValueType(Type type) : IlType(type);
+
+public class IlReferenceType(Type type) : IlType(type)
+{
+    public override bool IsManaged => true;
+    public override bool IsUnmanaged => false;
+}
+
+public class IlPrimitiveType(Type type) : IlValueType(type)
+{
+    public override bool IsManaged => false;
+    public override bool IsUnmanaged => true;
+
+    public override IlPrimitiveType ExpectedStackType()
+    {
+        if (Type == typeof(IntPtr) || Type == typeof(UIntPtr))
+            return (IlPrimitiveType)
+                IlInstanceBuilder.GetType(Type);
+        return (IlPrimitiveType)(Type.GetTypeCode(Type) switch
+        {
+            TypeCode.Boolean => IlInstanceBuilder.GetType(typeof(bool)),
+            TypeCode.Char => IlInstanceBuilder.GetType(typeof(char)),
+            TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 => IlInstanceBuilder.GetType(typeof(int)),
+            TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(uint)),
+            TypeCode.Int64 => IlInstanceBuilder.GetType(typeof(long)),
+            TypeCode.UInt64 => IlInstanceBuilder.GetType(typeof(ulong)),
+            TypeCode.Single => IlInstanceBuilder.GetType(typeof(float)),
+            TypeCode.Double => IlInstanceBuilder.GetType(typeof(double)),
+            _ => throw new NotSupportedException("unhandled primitive stack type " + ToString()),
+        });
+    }
+}
+
+public class IlEnumType(Type type) : IlValueType(type)
+{
+    public override bool IsManaged => false;
+    public override bool IsUnmanaged => true;
+
+    public IlType UnderlyingType = IlInstanceBuilder.GetType(Enum.GetUnderlyingType(type));
+    public Dictionary<string, IlConstant> NameToValueMapping = new();
 
     public override void Construct()
     {
-        DeclaringType = IlInstanceBuilder.GetType((_fieldInfo.ReflectedType ?? _fieldInfo.DeclaringType)!);
-        Type = IlInstanceBuilder.GetType(_fieldInfo.FieldType);
-        Attributes = _fieldInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
-        DeclaringType.EnsureFieldAttached(this);
-        IsConstructed = true;
-    }
-
-    public override string ToString()
-    {
-        return $"{Type} {Name}";
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return obj is IlField other && other._fieldInfo == _fieldInfo;
-    }
-
-    public override int GetHashCode()
-    {
-        return _fieldInfo.GetHashCode();
+        Debug.Assert(Type.IsEnum);
+        base.Construct();
+        foreach (var value in Enum.GetValues(Type))
+        {
+            var name = Enum.GetName(Type, value) ?? "";
+            NameToValueMapping.TryAdd(name, IlConstant.From(value));
+        }
     }
 }
+
+// TODO add null value getter for such thing 
+public class IlStructType(Type type) : IlValueType(type);
+
+public class IlArrayType(Type type) : IlReferenceType(type)
+{
+    public IlType ElementType => IlInstanceBuilder.GetType(Type.GetElementType()!);
+}
+
+public class IlClassType(Type type) : IlReferenceType(type);

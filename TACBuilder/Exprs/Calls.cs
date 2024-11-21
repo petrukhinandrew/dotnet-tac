@@ -5,7 +5,8 @@ namespace TACBuilder.Exprs;
 
 public class IlCallIndirect(IlSignature signature, IlExpr ftn, List<IlExpr> args) : IlExpr
 {
-    public IlType? Type => signature.ReturnType;
+    public IlSignature Signature => signature;
+    public IlType Type => Signature.ReturnType;
     public IlExpr Callee => ftn;
     public List<IlExpr> Arguments => args;
 
@@ -23,12 +24,13 @@ public class IlCall(IlMethod method, List<IlExpr> args) : IlExpr
         public int Index => parameter.Position;
         public new string ToString() => parameter.Name ?? NamingUtil.ArgVar(parameter.Position);
     }
+
     public IlMethod Method => method;
 
     public string Name => Method.Name;
 
     // TODO ctor has no return type
-    public IlType ReturnType => Method.ReturnType ?? IlInstanceBuilder.GetType(typeof(void));
+    public IlType ReturnType => Method.ReturnType!;
     public List<IlExpr> Args => args;
     public IlType Type => ReturnType;
 
@@ -52,7 +54,7 @@ public class IlCall(IlMethod method, List<IlExpr> args) : IlExpr
 
     public bool Returns()
     {
-        return !Equals(ReturnType, IlInstanceBuilder.GetType(typeof(void)));
+        return ReturnType != IlInstanceBuilder.GetType(typeof(void));
     }
 
     public override bool Equals(object? obj)

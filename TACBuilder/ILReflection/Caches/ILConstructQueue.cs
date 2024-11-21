@@ -9,7 +9,7 @@ public class ILConstructQueue : Queue<IlCacheable>
     public new void Enqueue(IlCacheable item)
     {
         base.Enqueue(item);
-        _freshInstances.Add(item);
+        if (item is IlType) _freshInstances.Add(item);
     }
 
     public List<IlCacheable> FreshInstances => _freshInstances;

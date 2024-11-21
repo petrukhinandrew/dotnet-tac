@@ -34,8 +34,8 @@ using JetBrains.Rd.Text;
 
 namespace org.jacodb.api.net.generated.models
 {
-
-
+  
+  
   /// <summary>
   /// <p>Generated from: IlSigModel.kt:23</p>
   /// </summary>
@@ -43,54 +43,63 @@ namespace org.jacodb.api.net.generated.models
   {
     //fields
     //public fields
+    [NotNull] public IRdEndpoint<Request, List<IlTypeDto>> CallForAsm => _CallForAsm;
     [NotNull] public ISignal<Request> AsmRequest => _AsmRequest;
     [NotNull] public ISignal<List<IlDto>> AsmResponse => _AsmResponse;
-
+    
     //private fields
+    [NotNull] private readonly RdCall<Request, List<IlTypeDto>> _CallForAsm;
     [NotNull] private readonly RdSignal<Request> _AsmRequest;
     [NotNull] private readonly RdSignal<List<IlDto>> _AsmResponse;
-
+    
     //primary constructor
     private IlSigModel(
+      [NotNull] RdCall<Request, List<IlTypeDto>> callForAsm,
       [NotNull] RdSignal<Request> asmRequest,
       [NotNull] RdSignal<List<IlDto>> asmResponse
     )
     {
+      if (callForAsm == null) throw new ArgumentNullException("callForAsm");
       if (asmRequest == null) throw new ArgumentNullException("asmRequest");
       if (asmResponse == null) throw new ArgumentNullException("asmResponse");
-
+      
+      _CallForAsm = callForAsm;
       _AsmRequest = asmRequest;
       _AsmResponse = asmResponse;
       _AsmRequest.Async = true;
       _AsmResponse.Async = true;
+      BindableChildren.Add(new KeyValuePair<string, object>("callForAsm", _CallForAsm));
       BindableChildren.Add(new KeyValuePair<string, object>("asmRequest", _AsmRequest));
       BindableChildren.Add(new KeyValuePair<string, object>("asmResponse", _AsmResponse));
     }
     //secondary constructor
     internal IlSigModel (
     ) : this (
+      new RdCall<Request, List<IlTypeDto>>(Request.Read, Request.Write, ReadIlTypeDtoList, WriteIlTypeDtoList),
       new RdSignal<Request>(Request.Read, Request.Write),
       new RdSignal<List<IlDto>>(ReadIlDtoList, WriteIlDtoList)
     ) {}
     //deconstruct trait
     //statics
-
+    
+    public static CtxReadDelegate<List<IlTypeDto>> ReadIlTypeDtoList = IlTypeDto.Read.List();
     public static CtxReadDelegate<List<IlDto>> ReadIlDtoList = IlDto.Read.List();
-
+    
+    public static  CtxWriteDelegate<List<IlTypeDto>> WriteIlTypeDtoList = IlTypeDto.Write.List();
     public static  CtxWriteDelegate<List<IlDto>> WriteIlDtoList = IlDto.Write.List();
-
-    protected override long SerializationHash => 4472687692352809953L;
-
+    
+    protected override long SerializationHash => 9130847229297571826L;
+    
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
     {
-
+      
       serializers.RegisterToplevelOnce(typeof(IlRoot), IlRoot.RegisterDeclaredTypesSerializers);
     }
-
-
+    
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait
@@ -100,6 +109,7 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlSigModel (");
       using (printer.IndentCookie()) {
+        printer.Print("callForAsm = "); _CallForAsm.PrintEx(printer); printer.Println();
         printer.Print("asmRequest = "); _AsmRequest.PrintEx(printer); printer.Println();
         printer.Print("asmResponse = "); _AsmResponse.PrintEx(printer); printer.Println();
       }
@@ -120,8 +130,8 @@ namespace org.jacodb.api.net.generated.models
       return ilModel.GetOrCreateExtension("ilSigModel", () => new IlSigModel());
     }
   }
-
-
+  
+  
   /// <summary>
   /// <p>Generated from: IlSigModel.kt:24</p>
   /// </summary>
@@ -130,7 +140,7 @@ namespace org.jacodb.api.net.generated.models
     //fields
     //public fields
     [NotNull] public string RootAsm {get; private set;}
-
+    
     //private fields
     //primary constructor
     public Request(
@@ -138,7 +148,7 @@ namespace org.jacodb.api.net.generated.models
     )
     {
       if (rootAsm == null) throw new ArgumentNullException("rootAsm");
-
+      
       RootAsm = rootAsm;
     }
     //secondary constructor
@@ -148,21 +158,21 @@ namespace org.jacodb.api.net.generated.models
       rootAsm = RootAsm;
     }
     //statics
-
-    public static CtxReadDelegate<Request> Read = (ctx, reader) =>
+    
+    public static CtxReadDelegate<Request> Read = (ctx, reader) => 
     {
       var rootAsm = reader.ReadString();
       var _result = new Request(rootAsm);
       return _result;
     };
-
-    public static CtxWriteDelegate<Request> Write = (ctx, writer, value) =>
+    
+    public static CtxWriteDelegate<Request> Write = (ctx, writer, value) => 
     {
       writer.Write(value.RootAsm);
     };
-
+    
     //constants
-
+    
     //custom body
     //methods
     //equals trait

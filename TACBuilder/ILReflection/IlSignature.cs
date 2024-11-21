@@ -14,10 +14,9 @@ public class IlSignature : IlCacheable
 {
     private MethodSignature<Type> _signature;
     public bool HasExplicitThis { get; private set; }
-    public bool IsGeneric { get; private set; }
-    public bool IsInstance { get; private set; }
 
-    // TODO seems like may be null
+    public int GenericParameterCount { get; private set; }
+    public bool IsInstance { get; private set; }
     public IlType? ReturnType { get; private set; }
     public List<IlType> ParameterTypes { get; } = new();
     public new bool IsConstructed = true;
@@ -27,7 +26,7 @@ public class IlSignature : IlCacheable
     {
         byte* blob;
         int length;
-        // TODO ochen' vadjno, tak ploho
+        // TODO ochen' vajno, tak ploho
         if (!src.Module.Assembly.TryGetRawMetadata(out blob, out length))
             Assembly.GetExecutingAssembly().TryGetRawMetadata(out blob, out length);
         MetadataReader reader = new MetadataReader(blob, length);
@@ -40,9 +39,9 @@ public class IlSignature : IlCacheable
         }
 
         HasExplicitThis = _signature.Header.HasExplicitThis;
-        IsGeneric = _signature.Header.IsGeneric;
+        GenericParameterCount = _signature.GenericParameterCount;
         IsInstance = _signature.Header.IsInstance;
-        ReturnType = _signature.ReturnType == null ? null : IlInstanceBuilder.GetType(_signature.ReturnType);
+        ReturnType = IlInstanceBuilder.GetType(_signature.ReturnType);
         ParameterTypes.AddRange(_signature.ParameterTypes.Select(IlInstanceBuilder.GetType));
         IsConstructed = true;
     }
@@ -55,6 +54,7 @@ public class IlSignature : IlCacheable
 internal class SigTypeProdiver(MethodBase src) : ISignatureTypeProvider<Type, Type[]>
 {
     private readonly MethodBase _method = src;
+
     public Type GetSZArrayType(Type elementType)
     {
         return elementType.MakeArrayType();

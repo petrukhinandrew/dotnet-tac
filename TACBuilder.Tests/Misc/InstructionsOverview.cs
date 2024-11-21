@@ -179,6 +179,7 @@ static class ConditionsTests
         return res;
     }
 
+    // TODO add ternary with (raw pointer + managed ref) merge
     public static void TernaryOp()
     {
         int a = 1;
