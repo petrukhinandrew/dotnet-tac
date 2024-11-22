@@ -854,7 +854,20 @@ static class BlockTacLineBuilder
                     break;
                 }
                 case "conv.i1":
+                {
+                    IlExpr value = blockBuilder.Pop();
+                    IlConvCastExpr convCast = new IlConvCastExpr(IlInstanceBuilder.GetType(typeof(sbyte)), value);
+                    blockBuilder.Push(convCast);
+                    break;
+                }
+                    
                 case "conv.i2":
+                {
+                    IlExpr value = blockBuilder.Pop();
+                    IlConvCastExpr convCast = new IlConvCastExpr(IlInstanceBuilder.GetType(typeof(short)), value);
+                    blockBuilder.Push(convCast);
+                    break;
+                }
                 case "conv.i4":
                 {
                     IlExpr value = blockBuilder.Pop();
@@ -884,7 +897,19 @@ static class BlockTacLineBuilder
                     break;
                 }
                 case "conv.u1":
+                {
+                    IlExpr value = blockBuilder.Pop();
+                    IlConvCastExpr convCast = new IlConvCastExpr(IlInstanceBuilder.GetType(typeof(byte)), value);
+                    blockBuilder.Push(convCast);
+                    break;
+                }
                 case "conv.u2":
+                {
+                    IlExpr value = blockBuilder.Pop();
+                    IlConvCastExpr convCast = new IlConvCastExpr(IlInstanceBuilder.GetType(typeof(ushort)), value);
+                    blockBuilder.Push(convCast);
+                    break;
+                }
                 case "conv.u4":
                 {
                     IlExpr value = blockBuilder.Pop();
