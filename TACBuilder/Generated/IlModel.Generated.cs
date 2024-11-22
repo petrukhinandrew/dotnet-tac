@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => 1520836491596652957L;
+    protected override long SerializationHash => 6084287713397500581L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -117,7 +117,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:62</p>
+  /// <p>Generated from: IlModel.kt:61</p>
   /// </summary>
   public sealed class IlArrayTypeDto : IlReferenceTypeDto
   {
@@ -275,7 +275,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:65</p>
+  /// <p>Generated from: IlModel.kt:64</p>
   /// </summary>
   public sealed class IlAttrDto : IlDto
   {
@@ -285,6 +285,7 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public List<IlConstDto> CtorArgs {get; private set;}
     [NotNull] public List<string> NamedArgsNames {get; private set;}
     [NotNull] public List<IlConstDto> NamedArgsValues {get; private set;}
+    [NotNull] public List<TypeId> GenericArgs {get; private set;}
     
     //private fields
     //primary constructor
@@ -292,18 +293,21 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] TypeId attrType,
       [NotNull] List<IlConstDto> ctorArgs,
       [NotNull] List<string> namedArgsNames,
-      [NotNull] List<IlConstDto> namedArgsValues
+      [NotNull] List<IlConstDto> namedArgsValues,
+      [NotNull] List<TypeId> genericArgs
     )
     {
       if (attrType == null) throw new ArgumentNullException("attrType");
       if (ctorArgs == null) throw new ArgumentNullException("ctorArgs");
       if (namedArgsNames == null) throw new ArgumentNullException("namedArgsNames");
       if (namedArgsValues == null) throw new ArgumentNullException("namedArgsValues");
+      if (genericArgs == null) throw new ArgumentNullException("genericArgs");
       
       AttrType = attrType;
       CtorArgs = ctorArgs;
       NamedArgsNames = namedArgsNames;
       NamedArgsValues = namedArgsValues;
+      GenericArgs = genericArgs;
     }
     //secondary constructor
     //deconstruct trait
@@ -315,11 +319,13 @@ namespace org.jacodb.api.net.generated.models
       var ctorArgs = ReadIlConstDtoList(ctx, reader);
       var namedArgsNames = ReadStringList(ctx, reader);
       var namedArgsValues = ReadIlConstDtoList(ctx, reader);
-      var _result = new IlAttrDto(attrType, ctorArgs, namedArgsNames, namedArgsValues);
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var _result = new IlAttrDto(attrType, ctorArgs, namedArgsNames, namedArgsValues, genericArgs);
       return _result;
     };
     public static CtxReadDelegate<List<IlConstDto>> ReadIlConstDtoList = IlConstDto.Read.List();
     public static CtxReadDelegate<List<string>> ReadStringList = JetBrains.Rd.Impl.Serializers.ReadString.List();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     
     public static new CtxWriteDelegate<IlAttrDto> Write = (ctx, writer, value) => 
     {
@@ -327,9 +333,11 @@ namespace org.jacodb.api.net.generated.models
       WriteIlConstDtoList(ctx, writer, value.CtorArgs);
       WriteStringList(ctx, writer, value.NamedArgsNames);
       WriteIlConstDtoList(ctx, writer, value.NamedArgsValues);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
     };
     public static  CtxWriteDelegate<List<IlConstDto>> WriteIlConstDtoList = IlConstDto.Write.List();
     public static  CtxWriteDelegate<List<string>> WriteStringList = JetBrains.Rd.Impl.Serializers.WriteString.List();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     
     //constants
     
@@ -347,7 +355,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(AttrType, other.AttrType) && CtorArgs.SequenceEqual(other.CtorArgs) && NamedArgsNames.SequenceEqual(other.NamedArgsNames) && NamedArgsValues.SequenceEqual(other.NamedArgsValues);
+      return Equals(AttrType, other.AttrType) && CtorArgs.SequenceEqual(other.CtorArgs) && NamedArgsNames.SequenceEqual(other.NamedArgsNames) && NamedArgsValues.SequenceEqual(other.NamedArgsValues) && GenericArgs.SequenceEqual(other.GenericArgs);
     }
     //hash code trait
     public override int GetHashCode()
@@ -358,6 +366,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + CtorArgs.ContentHashCode();
         hash = hash * 31 + NamedArgsNames.ContentHashCode();
         hash = hash * 31 + NamedArgsValues.ContentHashCode();
+        hash = hash * 31 + GenericArgs.ContentHashCode();
         return hash;
       }
     }
@@ -370,6 +379,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("ctorArgs = "); CtorArgs.PrintEx(printer); printer.Println();
         printer.Print("namedArgsNames = "); NamedArgsNames.PrintEx(printer); printer.Println();
         printer.Print("namedArgsValues = "); NamedArgsValues.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -481,7 +491,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:61</p>
+  /// <p>Generated from: IlModel.kt:60</p>
   /// </summary>
   public sealed class IlClassTypeDto : IlReferenceTypeDto
   {
@@ -860,7 +870,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:51</p>
+  /// <p>Generated from: IlModel.kt:50</p>
   /// </summary>
   public sealed class IlEnumTypeDto : IlValueTypeDto
   {
@@ -2067,7 +2077,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:50</p>
+  /// <p>Generated from: IlModel.kt:49</p>
   /// </summary>
   public sealed class IlPrimitiveTypeDto : IlValueTypeDto
   {
@@ -2216,7 +2226,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:59</p>
+  /// <p>Generated from: IlModel.kt:58</p>
   /// </summary>
   public abstract class IlReferenceTypeDto : IlTypeDto
   {
@@ -2523,7 +2533,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:57</p>
+  /// <p>Generated from: IlModel.kt:56</p>
   /// </summary>
   public sealed class IlStructTypeDto : IlValueTypeDto
   {
@@ -2977,7 +2987,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:49</p>
+  /// <p>Generated from: IlModel.kt:48</p>
   /// </summary>
   public abstract class IlValueTypeDto : IlTypeDto
   {

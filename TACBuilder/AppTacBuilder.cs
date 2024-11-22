@@ -28,6 +28,14 @@ public class AppTacBuilder
 
     public List<IlAssembly> BuiltAssemblies { get; } = new();
 
+    public static void IncludeTACBuilder()
+    {
+        IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.GetName().ToString().StartsWith("TACBuilder"));
+        IlInstanceBuilder.AddTypeFilter(type =>
+            type.Assembly.GetName().ToString().StartsWith("TACBuilder"));
+        IlInstanceBuilder.AddMethodFilter(method =>
+            (method.ReflectedType ?? method.DeclaringType)!.Assembly.GetName().ToString().StartsWith("TACBuilder"));
+    }
     public static void IncludeRootAsm(string rootAssemblyPath)
     {
         IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);

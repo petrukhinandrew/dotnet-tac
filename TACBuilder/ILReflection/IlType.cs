@@ -27,7 +27,6 @@ public class IlType(Type type) : IlMember(type)
         {
             GenericArgs = _type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList();
         }
-
         Attributes = _type.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
         DeclaringAssembly.EnsureTypeAttached(this);

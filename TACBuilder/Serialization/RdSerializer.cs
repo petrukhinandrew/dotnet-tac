@@ -240,7 +240,8 @@ public static class RdSerializer
             attrType: attr.Type!.GetTypeId(),
             ctorArgs: attr.ConstructorArguments.Select(arg => arg.Value.SerializeConst()).ToList(),
             namedArgsNames: namedFlatten.Select(p => p.Key).ToList(),
-            namedArgsValues: namedFlatten.Select(p => p.Value.Value.SerializeConst()).ToList()
+            namedArgsValues: namedFlatten.Select(p => p.Value.Value.SerializeConst()).ToList(),
+            genericArgs: attr.GenericArgs.Select(arg => arg.GetTypeId()).ToList()
         );
     }
 
