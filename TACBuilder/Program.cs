@@ -1,8 +1,4 @@
-﻿// #define CONSOLE_SERIALIZER
-
-#define RD_SERIALIZER
-
-using TACBuilder.Serialization;
+﻿using TACBuilder.Serialization;
 using TACBuilder.Utils;
 
 namespace TACBuilder;
@@ -40,8 +36,9 @@ class Program
         {
             var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
             Console.WriteLine(path);
-            AppTacBuilder.IncludeRootAsm(path);
-            AppTacBuilder.IncludeMsCoreLib();
+            AppTacBuilder.IncludeTACBuilder();
+            // AppTacBuilder.IncludeRootAsm(path);
+            // AppTacBuilder.IncludeMsCoreLib();
             builder.Build(path);
             var builtAsms = builder.BuiltAssemblies;
             var serialized = RdSerializer.Serialize(AppTacBuilder.GetFreshInstances());

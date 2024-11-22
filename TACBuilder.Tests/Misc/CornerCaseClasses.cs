@@ -30,3 +30,19 @@ public unsafe class MyVector<T> where T : unmanaged
         _data[index] = new T();
     }
 }
+
+[AttributeUsage(AttributeTargets.All)]
+public class GenericAttr<T> : Attribute
+{
+    public T Value { get; set; }
+}
+
+[GenericAttr<int>(Value = 5)]
+public class GenericAttrUsage
+{
+    [GenericAttr<string>(Value = "value")]
+    public void Method(int value)
+    {
+        
+    }
+}
