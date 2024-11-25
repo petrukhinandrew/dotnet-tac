@@ -114,7 +114,7 @@ public static class RdSerializer
             };
             res.Add(dto);
         }
-        #if TEST_DUMPSIGNATURES
+#if TEST_DUMPSIGNATURES
         var tmpPath = Path.GetTempFileName();
         Console.WriteLine(tmpPath);
         var tmpFile = File.Create(tmpPath);
@@ -122,19 +122,20 @@ public static class RdSerializer
         foreach (var t in res.Select(r => (r as IlTypeDto)!))
         {
             printer.WriteLine(t.Name);
-            foreach (var field in t.Fields)
+            foreach (var field in t.Fields.OrderBy(f => f.Name))
             {
                 printer.WriteLine($"{field.FieldType.TypeName} {field.Name}");
             }
 
-            foreach (var method in t.Methods)
+            foreach (var method in t.Methods.OrderBy(m => m.Name))
             {
                 printer.WriteLine($"{method.ReturnType.TypeName} {method.Name} {method.Parameters.Count}");
             }
         }
+
         printer.Close();
         tmpFile.Close();
-        #endif
+#endif
         return res;
     }
 
