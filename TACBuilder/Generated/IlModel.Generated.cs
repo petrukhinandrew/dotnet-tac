@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => 6084287713397500581L;
+    protected override long SerializationHash => -2680165846883938225L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -1635,7 +1635,7 @@ namespace org.jacodb.api.net.generated.models
   {
     //fields
     //public fields
-    [Nullable] public TypeId ReturnType {get; private set;}
+    [NotNull] public TypeId ReturnType {get; private set;}
     [NotNull] public List<IlAttrDto> Attrs {get; private set;}
     [NotNull] public string Name {get; private set;}
     [NotNull] public List<IlParameterDto> Parameters {get; private set;}
@@ -1649,7 +1649,7 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlMethodDto(
-      [Nullable] TypeId returnType,
+      [NotNull] TypeId returnType,
       [NotNull] List<IlAttrDto> attrs,
       [NotNull] string name,
       [NotNull] List<IlParameterDto> parameters,
@@ -1661,6 +1661,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] List<IlStmtDto> body
     )
     {
+      if (returnType == null) throw new ArgumentNullException("returnType");
       if (attrs == null) throw new ArgumentNullException("attrs");
       if (name == null) throw new ArgumentNullException("name");
       if (parameters == null) throw new ArgumentNullException("parameters");
@@ -1687,7 +1688,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlMethodDto> Read = (ctx, reader) => 
     {
-      var returnType = ReadTypeIdNullable(ctx, reader);
+      var returnType = TypeId.Read(ctx, reader);
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var name = reader.ReadString();
       var parameters = ReadIlParameterDtoList(ctx, reader);
@@ -1700,7 +1701,6 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlMethodDto(returnType, attrs, name, parameters, resolved, locals, temps, errs, ehScopes, body);
       return _result;
     };
-    public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
     public static CtxReadDelegate<List<IlParameterDto>> ReadIlParameterDtoList = IlParameterDto.Read.List();
     public static CtxReadDelegate<List<IlLocalVarDto>> ReadIlLocalVarDtoList = IlLocalVarDto.Read.List();
@@ -1711,7 +1711,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlMethodDto> Write = (ctx, writer, value) => 
     {
-      WriteTypeIdNullable(ctx, writer, value.ReturnType);
+      TypeId.Write(ctx, writer, value.ReturnType);
       WriteIlAttrDtoList(ctx, writer, value.Attrs);
       writer.Write(value.Name);
       WriteIlParameterDtoList(ctx, writer, value.Parameters);
@@ -1722,7 +1722,6 @@ namespace org.jacodb.api.net.generated.models
       WriteIlEhScopeDtoList(ctx, writer, value.EhScopes);
       WriteIlStmtDtoList(ctx, writer, value.Body);
     };
-    public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
     public static  CtxWriteDelegate<List<IlParameterDto>> WriteIlParameterDtoList = IlParameterDto.Write.List();
     public static  CtxWriteDelegate<List<IlLocalVarDto>> WriteIlLocalVarDtoList = IlLocalVarDto.Write.List();
@@ -1754,7 +1753,7 @@ namespace org.jacodb.api.net.generated.models
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + (ReturnType != null ? ReturnType.GetHashCode() : 0);
+        hash = hash * 31 + ReturnType.GetHashCode();
         hash = hash * 31 + Attrs.ContentHashCode();
         hash = hash * 31 + Name.GetHashCode();
         hash = hash * 31 + Parameters.ContentHashCode();
