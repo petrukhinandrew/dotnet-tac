@@ -1026,9 +1026,9 @@ static class BlockTacLineBuilder
                                   throw new KnownBug("inline multidimensional array, got " +
                                                      (arrVar.Value?.Type.ToString() ?? "null") +
                                                      " instead of NewArrayExpr");
-            ;
             IlInt32Const arrSize = (IlInt32Const)expr.Size;
             Type elemType = ((IlArrayType)expr.Type).ElementType.Type;
+            // TODO use runtime helpers initialize array instead 
             var tmp = Array.CreateInstance(elemType, arrSize.Value);
             GCHandle handle = GCHandle.Alloc(tmp, GCHandleType.Pinned);
             try
