@@ -1,4 +1,4 @@
-using System.Net.Mail;
+#define TEST_DUMPSIGNATURES
 using org.jacodb.api.net.generated.models;
 using TACBuilder.BodyBuilder;
 using TACBuilder.Exprs;
@@ -14,10 +14,10 @@ public static class RdSerializer
     public static List<IlDto> Serialize(List<IlCacheable> instances)
     {
         var res = new List<IlDto>();
-        foreach (var (idx, instance) in instances.Select((v, i) => (i, v)))
+        foreach (var (idx, type) in instances.Where(inst => inst is IlType).OrderBy(t => (t as IlType)!.FullName)
+                     .Select((v, i) => (i, (v as IlType)!)))
         {
-            if (instance is not IlType type) continue;
-            Console.WriteLine($"handling {idx}/{instances.Count}");
+            Console.WriteLine($"handling {idx}/{instances.Count} {type.Name}");
             var fields = type.Fields.Select(field =>
                 new IlFieldDto(fieldType: field.Type!.GetTypeId(),
                     name: field.Name,
@@ -114,7 +114,27 @@ public static class RdSerializer
             };
             res.Add(dto);
         }
+        #if TEST_DUMPSIGNATURES
+        var tmpPath = Path.GetTempFileName();
+        Console.WriteLine(tmpPath);
+        var tmpFile = File.Create(tmpPath);
+        var printer = new StreamWriter(tmpFile);
+        foreach (var t in res.Select(r => (r as IlTypeDto)!))
+        {
+            printer.WriteLine(t.Name);
+            foreach (var field in t.Fields)
+            {
+                printer.WriteLine($"{field.FieldType.TypeName} {field.Name}");
+            }
 
+            foreach (var method in t.Methods)
+            {
+                printer.WriteLine($"{method.ReturnType.TypeName} {method.Name} {method.Parameters.Count}");
+            }
+        }
+        printer.Close();
+        tmpFile.Close();
+        #endif
         return res;
     }
 
