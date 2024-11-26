@@ -1047,7 +1047,7 @@ static class BlockTacLineBuilder
             return;
         }
 
-        throw new Exception("bad array init values");
+        Console.WriteLine("bad array init values");
     }
 
     private static List<IlExpr> ArrayInitCastDiscarded(this List<IlExpr> args)
