@@ -37,7 +37,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:25</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:24</p>
   /// </summary>
   public class IlMethodBodyModel : RdExtBase
   {
@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => 7606042870190843005L;
+    protected override long SerializationHash => -3139965924659144766L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -157,7 +157,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:182</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:181</p>
   /// </summary>
   public sealed class IlArgAccessDto : IlValueDto
   {
@@ -243,18 +243,18 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:130</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:129</p>
   /// </summary>
   public sealed class IlArgListRefDto : IlExprDto
   {
     //fields
     //public fields
-    [NotNull] public InstanceIdRef Method {get; private set;}
+    [NotNull] public InstanceId Method {get; private set;}
     
     //private fields
     //primary constructor
     public IlArgListRefDto(
-      [NotNull] InstanceIdRef method,
+      [NotNull] InstanceId method,
       [NotNull] TypeId type
     ) : base (
       type
@@ -271,7 +271,7 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxReadDelegate<IlArgListRefDto> Read = (ctx, reader) => 
     {
       var type = TypeId.Read(ctx, reader);
-      var method = InstanceIdRef.Read(ctx, reader);
+      var method = InstanceId.Read(ctx, reader);
       var _result = new IlArgListRefDto(method, type);
       return _result;
     };
@@ -279,7 +279,7 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxWriteDelegate<IlArgListRefDto> Write = (ctx, writer, value) => 
     {
       TypeId.Write(ctx, writer, value.Type);
-      InstanceIdRef.Write(ctx, writer, value.Method);
+      InstanceId.Write(ctx, writer, value.Method);
     };
     
     //constants
@@ -331,7 +331,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:88</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:87</p>
   /// </summary>
   public sealed class IlArrayAccessDto : IlValueDto
   {
@@ -427,7 +427,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:54</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:53</p>
   /// </summary>
   public sealed class IlArrayConstDto : IlConstDto
   {
@@ -517,7 +517,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:97</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:96</p>
   /// </summary>
   public sealed class IlArrayLengthExprDto : IlExprDto
   {
@@ -605,7 +605,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:140</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:139</p>
   /// </summary>
   public sealed class IlAssignStmtDto : IlStmtDto
   {
@@ -694,7 +694,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:71</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:70</p>
   /// </summary>
   public sealed class IlBinaryOpDto : IlExprDto
   {
@@ -790,7 +790,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:63</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:62</p>
   /// </summary>
   public sealed class IlBoolConstDto : IlConstDto
   {
@@ -876,7 +876,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:109</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:108</p>
   /// </summary>
   public sealed class IlBoxExprDto : IlCastExprDto
   {
@@ -967,7 +967,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:166</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:165</p>
   /// </summary>
   public abstract class IlBranchStmtDto : IlStmtDto
   {
@@ -1079,19 +1079,19 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:98</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:97</p>
   /// </summary>
   public sealed class IlCallDto : IlExprDto
   {
     //fields
     //public fields
-    [NotNull] public InstanceIdRef Method {get; private set;}
+    [NotNull] public InstanceId Method {get; private set;}
     [NotNull] public List<IlExprDto> Args {get; private set;}
     
     //private fields
     //primary constructor
     public IlCallDto(
-      [NotNull] InstanceIdRef method,
+      [NotNull] InstanceId method,
       [NotNull] List<IlExprDto> args,
       [NotNull] TypeId type
     ) : base (
@@ -1111,7 +1111,7 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxReadDelegate<IlCallDto> Read = (ctx, reader) => 
     {
       var type = TypeId.Read(ctx, reader);
-      var method = InstanceIdRef.Read(ctx, reader);
+      var method = InstanceId.Read(ctx, reader);
       var args = ReadIlExprDtoList(ctx, reader);
       var _result = new IlCallDto(method, args, type);
       return _result;
@@ -1121,7 +1121,7 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxWriteDelegate<IlCallDto> Write = (ctx, writer, value) => 
     {
       TypeId.Write(ctx, writer, value.Type);
-      InstanceIdRef.Write(ctx, writer, value.Method);
+      InstanceId.Write(ctx, writer, value.Method);
       WriteIlExprDtoList(ctx, writer, value.Args);
     };
     public static  CtxWriteDelegate<List<IlExprDto>> WriteIlExprDtoList = IlExprDto.Write.List();
@@ -1177,7 +1177,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:145</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:144</p>
   /// </summary>
   public sealed class IlCallStmtDto : IlStmtDto
   {
@@ -1258,7 +1258,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:133</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:132</p>
   /// </summary>
   public sealed class IlCalliDto : IlExprDto
   {
@@ -1364,7 +1364,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:148</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:147</p>
   /// </summary>
   public sealed class IlCalliStmtDto : IlStmtDto
   {
@@ -1445,7 +1445,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:111</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:110</p>
   /// </summary>
   public sealed class IlCastClassExprDto : IlCastExprDto
   {
@@ -1536,7 +1536,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:103</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:102</p>
   /// </summary>
   public abstract class IlCastExprDto : IlExprDto
   {
@@ -1669,7 +1669,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:52</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:51</p>
   /// </summary>
   public sealed class IlCharConstDto : IlNumConstDto
   {
@@ -1755,7 +1755,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:34</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:33</p>
   /// </summary>
   public abstract class IlConstDto : IlValueDto
   {
@@ -1867,7 +1867,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:108</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:107</p>
   /// </summary>
   public sealed class IlConvExprDto : IlCastExprDto
   {
@@ -1958,7 +1958,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:118</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:117</p>
   /// </summary>
   public abstract class IlDerefExprDto : IlValueDto
   {
@@ -2081,7 +2081,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:50</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:49</p>
   /// </summary>
   public sealed class IlDoubleConstDto : IlNumConstDto
   {
@@ -2167,7 +2167,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:155</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:154</p>
   /// </summary>
   public abstract class IlEhStmtDto : IlStmtDto
   {
@@ -2259,7 +2259,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:161</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:160</p>
   /// </summary>
   public sealed class IlEndFaultStmtDto : IlEhStmtDto
   {
@@ -2325,7 +2325,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:162</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:161</p>
   /// </summary>
   public sealed class IlEndFilterStmtDto : IlEhStmtDto
   {
@@ -2406,7 +2406,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:160</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:159</p>
   /// </summary>
   public sealed class IlEndFinallyStmtDto : IlEhStmtDto
   {
@@ -2472,7 +2472,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:57</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:56</p>
   /// </summary>
   public sealed class IlEnumConstDto : IlConstDto
   {
@@ -2568,7 +2568,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:30</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:29</p>
   /// </summary>
   public abstract class IlExprDto{
     //fields
@@ -2681,20 +2681,20 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:84</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:83</p>
   /// </summary>
   public sealed class IlFieldAccessDto : IlValueDto
   {
     //fields
     //public fields
     [Nullable] public IlExprDto Instance {get; private set;}
-    [NotNull] public InstanceIdRef Field {get; private set;}
+    [NotNull] public InstanceId Field {get; private set;}
     
     //private fields
     //primary constructor
     public IlFieldAccessDto(
       [Nullable] IlExprDto instance,
-      [NotNull] InstanceIdRef field,
+      [NotNull] InstanceId field,
       [NotNull] TypeId type
     ) : base (
       type
@@ -2713,7 +2713,7 @@ namespace org.jacodb.api.net.generated.models
     {
       var type = TypeId.Read(ctx, reader);
       var instance = ReadIlExprDtoNullable(ctx, reader);
-      var field = InstanceIdRef.Read(ctx, reader);
+      var field = InstanceId.Read(ctx, reader);
       var _result = new IlFieldAccessDto(instance, field, type);
       return _result;
     };
@@ -2723,7 +2723,7 @@ namespace org.jacodb.api.net.generated.models
     {
       TypeId.Write(ctx, writer, value.Type);
       WriteIlExprDtoNullable(ctx, writer, value.Instance);
-      InstanceIdRef.Write(ctx, writer, value.Field);
+      InstanceId.Write(ctx, writer, value.Field);
     };
     public static  CtxWriteDelegate<IlExprDto> WriteIlExprDtoNullable = IlExprDto.Write.NullableClass();
     
@@ -2778,18 +2778,18 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:68</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:67</p>
   /// </summary>
   public sealed class IlFieldRefDto : IlConstDto
   {
     //fields
     //public fields
-    [NotNull] public InstanceIdRef Field {get; private set;}
+    [NotNull] public InstanceId Field {get; private set;}
     
     //private fields
     //primary constructor
     public IlFieldRefDto(
-      [NotNull] InstanceIdRef field,
+      [NotNull] InstanceId field,
       [NotNull] TypeId type
     ) : base (
       type
@@ -2806,7 +2806,7 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxReadDelegate<IlFieldRefDto> Read = (ctx, reader) => 
     {
       var type = TypeId.Read(ctx, reader);
-      var field = InstanceIdRef.Read(ctx, reader);
+      var field = InstanceId.Read(ctx, reader);
       var _result = new IlFieldRefDto(field, type);
       return _result;
     };
@@ -2814,7 +2814,7 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxWriteDelegate<IlFieldRefDto> Write = (ctx, writer, value) => 
     {
       TypeId.Write(ctx, writer, value.Type);
-      InstanceIdRef.Write(ctx, writer, value.Field);
+      InstanceId.Write(ctx, writer, value.Field);
     };
     
     //constants
@@ -2866,7 +2866,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:49</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:48</p>
   /// </summary>
   public sealed class IlFloatConstDto : IlNumConstDto
   {
@@ -2952,7 +2952,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:170</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:169</p>
   /// </summary>
   public sealed class IlGotoStmtDto : IlBranchStmtDto
   {
@@ -3031,7 +3031,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:173</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:172</p>
   /// </summary>
   public sealed class IlIfStmtDto : IlBranchStmtDto
   {
@@ -3119,7 +3119,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:40</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:39</p>
   /// </summary>
   public sealed class IlInt16ConstDto : IlNumConstDto
   {
@@ -3205,7 +3205,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:43</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:42</p>
   /// </summary>
   public sealed class IlInt32ConstDto : IlNumConstDto
   {
@@ -3291,7 +3291,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:46</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:45</p>
   /// </summary>
   public sealed class IlInt64ConstDto : IlNumConstDto
   {
@@ -3377,7 +3377,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:37</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:36</p>
   /// </summary>
   public sealed class IlInt8ConstDto : IlNumConstDto
   {
@@ -3463,7 +3463,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:112</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:111</p>
   /// </summary>
   public sealed class IlIsInstExprDto : IlCastExprDto
   {
@@ -3554,7 +3554,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:124</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:123</p>
   /// </summary>
   public sealed class IlManagedDerefExprDto : IlDerefExprDto
   {
@@ -3639,7 +3639,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:122</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:121</p>
   /// </summary>
   public sealed class IlManagedRefExprDto : IlRefExprDto
   {
@@ -3724,18 +3724,18 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:67</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:66</p>
   /// </summary>
   public sealed class IlMethodRefDto : IlConstDto
   {
     //fields
     //public fields
-    [NotNull] public InstanceIdRef Method {get; private set;}
+    [NotNull] public InstanceId Method {get; private set;}
     
     //private fields
     //primary constructor
     public IlMethodRefDto(
-      [NotNull] InstanceIdRef method,
+      [NotNull] InstanceId method,
       [NotNull] TypeId type
     ) : base (
       type
@@ -3752,7 +3752,7 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxReadDelegate<IlMethodRefDto> Read = (ctx, reader) => 
     {
       var type = TypeId.Read(ctx, reader);
-      var method = InstanceIdRef.Read(ctx, reader);
+      var method = InstanceId.Read(ctx, reader);
       var _result = new IlMethodRefDto(method, type);
       return _result;
     };
@@ -3760,7 +3760,7 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxWriteDelegate<IlMethodRefDto> Write = (ctx, writer, value) => 
     {
       TypeId.Write(ctx, writer, value.Type);
-      InstanceIdRef.Write(ctx, writer, value.Method);
+      InstanceId.Write(ctx, writer, value.Method);
     };
     
     //constants
@@ -3812,7 +3812,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:93</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:92</p>
   /// </summary>
   public sealed class IlNewArrayExprDto : IlExprDto
   {
@@ -3900,7 +3900,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:76</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:75</p>
   /// </summary>
   public sealed class IlNewExprDto : IlExprDto
   {
@@ -3979,7 +3979,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:62</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:61</p>
   /// </summary>
   public sealed class IlNullDto : IlConstDto
   {
@@ -4058,7 +4058,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:35</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:34</p>
   /// </summary>
   public abstract class IlNumConstDto : IlConstDto
   {
@@ -4170,7 +4170,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:115</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:114</p>
   /// </summary>
   public abstract class IlRefExprDto : IlValueDto
   {
@@ -4293,7 +4293,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:159</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:158</p>
   /// </summary>
   public sealed class IlRethrowStmtDto : IlEhStmtDto
   {
@@ -4359,7 +4359,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:151</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:150</p>
   /// </summary>
   public sealed class IlReturnStmtDto : IlStmtDto
   {
@@ -4440,7 +4440,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:79</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:78</p>
   /// </summary>
   public sealed class IlSizeOfExprDto : IlExprDto
   {
@@ -4528,7 +4528,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:127</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:126</p>
   /// </summary>
   public sealed class IlStackAllocExprDto : IlExprDto
   {
@@ -4616,7 +4616,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:138</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:137</p>
   /// </summary>
   public abstract class IlStmtDto{
     //fields
@@ -4707,7 +4707,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:64</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:63</p>
   /// </summary>
   public sealed class IlStringConstDto : IlConstDto
   {
@@ -4795,7 +4795,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:156</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:155</p>
   /// </summary>
   public sealed class IlThrowStmtDto : IlEhStmtDto
   {
@@ -4876,7 +4876,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:66</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:65</p>
   /// </summary>
   public sealed class IlTypeRefDto : IlConstDto
   {
@@ -4964,7 +4964,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:41</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:40</p>
   /// </summary>
   public sealed class IlUint16ConstDto : IlNumConstDto
   {
@@ -5050,7 +5050,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:44</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:43</p>
   /// </summary>
   public sealed class IlUint32ConstDto : IlNumConstDto
   {
@@ -5136,7 +5136,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:47</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:46</p>
   /// </summary>
   public sealed class IlUint64ConstDto : IlNumConstDto
   {
@@ -5222,7 +5222,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:38</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:37</p>
   /// </summary>
   public sealed class IlUint8ConstDto : IlNumConstDto
   {
@@ -5308,7 +5308,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:70</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:69</p>
   /// </summary>
   public sealed class IlUnaryOpDto : IlExprDto
   {
@@ -5396,7 +5396,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:110</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:109</p>
   /// </summary>
   public sealed class IlUnboxExprDto : IlCastExprDto
   {
@@ -5487,7 +5487,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:125</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:124</p>
   /// </summary>
   public sealed class IlUnmanagedDerefExprDto : IlDerefExprDto
   {
@@ -5572,7 +5572,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:123</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:122</p>
   /// </summary>
   public sealed class IlUnmanagedRefExprDto : IlRefExprDto
   {
@@ -5657,7 +5657,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:33</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:32</p>
   /// </summary>
   public abstract class IlValueDto : IlExprDto
   {
@@ -5769,7 +5769,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:185</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:184</p>
   /// </summary>
   public sealed class IlVarAccessDto : IlValueDto
   {
@@ -5862,7 +5862,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:177</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:176</p>
   /// </summary>
   public enum IlVarKind {
     local,
@@ -5872,48 +5872,49 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:26</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:25</p>
   /// </summary>
-  public sealed class InstanceIdRef : IPrintable, IEquatable<InstanceIdRef>
+  public sealed class InstanceId : IPrintable, IEquatable<InstanceId>
   {
     //fields
     //public fields
     [NotNull] public TypeId Type {get; private set;}
-    public int InstanceToken {get; private set;}
+    [NotNull] public string Name {get; private set;}
     
     //private fields
     //primary constructor
-    public InstanceIdRef(
+    public InstanceId(
       [NotNull] TypeId type,
-      int instanceToken
+      [NotNull] string name
     )
     {
       if (type == null) throw new ArgumentNullException("type");
+      if (name == null) throw new ArgumentNullException("name");
       
       Type = type;
-      InstanceToken = instanceToken;
+      Name = name;
     }
     //secondary constructor
     //deconstruct trait
-    public void Deconstruct([NotNull] out TypeId type, out int instanceToken)
+    public void Deconstruct([NotNull] out TypeId type, [NotNull] out string name)
     {
       type = Type;
-      instanceToken = InstanceToken;
+      name = Name;
     }
     //statics
     
-    public static CtxReadDelegate<InstanceIdRef> Read = (ctx, reader) => 
+    public static CtxReadDelegate<InstanceId> Read = (ctx, reader) => 
     {
       var type = TypeId.Read(ctx, reader);
-      var instanceToken = reader.ReadInt();
-      var _result = new InstanceIdRef(type, instanceToken);
+      var name = reader.ReadString();
+      var _result = new InstanceId(type, name);
       return _result;
     };
     
-    public static CtxWriteDelegate<InstanceIdRef> Write = (ctx, writer, value) => 
+    public static CtxWriteDelegate<InstanceId> Write = (ctx, writer, value) => 
     {
       TypeId.Write(ctx, writer, value.Type);
-      writer.Write(value.InstanceToken);
+      writer.Write(value.Name);
     };
     
     //constants
@@ -5926,13 +5927,13 @@ namespace org.jacodb.api.net.generated.models
       if (ReferenceEquals(null, obj)) return false;
       if (ReferenceEquals(this, obj)) return true;
       if (obj.GetType() != GetType()) return false;
-      return Equals((InstanceIdRef) obj);
+      return Equals((InstanceId) obj);
     }
-    public bool Equals(InstanceIdRef other)
+    public bool Equals(InstanceId other)
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Type, other.Type) && InstanceToken == other.InstanceToken;
+      return Equals(Type, other.Type) && Name == other.Name;
     }
     //hash code trait
     public override int GetHashCode()
@@ -5940,17 +5941,17 @@ namespace org.jacodb.api.net.generated.models
       unchecked {
         var hash = 0;
         hash = hash * 31 + Type.GetHashCode();
-        hash = hash * 31 + InstanceToken.GetHashCode();
+        hash = hash * 31 + Name.GetHashCode();
         return hash;
       }
     }
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("InstanceIdRef (");
+      printer.Println("InstanceId (");
       using (printer.IndentCookie()) {
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
-        printer.Print("instanceToken = "); InstanceToken.PrintEx(printer); printer.Println();
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }

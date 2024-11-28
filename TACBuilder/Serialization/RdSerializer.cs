@@ -17,7 +17,7 @@ public static class RdSerializer
         foreach (var (idx, type) in instances.Where(inst => inst is IlType).OrderBy(t => (t as IlType)!.Name)
                      .Select((v, i) => (i, (v as IlType)!)))
         {
-            Console.WriteLine($"handling {idx}/{instances.Count} {type.Name}");
+            Console.WriteLine($"handling {idx}/{instances.Count} {type.FullName}");
             var fields = type.Fields.Select(field =>
                 new IlFieldDto(fieldType: field.Type!.GetTypeId(),
                     name: field.Name,
@@ -31,6 +31,7 @@ public static class RdSerializer
                     asmName: pointerType.AsmName,
                     namespaceName: pointerType.Namespace,
                     name: pointerType.Name,
+                    fullname: pointerType.FullName,
                     declType: pointerType.DeclaringType?.GetTypeId(),
                     targetType: pointerType.TargetType.GetTypeId(),
                     genericArgs: pointerType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
@@ -45,6 +46,7 @@ public static class RdSerializer
                     asmName: structType.AsmName,
                     namespaceName: structType.Namespace,
                     name: structType.Name,
+                    fullname: structType.FullName,
                     declType: structType.DeclaringType?.GetTypeId(),
                     genericArgs: structType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: structType.IsGenericParameter,
@@ -59,6 +61,7 @@ public static class RdSerializer
                     namespaceName: enumType.Namespace,
                     underlyingType: enumType.UnderlyingType.GetTypeId(),
                     name: enumType.Name,
+                    fullname: enumType.FullName,
                     declType: enumType.DeclaringType?.GetTypeId(),
                     genericArgs: enumType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: enumType.IsGenericParameter,
@@ -74,6 +77,7 @@ public static class RdSerializer
                     asmName: primitiveType.AsmName,
                     namespaceName: primitiveType.Namespace,
                     name: primitiveType.Name,
+                    fullname: primitiveType.FullName,
                     declType: primitiveType.DeclaringType?.GetTypeId(),
                     genericArgs: primitiveType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: primitiveType.IsGenericParameter,
@@ -87,6 +91,7 @@ public static class RdSerializer
                     asmName: classType.AsmName,
                     namespaceName: classType.Namespace,
                     name: classType.Name,
+                    fullname: classType.FullName,
                     declType: classType.DeclaringType?.GetTypeId(),
                     genericArgs: classType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: classType.IsGenericParameter,
@@ -100,6 +105,7 @@ public static class RdSerializer
                     asmName: arrayType.AsmName,
                     namespaceName: arrayType.Namespace,
                     name: arrayType.Name,
+                    fullname: arrayType.FullName,
                     elementType: arrayType.ElementType.GetTypeId(),
                     declType: arrayType.DeclaringType?.GetTypeId(),
                     genericArgs: arrayType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
@@ -119,7 +125,7 @@ public static class RdSerializer
         Console.WriteLine(tmpPath);
         var tmpFile = File.Create(tmpPath);
         var printer = new StreamWriter(tmpFile);
-        foreach (var t in res.Select(r => (r as IlTypeDto)!))
+        foreach (var t in res.Where(r => r is IlTypeDto).Select(r => (r as IlTypeDto)!).OrderBy(t => t.Name))
         {
             printer.WriteLine(t.Name);
             foreach (var field in t.Fields.OrderBy(f => f.Name))
@@ -305,7 +311,7 @@ public static class RdSerializer
                 };
                 return res;
             }).ToList(),
-            body: SerializeMethodBody(method)
+            rawInstList: SerializeMethodBody(method)
         );
     }
 }
@@ -328,15 +334,13 @@ static class KeyBuilder
         return type.GetTypeId();
     }
 
-    public static InstanceIdRef GetRefId(this IlField field)
+    public static InstanceId GetRefId(this IlField field)
     {
-        return new InstanceIdRef(type: field.DeclaringType!.GetTypeId(), instanceToken: field.MetadataToken);
+        return new InstanceId(type: field.DeclaringType!.GetTypeId(), name: field.Name);
     }
 
-    public static InstanceIdRef GetRefId(this IlMethod method)
+    public static InstanceId GetRefId(this IlMethod method)
     {
-        return new InstanceIdRef(type: method.DeclaringType!.GetTypeId(), instanceToken: method.MetadataToken);
+        return new InstanceId(type: method.DeclaringType!.GetTypeId(), name: method.Name);
     }
 }
-
-// TODO calli, ilsignature

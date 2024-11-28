@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => -2680165846883938225L;
+    protected override long SerializationHash => -3729319067140704816L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -117,7 +117,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:61</p>
+  /// <p>Generated from: IlModel.kt:62</p>
   /// </summary>
   public sealed class IlArrayTypeDto : IlReferenceTypeDto
   {
@@ -132,6 +132,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -144,6 +145,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -167,6 +169,7 @@ namespace org.jacodb.api.net.generated.models
       var asmName = reader.ReadString();
       var namespaceName = reader.ReadString();
       var name = reader.ReadString();
+      var fullname = reader.ReadString();
       var declType = ReadTypeIdNullable(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
@@ -176,7 +179,7 @@ namespace org.jacodb.api.net.generated.models
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
       var elementType = TypeId.Read(ctx, reader);
-      var _result = new IlArrayTypeDto(elementType, asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlArrayTypeDto(elementType, asmName, namespaceName, name, fullname, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -190,6 +193,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.AsmName);
       writer.Write(value.NamespaceName);
       writer.Write(value.Name);
+      writer.Write(value.Fullname);
       WriteTypeIdNullable(ctx, writer, value.DeclType);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
@@ -222,7 +226,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(ElementType, other.ElementType) && AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(ElementType, other.ElementType) && AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Fullname == other.Fullname && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -233,6 +237,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + AsmName.GetHashCode();
         hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Fullname.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
@@ -253,6 +258,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("fullname = "); Fullname.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
@@ -275,7 +281,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:64</p>
+  /// <p>Generated from: IlModel.kt:65</p>
   /// </summary>
   public sealed class IlAttrDto : IlDto
   {
@@ -394,7 +400,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:105</p>
+  /// <p>Generated from: IlModel.kt:106</p>
   /// </summary>
   public sealed class IlCatchScopeDto : IlEhScopeDto
   {
@@ -491,7 +497,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:60</p>
+  /// <p>Generated from: IlModel.kt:61</p>
   /// </summary>
   public sealed class IlClassTypeDto : IlReferenceTypeDto
   {
@@ -504,6 +510,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -516,6 +523,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -536,6 +544,7 @@ namespace org.jacodb.api.net.generated.models
       var asmName = reader.ReadString();
       var namespaceName = reader.ReadString();
       var name = reader.ReadString();
+      var fullname = reader.ReadString();
       var declType = ReadTypeIdNullable(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
@@ -544,7 +553,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlClassTypeDto(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlClassTypeDto(asmName, namespaceName, name, fullname, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -558,6 +567,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.AsmName);
       writer.Write(value.NamespaceName);
       writer.Write(value.Name);
+      writer.Write(value.Fullname);
       WriteTypeIdNullable(ctx, writer, value.DeclType);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
@@ -589,7 +599,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Fullname == other.Fullname && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -599,6 +609,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + AsmName.GetHashCode();
         hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Fullname.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
@@ -618,6 +629,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("fullname = "); Fullname.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
@@ -731,7 +743,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:99</p>
+  /// <p>Generated from: IlModel.kt:100</p>
   /// </summary>
   public abstract class IlEhScopeDto : IlDto
   {
@@ -870,7 +882,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:50</p>
+  /// <p>Generated from: IlModel.kt:51</p>
   /// </summary>
   public sealed class IlEnumTypeDto : IlValueTypeDto
   {
@@ -889,6 +901,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -901,6 +914,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -928,6 +942,7 @@ namespace org.jacodb.api.net.generated.models
       var asmName = reader.ReadString();
       var namespaceName = reader.ReadString();
       var name = reader.ReadString();
+      var fullname = reader.ReadString();
       var declType = ReadTypeIdNullable(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
@@ -939,7 +954,7 @@ namespace org.jacodb.api.net.generated.models
       var underlyingType = TypeId.Read(ctx, reader);
       var names = ReadStringList(ctx, reader);
       var values = ReadIlConstDtoList(ctx, reader);
-      var _result = new IlEnumTypeDto(underlyingType, names, values, asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlEnumTypeDto(underlyingType, names, values, asmName, namespaceName, name, fullname, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<List<string>> ReadStringList = JetBrains.Rd.Impl.Serializers.ReadString.List();
@@ -955,6 +970,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.AsmName);
       writer.Write(value.NamespaceName);
       writer.Write(value.Name);
+      writer.Write(value.Fullname);
       WriteTypeIdNullable(ctx, writer, value.DeclType);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
@@ -991,7 +1007,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(UnderlyingType, other.UnderlyingType) && Names.SequenceEqual(other.Names) && Values.SequenceEqual(other.Values) && AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(UnderlyingType, other.UnderlyingType) && Names.SequenceEqual(other.Names) && Values.SequenceEqual(other.Values) && AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Fullname == other.Fullname && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1004,6 +1020,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + AsmName.GetHashCode();
         hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Fullname.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
@@ -1026,6 +1043,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("fullname = "); Fullname.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
@@ -1048,7 +1066,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:97</p>
+  /// <p>Generated from: IlModel.kt:98</p>
   /// </summary>
   public sealed class IlErrVarDto : IlVarDto
   {
@@ -1133,7 +1151,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:110</p>
+  /// <p>Generated from: IlModel.kt:111</p>
   /// </summary>
   public sealed class IlFaultScopeDto : IlEhScopeDto
   {
@@ -1230,7 +1248,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:72</p>
+  /// <p>Generated from: IlModel.kt:73</p>
   /// </summary>
   public sealed class IlFieldDto : IlDto
   {
@@ -1336,7 +1354,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:107</p>
+  /// <p>Generated from: IlModel.kt:108</p>
   /// </summary>
   public sealed class IlFilterScopeDto : IlEhScopeDto
   {
@@ -1440,7 +1458,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:111</p>
+  /// <p>Generated from: IlModel.kt:112</p>
   /// </summary>
   public sealed class IlFinallyScopeDto : IlEhScopeDto
   {
@@ -1537,7 +1555,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:92</p>
+  /// <p>Generated from: IlModel.kt:93</p>
   /// </summary>
   public sealed class IlLocalVarDto : IlVarDto
   {
@@ -1629,7 +1647,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:114</p>
+  /// <p>Generated from: IlModel.kt:115</p>
   /// </summary>
   public sealed class IlMethodDto : IlDto
   {
@@ -1644,7 +1662,7 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public List<IlTempVarDto> Temps {get; private set;}
     [NotNull] public List<IlErrVarDto> Errs {get; private set;}
     [NotNull] public List<IlEhScopeDto> EhScopes {get; private set;}
-    [NotNull] public List<IlStmtDto> Body {get; private set;}
+    [NotNull] public List<IlStmtDto> RawInstList {get; private set;}
     
     //private fields
     //primary constructor
@@ -1658,7 +1676,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] List<IlTempVarDto> temps,
       [NotNull] List<IlErrVarDto> errs,
       [NotNull] List<IlEhScopeDto> ehScopes,
-      [NotNull] List<IlStmtDto> body
+      [NotNull] List<IlStmtDto> rawInstList
     )
     {
       if (returnType == null) throw new ArgumentNullException("returnType");
@@ -1669,7 +1687,7 @@ namespace org.jacodb.api.net.generated.models
       if (temps == null) throw new ArgumentNullException("temps");
       if (errs == null) throw new ArgumentNullException("errs");
       if (ehScopes == null) throw new ArgumentNullException("ehScopes");
-      if (body == null) throw new ArgumentNullException("body");
+      if (rawInstList == null) throw new ArgumentNullException("rawInstList");
       
       ReturnType = returnType;
       Attrs = attrs;
@@ -1680,7 +1698,7 @@ namespace org.jacodb.api.net.generated.models
       Temps = temps;
       Errs = errs;
       EhScopes = ehScopes;
-      Body = body;
+      RawInstList = rawInstList;
     }
     //secondary constructor
     //deconstruct trait
@@ -1697,8 +1715,8 @@ namespace org.jacodb.api.net.generated.models
       var temps = ReadIlTempVarDtoList(ctx, reader);
       var errs = ReadIlErrVarDtoList(ctx, reader);
       var ehScopes = ReadIlEhScopeDtoList(ctx, reader);
-      var body = ReadIlStmtDtoList(ctx, reader);
-      var _result = new IlMethodDto(returnType, attrs, name, parameters, resolved, locals, temps, errs, ehScopes, body);
+      var rawInstList = ReadIlStmtDtoList(ctx, reader);
+      var _result = new IlMethodDto(returnType, attrs, name, parameters, resolved, locals, temps, errs, ehScopes, rawInstList);
       return _result;
     };
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -1720,7 +1738,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlTempVarDtoList(ctx, writer, value.Temps);
       WriteIlErrVarDtoList(ctx, writer, value.Errs);
       WriteIlEhScopeDtoList(ctx, writer, value.EhScopes);
-      WriteIlStmtDtoList(ctx, writer, value.Body);
+      WriteIlStmtDtoList(ctx, writer, value.RawInstList);
     };
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
     public static  CtxWriteDelegate<List<IlParameterDto>> WriteIlParameterDtoList = IlParameterDto.Write.List();
@@ -1746,7 +1764,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && Body.SequenceEqual(other.Body);
+      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1762,7 +1780,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + Temps.ContentHashCode();
         hash = hash * 31 + Errs.ContentHashCode();
         hash = hash * 31 + EhScopes.ContentHashCode();
-        hash = hash * 31 + Body.ContentHashCode();
+        hash = hash * 31 + RawInstList.ContentHashCode();
         return hash;
       }
     }
@@ -1780,7 +1798,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("temps = "); Temps.PrintEx(printer); printer.Println();
         printer.Print("errs = "); Errs.PrintEx(printer); printer.Println();
         printer.Print("ehScopes = "); EhScopes.PrintEx(printer); printer.Println();
-        printer.Print("body = "); Body.PrintEx(printer); printer.Println();
+        printer.Print("rawInstList = "); RawInstList.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -1795,7 +1813,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:79</p>
+  /// <p>Generated from: IlModel.kt:80</p>
   /// </summary>
   public sealed class IlParameterDto : IPrintable, IEquatable<IlParameterDto>
   {
@@ -1918,7 +1936,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:45</p>
+  /// <p>Generated from: IlModel.kt:46</p>
   /// </summary>
   public sealed class IlPointerTypeDto : IlTypeDto
   {
@@ -1933,6 +1951,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -1945,6 +1964,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -1968,6 +1988,7 @@ namespace org.jacodb.api.net.generated.models
       var asmName = reader.ReadString();
       var namespaceName = reader.ReadString();
       var name = reader.ReadString();
+      var fullname = reader.ReadString();
       var declType = ReadTypeIdNullable(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
@@ -1977,7 +1998,7 @@ namespace org.jacodb.api.net.generated.models
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
       var targetType = TypeId.Read(ctx, reader);
-      var _result = new IlPointerTypeDto(targetType, asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlPointerTypeDto(targetType, asmName, namespaceName, name, fullname, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -1991,6 +2012,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.AsmName);
       writer.Write(value.NamespaceName);
       writer.Write(value.Name);
+      writer.Write(value.Fullname);
       WriteTypeIdNullable(ctx, writer, value.DeclType);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
@@ -2023,7 +2045,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(TargetType, other.TargetType) && AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(TargetType, other.TargetType) && AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Fullname == other.Fullname && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2034,6 +2056,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + AsmName.GetHashCode();
         hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Fullname.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
@@ -2054,6 +2077,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("fullname = "); Fullname.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
@@ -2076,7 +2100,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:49</p>
+  /// <p>Generated from: IlModel.kt:50</p>
   /// </summary>
   public sealed class IlPrimitiveTypeDto : IlValueTypeDto
   {
@@ -2089,6 +2113,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -2101,6 +2126,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -2121,6 +2147,7 @@ namespace org.jacodb.api.net.generated.models
       var asmName = reader.ReadString();
       var namespaceName = reader.ReadString();
       var name = reader.ReadString();
+      var fullname = reader.ReadString();
       var declType = ReadTypeIdNullable(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
@@ -2129,7 +2156,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlPrimitiveTypeDto(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlPrimitiveTypeDto(asmName, namespaceName, name, fullname, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -2143,6 +2170,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.AsmName);
       writer.Write(value.NamespaceName);
       writer.Write(value.Name);
+      writer.Write(value.Fullname);
       WriteTypeIdNullable(ctx, writer, value.DeclType);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
@@ -2174,7 +2202,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Fullname == other.Fullname && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2184,6 +2212,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + AsmName.GetHashCode();
         hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Fullname.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
@@ -2203,6 +2232,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("fullname = "); Fullname.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
@@ -2225,7 +2255,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:58</p>
+  /// <p>Generated from: IlModel.kt:59</p>
   /// </summary>
   public abstract class IlReferenceTypeDto : IlTypeDto
   {
@@ -2238,6 +2268,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -2250,6 +2281,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -2291,6 +2323,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -2303,6 +2336,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -2323,6 +2357,7 @@ namespace org.jacodb.api.net.generated.models
       var asmName = reader.ReadString();
       var namespaceName = reader.ReadString();
       var name = reader.ReadString();
+      var fullname = reader.ReadString();
       var declType = ReadTypeIdNullable(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
@@ -2331,7 +2366,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlReferenceTypeDto_Unknown(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlReferenceTypeDto_Unknown(asmName, namespaceName, name, fullname, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -2345,6 +2380,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.AsmName);
       writer.Write(value.NamespaceName);
       writer.Write(value.Name);
+      writer.Write(value.Fullname);
       WriteTypeIdNullable(ctx, writer, value.DeclType);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
@@ -2376,7 +2412,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Fullname == other.Fullname && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2386,6 +2422,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + AsmName.GetHashCode();
         hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Fullname.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
@@ -2405,6 +2442,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("fullname = "); Fullname.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
@@ -2427,7 +2465,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:127</p>
+  /// <p>Generated from: IlModel.kt:128</p>
   /// </summary>
   public sealed class IlSignatureDto : IlDto
   {
@@ -2532,7 +2570,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:56</p>
+  /// <p>Generated from: IlModel.kt:57</p>
   /// </summary>
   public sealed class IlStructTypeDto : IlValueTypeDto
   {
@@ -2545,6 +2583,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -2557,6 +2596,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -2577,6 +2617,7 @@ namespace org.jacodb.api.net.generated.models
       var asmName = reader.ReadString();
       var namespaceName = reader.ReadString();
       var name = reader.ReadString();
+      var fullname = reader.ReadString();
       var declType = ReadTypeIdNullable(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
@@ -2585,7 +2626,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlStructTypeDto(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlStructTypeDto(asmName, namespaceName, name, fullname, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -2599,6 +2640,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.AsmName);
       writer.Write(value.NamespaceName);
       writer.Write(value.Name);
+      writer.Write(value.Fullname);
       WriteTypeIdNullable(ctx, writer, value.DeclType);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
@@ -2630,7 +2672,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Fullname == other.Fullname && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2640,6 +2682,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + AsmName.GetHashCode();
         hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Fullname.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
@@ -2659,6 +2702,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("fullname = "); Fullname.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
@@ -2681,7 +2725,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:96</p>
+  /// <p>Generated from: IlModel.kt:97</p>
   /// </summary>
   public sealed class IlTempVarDto : IlVarDto
   {
@@ -2775,6 +2819,7 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public string AsmName {get; private set;}
     [NotNull] public string NamespaceName {get; private set;}
     [NotNull] public string Name {get; private set;}
+    [NotNull] public string Fullname {get; private set;}
     [Nullable] public TypeId DeclType {get; private set;}
     [NotNull] public List<TypeId> GenericArgs {get; private set;}
     public bool IsGenericParam {get; private set;}
@@ -2790,6 +2835,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -2803,6 +2849,7 @@ namespace org.jacodb.api.net.generated.models
       if (asmName == null) throw new ArgumentNullException("asmName");
       if (namespaceName == null) throw new ArgumentNullException("namespaceName");
       if (name == null) throw new ArgumentNullException("name");
+      if (fullname == null) throw new ArgumentNullException("fullname");
       if (genericArgs == null) throw new ArgumentNullException("genericArgs");
       if (attrs == null) throw new ArgumentNullException("attrs");
       if (fields == null) throw new ArgumentNullException("fields");
@@ -2811,6 +2858,7 @@ namespace org.jacodb.api.net.generated.models
       AsmName = asmName;
       NamespaceName = namespaceName;
       Name = name;
+      Fullname = fullname;
       DeclType = declType;
       GenericArgs = genericArgs;
       IsGenericParam = isGenericParam;
@@ -2850,6 +2898,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -2862,6 +2911,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -2882,6 +2932,7 @@ namespace org.jacodb.api.net.generated.models
       var asmName = reader.ReadString();
       var namespaceName = reader.ReadString();
       var name = reader.ReadString();
+      var fullname = reader.ReadString();
       var declType = ReadTypeIdNullable(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
@@ -2890,7 +2941,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlTypeDto_Unknown(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlTypeDto_Unknown(asmName, namespaceName, name, fullname, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -2904,6 +2955,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.AsmName);
       writer.Write(value.NamespaceName);
       writer.Write(value.Name);
+      writer.Write(value.Fullname);
       WriteTypeIdNullable(ctx, writer, value.DeclType);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
@@ -2935,7 +2987,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Fullname == other.Fullname && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2945,6 +2997,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + AsmName.GetHashCode();
         hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Fullname.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
@@ -2964,6 +3017,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("fullname = "); Fullname.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
@@ -2986,7 +3040,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:48</p>
+  /// <p>Generated from: IlModel.kt:49</p>
   /// </summary>
   public abstract class IlValueTypeDto : IlTypeDto
   {
@@ -2999,6 +3053,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -3011,6 +3066,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -3052,6 +3108,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] string asmName,
       [NotNull] string namespaceName,
       [NotNull] string name,
+      [NotNull] string fullname,
       [Nullable] TypeId declType,
       [NotNull] List<TypeId> genericArgs,
       bool isGenericParam,
@@ -3064,6 +3121,7 @@ namespace org.jacodb.api.net.generated.models
       asmName,
       namespaceName,
       name,
+      fullname,
       declType,
       genericArgs,
       isGenericParam,
@@ -3084,6 +3142,7 @@ namespace org.jacodb.api.net.generated.models
       var asmName = reader.ReadString();
       var namespaceName = reader.ReadString();
       var name = reader.ReadString();
+      var fullname = reader.ReadString();
       var declType = ReadTypeIdNullable(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
@@ -3092,7 +3151,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlValueTypeDto_Unknown(asmName, namespaceName, name, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlValueTypeDto_Unknown(asmName, namespaceName, name, fullname, declType, genericArgs, isGenericParam, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -3106,6 +3165,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.AsmName);
       writer.Write(value.NamespaceName);
       writer.Write(value.Name);
+      writer.Write(value.Fullname);
       WriteTypeIdNullable(ctx, writer, value.DeclType);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.IsGenericParam);
@@ -3137,7 +3197,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && NamespaceName == other.NamespaceName && Name == other.Name && Fullname == other.Fullname && Equals(DeclType, other.DeclType) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericParam == other.IsGenericParam && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -3147,6 +3207,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + AsmName.GetHashCode();
         hash = hash * 31 + NamespaceName.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Fullname.GetHashCode();
         hash = hash * 31 + (DeclType != null ? DeclType.GetHashCode() : 0);
         hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
@@ -3166,6 +3227,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("namespaceName = "); NamespaceName.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("fullname = "); Fullname.PrintEx(printer); printer.Println();
         printer.Print("declType = "); DeclType.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
@@ -3188,7 +3250,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:87</p>
+  /// <p>Generated from: IlModel.kt:88</p>
   /// </summary>
   public abstract class IlVarDto : IlDto
   {
