@@ -110,7 +110,7 @@ public class IlType(Type type) : IlMember(type)
 
     public string Namespace => _type.Namespace ?? "";
 
-    public string FullName => _type.FullName ?? _type.Name;
+    public string FullName => DeclaringType is null ? (Namespace == "" ? _type.Name : $"{Namespace}.{Name}") : $"{DeclaringType.FullName}+{Name}";
     public int ModuleToken => _type.Module.MetadataToken;
     public int MetadataToken => _type.MetadataToken;
     public List<IlAttribute> Attributes { get; private set; }
@@ -156,7 +156,7 @@ public class IlPointerType(Type targetType) : IlType(targetType)
 {
     public override bool IsManaged => false;
     public override bool IsUnmanaged => true;
-    public IlType TargetType => IlInstanceBuilder.GetType(targetType);
+    public IlType TargetType => IlInstanceBuilder.GetType(Type);
 }
 
 public class IlValueType(Type type) : IlType(type);
