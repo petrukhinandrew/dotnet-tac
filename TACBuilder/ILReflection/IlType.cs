@@ -105,7 +105,6 @@ public class IlType(Type type) : IlMember(type)
     }
 
     public IlAssembly DeclaringAssembly { get; private set; }
-    public int AsmToken => _type.Assembly.GetHashCode();
     public string AsmName => _type.Assembly.GetName().ToString();
 
     public string Namespace => _type.Namespace ?? "";
