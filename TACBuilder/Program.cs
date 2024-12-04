@@ -9,7 +9,6 @@ class Program
 {
     static void Main(string[] args)
     {
-
         AppTacBuilder builder = new();
         if (args.Contains("--rd"))
         {
@@ -21,9 +20,10 @@ class Program
                 AppTacBuilder.IncludeRootAsm(req.RootAsm);
                 builder.Build(req.RootAsm);
                 var instances = AppTacBuilder.GetFreshInstances();
-                Console.WriteLine($".net built {instances.Count} instances with total of {instances.Select(it => (it as IlType).Methods.Count).Sum()}");
+                Console.WriteLine(
+                    $".net built {instances.Count} instances with total of {instances.Select(it => (it as IlType).Methods.Count).Sum()}");
                 var serialized = RdSerializer.Serialize(instances);
-                
+
                 return serialized;
             });
             connection.Connect(8083);
@@ -44,8 +44,10 @@ class Program
             // AppTacBuilder.IncludeRootAsm(path);
             // AppTacBuilder.IncludeMsCoreLib();
             builder.Build(path);
-            var builtAsms = builder.BuiltAssemblies;
-            var serialized = RdSerializer.Serialize(AppTacBuilder.GetFreshInstances()); // .Where(i => i is IlType t && t.Name.Contains("AnotherStruct")).ToList()
+            var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
+            var serialized =
+                RdSerializer.Serialize(IlInstanceBuilder
+                    .GetFreshTypes()); // .Where(i => i is IlType t && t.Name.Contains("AnotherStruct")).ToList()
         }
     }
 }

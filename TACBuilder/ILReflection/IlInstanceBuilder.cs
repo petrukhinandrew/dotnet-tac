@@ -62,9 +62,17 @@ public static class IlInstanceBuilder
         return _cache.GetAssemblies();
     }
 
-    public static List<IlCacheable> GetFreshInstances()
+    public static Dictionary<string, List<string>> GetAsmDependencyGraph()
     {
-        IlCacheable[] instances = new IlCacheable[_queue.FreshInstances.Count];
+        var mapping = _queue.BuiltAssemblies.ToDictionary(asm => asm.Name.ToString(),
+            asm => asm.ReferencedAssemblies.Select(it => it.Name).ToList());
+        _queue.DropBuiltAssemblies();
+        return mapping;
+    }
+
+    public static List<IlType> GetFreshTypes()
+    {
+        IlType[] instances = new IlType[_queue.FreshInstances.Count];
         _queue.FreshInstances.CopyTo(instances, 0);
         _queue.DropFreshInstances();
         return instances.ToList();
@@ -102,7 +110,7 @@ public static class IlInstanceBuilder
 
     private static IlType CreateIlType(Type type)
     {
-        if (type.IsPointer || type.IsByRef) 
+        if (type.IsPointer || type.IsByRef)
             return new IlPointerType(type.GetElementType()!);
         if (type.IsPrimitive) return new IlPrimitiveType(type);
         if (type.IsEnum) return new IlEnumType(type);

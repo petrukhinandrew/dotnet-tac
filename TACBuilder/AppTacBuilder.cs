@@ -36,6 +36,7 @@ public class AppTacBuilder
         IlInstanceBuilder.AddMethodFilter(method =>
             (method.ReflectedType ?? method.DeclaringType)!.Assembly.GetName().ToString().StartsWith("TACBuilder"));
     }
+
     public static void IncludeRootAsm(string rootAssemblyPath)
     {
         IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
@@ -87,8 +88,13 @@ public class AppTacBuilder
         IlInstanceBuilder.AddMethodFilter(method => method.DeclaringType!.Name.StartsWith(typeNamePart));
     }
 
-    public static List<IlCacheable> GetFreshInstances()
+    public static List<IlType> GetFreshInstances()
     {
-        return IlInstanceBuilder.GetFreshInstances();
+        return IlInstanceBuilder.GetFreshTypes();
+    }
+
+    public static Dictionary<string, List<string>> GetBuiltAssemblies()
+    {
+        return IlInstanceBuilder.GetAsmDependencyGraph();
     }
 }
