@@ -11,10 +11,10 @@ namespace TACBuilder.Serialization;
 
 public static class RdSerializer
 {
-    public static List<IlDto> Serialize(List<IlCacheable> instances)
+    public static List<IlDto> Serialize(List<IlType> instances)
     {
         var res = new List<IlDto>();
-        foreach (var (idx, type) in instances.Where(inst => inst is IlType).OrderBy(t => (t as IlType)!.Name)
+        foreach (var (idx, type) in instances.OrderBy(t => (t as IlType)!.Name)
                      .Select((v, i) => (i, (v as IlType)!)))
         {
             // Console.WriteLine($"handling {idx}/{instances.Count} {type.FullName}");

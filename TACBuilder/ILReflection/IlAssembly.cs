@@ -6,15 +6,15 @@ namespace TACBuilder.ILReflection;
 public class IlAssembly(Assembly assembly) : IlCacheable
 {
     public readonly Assembly _assembly = assembly;
-    public string? Name { get; private set; }
+    public string Name { get; } = assembly.GetName().FullName;
     public string? Location { get; private set; }
     public HashSet<IlType> Types { get; } = new();
     public List<IlAssembly> ReferencedAssemblies { get; } = new();
     public new bool IsConstructed = false;
     public int MetadataToken => assembly.GetHashCode();
+
     public override void Construct()
     {
-        Name = _assembly.GetName().FullName;
         Location = _assembly.Location;
         Logger.LogInformation("Constructed {Name}", Name);
         if (IlInstanceBuilder.AssemblyFilters.All(f => !f(_assembly))) return;
