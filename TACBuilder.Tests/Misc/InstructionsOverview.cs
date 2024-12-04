@@ -955,4 +955,22 @@ namespace Usvm.IL.Test.Instructions
             var another = list.Flatten();
         }
     }
+
+    public class KekGG<GG> where GG : struct
+    {
+        public GG gg;
+
+        public class LolGG<GG> where GG : class
+        {
+            public GG gg;
+        }
+
+        public class BB
+        {
+        }
+    }
+
+    class GG
+    {
+    }
 }

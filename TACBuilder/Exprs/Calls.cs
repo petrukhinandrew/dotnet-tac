@@ -28,8 +28,6 @@ public class IlCall(IlMethod method, List<IlExpr> args) : IlExpr
     public IlMethod Method => method;
 
     public string Name => Method.Name;
-
-    // TODO ctor has no return type
     public IlType ReturnType => Method.ReturnType!;
     public List<IlExpr> Args => args;
     public IlType Type => ReturnType;
