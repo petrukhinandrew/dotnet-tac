@@ -28,9 +28,9 @@ public abstract class PointerExprTypeResolver
 public class IlManagedRef(IlExpr value) : ILRefExpr
 {
     public IlExpr Value => value;
-
-    // TODO
-    public IlType Type => new IlPointerType(value.Type.Type);
+    
+    public IlType Type =>
+        IlInstanceBuilder.GetType(value.Type.Type.MakeByRefType());
 
     public override string ToString()
     {
@@ -42,8 +42,8 @@ public class IlUnmanagedRef(IlExpr value) : ILRefExpr
 {
     public IlExpr Value => value;
 
-    // TODO
-    public IlType Type => new IlPointerType(value.Type.Type);
+    public IlType Type =>
+        IlInstanceBuilder.GetType(value.Type.Type.MakePointerType()); 
 
     public override string ToString()
     {

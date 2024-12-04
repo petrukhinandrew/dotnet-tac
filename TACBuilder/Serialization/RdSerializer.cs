@@ -17,13 +17,14 @@ public static class RdSerializer
         foreach (var (idx, type) in instances.Where(inst => inst is IlType).OrderBy(t => (t as IlType)!.Name)
                      .Select((v, i) => (i, (v as IlType)!)))
         {
-            Console.WriteLine($"handling {idx}/{instances.Count} {type.FullName}");
+            // Console.WriteLine($"handling {idx}/{instances.Count} {type.FullName}");
             var fields = type.Fields.Select(field =>
                 new IlFieldDto(fieldType: field.Type!.GetTypeId(),
                     name: field.Name,
                     isStatic: field.IsStatic,
                     attrs: field.Attributes.Select(a => a.SerializeAttr()).ToList())).ToList();
             List<IlMethodDto> methods = type.Methods.Select(SerializeMethod).ToList();
+            List<TypeId> interfaces = type.Interfaces.Select(t => t.GetTypeId()).ToList();
             var attrs = type.Attributes.Select(SerializeAttr).ToList();
             IlDto dto = type switch
             {
@@ -33,6 +34,8 @@ public static class RdSerializer
                     name: pointerType.Name,
                     fullname: pointerType.FullName,
                     declType: pointerType.DeclaringType?.GetTypeId(),
+                    baseType: pointerType.BaseType?.GetTypeId(),
+                    interfaces: interfaces,
                     targetType: pointerType.TargetType.GetTypeId(),
                     genericArgs: pointerType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: pointerType.IsGenericParameter,
@@ -48,6 +51,8 @@ public static class RdSerializer
                     name: structType.Name,
                     fullname: structType.FullName,
                     declType: structType.DeclaringType?.GetTypeId(),
+                    baseType: structType.BaseType?.GetTypeId(),
+                    interfaces: interfaces,
                     genericArgs: structType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: structType.IsGenericParameter,
                     isManaged: structType.IsManaged,
@@ -63,6 +68,8 @@ public static class RdSerializer
                     name: enumType.Name,
                     fullname: enumType.FullName,
                     declType: enumType.DeclaringType?.GetTypeId(),
+                    baseType: enumType.BaseType?.GetTypeId(),
+                    interfaces: interfaces,
                     genericArgs: enumType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: enumType.IsGenericParameter,
                     isManaged: enumType.IsManaged,
@@ -79,6 +86,8 @@ public static class RdSerializer
                     name: primitiveType.Name,
                     fullname: primitiveType.FullName,
                     declType: primitiveType.DeclaringType?.GetTypeId(),
+                    baseType: primitiveType.BaseType?.GetTypeId(),
+                    interfaces: interfaces,
                     genericArgs: primitiveType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: primitiveType.IsGenericParameter,
                     isManaged: primitiveType.IsManaged,
@@ -93,6 +102,8 @@ public static class RdSerializer
                     name: classType.Name,
                     fullname: classType.FullName,
                     declType: classType.DeclaringType?.GetTypeId(),
+                    baseType: classType.BaseType?.GetTypeId(),
+                    interfaces: interfaces,
                     genericArgs: classType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: classType.IsGenericParameter,
                     isManaged: classType.IsManaged,
@@ -108,6 +119,8 @@ public static class RdSerializer
                     fullname: arrayType.FullName,
                     elementType: arrayType.ElementType.GetTypeId(),
                     declType: arrayType.DeclaringType?.GetTypeId(),
+                    baseType: arrayType.BaseType?.GetTypeId(),
+                    interfaces: interfaces,
                     genericArgs: arrayType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
                     isGenericParam: arrayType.IsGenericParameter,
                     isManaged: arrayType.IsManaged,
@@ -341,6 +354,6 @@ static class KeyBuilder
 
     public static InstanceId GetRefId(this IlMethod method)
     {
-        return new InstanceId(type: method.DeclaringType!.GetTypeId(), name: method.Name);
+        return new InstanceId(type: method.DeclaringType!.GetTypeId(), name: method.Signature);
     }
 }

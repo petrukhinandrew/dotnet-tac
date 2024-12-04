@@ -1,4 +1,6 @@
-﻿using TACBuilder.Serialization;
+﻿using org.jacodb.api.net.generated.models;
+using TACBuilder.ILReflection;
+using TACBuilder.Serialization;
 using TACBuilder.Utils;
 
 namespace TACBuilder;
@@ -19,7 +21,9 @@ class Program
                 AppTacBuilder.IncludeRootAsm(req.RootAsm);
                 builder.Build(req.RootAsm);
                 var instances = AppTacBuilder.GetFreshInstances();
+                Console.WriteLine($".net built {instances.Count} instances with total of {instances.Select(it => (it as IlType).Methods.Count).Sum()}");
                 var serialized = RdSerializer.Serialize(instances);
+                
                 return serialized;
             });
             connection.Connect(8083);
@@ -41,7 +45,7 @@ class Program
             // AppTacBuilder.IncludeMsCoreLib();
             builder.Build(path);
             var builtAsms = builder.BuiltAssemblies;
-            var serialized = RdSerializer.Serialize(AppTacBuilder.GetFreshInstances());
+            var serialized = RdSerializer.Serialize(AppTacBuilder.GetFreshInstances()); // .Where(i => i is IlType t && t.Name.Contains("AnotherStruct")).ToList()
         }
     }
 }

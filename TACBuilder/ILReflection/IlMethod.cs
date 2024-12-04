@@ -143,7 +143,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     public new string Name => _methodBase.Name;
 
     public string Signature =>
-        $"{ReturnType?.FullName ?? ""}{_methodBase.Name}({string.Join(",", Parameters.Select(p => p.FullName))})";
+        $"{ReturnType!.FullName} {_methodBase.Name}({string.Join(",", Parameters.Select(p => p.Type.FullName))})";
 
     public bool IsGeneric => _methodBase.IsGenericMethod;
     public bool IsStatic => _methodBase.IsStatic;
@@ -184,7 +184,9 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             }
         }
 
-        ReturnType = _methodBase is MethodInfo methodInfo ? IlInstanceBuilder.GetType(methodInfo.ReturnType) : IlInstanceBuilder.GetType(typeof(void));
+        ReturnType = _methodBase is MethodInfo methodInfo
+            ? IlInstanceBuilder.GetType(methodInfo.ReturnType)
+            : IlInstanceBuilder.GetType(typeof(void));
 
         Debug.Assert(Parameters.Count == 0);
 

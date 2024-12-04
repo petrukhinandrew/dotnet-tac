@@ -25,13 +25,15 @@ public class IlType(Type type) : IlMember(type)
         DeclaringType = _type.DeclaringType == null ? null : IlInstanceBuilder.GetType(_type.DeclaringType);
         if (_type.IsGenericType)
         {
-            GenericArgs = _type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList();
+            GenericArgs.AddRange(_type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList());
         }
+
         Attributes = _type.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
         DeclaringAssembly.EnsureTypeAttached(this);
         if (IlInstanceBuilder.TypeFilters.All(f => !f(_type))) return;
-
+        BaseType = _type.BaseType == null ? null : IlInstanceBuilder.GetType(_type.BaseType);
+        Interfaces.AddRange(_type.GetInterfaces().Select(IlInstanceBuilder.GetType));
         var fields = _type.GetFields(BindingFlags);
         foreach (var field in fields)
         {
@@ -68,7 +70,7 @@ public class IlType(Type type) : IlMember(type)
     {
         if (left == null || right == null) return IlInstanceBuilder.GetType(typeof(object));
         if (left is IlPointerType lp && right is IlPointerType rp)
-            return new IlPointerType(MeetTypes(lp.TargetType.Type, rp.TargetType.Type));
+            return IlInstanceBuilder.GetType(MeetTypes(lp.TargetType.Type, rp.TargetType.Type));
         return IlInstanceBuilder.GetType(MeetTypes(left.Type, right.Type));
     }
 
@@ -109,12 +111,24 @@ public class IlType(Type type) : IlMember(type)
 
     public string Namespace => _type.Namespace ?? "";
 
-    public string FullName => DeclaringType is null ? (Namespace == "" ? _type.Name : $"{Namespace}.{Name}") : $"{DeclaringType.FullName}+{Name}";
+    public string FullName => _type + (_type.IsGenericType
+        ? string.Join(",", _type.GenericTypeArguments.Select(ta => ta.MetadataToken.ToString()))
+        : "");
+    // DeclaringType is null
+    // ? (Namespace == "" ? NameWithGenerics : $"{Namespace}.{NameWithGenerics}")
+    // : $"{DeclaringType.FullName}+{NameWithGenerics}";
+
+    public string NameWithGenerics =>
+        Name; //IsGenericType ? $"{Name}<{string.Join(",", GenericArgs.Select(ga => ga.FullName).ToList())}>" : Name;
+
     public int ModuleToken => _type.Module.MetadataToken;
     public int MetadataToken => _type.MetadataToken;
     public List<IlAttribute> Attributes { get; private set; }
     public IlType? DeclaringType { get; private set; }
+    public IlType? BaseType { get; private set; }
+    public List<IlType> Interfaces { get; } = new();
     public List<IlType> GenericArgs { get; private set; } = new();
+
     public HashSet<IlMethod> Methods { get; } = new();
     public HashSet<IlField> Fields { get; } = new();
     public new string Name => _type.Name;
@@ -122,6 +136,7 @@ public class IlType(Type type) : IlMember(type)
     public bool IsValueType => _type.IsValueType;
     public virtual bool IsManaged => !_type.IsUnmanaged();
     public bool IsGenericParameter => _type.IsGenericParameter;
+    public bool IsGenericType => _type.IsGenericType;
     public virtual bool IsUnmanaged => _type.IsUnmanaged();
 
     internal void EnsureFieldAttached(IlField ilField)
