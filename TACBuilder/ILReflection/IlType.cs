@@ -114,12 +114,6 @@ public class IlType(Type type) : IlMember(type)
     public string FullName => _type + (_type.IsGenericType
         ? string.Join(",", _type.GenericTypeArguments.Select(ta => ta.MetadataToken.ToString()))
         : "");
-    // DeclaringType is null
-    // ? (Namespace == "" ? NameWithGenerics : $"{Namespace}.{NameWithGenerics}")
-    // : $"{DeclaringType.FullName}+{NameWithGenerics}";
-
-    public string NameWithGenerics =>
-        Name; //IsGenericType ? $"{Name}<{string.Join(",", GenericArgs.Select(ga => ga.FullName).ToList())}>" : Name;
 
     public int ModuleToken => _type.Module.MetadataToken;
     public int MetadataToken => _type.MetadataToken;
@@ -135,7 +129,10 @@ public class IlType(Type type) : IlMember(type)
     public Type Type => _type;
     public bool IsValueType => _type.IsValueType;
     public virtual bool IsManaged => !_type.IsUnmanaged();
+
+    // TODO may be split into method parameter and type parameter, if needed 
     public bool IsGenericParameter => _type.IsGenericParameter;
+    public bool IsGenericDefinition => _type.IsGenericTypeDefinition;
     public bool IsGenericType => _type.IsGenericType;
     public virtual bool IsUnmanaged => _type.IsUnmanaged();
 
