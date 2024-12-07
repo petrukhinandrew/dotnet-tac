@@ -2,7 +2,7 @@
 
 ## Setup 
 
-1. Create a publication: `dotnet publish -c Release --self-contained`
+1. Create a publication for a project you want to explore: `dotnet publish -c Release --self-contained`
 2. Build a TACBuilder: `dotnet build -c Debug`
 
 ## Run (Console) 
