@@ -43,31 +43,37 @@ namespace org.jacodb.api.net.generated.models
   {
     //fields
     //public fields
-    [NotNull] public IRdEndpoint<Request, List<IlTypeDto>> CallForAsm => _CallForAsm;
-    [NotNull] public ISignal<Request> AsmRequest => _AsmRequest;
+    [NotNull] public IRdEndpoint<PublicationRequest, PublicationResponse> Publication => _Publication;
+    [NotNull] public IRdEndpoint<PublicationRequest, List<IlTypeDto>> CallForAsm => _CallForAsm;
+    [NotNull] public ISignal<PublicationRequest> AsmRequest => _AsmRequest;
     [NotNull] public ISignal<List<IlDto>> AsmResponse => _AsmResponse;
     
     //private fields
-    [NotNull] private readonly RdCall<Request, List<IlTypeDto>> _CallForAsm;
-    [NotNull] private readonly RdSignal<Request> _AsmRequest;
+    [NotNull] private readonly RdCall<PublicationRequest, PublicationResponse> _Publication;
+    [NotNull] private readonly RdCall<PublicationRequest, List<IlTypeDto>> _CallForAsm;
+    [NotNull] private readonly RdSignal<PublicationRequest> _AsmRequest;
     [NotNull] private readonly RdSignal<List<IlDto>> _AsmResponse;
     
     //primary constructor
     private IlSigModel(
-      [NotNull] RdCall<Request, List<IlTypeDto>> callForAsm,
-      [NotNull] RdSignal<Request> asmRequest,
+      [NotNull] RdCall<PublicationRequest, PublicationResponse> publication,
+      [NotNull] RdCall<PublicationRequest, List<IlTypeDto>> callForAsm,
+      [NotNull] RdSignal<PublicationRequest> asmRequest,
       [NotNull] RdSignal<List<IlDto>> asmResponse
     )
     {
+      if (publication == null) throw new ArgumentNullException("publication");
       if (callForAsm == null) throw new ArgumentNullException("callForAsm");
       if (asmRequest == null) throw new ArgumentNullException("asmRequest");
       if (asmResponse == null) throw new ArgumentNullException("asmResponse");
       
+      _Publication = publication;
       _CallForAsm = callForAsm;
       _AsmRequest = asmRequest;
       _AsmResponse = asmResponse;
       _AsmRequest.Async = true;
       _AsmResponse.Async = true;
+      BindableChildren.Add(new KeyValuePair<string, object>("publication", _Publication));
       BindableChildren.Add(new KeyValuePair<string, object>("callForAsm", _CallForAsm));
       BindableChildren.Add(new KeyValuePair<string, object>("asmRequest", _AsmRequest));
       BindableChildren.Add(new KeyValuePair<string, object>("asmResponse", _AsmResponse));
@@ -75,8 +81,9 @@ namespace org.jacodb.api.net.generated.models
     //secondary constructor
     internal IlSigModel (
     ) : this (
-      new RdCall<Request, List<IlTypeDto>>(Request.Read, Request.Write, ReadIlTypeDtoList, WriteIlTypeDtoList),
-      new RdSignal<Request>(Request.Read, Request.Write),
+      new RdCall<PublicationRequest, PublicationResponse>(PublicationRequest.Read, PublicationRequest.Write, PublicationResponse.Read, PublicationResponse.Write),
+      new RdCall<PublicationRequest, List<IlTypeDto>>(PublicationRequest.Read, PublicationRequest.Write, ReadIlTypeDtoList, WriteIlTypeDtoList),
+      new RdSignal<PublicationRequest>(PublicationRequest.Read, PublicationRequest.Write),
       new RdSignal<List<IlDto>>(ReadIlDtoList, WriteIlDtoList)
     ) {}
     //deconstruct trait
@@ -88,7 +95,7 @@ namespace org.jacodb.api.net.generated.models
     public static  CtxWriteDelegate<List<IlTypeDto>> WriteIlTypeDtoList = IlTypeDto.Write.List();
     public static  CtxWriteDelegate<List<IlDto>> WriteIlDtoList = IlDto.Write.List();
     
-    protected override long SerializationHash => 9130847229297571826L;
+    protected override long SerializationHash => -1254477867872549445L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -109,6 +116,7 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlSigModel (");
       using (printer.IndentCookie()) {
+        printer.Print("publication = "); _Publication.PrintEx(printer); printer.Println();
         printer.Print("callForAsm = "); _CallForAsm.PrintEx(printer); printer.Println();
         printer.Print("asmRequest = "); _AsmRequest.PrintEx(printer); printer.Println();
         printer.Print("asmResponse = "); _AsmResponse.PrintEx(printer); printer.Println();
@@ -135,41 +143,43 @@ namespace org.jacodb.api.net.generated.models
   /// <summary>
   /// <p>Generated from: IlSigModel.kt:24</p>
   /// </summary>
-  public sealed class Request : IPrintable, IEquatable<Request>
+  public sealed class PublicationRequest : IPrintable, IEquatable<PublicationRequest>
   {
     //fields
     //public fields
-    [NotNull] public string RootAsm {get; private set;}
+    [NotNull] public List<string> RootAsms {get; private set;}
     
     //private fields
     //primary constructor
-    public Request(
-      [NotNull] string rootAsm
+    public PublicationRequest(
+      [NotNull] List<string> rootAsms
     )
     {
-      if (rootAsm == null) throw new ArgumentNullException("rootAsm");
+      if (rootAsms == null) throw new ArgumentNullException("rootAsms");
       
-      RootAsm = rootAsm;
+      RootAsms = rootAsms;
     }
     //secondary constructor
     //deconstruct trait
-    public void Deconstruct([NotNull] out string rootAsm)
+    public void Deconstruct([NotNull] out List<string> rootAsms)
     {
-      rootAsm = RootAsm;
+      rootAsms = RootAsms;
     }
     //statics
     
-    public static CtxReadDelegate<Request> Read = (ctx, reader) => 
+    public static CtxReadDelegate<PublicationRequest> Read = (ctx, reader) => 
     {
-      var rootAsm = reader.ReadString();
-      var _result = new Request(rootAsm);
+      var rootAsms = ReadStringList(ctx, reader);
+      var _result = new PublicationRequest(rootAsms);
       return _result;
     };
+    public static CtxReadDelegate<List<string>> ReadStringList = JetBrains.Rd.Impl.Serializers.ReadString.List();
     
-    public static CtxWriteDelegate<Request> Write = (ctx, writer, value) => 
+    public static CtxWriteDelegate<PublicationRequest> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.RootAsm);
+      WriteStringList(ctx, writer, value.RootAsms);
     };
+    public static  CtxWriteDelegate<List<string>> WriteStringList = JetBrains.Rd.Impl.Serializers.WriteString.List();
     
     //constants
     
@@ -181,29 +191,138 @@ namespace org.jacodb.api.net.generated.models
       if (ReferenceEquals(null, obj)) return false;
       if (ReferenceEquals(this, obj)) return true;
       if (obj.GetType() != GetType()) return false;
-      return Equals((Request) obj);
+      return Equals((PublicationRequest) obj);
     }
-    public bool Equals(Request other)
+    public bool Equals(PublicationRequest other)
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return RootAsm == other.RootAsm;
+      return RootAsms.SequenceEqual(other.RootAsms);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + RootAsm.GetHashCode();
+        hash = hash * 31 + RootAsms.ContentHashCode();
         return hash;
       }
     }
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("Request (");
+      printer.Println("PublicationRequest (");
       using (printer.IndentCookie()) {
-        printer.Print("rootAsm = "); RootAsm.PrintEx(printer); printer.Println();
+        printer.Print("rootAsms = "); RootAsms.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlSigModel.kt:27</p>
+  /// </summary>
+  public sealed class PublicationResponse : IPrintable, IEquatable<PublicationResponse>
+  {
+    //fields
+    //public fields
+    [NotNull] public List<string> ReachableAsms {get; private set;}
+    [NotNull] public List<List<string>> ReferencedAsms {get; private set;}
+    [NotNull] public List<IlTypeDto> ReachableTypes {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public PublicationResponse(
+      [NotNull] List<string> reachableAsms,
+      [NotNull] List<List<string>> referencedAsms,
+      [NotNull] List<IlTypeDto> reachableTypes
+    )
+    {
+      if (reachableAsms == null) throw new ArgumentNullException("reachableAsms");
+      if (referencedAsms == null) throw new ArgumentNullException("referencedAsms");
+      if (reachableTypes == null) throw new ArgumentNullException("reachableTypes");
+      
+      ReachableAsms = reachableAsms;
+      ReferencedAsms = referencedAsms;
+      ReachableTypes = reachableTypes;
+    }
+    //secondary constructor
+    //deconstruct trait
+    public void Deconstruct([NotNull] out List<string> reachableAsms, [NotNull] out List<List<string>> referencedAsms, [NotNull] out List<IlTypeDto> reachableTypes)
+    {
+      reachableAsms = ReachableAsms;
+      referencedAsms = ReferencedAsms;
+      reachableTypes = ReachableTypes;
+    }
+    //statics
+    
+    public static CtxReadDelegate<PublicationResponse> Read = (ctx, reader) => 
+    {
+      var reachableAsms = ReadStringList(ctx, reader);
+      var referencedAsms = ReadStringListList(ctx, reader);
+      var reachableTypes = ReadIlTypeDtoList(ctx, reader);
+      var _result = new PublicationResponse(reachableAsms, referencedAsms, reachableTypes);
+      return _result;
+    };
+    public static CtxReadDelegate<List<string>> ReadStringList = JetBrains.Rd.Impl.Serializers.ReadString.List();
+    public static CtxReadDelegate<List<List<string>>> ReadStringListList = JetBrains.Rd.Impl.Serializers.ReadString.List().List();
+    public static CtxReadDelegate<List<IlTypeDto>> ReadIlTypeDtoList = IlTypeDto.Read.List();
+    
+    public static CtxWriteDelegate<PublicationResponse> Write = (ctx, writer, value) => 
+    {
+      WriteStringList(ctx, writer, value.ReachableAsms);
+      WriteStringListList(ctx, writer, value.ReferencedAsms);
+      WriteIlTypeDtoList(ctx, writer, value.ReachableTypes);
+    };
+    public static  CtxWriteDelegate<List<string>> WriteStringList = JetBrains.Rd.Impl.Serializers.WriteString.List();
+    public static  CtxWriteDelegate<List<List<string>>> WriteStringListList = JetBrains.Rd.Impl.Serializers.WriteString.List().List();
+    public static  CtxWriteDelegate<List<IlTypeDto>> WriteIlTypeDtoList = IlTypeDto.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((PublicationResponse) obj);
+    }
+    public bool Equals(PublicationResponse other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return ReachableAsms.SequenceEqual(other.ReachableAsms) && ReferencedAsms.SequenceEqual(other.ReferencedAsms) && ReachableTypes.SequenceEqual(other.ReachableTypes);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + ReachableAsms.ContentHashCode();
+        hash = hash * 31 + ReferencedAsms.ContentHashCode();
+        hash = hash * 31 + ReachableTypes.ContentHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("PublicationResponse (");
+      using (printer.IndentCookie()) {
+        printer.Print("reachableAsms = "); ReachableAsms.PrintEx(printer); printer.Println();
+        printer.Print("referencedAsms = "); ReferencedAsms.PrintEx(printer); printer.Println();
+        printer.Print("reachableTypes = "); ReachableTypes.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }

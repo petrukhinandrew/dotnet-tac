@@ -1,4 +1,6 @@
-﻿using org.jacodb.api.net.generated.models;
+﻿using System.Diagnostics;
+using CommandLine;
+using org.jacodb.api.net.generated.models;
 using TACBuilder.ILReflection;
 using TACBuilder.Serialization;
 using TACBuilder.Utils;
@@ -7,47 +9,94 @@ namespace TACBuilder;
 
 class Program
 {
+    public class StartOptions
+    {
+        [Option('m', "mode", Required = true, HelpText = "The mode to use (rd, console)", Default = "console")]
+        public string Mode { get; set; }
+
+        [Option('f', "files", Required = false, HelpText = ".dll files to use")]
+        public IEnumerable<string> InputFiles { get; set; }
+    }
+
     static void Main(string[] args)
     {
-        AppTacBuilder builder = new();
-        if (args.Contains("--rd"))
-        {
-            Console.WriteLine(Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll"));
+        Parser.Default.ParseArguments<StartOptions>(args).WithParsed(Run).WithNotParsed(HandleParseError);
+    }
 
-            var connection = new RdConnection(req =>
+    private static void Run(StartOptions opts)
+    {
+        switch (opts.Mode)
+        {
+            case "rd":
             {
-                Console.WriteLine(req.RootAsm);
-                AppTacBuilder.IncludeRootAsm(req.RootAsm);
-                builder.Build(req.RootAsm);
-                var instances = AppTacBuilder.GetFreshInstances();
-                Console.WriteLine(
-                    $".net built {instances.Count} instances with total of {instances.Select(it => (it as IlType).Methods.Count).Sum()}");
-                var serialized = RdSerializer.Serialize(instances);
+                RunRd(opts);
+                break;
+            }
+            case "console":
+            {
+                RunConsole(opts);
+                break;
+            }
+        }
 
-                return serialized;
-            });
-            connection.Connect(8083);
-        }
-        else if (args.Contains("--dynamic-tests"))
+        AppTacBuilder builder = new();
+
+
+        // TODO add dynamic asm tests case
+        // TODO move to tests
+        // var asm = new CalliDynamicAsmBuilder().Build();
+        // var name = asm.GetName();
+        // AppTacBuilder.IncludeRootAsm(name);
+        // builder.Build(asm);
+        // var builtAsms = builder.BuiltAssemblies;
+    }
+
+    private static void RunRd(StartOptions opts)
+    {
+        AppTacBuilder builder = new();
+        var connection = new RdConnection(req =>
         {
-            var asm = new CalliDynamicAsmBuilder().Build();
-            var name = asm.GetName();
-            AppTacBuilder.IncludeRootAsm(name);
-            builder.Build(asm);
-            var builtAsms = builder.BuiltAssemblies;
-        }
-        else if (args.Contains("--console"))
-        {
-            var path = Path.Combine(Environment.CurrentDirectory, "TACBuilder.Tests.dll");
-            Console.WriteLine(path);
-            AppTacBuilder.IncludeTACBuilder();
-            // AppTacBuilder.IncludeRootAsm(path);
-            // AppTacBuilder.IncludeMsCoreLib();
-            builder.Build(path);
+            foreach (var target in req.RootAsms)
+            {
+                AppTacBuilder.IncludeRootAsm(target);
+                builder.Build(target);
+            }
+
+            var instances = AppTacBuilder.GetFreshInstances();
+            Console.WriteLine(
+                $".net built {instances.Count} instances with total of {instances.Select(it => (it as IlType).Methods.Count).Sum()}");
             var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
-            var serialized =
-                RdSerializer.Serialize(IlInstanceBuilder
-                    .GetFreshTypes()); // .Where(i => i is IlType t && t.Name.Contains("AnotherStruct")).ToList()
+            var serialized = RdSerializer.Serialize(instances);
+
+            return new PublicationResponse(asmDepGraph.Keys.ToList(), asmDepGraph.Values.ToList(), serialized);
+        });
+        connection.Connect(8083);
+    }
+
+    private static void RunConsole(StartOptions opts)
+    {
+        AppTacBuilder builder = new();
+        // AppTacBuilder.IncludeMsCoreLib();
+        foreach (var file in opts.InputFiles)
+        {
+            Debug.Assert(File.Exists(file));
+            AppTacBuilder.IncludeRootAsm(file);
+        }
+
+        foreach (var file in opts.InputFiles)
+            builder.Build(file);
+        var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
+        var serialized =
+            RdSerializer.Serialize(IlInstanceBuilder
+                .GetFreshTypes());
+    }
+
+    static void HandleParseError(IEnumerable<Error> errs)
+    {
+        Console.WriteLine("Error parsing start options:");
+        foreach (var err in errs)
+        {
+            Console.WriteLine(err.ToString());
         }
     }
 }

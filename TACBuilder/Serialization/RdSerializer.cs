@@ -11,9 +11,9 @@ namespace TACBuilder.Serialization;
 
 public static class RdSerializer
 {
-    public static List<IlDto> Serialize(List<IlType> instances)
+    public static List<IlTypeDto> Serialize(List<IlType> instances)
     {
-        var res = new List<IlDto>();
+        var res = new List<IlTypeDto>();
         foreach (var (idx, type) in instances.OrderBy(t => (t as IlType)!.Name)
                      .Select((v, i) => (i, (v as IlType)!)))
         {
@@ -26,7 +26,7 @@ public static class RdSerializer
             List<IlMethodDto> methods = type.Methods.Select(SerializeMethod).ToList();
             List<TypeId> interfaces = type.Interfaces.Select(t => t.GetTypeId()).ToList();
             var attrs = type.Attributes.Select(SerializeAttr).ToList();
-            IlDto dto = type switch
+            IlTypeDto dto = type switch
             {
                 IlPointerType pointerType => new IlPointerTypeDto(
                     asmName: pointerType.AsmName,

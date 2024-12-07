@@ -2,38 +2,49 @@ using JetBrains.Collections.Viewable;
 using JetBrains.Lifetimes;
 using JetBrains.Rd;
 using JetBrains.Rd.Impl;
+using JetBrains.Rd.Tasks;
 using org.jacodb.api.net.generated.models;
 
 namespace TACBuilder;
 
-public class RdConnection(Func<Request, List<IlDto>> asmReqCallback)
+public class RdConnection
 {
     private LifetimeDefinition _lifetimeDef = Lifetime.Eternal.CreateNested();
-    private IScheduler _scheduler;
-    private Func<Request, List<IlDto>> _asmReqCallback = asmReqCallback;
+    private readonly Func<PublicationRequest, PublicationResponse> _asmReqCallback;
+
+    public RdConnection(Func<PublicationRequest, PublicationResponse> asmReqCallback)
+    {
+        _asmReqCallback = asmReqCallback;
+        SpinAndTerminate();
+    }
 
     public void Connect(int port)
     {
-        var _lifetime = _lifetimeDef.Lifetime;
-        _scheduler = SingleThreadScheduler.RunOnSeparateThread(_lifetime, "Client", scheduler =>
-        {
-            var wire = new SocketWire.Client(_lifetime, scheduler, port, "Client");
-            var idKind = IdKind.Client;
-            var serializers = new Serializers();
-            var protocol = new Protocol("client side", serializers, new Identities(idKind), scheduler, wire,
-                _lifetime);
-            scheduler.Queue(() =>
+        var lifetime = _lifetimeDef.Lifetime;
+        SingleThreadScheduler.RunOnSeparateThread(lifetime, "Client", scheduler =>
+            {
+                var wire = new SocketWire.Client(lifetime, scheduler, port, "Client");
+                var idKind = IdKind.Client;
+                var serializers = new Serializers();
+                var protocol = new Protocol("client side", serializers, new Identities(idKind), scheduler, wire,
+                    lifetime);
+                scheduler.Queue(() =>
                 {
-                    var ilModel = new IlModel(_lifetime, protocol);
-                    var asmReq = ilModel.GetIlSigModel().AsmRequest;
-                    var asmResp = ilModel.GetIlSigModel().AsmResponse;
-                    asmReq.Advise(_lifetime, req =>
+                    var ilModel = new IlModel(lifetime, protocol);
+                    protocol.Scheduler.Queue(() =>
                     {
-                        var response = _asmReqCallback(req);
-                        asmResp.Fire(response);
+                        ilModel.GetIlSigModel().Publication.SetSync((lt, request) =>
+                            _asmReqCallback(request)
+                        );
                     });
-                }
-            );
-        });
+                });
+            }
+        );
+    }
+
+    public async void SpinAndTerminate()
+    {
+        await Task.Delay(10_000);
+        _lifetimeDef.Terminate();
     }
 }
