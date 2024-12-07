@@ -14,6 +14,10 @@ class Program
         [Option('m', "mode", Required = true, HelpText = "The mode to use (rd, console)", Default = "console")]
         public string Mode { get; set; }
 
+        [Option('p', "port", Required = false, HelpText = "The port to listen on, required for rd mode",
+            Default = 8083)]
+        public int Port { get; set; }
+
         [Option('f', "files", Required = false, HelpText = ".dll files to use")]
         public IEnumerable<string> InputFiles { get; set; }
     }
@@ -70,7 +74,7 @@ class Program
 
             return new PublicationResponse(asmDepGraph.Keys.ToList(), asmDepGraph.Values.ToList(), serialized);
         });
-        connection.Connect(8083);
+        connection.Connect(opts.Port);
     }
 
     private static void RunConsole(StartOptions opts)
