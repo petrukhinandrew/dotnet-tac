@@ -39,7 +39,7 @@ static class BlockTacLineBuilder
                 Debug.Assert(blockBuilder._switchRegister is not null);
                 // targets.Add(target.value);
                 blockBuilder.NewLine(new IlIfStmt(
-                    new IlBinaryOperation(blockBuilder._switchRegister,
+                    new IlCeqOp(blockBuilder._switchRegister,
                         new IlInt32Const(switchBranch.Value)),
                     target.value.idx
                 ));
@@ -640,55 +640,221 @@ static class BlockTacLineBuilder
                     break;
                 }
                 case "add":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlAddOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
                 case "add.ovf":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlAddOp(lhs, rhs, isChecked: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
                 case "add.ovf.un":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlAddOp(lhs, rhs, isChecked: true, isUnsigned: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
-                case "sub.ovf":
-                case "sub.ovf.un":
                 case "sub":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlSubOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
+                case "sub.ovf":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlSubOp(lhs, rhs, isChecked: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
+                case "sub.ovf.un":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlSubOp(lhs, rhs, isChecked: true, isUnsigned: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
-                case "mul.ovf":
-                case "mul.ovf.un":
                 case "mul":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlMulOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
+                case "mul.ovf":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlMulOp(lhs, rhs, isChecked: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
+                case "mul.ovf.un":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlMulOp(lhs, rhs, isChecked: true, isUnsigned: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
-                case "div.un":
                 case "div":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlDivOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
+                case "div.un":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlMulOp(lhs, rhs, isUnsigned: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
-                case "rem.un":
                 case "rem":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlRemOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
+                case "rem.un":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlRemOp(lhs, rhs, isUnsigned: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
                 case "and":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlAndOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
                 case "or":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlOrOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
                 case "xor":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlXorOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
                 case "shl":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlShlOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
                 case "shr":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlShrOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
                 case "shr.un":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlShrOp(lhs, rhs, isUnsigned: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
                 case "ceq":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlCeqOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
-                case "cgt.un":
                 case "cgt":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlCgtOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
+                case "cgt.un":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlCgtOp(lhs, rhs, isUnsigned: true);
+                    blockBuilder.Push(op);
+                    break;
+                }
 
-                case "clt.un":
                 case "clt":
                 {
                     IlExpr rhs = blockBuilder.Pop();
                     IlExpr lhs = blockBuilder.Pop();
-                    if (lhs.Type == null)
-                        Console.WriteLine("suka");
-                    IlBinaryOperation op = new IlBinaryOperation(lhs, rhs);
+                    var op = new IlCltOp(lhs, rhs);
+                    blockBuilder.Push(op);
+                    break;
+                }
+                case "clt.un":
+                {
+                    IlExpr rhs = blockBuilder.Pop();
+                    IlExpr lhs = blockBuilder.Pop();
+                    var op = new IlCltOp(lhs, rhs, isUnsigned: true);
                     blockBuilder.Push(op);
                     break;
                 }
                 case "neg":
+                {
+                    IlExpr operand = blockBuilder.Pop();
+                    IlNegOp op = new(operand);
+                    blockBuilder.Push(op);
+                    break;
+                }
+
                 case "not":
                 {
                     IlExpr operand = blockBuilder.Pop();
-                    IlUnaryOperation op = new IlUnaryOperation(operand);
+                    IlNotOp op = new(operand);
                     blockBuilder.Push(op);
                     break;
                 }
@@ -700,38 +866,113 @@ static class BlockTacLineBuilder
                     // frame.ContinueBranchingTo(target, null);
                     return true;
                 }
-                case "beq.s":
                 case "beq":
-
-                case "bne.un":
-                case "bne.un.s":
-
-                case "bge.un":
-                case "bge.un.s":
-                case "bge.s":
-                case "bge":
-
-                case "bgt.un":
-                case "bgt.un.s":
-                case "bgt.s":
-                case "bgt":
-
-                case "ble.un":
-                case "ble.un.s":
-                case "ble.s":
-                case "ble":
-
-                case "blt.un":
-                case "blt.un.s":
-                case "blt.s":
-                case "blt":
-
+                case "beq.s":
                 {
                     IlExpr lhs = blockBuilder.Pop();
                     IlExpr rhs = blockBuilder.Pop();
                     ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     blockBuilder.NewLine(new IlIfStmt(
-                        new IlBinaryOperation(lhs, rhs),
+                        new IlCeqOp(lhs, rhs),
+                        tb.idx));
+                    return true;
+                }
+                case "bne.un":
+                case "bne.un.s":
+                {
+                    IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = blockBuilder.Pop();
+                    ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlIfStmt(
+                        new IlCneOp(lhs, rhs),
+                        tb.idx));
+                    return true;
+                }
+                case "bge":
+                case "bge.s":
+                {
+                    IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = blockBuilder.Pop();
+                    ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlIfStmt(
+                        new IlCgeOp(lhs, rhs),
+                        tb.idx));
+                    return true;
+                }
+                case "bge.un":
+                case "bge.un.s":
+                {
+                    IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = blockBuilder.Pop();
+                    ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlIfStmt(
+                        new IlCgeOp(lhs, rhs, isUnsigned: true),
+                        tb.idx));
+                    return true;
+                }
+                case "bgt":
+                case "bgt.s":
+                {
+                    IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = blockBuilder.Pop();
+                    ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlIfStmt(
+                        new IlCgtOp(lhs, rhs),
+                        tb.idx));
+                    return true;
+                }
+                case "bgt.un":
+                case "bgt.un.s":
+                {
+                    IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = blockBuilder.Pop();
+                    ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlIfStmt(
+                        new IlCgtOp(lhs, rhs, isUnsigned: true),
+                        tb.idx));
+                    return true;
+                }
+                case "ble":
+                case "ble.s":
+                {
+                    IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = blockBuilder.Pop();
+                    ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlIfStmt(
+                        new IlCleOp(lhs, rhs),
+                        tb.idx));
+                    return true;
+                }
+                case "ble.un":
+                case "ble.un.s":
+                {
+                    IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = blockBuilder.Pop();
+                    ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlIfStmt(
+                        new IlCleOp(lhs, rhs, isUnsigned: true),
+                        tb.idx));
+                    return true;
+                }
+                case "blt":
+                case "blt.s":
+                {
+                    IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = blockBuilder.Pop();
+                    ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlIfStmt(
+                        new IlCltOp(lhs, rhs),
+                        tb.idx));
+                    return true;
+                }
+                case "blt.un":
+                case "blt.un.s":
+                {
+                    IlExpr lhs = blockBuilder.Pop();
+                    IlExpr rhs = blockBuilder.Pop();
+                    ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlIfStmt(
+                        new IlCltOp(lhs, rhs, isUnsigned: true),
                         tb.idx));
                     return true;
                 }
@@ -744,7 +985,7 @@ static class BlockTacLineBuilder
                     IlExpr rhs = IlConstant.BrFalseWith(lhs);
                     ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     blockBuilder.NewLine(new IlIfStmt(
-                        new IlBinaryOperation(lhs, rhs), tb.idx));
+                        new IlCneOp(lhs, rhs), tb.idx));
                     return true;
                 }
                 case "brnull":
@@ -758,12 +999,13 @@ static class BlockTacLineBuilder
                     IlExpr rhs = IlConstant.BrFalseWith(lhs);
                     ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     blockBuilder.NewLine(new IlIfStmt(
-                        new IlBinaryOperation(lhs, rhs), tb.idx));
+                        new IlCeqOp(lhs, rhs), tb.idx));
                     return true;
                 }
                 case "newobj":
                 {
                     IlMethod ilMethod = ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
+                    // ReSharper disable once PossibleUnintendedReferenceComparison
                     Debug.Assert(ilMethod.ReturnType == IlInstanceBuilder.GetType(typeof(void)));
                     IlType objIlType = ilMethod.DeclaringType!;
                     var newInstance = blockBuilder.GetNewTemp(new IlNullConst(), blockBuilder.CurInstr.idx);
@@ -860,7 +1102,7 @@ static class BlockTacLineBuilder
                     blockBuilder.Push(convCast);
                     break;
                 }
-                    
+
                 case "conv.i2":
                 {
                     IlExpr value = blockBuilder.Pop();

@@ -4,45 +4,6 @@ using TACBuilder.Utils;
 
 namespace TACBuilder.ILTAC.TypeSystem;
 
-// impl 86-87
-public class IlUnaryOperation(IlExpr operand) : IlExpr
-{
-    public IlExpr Operand => operand;
-
-    public IlType Type => operand.Type;
-
-    public new string ToString()
-    {
-        return "unOp " + operand.ToString();
-    }
-}
-
-public class IlBinaryOperation : IlExpr
-{
-    private readonly IlExpr _lhs;
-    private readonly IlExpr _rhs;
-    private readonly string _op;
-
-    public IlBinaryOperation(IlExpr lhs, IlExpr rhs, string op = " binop ")
-    {
-        _lhs = lhs;
-        _rhs = rhs;
-        _op = op;
-        if (_lhs.Type == null)
-        {
-            Console.WriteLine("kek");
-        }
-
-        Type = lhs.Type;
-    }
-
-    public IlType Type { get; }
-
-    public IlExpr Lhs => _lhs;
-    public IlExpr Rhs => _rhs;
-    public new string ToString() => $"{Lhs.ToString()} {_op} {Rhs.ToString()}";
-}
-
 public class IlNewExpr(IlType type) : IlExpr
 {
     public IlType Type => type;
