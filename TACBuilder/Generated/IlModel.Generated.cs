@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => -5498946025153824894L;
+    protected override long SerializationHash => 822066295397104068L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -1709,6 +1709,7 @@ namespace org.jacodb.api.net.generated.models
     //public fields
     [NotNull] public TypeId ReturnType {get; private set;}
     [NotNull] public List<IlAttrDto> Attrs {get; private set;}
+    public bool IsStatic {get; private set;}
     [NotNull] public string Name {get; private set;}
     [NotNull] public List<IlParameterDto> Parameters {get; private set;}
     public bool Resolved {get; private set;}
@@ -1723,6 +1724,7 @@ namespace org.jacodb.api.net.generated.models
     public IlMethodDto(
       [NotNull] TypeId returnType,
       [NotNull] List<IlAttrDto> attrs,
+      bool isStatic,
       [NotNull] string name,
       [NotNull] List<IlParameterDto> parameters,
       bool resolved,
@@ -1745,6 +1747,7 @@ namespace org.jacodb.api.net.generated.models
       
       ReturnType = returnType;
       Attrs = attrs;
+      IsStatic = isStatic;
       Name = name;
       Parameters = parameters;
       Resolved = resolved;
@@ -1762,6 +1765,7 @@ namespace org.jacodb.api.net.generated.models
     {
       var returnType = TypeId.Read(ctx, reader);
       var attrs = ReadIlAttrDtoList(ctx, reader);
+      var isStatic = reader.ReadBool();
       var name = reader.ReadString();
       var parameters = ReadIlParameterDtoList(ctx, reader);
       var resolved = reader.ReadBool();
@@ -1770,7 +1774,7 @@ namespace org.jacodb.api.net.generated.models
       var errs = ReadIlErrVarDtoList(ctx, reader);
       var ehScopes = ReadIlEhScopeDtoList(ctx, reader);
       var rawInstList = ReadIlStmtDtoList(ctx, reader);
-      var _result = new IlMethodDto(returnType, attrs, name, parameters, resolved, locals, temps, errs, ehScopes, rawInstList);
+      var _result = new IlMethodDto(returnType, attrs, isStatic, name, parameters, resolved, locals, temps, errs, ehScopes, rawInstList);
       return _result;
     };
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -1785,6 +1789,7 @@ namespace org.jacodb.api.net.generated.models
     {
       TypeId.Write(ctx, writer, value.ReturnType);
       WriteIlAttrDtoList(ctx, writer, value.Attrs);
+      writer.Write(value.IsStatic);
       writer.Write(value.Name);
       WriteIlParameterDtoList(ctx, writer, value.Parameters);
       writer.Write(value.Resolved);
@@ -1818,7 +1823,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList);
+      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && IsStatic == other.IsStatic && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1827,6 +1832,7 @@ namespace org.jacodb.api.net.generated.models
         var hash = 0;
         hash = hash * 31 + ReturnType.GetHashCode();
         hash = hash * 31 + Attrs.ContentHashCode();
+        hash = hash * 31 + IsStatic.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
         hash = hash * 31 + Parameters.ContentHashCode();
         hash = hash * 31 + Resolved.GetHashCode();
@@ -1845,6 +1851,7 @@ namespace org.jacodb.api.net.generated.models
       using (printer.IndentCookie()) {
         printer.Print("returnType = "); ReturnType.PrintEx(printer); printer.Println();
         printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
+        printer.Print("isStatic = "); IsStatic.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
         printer.Print("parameters = "); Parameters.PrintEx(printer); printer.Println();
         printer.Print("resolved = "); Resolved.PrintEx(printer); printer.Println();
@@ -2579,7 +2586,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:131</p>
+  /// <p>Generated from: IlModel.kt:132</p>
   /// </summary>
   public sealed class IlSignatureDto : IlDto
   {

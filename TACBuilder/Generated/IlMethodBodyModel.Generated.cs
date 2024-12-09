@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => -3139965924659144766L;
+    protected override long SerializationHash => -2346733504392876579L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -80,8 +80,24 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlTypeRefDto.Read, IlTypeRefDto.Write);
       serializers.Register(IlMethodRefDto.Read, IlMethodRefDto.Write);
       serializers.Register(IlFieldRefDto.Read, IlFieldRefDto.Write);
-      serializers.Register(IlUnaryOpDto.Read, IlUnaryOpDto.Write);
-      serializers.Register(IlBinaryOpDto.Read, IlBinaryOpDto.Write);
+      serializers.Register(IlNegOpDto.Read, IlNegOpDto.Write);
+      serializers.Register(IlNotOpDto.Read, IlNotOpDto.Write);
+      serializers.Register(IlAddOpDto.Read, IlAddOpDto.Write);
+      serializers.Register(IlSubOpDto.Read, IlSubOpDto.Write);
+      serializers.Register(IlMulOpDto.Read, IlMulOpDto.Write);
+      serializers.Register(IlDivOpDto.Read, IlDivOpDto.Write);
+      serializers.Register(IlRemOpDto.Read, IlRemOpDto.Write);
+      serializers.Register(IlAndOpDto.Read, IlAndOpDto.Write);
+      serializers.Register(IlOrOpDto.Read, IlOrOpDto.Write);
+      serializers.Register(IlXorOpDto.Read, IlXorOpDto.Write);
+      serializers.Register(IlShlOpDto.Read, IlShlOpDto.Write);
+      serializers.Register(IlShrOpDto.Read, IlShrOpDto.Write);
+      serializers.Register(IlCeqOpDto.Read, IlCeqOpDto.Write);
+      serializers.Register(IlCneOpDto.Read, IlCneOpDto.Write);
+      serializers.Register(IlCgtOpDto.Read, IlCgtOpDto.Write);
+      serializers.Register(IlCgeOpDto.Read, IlCgeOpDto.Write);
+      serializers.Register(IlCltOpDto.Read, IlCltOpDto.Write);
+      serializers.Register(IlCleOpDto.Read, IlCleOpDto.Write);
       serializers.Register(IlNewExprDto.Read, IlNewExprDto.Write);
       serializers.Register(IlSizeOfExprDto.Read, IlSizeOfExprDto.Write);
       serializers.Register(IlFieldAccessDto.Read, IlFieldAccessDto.Write);
@@ -118,6 +134,8 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlValueDto_Unknown.Read, IlValueDto_Unknown.Write);
       serializers.Register(IlConstDto_Unknown.Read, IlConstDto_Unknown.Write);
       serializers.Register(IlNumConstDto_Unknown.Read, IlNumConstDto_Unknown.Write);
+      serializers.Register(IlUnaryOpDto_Unknown.Read, IlUnaryOpDto_Unknown.Write);
+      serializers.Register(IlBinaryOpDto_Unknown.Read, IlBinaryOpDto_Unknown.Write);
       serializers.Register(IlCastExprDto_Unknown.Read, IlCastExprDto_Unknown.Write);
       serializers.Register(IlRefExprDto_Unknown.Read, IlRefExprDto_Unknown.Write);
       serializers.Register(IlDerefExprDto_Unknown.Read, IlDerefExprDto_Unknown.Write);
@@ -157,7 +175,213 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:181</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:80</p>
+  /// </summary>
+  public sealed class IlAddOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlAddOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlAddOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlAddOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlAddOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlAddOpDto) obj);
+    }
+    public bool Equals(IlAddOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlAddOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:85</p>
+  /// </summary>
+  public sealed class IlAndOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlAndOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlAndOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlAndOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlAndOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlAndOpDto) obj);
+    }
+    public bool Equals(IlAndOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlAndOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:203</p>
   /// </summary>
   public sealed class IlArgAccessDto : IlValueDto
   {
@@ -243,7 +467,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:129</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:151</p>
   /// </summary>
   public sealed class IlArgListRefDto : IlExprDto
   {
@@ -331,7 +555,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:87</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:109</p>
   /// </summary>
   public sealed class IlArrayAccessDto : IlValueDto
   {
@@ -517,7 +741,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:96</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:118</p>
   /// </summary>
   public sealed class IlArrayLengthExprDto : IlExprDto
   {
@@ -605,7 +829,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:139</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:161</p>
   /// </summary>
   public sealed class IlAssignStmtDto : IlStmtDto
   {
@@ -694,20 +918,24 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:70</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:73</p>
   /// </summary>
-  public sealed class IlBinaryOpDto : IlExprDto
+  public abstract class IlBinaryOpDto : IlExprDto
   {
     //fields
     //public fields
     [NotNull] public IlExprDto Lhs {get; private set;}
     [NotNull] public IlExprDto Rhs {get; private set;}
+    public bool IsChecked {get; private set;}
+    public bool IsUnsigned {get; private set;}
     
     //private fields
     //primary constructor
-    public IlBinaryOpDto(
+    protected IlBinaryOpDto(
       [NotNull] IlExprDto lhs,
       [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
       type
@@ -718,25 +946,72 @@ namespace org.jacodb.api.net.generated.models
       
       Lhs = lhs;
       Rhs = rhs;
+      IsChecked = isChecked;
+      IsUnsigned = isUnsigned;
     }
     //secondary constructor
     //deconstruct trait
     //statics
     
-    public static new CtxReadDelegate<IlBinaryOpDto> Read = (ctx, reader) => 
+    public static new CtxReadDelegate<IlBinaryOpDto> Read = Polymorphic<IlBinaryOpDto>.ReadAbstract(IlBinaryOpDto_Unknown.Read);
+    
+    public static new CtxWriteDelegate<IlBinaryOpDto> Write = Polymorphic<IlBinaryOpDto>.Write;
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    //hash code trait
+    //pretty print
+    //toString
+  }
+  
+  
+  public sealed class IlBinaryOpDto_Unknown : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlBinaryOpDto_Unknown(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
     {
-      var type = TypeId.Read(ctx, reader);
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlBinaryOpDto_Unknown> Read = (ctx, reader) => 
+    {
       var lhs = IlExprDto.Read(ctx, reader);
       var rhs = IlExprDto.Read(ctx, reader);
-      var _result = new IlBinaryOpDto(lhs, rhs, type);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlBinaryOpDto_Unknown(lhs, rhs, isChecked, isUnsigned, type);
       return _result;
     };
     
-    public static new CtxWriteDelegate<IlBinaryOpDto> Write = (ctx, writer, value) => 
+    public static new CtxWriteDelegate<IlBinaryOpDto_Unknown> Write = (ctx, writer, value) => 
     {
-      TypeId.Write(ctx, writer, value.Type);
       IlExprDto.Write(ctx, writer, value.Lhs);
       IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
     };
     
     //constants
@@ -749,13 +1024,13 @@ namespace org.jacodb.api.net.generated.models
       if (ReferenceEquals(null, obj)) return false;
       if (ReferenceEquals(this, obj)) return true;
       if (obj.GetType() != GetType()) return false;
-      return Equals((IlBinaryOpDto) obj);
+      return Equals((IlBinaryOpDto_Unknown) obj);
     }
-    public bool Equals(IlBinaryOpDto other)
+    public bool Equals(IlBinaryOpDto_Unknown other)
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && Equals(Type, other.Type);
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
@@ -764,6 +1039,8 @@ namespace org.jacodb.api.net.generated.models
         var hash = 0;
         hash = hash * 31 + Lhs.GetHashCode();
         hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
         return hash;
       }
@@ -771,10 +1048,12 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("IlBinaryOpDto (");
+      printer.Println("IlBinaryOpDto_Unknown (");
       using (printer.IndentCookie()) {
         printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
         printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
@@ -876,7 +1155,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:108</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:130</p>
   /// </summary>
   public sealed class IlBoxExprDto : IlCastExprDto
   {
@@ -967,7 +1246,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:165</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:187</p>
   /// </summary>
   public abstract class IlBranchStmtDto : IlStmtDto
   {
@@ -1079,7 +1358,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:97</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:119</p>
   /// </summary>
   public sealed class IlCallDto : IlExprDto
   {
@@ -1177,7 +1456,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:144</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:166</p>
   /// </summary>
   public sealed class IlCallStmtDto : IlStmtDto
   {
@@ -1258,7 +1537,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:132</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:154</p>
   /// </summary>
   public sealed class IlCalliDto : IlExprDto
   {
@@ -1364,7 +1643,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:147</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:169</p>
   /// </summary>
   public sealed class IlCalliStmtDto : IlStmtDto
   {
@@ -1445,7 +1724,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:110</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:132</p>
   /// </summary>
   public sealed class IlCastClassExprDto : IlCastExprDto
   {
@@ -1536,7 +1815,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:102</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:124</p>
   /// </summary>
   public abstract class IlCastExprDto : IlExprDto
   {
@@ -1669,6 +1948,315 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:90</p>
+  /// </summary>
+  public sealed class IlCeqOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlCeqOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlCeqOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlCeqOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlCeqOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCeqOpDto) obj);
+    }
+    public bool Equals(IlCeqOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCeqOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:93</p>
+  /// </summary>
+  public sealed class IlCgeOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlCgeOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlCgeOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlCgeOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlCgeOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCgeOpDto) obj);
+    }
+    public bool Equals(IlCgeOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCgeOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:92</p>
+  /// </summary>
+  public sealed class IlCgtOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlCgtOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlCgtOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlCgtOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlCgtOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCgtOpDto) obj);
+    }
+    public bool Equals(IlCgtOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCgtOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
   /// <p>Generated from: IlMethodBodyModel.kt:51</p>
   /// </summary>
   public sealed class IlCharConstDto : IlNumConstDto
@@ -1740,6 +2328,315 @@ namespace org.jacodb.api.net.generated.models
       printer.Println("IlCharConstDto (");
       using (printer.IndentCookie()) {
         printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:95</p>
+  /// </summary>
+  public sealed class IlCleOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlCleOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlCleOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlCleOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlCleOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCleOpDto) obj);
+    }
+    public bool Equals(IlCleOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCleOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:94</p>
+  /// </summary>
+  public sealed class IlCltOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlCltOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlCltOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlCltOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlCltOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCltOpDto) obj);
+    }
+    public bool Equals(IlCltOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCltOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:91</p>
+  /// </summary>
+  public sealed class IlCneOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlCneOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlCneOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlCneOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlCneOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlCneOpDto) obj);
+    }
+    public bool Equals(IlCneOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlCneOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
@@ -1867,7 +2764,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:107</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:129</p>
   /// </summary>
   public sealed class IlConvExprDto : IlCastExprDto
   {
@@ -1958,7 +2855,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:117</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:139</p>
   /// </summary>
   public abstract class IlDerefExprDto : IlValueDto
   {
@@ -2081,6 +2978,109 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:83</p>
+  /// </summary>
+  public sealed class IlDivOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlDivOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlDivOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlDivOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlDivOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlDivOpDto) obj);
+    }
+    public bool Equals(IlDivOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlDivOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
   /// <p>Generated from: IlMethodBodyModel.kt:49</p>
   /// </summary>
   public sealed class IlDoubleConstDto : IlNumConstDto
@@ -2167,7 +3167,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:154</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:176</p>
   /// </summary>
   public abstract class IlEhStmtDto : IlStmtDto
   {
@@ -2259,7 +3259,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:160</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:182</p>
   /// </summary>
   public sealed class IlEndFaultStmtDto : IlEhStmtDto
   {
@@ -2325,7 +3325,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:161</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:183</p>
   /// </summary>
   public sealed class IlEndFilterStmtDto : IlEhStmtDto
   {
@@ -2406,7 +3406,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:159</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:181</p>
   /// </summary>
   public sealed class IlEndFinallyStmtDto : IlEhStmtDto
   {
@@ -2681,7 +3681,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:83</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:105</p>
   /// </summary>
   public sealed class IlFieldAccessDto : IlValueDto
   {
@@ -2952,7 +3952,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:169</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:191</p>
   /// </summary>
   public sealed class IlGotoStmtDto : IlBranchStmtDto
   {
@@ -3031,7 +4031,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:172</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:194</p>
   /// </summary>
   public sealed class IlIfStmtDto : IlBranchStmtDto
   {
@@ -3463,7 +4463,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:111</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:133</p>
   /// </summary>
   public sealed class IlIsInstExprDto : IlCastExprDto
   {
@@ -3554,7 +4554,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:123</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:145</p>
   /// </summary>
   public sealed class IlManagedDerefExprDto : IlDerefExprDto
   {
@@ -3639,7 +4639,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:121</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:143</p>
   /// </summary>
   public sealed class IlManagedRefExprDto : IlRefExprDto
   {
@@ -3812,7 +4812,195 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:92</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:82</p>
+  /// </summary>
+  public sealed class IlMulOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlMulOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlMulOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlMulOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlMulOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlMulOpDto) obj);
+    }
+    public bool Equals(IlMulOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlMulOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:70</p>
+  /// </summary>
+  public sealed class IlNegOpDto : IlUnaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlNegOpDto(
+      [NotNull] IlExprDto operand,
+      [NotNull] TypeId type
+    ) : base (
+      operand,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlNegOpDto> Read = (ctx, reader) => 
+    {
+      var operand = IlExprDto.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlNegOpDto(operand, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlNegOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Operand);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlNegOpDto) obj);
+    }
+    public bool Equals(IlNegOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Operand, other.Operand) && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Operand.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlNegOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("operand = "); Operand.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:114</p>
   /// </summary>
   public sealed class IlNewArrayExprDto : IlExprDto
   {
@@ -3900,7 +5088,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:75</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:97</p>
   /// </summary>
   public sealed class IlNewExprDto : IlExprDto
   {
@@ -3964,6 +5152,91 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlNewExprDto (");
       using (printer.IndentCookie()) {
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:71</p>
+  /// </summary>
+  public sealed class IlNotOpDto : IlUnaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlNotOpDto(
+      [NotNull] IlExprDto operand,
+      [NotNull] TypeId type
+    ) : base (
+      operand,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlNotOpDto> Read = (ctx, reader) => 
+    {
+      var operand = IlExprDto.Read(ctx, reader);
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlNotOpDto(operand, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlNotOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Operand);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlNotOpDto) obj);
+    }
+    public bool Equals(IlNotOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Operand, other.Operand) && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Operand.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlNotOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("operand = "); Operand.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
@@ -4170,7 +5443,110 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:114</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:86</p>
+  /// </summary>
+  public sealed class IlOrOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlOrOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlOrOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlOrOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlOrOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlOrOpDto) obj);
+    }
+    public bool Equals(IlOrOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlOrOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:136</p>
   /// </summary>
   public abstract class IlRefExprDto : IlValueDto
   {
@@ -4293,7 +5669,110 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:158</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:84</p>
+  /// </summary>
+  public sealed class IlRemOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlRemOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlRemOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlRemOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlRemOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlRemOpDto) obj);
+    }
+    public bool Equals(IlRemOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlRemOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:180</p>
   /// </summary>
   public sealed class IlRethrowStmtDto : IlEhStmtDto
   {
@@ -4359,7 +5838,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:150</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:172</p>
   /// </summary>
   public sealed class IlReturnStmtDto : IlStmtDto
   {
@@ -4440,7 +5919,213 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:78</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:88</p>
+  /// </summary>
+  public sealed class IlShlOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlShlOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlShlOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlShlOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlShlOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlShlOpDto) obj);
+    }
+    public bool Equals(IlShlOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlShlOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:89</p>
+  /// </summary>
+  public sealed class IlShrOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlShrOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlShrOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlShrOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlShrOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlShrOpDto) obj);
+    }
+    public bool Equals(IlShrOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlShrOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:100</p>
   /// </summary>
   public sealed class IlSizeOfExprDto : IlExprDto
   {
@@ -4528,7 +6213,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:126</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:148</p>
   /// </summary>
   public sealed class IlStackAllocExprDto : IlExprDto
   {
@@ -4616,7 +6301,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:137</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:159</p>
   /// </summary>
   public abstract class IlStmtDto{
     //fields
@@ -4795,7 +6480,110 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:155</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:81</p>
+  /// </summary>
+  public sealed class IlSubOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlSubOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlSubOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlSubOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlSubOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlSubOpDto) obj);
+    }
+    public bool Equals(IlSubOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlSubOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:177</p>
   /// </summary>
   public sealed class IlThrowStmtDto : IlEhStmtDto
   {
@@ -5310,7 +7098,7 @@ namespace org.jacodb.api.net.generated.models
   /// <summary>
   /// <p>Generated from: IlMethodBodyModel.kt:69</p>
   /// </summary>
-  public sealed class IlUnaryOpDto : IlExprDto
+  public abstract class IlUnaryOpDto : IlExprDto
   {
     //fields
     //public fields
@@ -5318,7 +7106,7 @@ namespace org.jacodb.api.net.generated.models
     
     //private fields
     //primary constructor
-    public IlUnaryOpDto(
+    protected IlUnaryOpDto(
       [NotNull] IlExprDto operand,
       [NotNull] TypeId type
     ) : base (
@@ -5333,18 +7121,53 @@ namespace org.jacodb.api.net.generated.models
     //deconstruct trait
     //statics
     
-    public static new CtxReadDelegate<IlUnaryOpDto> Read = (ctx, reader) => 
+    public static new CtxReadDelegate<IlUnaryOpDto> Read = Polymorphic<IlUnaryOpDto>.ReadAbstract(IlUnaryOpDto_Unknown.Read);
+    
+    public static new CtxWriteDelegate<IlUnaryOpDto> Write = Polymorphic<IlUnaryOpDto>.Write;
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    //hash code trait
+    //pretty print
+    //toString
+  }
+  
+  
+  public sealed class IlUnaryOpDto_Unknown : IlUnaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlUnaryOpDto_Unknown(
+      [NotNull] IlExprDto operand,
+      [NotNull] TypeId type
+    ) : base (
+      operand,
+      type
+     ) 
     {
-      var type = TypeId.Read(ctx, reader);
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlUnaryOpDto_Unknown> Read = (ctx, reader) => 
+    {
       var operand = IlExprDto.Read(ctx, reader);
-      var _result = new IlUnaryOpDto(operand, type);
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlUnaryOpDto_Unknown(operand, type);
       return _result;
     };
     
-    public static new CtxWriteDelegate<IlUnaryOpDto> Write = (ctx, writer, value) => 
+    public static new CtxWriteDelegate<IlUnaryOpDto_Unknown> Write = (ctx, writer, value) => 
     {
-      TypeId.Write(ctx, writer, value.Type);
       IlExprDto.Write(ctx, writer, value.Operand);
+      TypeId.Write(ctx, writer, value.Type);
     };
     
     //constants
@@ -5357,9 +7180,9 @@ namespace org.jacodb.api.net.generated.models
       if (ReferenceEquals(null, obj)) return false;
       if (ReferenceEquals(this, obj)) return true;
       if (obj.GetType() != GetType()) return false;
-      return Equals((IlUnaryOpDto) obj);
+      return Equals((IlUnaryOpDto_Unknown) obj);
     }
-    public bool Equals(IlUnaryOpDto other)
+    public bool Equals(IlUnaryOpDto_Unknown other)
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
@@ -5378,7 +7201,7 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("IlUnaryOpDto (");
+      printer.Println("IlUnaryOpDto_Unknown (");
       using (printer.IndentCookie()) {
         printer.Print("operand = "); Operand.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -5396,7 +7219,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:109</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:131</p>
   /// </summary>
   public sealed class IlUnboxExprDto : IlCastExprDto
   {
@@ -5487,7 +7310,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:124</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:146</p>
   /// </summary>
   public sealed class IlUnmanagedDerefExprDto : IlDerefExprDto
   {
@@ -5572,7 +7395,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:122</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:144</p>
   /// </summary>
   public sealed class IlUnmanagedRefExprDto : IlRefExprDto
   {
@@ -5769,7 +7592,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:184</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:206</p>
   /// </summary>
   public sealed class IlVarAccessDto : IlValueDto
   {
@@ -5862,12 +7685,115 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:176</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:198</p>
   /// </summary>
   public enum IlVarKind {
     local,
     temp,
     err
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlMethodBodyModel.kt:87</p>
+  /// </summary>
+  public sealed class IlXorOpDto : IlBinaryOpDto
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public IlXorOpDto(
+      [NotNull] IlExprDto lhs,
+      [NotNull] IlExprDto rhs,
+      bool isChecked,
+      bool isUnsigned,
+      [NotNull] TypeId type
+    ) : base (
+      lhs,
+      rhs,
+      isChecked,
+      isUnsigned,
+      type
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<IlXorOpDto> Read = (ctx, reader) => 
+    {
+      var lhs = IlExprDto.Read(ctx, reader);
+      var rhs = IlExprDto.Read(ctx, reader);
+      var isChecked = reader.ReadBool();
+      var isUnsigned = reader.ReadBool();
+      var type = TypeId.Read(ctx, reader);
+      var _result = new IlXorOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      return _result;
+    };
+    
+    public static new CtxWriteDelegate<IlXorOpDto> Write = (ctx, writer, value) => 
+    {
+      IlExprDto.Write(ctx, writer, value.Lhs);
+      IlExprDto.Write(ctx, writer, value.Rhs);
+      writer.Write(value.IsChecked);
+      writer.Write(value.IsUnsigned);
+      TypeId.Write(ctx, writer, value.Type);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlXorOpDto) obj);
+    }
+    public bool Equals(IlXorOpDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Lhs.GetHashCode();
+        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + IsChecked.GetHashCode();
+        hash = hash * 31 + IsUnsigned.GetHashCode();
+        hash = hash * 31 + Type.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlXorOpDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
+        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
+        printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
+        printer.Print("type = "); Type.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
   }
   
   

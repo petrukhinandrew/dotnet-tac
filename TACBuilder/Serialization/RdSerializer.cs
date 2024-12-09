@@ -1,4 +1,5 @@
 #define TEST_DUMPSIGNATURES
+using System.Diagnostics;
 using org.jacodb.api.net.generated.models;
 using TACBuilder.BodyBuilder;
 using TACBuilder.Exprs;
@@ -191,6 +192,48 @@ public static class RdSerializer
         };
     }
 
+    private static IlExprDto SerializeOp(this IlExpr expr)
+    {
+        Debug.Assert(expr is IlUnaryOperation || expr is IlBinaryOperation);
+        return expr switch
+        {
+            IlNotOp notOp => new IlNotOpDto(notOp.Operand.SerializeExpr(), notOp.Type.GetTypeId()),
+            IlNegOp negOp => new IlNegOpDto(negOp.Operand.SerializeExpr(), negOp.Type.GetTypeId()),
+            IlAddOp addOp => new IlAddOpDto(addOp.Lhs.SerializeExpr(), addOp.Rhs.SerializeExpr(), addOp.IsChecked,
+                addOp.IsUnsigned, addOp.Type.GetTypeId()),
+            IlSubOp subOp => new IlSubOpDto(subOp.Lhs.SerializeExpr(), subOp.Rhs.SerializeExpr(), subOp.IsChecked,
+                subOp.IsUnsigned, subOp.Type.GetTypeId()),
+            IlMulOp mulOp => new IlMulOpDto(mulOp.Lhs.SerializeExpr(), mulOp.Rhs.SerializeExpr(), mulOp.IsChecked,
+                mulOp.IsUnsigned, mulOp.Type.GetTypeId()),
+            IlDivOp divOp => new IlDivOpDto(divOp.Lhs.SerializeExpr(), divOp.Rhs.SerializeExpr(), divOp.IsChecked,
+                divOp.IsUnsigned, divOp.Type.GetTypeId()),
+            IlRemOp remOp => new IlRemOpDto(remOp.Lhs.SerializeExpr(), remOp.Rhs.SerializeExpr(), remOp.IsChecked,
+                remOp.IsUnsigned, remOp.Type.GetTypeId()),
+            IlAndOp andOp => new IlAndOpDto(andOp.Lhs.SerializeExpr(), andOp.Rhs.SerializeExpr(), andOp.IsChecked,
+                andOp.IsUnsigned, andOp.Type.GetTypeId()),
+            IlOrOp orOp => new IlOrOpDto(orOp.Lhs.SerializeExpr(), orOp.Rhs.SerializeExpr(), orOp.IsChecked,
+                orOp.IsUnsigned, orOp.Type.GetTypeId()),
+            IlXorOp xorOp => new IlXorOpDto(xorOp.Lhs.SerializeExpr(), xorOp.Rhs.SerializeExpr(), xorOp.IsChecked,
+                xorOp.IsUnsigned, xorOp.Type.GetTypeId()),
+            IlShlOp shlOp => new IlShlOpDto(shlOp.Lhs.SerializeExpr(), shlOp.Rhs.SerializeExpr(), shlOp.IsChecked,
+                shlOp.IsUnsigned, shlOp.Type.GetTypeId()),
+            IlShrOp shrOp => new IlShrOpDto(shrOp.Lhs.SerializeExpr(), shrOp.Rhs.SerializeExpr(), shrOp.IsChecked,
+                shrOp.IsUnsigned, shrOp.Type.GetTypeId()),
+            IlCeqOp ceqOp => new IlCeqOpDto(ceqOp.Lhs.SerializeExpr(), ceqOp.Rhs.SerializeExpr(), ceqOp.IsChecked,
+                ceqOp.IsUnsigned, ceqOp.Type.GetTypeId()),
+            IlCneOp cneOp => new IlCneOpDto(cneOp.Lhs.SerializeExpr(), cneOp.Rhs.SerializeExpr(), cneOp.IsChecked,
+                cneOp.IsUnsigned, cneOp.Type.GetTypeId()),
+            IlCgtOp cgtOp => new IlCgtOpDto(cgtOp.Lhs.SerializeExpr(), cgtOp.Rhs.SerializeExpr(), cgtOp.IsChecked,
+                cgtOp.IsUnsigned, cgtOp.Type.GetTypeId()),
+            IlCgeOp cgeOp => new IlCgeOpDto(cgeOp.Lhs.SerializeExpr(), cgeOp.Rhs.SerializeExpr(), cgeOp.IsChecked,
+                cgeOp.IsUnsigned, cgeOp.Type.GetTypeId()),
+            IlCltOp cltOp => new IlCltOpDto(cltOp.Lhs.SerializeExpr(), cltOp.Rhs.SerializeExpr(), cltOp.IsChecked,
+                cltOp.IsUnsigned, cltOp.Type.GetTypeId()),
+            IlCleOp cleOp => new IlCleOpDto(cleOp.Lhs.SerializeExpr(), cleOp.Rhs.SerializeExpr(), cleOp.IsChecked,
+                cleOp.IsUnsigned, cleOp.Type.GetTypeId()),
+        };
+    }
+
     private static IlExprDto SerializeExpr(this IlExpr expr)
     {
         return expr switch
@@ -208,10 +251,7 @@ public static class RdSerializer
             IlCallIndirect calli => new IlCalliDto(signature: SerializeSignature(calli.Signature),
                 type: new TypeId("", ""),
                 ftn: calli.Callee.SerializeExpr(), args: calli.Arguments.Select(SerializeExpr).ToList()),
-            IlUnaryOperation unaryOp => new IlUnaryOpDto(type: unaryOp.Type.GetTypeId(),
-                operand: unaryOp.Operand.SerializeExpr()),
-            IlBinaryOperation binaryOp => new IlBinaryOpDto(type: binaryOp.Type.GetTypeId(),
-                lhs: binaryOp.Lhs.SerializeExpr(), rhs: binaryOp.Rhs.SerializeExpr()),
+            IlUnaryOperation or IlBinaryOperation => expr.SerializeOp(),
             IlNewExpr newExpr => new IlNewExprDto(newExpr.Type.GetTypeId()),
             IlSizeOfExpr sizeOfExpr => new IlSizeOfExprDto(type: sizeOfExpr.Type.GetTypeId(),
                 targetType: sizeOfExpr.Arg.GetTypeId()),
@@ -300,8 +340,11 @@ public static class RdSerializer
 
     private static IlMethodDto SerializeMethod(this IlMethod method)
     {
-        return new IlMethodDto(returnType: method.ReturnType?.GetTypeId(),
-            attrs: method.Attributes.Select(SerializeAttr).ToList(), name: method.Name,
+        return new IlMethodDto(
+            returnType: method.ReturnType?.GetTypeId(),
+            attrs: method.Attributes.Select(SerializeAttr).ToList(),
+            isStatic: method.IsStatic,
+            name: method.Name,
             parameters: method.Parameters
                 .Select(p => new IlParameterDto(p.Position, p.Type.GetTypeId(), p.Name, null,
                     attrs: p.Attributes.Select(a => a.SerializeAttr()).ToList())).ToList(),
