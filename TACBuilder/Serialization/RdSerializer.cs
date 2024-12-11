@@ -26,11 +26,15 @@ public static class RdSerializer
                     attrs: field.Attributes.Select(a => a.SerializeAttr()).ToList())).ToList();
             List<IlMethodDto> methods = type.Methods.Select(SerializeMethod).ToList();
             List<TypeId> interfaces = type.Interfaces.Select(t => t.GetTypeId()).ToList();
+            var typeToken = type.MetadataToken;
+            var moduleToken = type.ModuleToken;
             var attrs = type.Attributes.Select(SerializeAttr).ToList();
             IlTypeDto dto = type switch
             {
                 IlPointerType pointerType => new IlPointerTypeDto(
                     asmName: pointerType.AsmName,
+                    typeToken: typeToken,
+                    moduleToken: moduleToken,
                     namespaceName: pointerType.Namespace,
                     name: pointerType.Name,
                     fullname: pointerType.FullName,
@@ -49,6 +53,8 @@ public static class RdSerializer
                 ),
                 IlStructType structType => new IlStructTypeDto(
                     asmName: structType.AsmName,
+                    typeToken: typeToken,
+                    moduleToken: moduleToken,
                     namespaceName: structType.Namespace,
                     name: structType.Name,
                     fullname: structType.FullName,
@@ -66,6 +72,8 @@ public static class RdSerializer
                 ),
                 IlEnumType enumType => new IlEnumTypeDto(
                     asmName: enumType.AsmName,
+                    typeToken: typeToken,
+                    moduleToken: moduleToken,
                     namespaceName: enumType.Namespace,
                     underlyingType: enumType.UnderlyingType.GetTypeId(),
                     name: enumType.Name,
@@ -86,6 +94,8 @@ public static class RdSerializer
                 ),
                 IlPrimitiveType primitiveType => new IlPrimitiveTypeDto(
                     asmName: primitiveType.AsmName,
+                    typeToken: typeToken,
+                    moduleToken: moduleToken,
                     namespaceName: primitiveType.Namespace,
                     name: primitiveType.Name,
                     fullname: primitiveType.FullName,
@@ -103,6 +113,8 @@ public static class RdSerializer
                 ),
                 IlClassType classType => new IlClassTypeDto(
                     asmName: classType.AsmName,
+                    typeToken: typeToken,
+                    moduleToken: moduleToken,
                     namespaceName: classType.Namespace,
                     name: classType.Name,
                     fullname: classType.FullName,
@@ -120,6 +132,8 @@ public static class RdSerializer
                 ),
                 IlArrayType arrayType => new IlArrayTypeDto(
                     asmName: arrayType.AsmName,
+                    typeToken: typeToken,
+                    moduleToken: moduleToken,
                     namespaceName: arrayType.Namespace,
                     name: arrayType.Name,
                     fullname: arrayType.FullName,
