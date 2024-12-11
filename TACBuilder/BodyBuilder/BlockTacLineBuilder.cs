@@ -26,9 +26,7 @@ static class BlockTacLineBuilder
         if (sameStack) return false;
         blockBuilder._builtAtLeastOnce = true;
 
-        blockBuilder.ResetStackToInitial();
-        blockBuilder.TacLines.Clear();
-        blockBuilder.CurInstr = blockBuilder._firstInstr;
+        blockBuilder.Reset();
         while (true)
         {
             // TODO check if it is proper
@@ -115,7 +113,7 @@ static class BlockTacLineBuilder
                 {
                     IlExpr value = blockBuilder.Pop();
                     blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[0],
-                        value.WithTypeEnsured(blockBuilder.Locals[0].Type)));
+                        blockBuilder.EnsureTyped(value, blockBuilder.Locals[0].Type)));
                     blockBuilder.Locals[0].Value = value;
                     break;
                 }
@@ -123,7 +121,7 @@ static class BlockTacLineBuilder
                 {
                     IlExpr value = blockBuilder.Pop();
                     blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[1],
-                        value.WithTypeEnsured(blockBuilder.Locals[1].Type)));
+                        blockBuilder.EnsureTyped(value, blockBuilder.Locals[1].Type)));
                     blockBuilder.Locals[1].Value = value;
                     break;
                 }
@@ -131,7 +129,7 @@ static class BlockTacLineBuilder
                 {
                     IlExpr value = blockBuilder.Pop();
                     blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[2],
-                        value.WithTypeEnsured(blockBuilder.Locals[2].Type)));
+                        blockBuilder.EnsureTyped(value, blockBuilder.Locals[2].Type)));
                     blockBuilder.Locals[2].Value = value;
                     break;
                 }
@@ -139,7 +137,7 @@ static class BlockTacLineBuilder
                 {
                     IlExpr value = blockBuilder.Pop();
                     blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[3],
-                        value.WithTypeEnsured(blockBuilder.Locals[3].Type)));
+                        blockBuilder.EnsureTyped(value, blockBuilder.Locals[3].Type)));
                     blockBuilder.Locals[3].Value = value;
                     break;
                 }
@@ -148,7 +146,7 @@ static class BlockTacLineBuilder
                     int idx = ((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value;
                     IlExpr value = blockBuilder.Pop();
                     blockBuilder.NewLine(new ILAssignStmt(blockBuilder.Locals[idx],
-                        value.WithTypeEnsured(blockBuilder.Locals[idx].Type)));
+                        blockBuilder.EnsureTyped(value, blockBuilder.Locals[idx].Type)));
                     blockBuilder.Locals[idx].Value = value;
                     break;
                 }
@@ -157,7 +155,7 @@ static class BlockTacLineBuilder
                     int idx = ((ILInstrOperand.Arg16)blockBuilder.CurInstr.arg).value;
                     IlExpr value = blockBuilder.Pop();
                     blockBuilder.NewLine(new ILAssignStmt((IlLocal)blockBuilder.Params[idx],
-                        value.WithTypeEnsured(blockBuilder.Params[idx].Type)));
+                        blockBuilder.EnsureTyped(value, blockBuilder.Params[idx].Type)));
                     break;
                 }
                 case "starg.s":
@@ -165,7 +163,7 @@ static class BlockTacLineBuilder
                     int idx = ((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value;
                     IlExpr value = blockBuilder.Pop();
                     blockBuilder.NewLine(new ILAssignStmt((IlLocal)blockBuilder.Params[idx],
-                        value.WithTypeEnsured(blockBuilder.Params[idx].Type)));
+                        blockBuilder.EnsureTyped(value, blockBuilder.Params[idx].Type)));
                     break;
                 }
                 case "throw":
@@ -252,7 +250,8 @@ static class BlockTacLineBuilder
                     IlExpr value = blockBuilder.Pop();
                     IlExpr obj = blockBuilder.Pop();
                     IlFieldAccess ilFieldAccess = new IlFieldAccess(ilField, obj);
-                    blockBuilder.NewLine(new ILAssignStmt(ilFieldAccess, value.WithTypeEnsured(ilFieldAccess.Type)));
+                    blockBuilder.NewLine(new ILAssignStmt(ilFieldAccess,
+                        blockBuilder.EnsureTyped(value, ilFieldAccess.Type)));
                     break;
                 }
                 case "stsfld":
@@ -260,7 +259,8 @@ static class BlockTacLineBuilder
                     IlField ilField = ((ILInstrOperand.ResolvedField)blockBuilder.CurInstr.arg).value;
                     IlExpr value = blockBuilder.Pop();
                     IlFieldAccess ilFieldAccess = new IlFieldAccess(ilField);
-                    blockBuilder.NewLine(new ILAssignStmt(ilFieldAccess, value.WithTypeEnsured(ilFieldAccess.Type)));
+                    blockBuilder.NewLine(new ILAssignStmt(ilFieldAccess,
+                        blockBuilder.EnsureTyped(value, ilFieldAccess.Type)));
                     break;
                 }
                 case "sizeof":
@@ -389,7 +389,8 @@ static class BlockTacLineBuilder
                     IlValue addr = (IlValue)blockBuilder.Pop();
                     blockBuilder.NewLine(new ILAssignStmt(
                         PointerExprTypeResolver.Deref(addr, ilType),
-                        val.WithTypeEnsured(ilType)));
+                        blockBuilder.EnsureTyped(val, ilType)
+                    ));
                     break;
                 }
                 case "ldarga":
@@ -547,11 +548,12 @@ static class BlockTacLineBuilder
                 {
                     IlMethod ilMethod =
                         ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
-
+                    
                     List<IlExpr> args = new();
                     foreach (var t in ilMethod.Parameters)
                     {
-                        args.Add(blockBuilder.Pop().WithTypeEnsured(t.Type));
+                        var arg = blockBuilder.EnsureTyped(blockBuilder.Pop(), t.Type);
+                        args.Add(arg);
                     }
 
                     args.Reverse();
@@ -582,7 +584,8 @@ static class BlockTacLineBuilder
                     List<IlExpr> args = new();
                     foreach (var t in ilMethod.Parameters)
                     {
-                        args.Add(blockBuilder.Pop().WithTypeEnsured(t.Type));
+                        var arg = blockBuilder.EnsureTyped(blockBuilder.Pop(), t.Type);
+                        args.Add(arg);
                     }
 
                     args.Reverse();
@@ -608,7 +611,8 @@ static class BlockTacLineBuilder
                     var args = new List<IlExpr>();
                     foreach (var paramType in sig.ParameterTypes)
                     {
-                        args.Add(blockBuilder.Pop().WithTypeEnsured(paramType));
+                        var arg = blockBuilder.EnsureTyped(blockBuilder.Pop(), paramType);
+                        args.Add(arg);
                     }
 
                     args.Reverse();
@@ -633,7 +637,7 @@ static class BlockTacLineBuilder
                     IlExpr? retVal = null;
                     if (methodMeta.ReturnType != null &&
                         !Equals(methodMeta.ReturnType, IlInstanceBuilder.GetType(typeof(void))))
-                        retVal = blockBuilder.Pop().WithTypeEnsured(methodMeta.ReturnType);
+                        retVal = blockBuilder.EnsureTyped(blockBuilder.Pop(), methodMeta.ReturnType);
                     blockBuilder.NewLine(
                         new IlReturnStmt(retVal)
                     );
@@ -1014,7 +1018,8 @@ static class BlockTacLineBuilder
                     List<IlExpr> args = new();
                     foreach (var parameter in ilMethod.Parameters)
                     {
-                        args.Add(blockBuilder.Pop().WithTypeEnsured(parameter.Type));
+                        var arg = blockBuilder.EnsureTyped(blockBuilder.Pop(), parameter.Type);
+                        args.Add(arg);
                     }
 
                     args.Reverse();
@@ -1306,5 +1311,12 @@ static class BlockTacLineBuilder
         else res.Add(args[1]);
 
         return res;
+    }
+
+    private static IlValue EnsureTyped(this BlockTacBuilder blockBuilder, IlExpr expr, IlType expectedType)
+    {
+        var res = expr.WithTypeEnsured(expectedType);
+        if (res is IlValue value) return value;
+        return blockBuilder.GetNewTemp(res);
     }
 }

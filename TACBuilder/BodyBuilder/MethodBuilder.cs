@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime;
 using System.Runtime.CompilerServices;
 using TACBuilder.BodyBuilder;
@@ -14,7 +15,7 @@ class MethodBuilder(IlMethod method)
     public List<IlLocalVar> LocalVars => method.LocalVars;
 
     public List<IlValue> Params = new();
-    public Dictionary<int, IlTempVar> Temps => method.Temps;
+    public Dictionary<int, List<IlTempVar>> Temps = new(); //=> method.Temps;
     public List<IlErrVar> Errs => method.Errs;
     public List<EhScope> EhScopes => method.Scopes;
     public readonly Dictionary<(int, int), IlMerged> Merged = new();
@@ -41,10 +42,11 @@ class MethodBuilder(IlMethod method)
             if (!_method.HasMethodBody) return [];
             InitBlockBuilders();
 
-            ProcessIL();
+            ProcessIl();
             foreach (var m in Merged.Values)
             {
-                var temp = GetNewTemp(m, Temps.Count == 0 ? 0 : Temps.Keys.Max() + 1);
+                var newTmpIdx = Temps.Values.Select(v => v.Count).Sum();
+                var temp = GetNewTemp(m, newTmpIdx, 0);
                 m.MakeTemp(temp);
             }
 
@@ -54,10 +56,16 @@ class MethodBuilder(IlMethod method)
             }
 
             ComposeTac();
+            var idx = 0;
+            foreach (var tmp in Temps.SelectMany(keyValuePair => keyValuePair.Value))
+            {
+                method.Temps[idx++] = tmp;
+            }
         }
         catch (KnownBug kb)
         {
-            Console.WriteLine(kb.Message + " found at " + (method.DeclaringType?.Type.ToString() ?? " ") + " " + method);
+            Console.WriteLine(kb.Message + " found at " + (method.DeclaringType?.Type.ToString() ?? " ") + " " +
+                              method);
             return [];
         }
 
@@ -77,7 +85,7 @@ class MethodBuilder(IlMethod method)
         }
     }
 
-    private void ProcessIL()
+    private void ProcessIl()
     {
         Worklist.Clear();
 
@@ -148,14 +156,22 @@ class MethodBuilder(IlMethod method)
         }
     }
 
-    internal IlTempVar GetNewTemp(IlExpr value, int instrIdx)
+    internal IlTempVar GetNewTemp(IlExpr value, int instrIdx, int internalIdx)
     {
-        if (!Temps.ContainsKey(instrIdx))
+        var tmpIdx = Temps.Select(v => v.Value.Count).Sum();
+        if (!Temps.TryGetValue(instrIdx, out var tmps))
         {
-            Temps.Add(instrIdx, new IlTempVar(Temps.Count, value));
+            Debug.Assert(internalIdx == 0);
+            tmps = new List<IlTempVar>();
+            tmps.Add(new IlTempVar(tmpIdx, value));
+            Temps.Add(instrIdx, tmps);
+            return tmps[0];
         }
 
-        return Temps[instrIdx];
+        if (tmps.Count > internalIdx) return tmps[internalIdx];
+        Debug.Assert(tmps.Count == internalIdx);
+        tmps.Add(new IlTempVar(tmpIdx, value));
+        return tmps.Last();
     }
 
     internal IlExpr GetNewErr(Type type)

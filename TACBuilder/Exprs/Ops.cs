@@ -21,6 +21,7 @@ class IlNotOp(IlExpr operand) : IlUnaryOperation(operand);
 public abstract class IlBinaryOperation(IlExpr lhs, IlExpr rhs, bool isChecked = false, bool isUnsigned = false)
     : IlExpr
 {
+    // TODO CRITICAL
     public IlType Type { get; } = lhs.Type;
 
     public IlExpr Lhs => lhs;

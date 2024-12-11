@@ -54,7 +54,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
         if (stacks.All(s => s.Item2.Count == 0)) return true;
         if (stackLengths.Max() != stackLengths.Min())
             Debug.Assert(stackLengths.Max() == stackLengths.Min(),
-                meta.MethodMeta.Name + meta.MethodMeta.Parameters.Count);
+                meta.MethodMeta!.Name + meta.MethodMeta.Parameters.Count);
         for (int j = 0; j < stackLengths.Max(); j++)
         {
             var values = stacks.Select(s => s.Item2.Pop()).ToList();
@@ -79,10 +79,20 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
         return copy.SequenceEqual(_entryStackState);
     }
 
-    public void ResetStackToInitial()
+    private void ResetStackToInitial()
     {
         _stack = EvaluationStack<IlExpr>.CopyOf(_entryStackState);
     }
+
+    public void Reset()
+    {
+        ResetStackToInitial();
+        TacLines.Clear();
+        CurInstr = _firstInstr;
+        TempIndexer.Clear();
+    }
+
+    internal Dictionary<int, int> TempIndexer = new();
 
     public void InsertExtraAssignments()
     {
@@ -128,9 +138,10 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
         TacLines.Add(line);
     }
 
-    public IlTempVar GetNewTemp(IlExpr value, int instrIdx)
+    public IlTempVar GetNewTemp(IlExpr value, int? instrIdx = null)
     {
-        return methodBuilder.GetNewTemp(value, instrIdx);
+        TempIndexer.TryAdd(CurInstr.idx, 0);
+        return methodBuilder.GetNewTemp(value, instrIdx ?? CurInstr.idx, internalIdx: TempIndexer[CurInstr.idx]++);
     }
 
     public override bool Equals(object? obj)

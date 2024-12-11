@@ -28,7 +28,7 @@ public abstract class PointerExprTypeResolver
 public class IlManagedRef(IlExpr value) : ILRefExpr
 {
     public IlExpr Value => value;
-    
+
     public IlType Type =>
         IlInstanceBuilder.GetType(value.Type.Type.MakeByRefType());
 
@@ -43,7 +43,7 @@ public class IlUnmanagedRef(IlExpr value) : ILRefExpr
     public IlExpr Value => value;
 
     public IlType Type =>
-        IlInstanceBuilder.GetType(value.Type.Type.MakePointerType()); 
+        IlInstanceBuilder.GetType(value.Type.Type.MakePointerType());
 
     public override string ToString()
     {
@@ -57,7 +57,7 @@ public class IlManagedDeref(IlExpr byRefVal) : ILDerefExpr
 
     public IlType Type => byRefVal.Type is IlPointerType managedRef
         ? managedRef.TargetType
-        : throw new Exception("pointer type expected, got " + Type);
+        : throw new Exception("managed deref got type " + byRefVal.Type);
 
     public override string ToString()
     {

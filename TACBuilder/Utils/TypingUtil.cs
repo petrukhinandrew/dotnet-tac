@@ -85,17 +85,15 @@ public static class TypingUtil
         }
     }
 
-    public static IlExpr WithTypeEnsured(this IlExpr expr, IlType expectedType)
+    internal static IlExpr WithTypeEnsured(this IlExpr expr, IlType expectedType)
     {
         // TODO constants optimisations
-        if (Equals(expr.Type, expectedType)) return expr;
-        return new IlConvCastExpr(expectedType, expr);
+        return Equals(expr.Type, expectedType) ? expr : new IlConvCastExpr(expectedType, expr);
     }
 
-    public static IlExpr Coerced(this IlExpr expr)
+    internal static IlExpr Coerced(this IlExpr expr)
     {
-        if (expr.Type == null)
-            Console.WriteLine("lolekke");
+        Debug.Assert(expr.Type != null);
         var coercedType = expr.Type.ExpectedStackType();
         return expr.WithTypeEnsured(coercedType);
     }

@@ -80,11 +80,12 @@ class Program
     private static void RunConsole(StartOptions opts)
     {
         AppTacBuilder builder = new();
+        AppTacBuilder.FilterSingleMethodFromRootAsm(opts.InputFiles.First(), "LdelemA");
         // AppTacBuilder.IncludeMsCoreLib();
         foreach (var file in opts.InputFiles)
         {
             Debug.Assert(File.Exists(file));
-            AppTacBuilder.IncludeRootAsm(file);
+            // AppTacBuilder.IncludeRootAsm(file);
         }
 
         foreach (var file in opts.InputFiles)

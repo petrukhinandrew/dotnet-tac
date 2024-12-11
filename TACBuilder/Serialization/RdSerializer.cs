@@ -176,8 +176,8 @@ public static class RdSerializer
     {
         return stmt switch
         {
-            ILAssignStmt assignStmt => new IlAssignStmtDto(lhs: (IlValueDto)SerializeExpr(assignStmt.Lhs),
-                rhs: SerializeExpr(assignStmt.Rhs)),
+            ILAssignStmt assignStmt => new IlAssignStmtDto(lhv: (IlValueDto)SerializeExpr(assignStmt.Lhs),
+                rhv: SerializeExpr(assignStmt.Rhs)),
             IlCallStmt callStmt => new IlCallStmtDto((IlCallDto)callStmt.Call.SerializeExpr()),
             IlCalliStmt calliStmt => new IlCalliStmtDto((IlCalliDto)calliStmt.Call.SerializeExpr()),
             IlReturnStmt returnStmt => new IlReturnStmtDto(returnStmt.RetVal?.SerializeExpr()),
@@ -256,7 +256,8 @@ public static class RdSerializer
             IlSizeOfExpr sizeOfExpr => new IlSizeOfExprDto(type: sizeOfExpr.Type.GetTypeId(),
                 targetType: sizeOfExpr.Arg.GetTypeId()),
             IlNewArrayExpr newArrayExpr => new IlNewArrayExprDto(size: newArrayExpr.Size.SerializeExpr(),
-                type: newArrayExpr.Type.GetTypeId()),
+                type: newArrayExpr.Type.GetTypeId(),
+                elementType: (newArrayExpr.Type as IlArrayType)!.ElementType.GetTypeId()),
             IlFieldAccess fieldAccess => new IlFieldAccessDto(instance: fieldAccess.Receiver?.SerializeExpr(),
                 field: fieldAccess.Field.GetRefId(), type: fieldAccess.Type.GetTypeId()),
             IlArrayAccess arrayAccess => new IlArrayAccessDto(array: arrayAccess.Array.SerializeExpr(),

@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => -2346733504392876579L;
+    protected override long SerializationHash => 2153136969800853524L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -185,14 +185,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlAddOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -205,19 +205,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlAddOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlAddOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlAddOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlAddOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -239,15 +239,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -259,8 +259,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlAddOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -288,14 +288,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlAndOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -308,19 +308,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlAndOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlAndOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlAndOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlAndOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -342,15 +342,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -362,8 +362,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlAndOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -835,21 +835,21 @@ namespace org.jacodb.api.net.generated.models
   {
     //fields
     //public fields
-    [NotNull] public IlValueDto Lhs {get; private set;}
-    [NotNull] public IlExprDto Rhs {get; private set;}
+    [NotNull] public IlValueDto Lhv {get; private set;}
+    [NotNull] public IlExprDto Rhv {get; private set;}
     
     //private fields
     //primary constructor
     public IlAssignStmtDto(
-      [NotNull] IlValueDto lhs,
-      [NotNull] IlExprDto rhs
+      [NotNull] IlValueDto lhv,
+      [NotNull] IlExprDto rhv
     )
     {
-      if (lhs == null) throw new ArgumentNullException("lhs");
-      if (rhs == null) throw new ArgumentNullException("rhs");
+      if (lhv == null) throw new ArgumentNullException("lhv");
+      if (rhv == null) throw new ArgumentNullException("rhv");
       
-      Lhs = lhs;
-      Rhs = rhs;
+      Lhv = lhv;
+      Rhv = rhv;
     }
     //secondary constructor
     //deconstruct trait
@@ -857,16 +857,16 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlAssignStmtDto> Read = (ctx, reader) => 
     {
-      var lhs = IlValueDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
-      var _result = new IlAssignStmtDto(lhs, rhs);
+      var lhv = IlValueDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
+      var _result = new IlAssignStmtDto(lhv, rhv);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlAssignStmtDto> Write = (ctx, writer, value) => 
     {
-      IlValueDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlValueDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
     };
     
     //constants
@@ -885,15 +885,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         return hash;
       }
     }
@@ -902,8 +902,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlAssignStmtDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -924,16 +924,16 @@ namespace org.jacodb.api.net.generated.models
   {
     //fields
     //public fields
-    [NotNull] public IlExprDto Lhs {get; private set;}
-    [NotNull] public IlExprDto Rhs {get; private set;}
+    [NotNull] public IlExprDto Lhv {get; private set;}
+    [NotNull] public IlExprDto Rhv {get; private set;}
     public bool IsChecked {get; private set;}
     public bool IsUnsigned {get; private set;}
     
     //private fields
     //primary constructor
     protected IlBinaryOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
@@ -941,11 +941,11 @@ namespace org.jacodb.api.net.generated.models
       type
      ) 
     {
-      if (lhs == null) throw new ArgumentNullException("lhs");
-      if (rhs == null) throw new ArgumentNullException("rhs");
+      if (lhv == null) throw new ArgumentNullException("lhv");
+      if (rhv == null) throw new ArgumentNullException("rhv");
       
-      Lhs = lhs;
-      Rhs = rhs;
+      Lhv = lhv;
+      Rhv = rhv;
       IsChecked = isChecked;
       IsUnsigned = isUnsigned;
     }
@@ -976,14 +976,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlBinaryOpDto_Unknown(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -996,19 +996,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlBinaryOpDto_Unknown> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlBinaryOpDto_Unknown(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlBinaryOpDto_Unknown(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlBinaryOpDto_Unknown> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -1030,15 +1030,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -1050,8 +1050,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlBinaryOpDto_Unknown (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -1958,14 +1958,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlCeqOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -1978,19 +1978,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlCeqOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlCeqOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlCeqOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlCeqOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -2012,15 +2012,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -2032,8 +2032,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlCeqOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -2061,14 +2061,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlCgeOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -2081,19 +2081,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlCgeOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlCgeOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlCgeOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlCgeOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -2115,15 +2115,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -2135,8 +2135,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlCgeOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -2164,14 +2164,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlCgtOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -2184,19 +2184,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlCgtOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlCgtOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlCgtOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlCgtOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -2218,15 +2218,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -2238,8 +2238,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlCgtOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -2353,14 +2353,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlCleOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -2373,19 +2373,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlCleOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlCleOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlCleOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlCleOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -2407,15 +2407,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -2427,8 +2427,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlCleOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -2456,14 +2456,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlCltOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -2476,19 +2476,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlCltOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlCltOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlCltOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlCltOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -2510,15 +2510,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -2530,8 +2530,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlCltOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -2559,14 +2559,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlCneOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -2579,19 +2579,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlCneOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlCneOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlCneOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlCneOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -2613,15 +2613,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -2633,8 +2633,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlCneOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -2988,14 +2988,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlDivOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -3008,19 +3008,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlDivOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlDivOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlDivOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlDivOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -3042,15 +3042,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -3062,8 +3062,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlDivOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -4822,14 +4822,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlMulOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -4842,19 +4842,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlMulOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlMulOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlMulOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlMulOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -4876,15 +4876,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -4896,8 +4896,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlMulOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -5006,19 +5006,23 @@ namespace org.jacodb.api.net.generated.models
   {
     //fields
     //public fields
+    [NotNull] public TypeId ElementType {get; private set;}
     [NotNull] public IlExprDto Size {get; private set;}
     
     //private fields
     //primary constructor
     public IlNewArrayExprDto(
+      [NotNull] TypeId elementType,
       [NotNull] IlExprDto size,
       [NotNull] TypeId type
     ) : base (
       type
      ) 
     {
+      if (elementType == null) throw new ArgumentNullException("elementType");
       if (size == null) throw new ArgumentNullException("size");
       
+      ElementType = elementType;
       Size = size;
     }
     //secondary constructor
@@ -5028,14 +5032,16 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxReadDelegate<IlNewArrayExprDto> Read = (ctx, reader) => 
     {
       var type = TypeId.Read(ctx, reader);
+      var elementType = TypeId.Read(ctx, reader);
       var size = IlExprDto.Read(ctx, reader);
-      var _result = new IlNewArrayExprDto(size, type);
+      var _result = new IlNewArrayExprDto(elementType, size, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlNewArrayExprDto> Write = (ctx, writer, value) => 
     {
       TypeId.Write(ctx, writer, value.Type);
+      TypeId.Write(ctx, writer, value.ElementType);
       IlExprDto.Write(ctx, writer, value.Size);
     };
     
@@ -5055,13 +5061,14 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Size, other.Size) && Equals(Type, other.Type);
+      return Equals(ElementType, other.ElementType) && Equals(Size, other.Size) && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
+        hash = hash * 31 + ElementType.GetHashCode();
         hash = hash * 31 + Size.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
         return hash;
@@ -5072,6 +5079,7 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlNewArrayExprDto (");
       using (printer.IndentCookie()) {
+        printer.Print("elementType = "); ElementType.PrintEx(printer); printer.Println();
         printer.Print("size = "); Size.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
       }
@@ -5453,14 +5461,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlOrOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -5473,19 +5481,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlOrOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlOrOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlOrOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlOrOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -5507,15 +5515,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -5527,8 +5535,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlOrOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -5679,14 +5687,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlRemOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -5699,19 +5707,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlRemOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlRemOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlRemOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlRemOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -5733,15 +5741,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -5753,8 +5761,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlRemOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -5929,14 +5937,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlShlOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -5949,19 +5957,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlShlOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlShlOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlShlOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlShlOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -5983,15 +5991,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -6003,8 +6011,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlShlOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -6032,14 +6040,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlShrOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -6052,19 +6060,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlShrOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlShrOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlShrOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlShrOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -6086,15 +6094,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -6106,8 +6114,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlShrOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -6490,14 +6498,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlSubOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -6510,19 +6518,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlSubOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlSubOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlSubOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlSubOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -6544,15 +6552,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -6564,8 +6572,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlSubOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();
@@ -7705,14 +7713,14 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlXorOpDto(
-      [NotNull] IlExprDto lhs,
-      [NotNull] IlExprDto rhs,
+      [NotNull] IlExprDto lhv,
+      [NotNull] IlExprDto rhv,
       bool isChecked,
       bool isUnsigned,
       [NotNull] TypeId type
     ) : base (
-      lhs,
-      rhs,
+      lhv,
+      rhv,
       isChecked,
       isUnsigned,
       type
@@ -7725,19 +7733,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlXorOpDto> Read = (ctx, reader) => 
     {
-      var lhs = IlExprDto.Read(ctx, reader);
-      var rhs = IlExprDto.Read(ctx, reader);
+      var lhv = IlExprDto.Read(ctx, reader);
+      var rhv = IlExprDto.Read(ctx, reader);
       var isChecked = reader.ReadBool();
       var isUnsigned = reader.ReadBool();
       var type = TypeId.Read(ctx, reader);
-      var _result = new IlXorOpDto(lhs, rhs, isChecked, isUnsigned, type);
+      var _result = new IlXorOpDto(lhv, rhv, isChecked, isUnsigned, type);
       return _result;
     };
     
     public static new CtxWriteDelegate<IlXorOpDto> Write = (ctx, writer, value) => 
     {
-      IlExprDto.Write(ctx, writer, value.Lhs);
-      IlExprDto.Write(ctx, writer, value.Rhs);
+      IlExprDto.Write(ctx, writer, value.Lhv);
+      IlExprDto.Write(ctx, writer, value.Rhv);
       writer.Write(value.IsChecked);
       writer.Write(value.IsUnsigned);
       TypeId.Write(ctx, writer, value.Type);
@@ -7759,15 +7767,15 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhs, other.Lhs) && Equals(Rhs, other.Rhs) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && IsChecked == other.IsChecked && IsUnsigned == other.IsUnsigned && Equals(Type, other.Type);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
-        hash = hash * 31 + Lhs.GetHashCode();
-        hash = hash * 31 + Rhs.GetHashCode();
+        hash = hash * 31 + Lhv.GetHashCode();
+        hash = hash * 31 + Rhv.GetHashCode();
         hash = hash * 31 + IsChecked.GetHashCode();
         hash = hash * 31 + IsUnsigned.GetHashCode();
         hash = hash * 31 + Type.GetHashCode();
@@ -7779,8 +7787,8 @@ namespace org.jacodb.api.net.generated.models
     {
       printer.Println("IlXorOpDto (");
       using (printer.IndentCookie()) {
-        printer.Print("lhs = "); Lhs.PrintEx(printer); printer.Println();
-        printer.Print("rhs = "); Rhs.PrintEx(printer); printer.Println();
+        printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
+        printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
         printer.Print("isChecked = "); IsChecked.PrintEx(printer); printer.Println();
         printer.Print("isUnsigned = "); IsUnsigned.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();

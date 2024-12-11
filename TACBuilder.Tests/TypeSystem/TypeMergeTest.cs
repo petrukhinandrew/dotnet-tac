@@ -23,7 +23,7 @@ public class TypeMergeTest
 
     class ClassWithInterface2 : BaseInterface;
 
-
+    
     [Fact]
     public void MergeSame()
     {
@@ -43,7 +43,7 @@ public class TypeMergeTest
         Assert.Equal(baseClass, merged);
         Assert.NotEqual(childClass, merged);
     }
-
+    
     [Fact]
     public void MergeChildren()
     {
@@ -55,7 +55,7 @@ public class TypeMergeTest
         var parent = new IlType(typeof(BaseClass));
         Assert.Equal(parent, merged);
     }
-
+    
     [Fact]
     public void MergeChildAndGrandChild()
     {
@@ -67,7 +67,7 @@ public class TypeMergeTest
         var parent = new IlType(typeof(BaseClass));
         Assert.Equal(parent, merged);
     }
-
+    
     [Fact]
     public void MergeStructsToInterface()
     {
@@ -78,7 +78,7 @@ public class TypeMergeTest
         Assert.NotEqual(s2, merged);
         Assert.NotEqual(new IlType(typeof(BaseInterface)), merged);
     }
-
+    
     [Fact]
     public void MergeClassToInterface()
     {
@@ -89,7 +89,7 @@ public class TypeMergeTest
         Assert.NotEqual(c2, merged);
         Assert.Equal(new IlType(typeof(BaseInterface)), merged);
     }
-
+    
     [Fact]
     public void MergePrimitives()
     {
@@ -99,7 +99,7 @@ public class TypeMergeTest
         Assert.NotEqual(ilInt, merged);
         Assert.Equal(ilDouble, merged);
     }
-
+    
     [Fact]
     public void MergeFloats()
     {
@@ -109,7 +109,7 @@ public class TypeMergeTest
         Assert.NotEqual(ilFloat, merged);
         Assert.Equal(ilDouble, merged);
     }
-
+    
     [Fact]
     public void MergeIntegers()
     {

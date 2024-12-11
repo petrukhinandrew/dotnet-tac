@@ -168,6 +168,7 @@ public class IlPointerType(Type targetType) : IlType(targetType)
     public override bool IsManaged => false;
     public override bool IsUnmanaged => true;
     public IlType TargetType => IlInstanceBuilder.GetType(Type);
+    public new string FullName => base.FullName + "*";
 }
 
 public class IlValueType(Type type) : IlType(type);

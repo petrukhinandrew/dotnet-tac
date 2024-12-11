@@ -124,7 +124,7 @@ public static class IlInstanceBuilder
         var args = SafeGenericArgs(source);
         try
         {
-            Type type = source.Module.ResolveType(token, args.FromType, args.FromMethod);
+            var type = source.Module.ResolveType(token, args.FromType, args.FromMethod);
             return GetType(type);
         }
         catch
