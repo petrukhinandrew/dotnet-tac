@@ -119,7 +119,7 @@ class MethodBuilder(IlMethod method)
         var tacBlocksIndexed = BlockTacBuilders.OrderBy(b => b.Key).ToList();
         foreach (var (i, bb) in tacBlocksIndexed.Select((e, i) => (i, e.Value)))
         {
-            ilToTacMapping[bb.IlFirst] = Tac.Count - 1;
+            ilToTacMapping[bb.IlFirst] = Tac.Count;
             foreach (var line in bb.TacLines)
             {
                 Tac.Add(line);
