@@ -119,13 +119,13 @@ class MethodBuilder(IlMethod method)
         var tacBlocksIndexed = BlockTacBuilders.OrderBy(b => b.Key).ToList();
         foreach (var (i, bb) in tacBlocksIndexed.Select((e, i) => (i, e.Value)))
         {
-            ilToTacMapping[bb.IlFirst] = Tac.Count;
+            ilToTacMapping[bb.IlFirst] = Tac.Count - 1;
             foreach (var line in bb.TacLines)
             {
                 Tac.Add(line);
             }
 
-            ilToTacMapping[bb.Meta.Exit.idx] = Tac.Count;
+            ilToTacMapping[bb.Meta.Exit.idx] = Tac.Count - 1;
             if (tacBlocksIndexed.Count > i + 1 && successors.ContainsKey(bb.IlFirst) &&
                 successors[bb.IlFirst].Count > 0 && successors[bb.IlFirst][0] != tacBlocksIndexed[i + 1].Key)
             {
