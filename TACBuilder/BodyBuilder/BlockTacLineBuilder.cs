@@ -1014,9 +1014,10 @@ static class BlockTacLineBuilder
                     // ReSharper disable once PossibleUnintendedReferenceComparison
                     Debug.Assert(ilMethod.ReturnType == IlInstanceBuilder.GetType(typeof(void)));
                     IlType objIlType = ilMethod.DeclaringType!;
-                    var newInstance = blockBuilder.GetNewTemp(new IlNullConst(), blockBuilder.CurInstr.idx);
+                    var allocExpr = new IlNewExpr(objIlType);
+                    var newInstance = blockBuilder.GetNewTemp(allocExpr, blockBuilder.CurInstr.idx);
+                    blockBuilder.NewLine(new ILAssignStmt(newInstance, allocExpr));
                     blockBuilder.Push(newInstance);
-                    blockBuilder.NewLine(new ILAssignStmt(newInstance, new IlNewExpr(objIlType)));
                     List<IlExpr> args = new();
                     foreach (var parameter in ilMethod.Parameters)
                     {
@@ -1319,6 +1320,8 @@ static class BlockTacLineBuilder
     {
         var res = expr.WithTypeEnsured(expectedType);
         if (res is IlValue value) return value;
-        return blockBuilder.GetNewTemp(res);
+        var newTmp = blockBuilder.GetNewTemp(res);
+        blockBuilder.NewLine(new ILAssignStmt(newTmp, res));
+        return newTmp;
     }
 }
