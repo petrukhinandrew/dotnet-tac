@@ -125,12 +125,13 @@ class MethodBuilder(IlMethod method)
                 Tac.Add(line);
             }
 
-            ilToTacMapping[bb.Meta.Exit.idx] = Tac.Count - 1;
+            
             if (tacBlocksIndexed.Count > i + 1 && successors.ContainsKey(bb.IlFirst) &&
                 successors[bb.IlFirst].Count > 0 && successors[bb.IlFirst][0] != tacBlocksIndexed[i + 1].Key)
             {
                 Tac.Add(new IlGotoStmt(successors[bb.IlFirst][0]));
             }
+            ilToTacMapping[bb.Meta.Exit.idx] = Tac.Count - 1;
         }
 
         foreach (var stmt in Tac)
@@ -153,6 +154,8 @@ class MethodBuilder(IlMethod method)
                 scope.tacLoc.hb = (int)hbv!;
             if (ilToTacMapping.TryGetValue(scope.ilLoc.he, out var hev))
                 scope.tacLoc.he = (int)hev!;
+            if (scope.tacLoc.hb > scope.tacLoc.he)
+                Console.WriteLine(method.Name);
         }
     }
 

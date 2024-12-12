@@ -421,8 +421,9 @@ static class BlockTacLineBuilder
                 case "leave.s":
                 {
                     ILInstr target = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlGotoStmt(target.idx));
                     blockBuilder.ClearStack();
-                    return false;
+                    return true;
                 }
                 case "switch":
                 {
@@ -548,7 +549,7 @@ static class BlockTacLineBuilder
                 {
                     IlMethod ilMethod =
                         ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
-                    
+
                     List<IlExpr> args = new();
                     foreach (var t in ilMethod.Parameters)
                     {
@@ -867,6 +868,7 @@ static class BlockTacLineBuilder
                 case "br":
                 {
                     ILInstr target = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
+                    blockBuilder.NewLine(new IlGotoStmt(target.idx));
                     // frame.ContinueBranchingTo(target, null);
                     return true;
                 }

@@ -51,7 +51,7 @@ public class ILBodyParser(MethodBase methodBase)
             int he = c.handlerOffset + c.handlerLength;
             Debug.Assert(_offsetToInstr[he].prev is not null);
             ILInstr handlerEnd = _offsetToInstr[he].prev;
-
+            Debug.Assert(handlerBegin.idx <= handlerEnd.idx);
             int fd = 0;
             if (c.type is ehcType.Filter filt)
             {
