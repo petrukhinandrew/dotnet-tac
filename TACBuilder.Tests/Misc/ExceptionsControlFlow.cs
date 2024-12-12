@@ -147,6 +147,24 @@ namespace IntegrationTests
             return addition;
         }
 
+        public static void AnotherNestedFinally(int a)
+        {
+            try
+            {
+                a += 10;
+            }
+            finally
+            {
+                try
+                {
+                    a += 100;
+                }
+                finally
+                {
+                }
+            }
+        }
+
         public static void FilterOrder(int x)
         {
             bool ThrowException()

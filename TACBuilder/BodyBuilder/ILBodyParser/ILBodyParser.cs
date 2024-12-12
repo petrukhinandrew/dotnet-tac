@@ -32,35 +32,31 @@ public class ILBodyParser(MethodBase methodBase)
         _ehs = clauses.Select(ParseEh).ToArray();
         return;
 
+        /*
+         * Here _offsetToInstr[endIdx].prev works because of IlInstr.Back at the end of list
+         * Otherwise any handler with no instruction after it may fail
+         */
         ehClause ParseEh(exceptionHandlingClause c)
         {
             ILInstr tryBegin = _offsetToInstr[c.tryOffset];
+            Debug.Assert(tryBegin is not null);
 
-            // TODO check
-            int te = c.tryOffset + c.tryLength - 1;
-            while (_offsetToInstr[te] is null)
-            {
-                te--;
-            }
-
-            Debug.Assert(_offsetToInstr[te] is not null);
-            ILInstr tryEnd = _offsetToInstr[te];
+            int te = c.tryOffset + c.tryLength;
+            Debug.Assert(_offsetToInstr[te].prev is not null);
+            ILInstr tryEnd = _offsetToInstr[te].prev;
 
             ILInstr handlerBegin = _offsetToInstr[c.handlerOffset];
             Debug.Assert(handlerBegin is not null);
-            int he = c.handlerOffset + c.handlerLength - 1;
-            while (_offsetToInstr[he] is null)
-            {
-                he--;
-            }
 
-            Debug.Assert(_offsetToInstr[he] is not null);
-            ILInstr handlerEnd = _offsetToInstr[he];
+            int he = c.handlerOffset + c.handlerLength;
+            Debug.Assert(_offsetToInstr[he].prev is not null);
+            ILInstr handlerEnd = _offsetToInstr[he].prev;
+
             int fd = 0;
             if (c.type is ehcType.Filter filt)
             {
                 fd = filt.offset;
-                while (_offsetToInstr[fd] is null) fd--;
+                Debug.Assert(_offsetToInstr[fd] is not null);
             }
 
             rewriterEhcType type = c.type switch
@@ -260,10 +256,7 @@ public class ILBodyParser(MethodBase methodBase)
                 if (!cur.IsJump) continue;
                 if (cur.arg is ILInstrOperand.Arg32 a32)
                 {
-                    if (_offsetToInstr[a32.value] is null)
-                    {
-                        Debug.Assert(false);
-                    }
+                    Debug.Assert(_offsetToInstr[a32.value] != null);
 
                     cur.arg = new ILInstrOperand.Target(_offsetToInstr[a32.value]);
                 }
