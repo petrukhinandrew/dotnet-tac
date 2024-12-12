@@ -13,10 +13,10 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
 
     public bool BuiltAtLeastOnce => _builtAtLeastOnce;
     internal bool _builtAtLeastOnce = false;
-    internal IlExpr? _switchRegister;
-    internal int? _switchBranch;
+    internal IlExpr? SwitchRegister;
+    internal int? SwitchBranch;
 
-    internal readonly ILInstr _firstInstr = meta.Entry;
+    internal readonly ILInstr FirstInstr = meta.Entry;
     internal ILInstr CurInstr = meta.Entry;
 
     private EvaluationStack<IlExpr> _entryStackState =
@@ -34,7 +34,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
 
     public List<IlLocalVar> Locals => methodBuilder.LocalVars;
     public List<IlValue> Params => methodBuilder.Params;
-    public int IlFirst => _firstInstr.idx;
+    public int IlFirst => FirstInstr.idx;
 
     public void ConnectSuccsAndPreds(List<BlockTacBuilder> succs, List<BlockTacBuilder> preds)
     {
@@ -88,7 +88,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
     {
         ResetStackToInitial();
         TacLines.Clear();
-        CurInstr = _firstInstr;
+        CurInstr = FirstInstr;
         TempIndexer.Clear();
     }
 

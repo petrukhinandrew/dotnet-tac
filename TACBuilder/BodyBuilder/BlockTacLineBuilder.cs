@@ -34,14 +34,14 @@ static class BlockTacLineBuilder
             if (blockBuilder.CurInstr is ILInstr.SwitchArg switchBranch)
             {
                 ILInstrOperand.Target target = (ILInstrOperand.Target)switchBranch.arg;
-                Debug.Assert(blockBuilder._switchRegister is not null);
+                Debug.Assert(blockBuilder.SwitchRegister is not null);
                 // targets.Add(target.value);
                 blockBuilder.NewLine(new IlIfStmt(
-                    new IlCeqOp(blockBuilder._switchRegister,
+                    new IlCeqOp(blockBuilder.SwitchRegister,
                         new IlInt32Const(switchBranch.Value)),
                     target.value.idx
                 ));
-                blockBuilder.Successors.ForEach(s => s._switchRegister = blockBuilder._switchRegister);
+                blockBuilder.Successors.ForEach(s => s.SwitchRegister = blockBuilder.SwitchRegister);
                 if (blockBuilder.CurInstrIsLast()) return true;
             }
 
@@ -429,7 +429,7 @@ static class BlockTacLineBuilder
                 {
                     int branchCnt = ((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value;
                     IlExpr compVal = blockBuilder.Pop();
-                    blockBuilder.Successors.ForEach(s => s._switchRegister = compVal);
+                    blockBuilder.Successors.ForEach(s => s.SwitchRegister = compVal);
                     // ILInstr switchBranch = blockBuilder.CurInstr;
                     // List<ILInstr> targets = [];
                     // for (int branch = 0; branch < branchCnt; branch++)
