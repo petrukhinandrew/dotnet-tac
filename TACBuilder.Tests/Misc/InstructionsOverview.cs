@@ -974,3 +974,13 @@ namespace Usvm.IL.Test.Instructions
     {
     }
 }
+
+public class RomaExamples
+{
+    public static int FirstFail(string a, int i)
+    {
+        if (a[i] == 'h')
+            return 1;
+        return 2;
+    }
+}

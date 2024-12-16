@@ -547,17 +547,13 @@ static class BlockTacLineBuilder
                 }
                 case "call":
                 {
-                    IlMethod ilMethod =
+                    var ilMethod =
                         ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
 
-                    List<IlExpr> args = new();
-                    foreach (var t in ilMethod.Parameters)
-                    {
-                        var arg = blockBuilder.EnsureTyped(blockBuilder.Pop(), t.Type);
-                        args.Add(arg);
-                    }
-
-                    args.Reverse();
+                    var rawArgs = ilMethod.Parameters.Select(t => blockBuilder.Pop()).ToList();
+                    rawArgs.Reverse();
+                    var args = rawArgs.Zip(ilMethod.Parameters)
+                        .Select(IlExpr (ap) => blockBuilder.EnsureTyped(ap.First, ap.Second.Type)).ToList();
 
                     var ilCall = new IlCall(ilMethod, args);
                     if (ilCall.IsInitializeArray())
@@ -582,16 +578,12 @@ static class BlockTacLineBuilder
                     IlMethod ilMethod =
                         ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
 
-                    List<IlExpr> args = new();
-                    foreach (var t in ilMethod.Parameters)
-                    {
-                        var arg = blockBuilder.EnsureTyped(blockBuilder.Pop(), t.Type);
-                        args.Add(arg);
-                    }
+                    var rawArgs = ilMethod.Parameters.Select(t => blockBuilder.Pop()).ToList();
+                    rawArgs.Reverse();
+                    var args = rawArgs.Zip(ilMethod.Parameters)
+                        .Select(IlExpr (ap) => blockBuilder.EnsureTyped(ap.First, ap.Second.Type)).ToList();
 
-                    args.Reverse();
-
-                    IlCall ilCall = new IlCall(ilMethod, args);
+                    var ilCall = new IlCall(ilMethod, args);
 
                     if (ilCall.Returns())
                     {
@@ -609,14 +601,10 @@ static class BlockTacLineBuilder
                     IlSignature sig =
                         ((ILInstrOperand.ResolvedSignature)blockBuilder.CurInstr.arg).value;
                     var ftn = blockBuilder.Pop();
-                    var args = new List<IlExpr>();
-                    foreach (var paramType in sig.ParameterTypes)
-                    {
-                        var arg = blockBuilder.EnsureTyped(blockBuilder.Pop(), paramType);
-                        args.Add(arg);
-                    }
-
-                    args.Reverse();
+                    var rawArgs = sig.ParameterTypes.Select(_ => blockBuilder.Pop()).ToList();
+                    rawArgs.Reverse();
+                    var args = rawArgs.Zip(sig.ParameterTypes)
+                        .Select(IlExpr (ap) => blockBuilder.EnsureTyped(ap.First, ap.Second)).ToList();
 
                     var calli = new IlCallIndirect(sig, ftn, args);
 
