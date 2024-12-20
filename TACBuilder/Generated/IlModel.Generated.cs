@@ -56,11 +56,12 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => -8688262656614676398L;
+    protected override long SerializationHash => 8637739640480870871L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
     {
+      serializers.Register(TypeId.Read, TypeId.Write);
       serializers.Register(IlPointerTypeDto.Read, IlPointerTypeDto.Write);
       serializers.Register(IlPrimitiveTypeDto.Read, IlPrimitiveTypeDto.Write);
       serializers.Register(IlEnumTypeDto.Read, IlEnumTypeDto.Write);
@@ -78,6 +79,7 @@ namespace org.jacodb.api.net.generated.models
       serializers.Register(IlFinallyScopeDto.Read, IlFinallyScopeDto.Write);
       serializers.Register(IlMethodDto.Read, IlMethodDto.Write);
       serializers.Register(IlSignatureDto.Read, IlSignatureDto.Write);
+      serializers.Register(TypeIdBase_Unknown.Read, TypeIdBase_Unknown.Write);
       serializers.Register(IlDto_Unknown.Read, IlDto_Unknown.Write);
       serializers.Register(IlTypeDto_Unknown.Read, IlTypeDto_Unknown.Write);
       serializers.Register(IlValueTypeDto_Unknown.Read, IlValueTypeDto_Unknown.Write);
@@ -117,7 +119,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:67</p>
+  /// <p>Generated from: IlModel.kt:69</p>
   /// </summary>
   public sealed class IlArrayTypeDto : IlReferenceTypeDto
   {
@@ -311,7 +313,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:70</p>
+  /// <p>Generated from: IlModel.kt:72</p>
   /// </summary>
   public sealed class IlAttrDto : IlDto
   {
@@ -430,7 +432,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:111</p>
+  /// <p>Generated from: IlModel.kt:113</p>
   /// </summary>
   public sealed class IlCatchScopeDto : IlEhScopeDto
   {
@@ -527,7 +529,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:66</p>
+  /// <p>Generated from: IlModel.kt:68</p>
   /// </summary>
   public sealed class IlClassTypeDto : IlReferenceTypeDto
   {
@@ -712,7 +714,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:29</p>
+  /// <p>Generated from: IlModel.kt:31</p>
   /// </summary>
   public abstract class IlDto{
     //fields
@@ -803,7 +805,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:105</p>
+  /// <p>Generated from: IlModel.kt:107</p>
   /// </summary>
   public abstract class IlEhScopeDto : IlDto
   {
@@ -942,7 +944,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:56</p>
+  /// <p>Generated from: IlModel.kt:58</p>
   /// </summary>
   public sealed class IlEnumTypeDto : IlValueTypeDto
   {
@@ -1156,7 +1158,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:103</p>
+  /// <p>Generated from: IlModel.kt:105</p>
   /// </summary>
   public sealed class IlErrVarDto : IlVarDto
   {
@@ -1241,7 +1243,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:116</p>
+  /// <p>Generated from: IlModel.kt:118</p>
   /// </summary>
   public sealed class IlFaultScopeDto : IlEhScopeDto
   {
@@ -1338,7 +1340,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:78</p>
+  /// <p>Generated from: IlModel.kt:80</p>
   /// </summary>
   public sealed class IlFieldDto : IlDto
   {
@@ -1444,7 +1446,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:113</p>
+  /// <p>Generated from: IlModel.kt:115</p>
   /// </summary>
   public sealed class IlFilterScopeDto : IlEhScopeDto
   {
@@ -1548,7 +1550,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:117</p>
+  /// <p>Generated from: IlModel.kt:119</p>
   /// </summary>
   public sealed class IlFinallyScopeDto : IlEhScopeDto
   {
@@ -1645,7 +1647,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:98</p>
+  /// <p>Generated from: IlModel.kt:100</p>
   /// </summary>
   public sealed class IlLocalVarDto : IlVarDto
   {
@@ -1737,7 +1739,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:120</p>
+  /// <p>Generated from: IlModel.kt:122</p>
   /// </summary>
   public sealed class IlMethodDto : IlDto
   {
@@ -1910,7 +1912,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:85</p>
+  /// <p>Generated from: IlModel.kt:87</p>
   /// </summary>
   public sealed class IlParameterDto : IPrintable, IEquatable<IlParameterDto>
   {
@@ -2033,7 +2035,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:51</p>
+  /// <p>Generated from: IlModel.kt:53</p>
   /// </summary>
   public sealed class IlPointerTypeDto : IlTypeDto
   {
@@ -2227,7 +2229,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:55</p>
+  /// <p>Generated from: IlModel.kt:57</p>
   /// </summary>
   public sealed class IlPrimitiveTypeDto : IlValueTypeDto
   {
@@ -2412,7 +2414,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:64</p>
+  /// <p>Generated from: IlModel.kt:66</p>
   /// </summary>
   public abstract class IlReferenceTypeDto : IlTypeDto
   {
@@ -2662,7 +2664,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:134</p>
+  /// <p>Generated from: IlModel.kt:136</p>
   /// </summary>
   public sealed class IlSignatureDto : IlDto
   {
@@ -2767,7 +2769,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:62</p>
+  /// <p>Generated from: IlModel.kt:64</p>
   /// </summary>
   public sealed class IlStructTypeDto : IlValueTypeDto
   {
@@ -2952,7 +2954,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:102</p>
+  /// <p>Generated from: IlModel.kt:104</p>
   /// </summary>
   public sealed class IlTempVarDto : IlVarDto
   {
@@ -3037,7 +3039,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:31</p>
+  /// <p>Generated from: IlModel.kt:33</p>
   /// </summary>
   public abstract class IlTypeDto : IlDto
   {
@@ -3313,7 +3315,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:54</p>
+  /// <p>Generated from: IlModel.kt:56</p>
   /// </summary>
   public abstract class IlValueTypeDto : IlTypeDto
   {
@@ -3563,7 +3565,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:93</p>
+  /// <p>Generated from: IlModel.kt:95</p>
   /// </summary>
   public abstract class IlVarDto : IlDto
   {
@@ -3686,10 +3688,105 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
+  /// <p>Generated from: IlModel.kt:28</p>
+  /// </summary>
+  public sealed class TypeId : TypeIdBase
+  {
+    //fields
+    //public fields
+    [NotNull] public List<TypeIdBase> TypeArgs {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public TypeId(
+      [NotNull] List<TypeIdBase> typeArgs,
+      [NotNull] string asmName,
+      [NotNull] string typeName
+    ) : base (
+      asmName,
+      typeName
+     ) 
+    {
+      if (typeArgs == null) throw new ArgumentNullException("typeArgs");
+      
+      TypeArgs = typeArgs;
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<TypeId> Read = (ctx, reader) => 
+    {
+      var asmName = reader.ReadString();
+      var typeName = reader.ReadString();
+      var typeArgs = ReadTypeIdBaseList(ctx, reader);
+      var _result = new TypeId(typeArgs, asmName, typeName);
+      return _result;
+    };
+    public static CtxReadDelegate<List<TypeIdBase>> ReadTypeIdBaseList = TypeIdBase.Read.List();
+    
+    public static new CtxWriteDelegate<TypeId> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.AsmName);
+      writer.Write(value.TypeName);
+      WriteTypeIdBaseList(ctx, writer, value.TypeArgs);
+    };
+    public static  CtxWriteDelegate<List<TypeIdBase>> WriteTypeIdBaseList = TypeIdBase.Write.List();
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((TypeId) obj);
+    }
+    public bool Equals(TypeId other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return TypeArgs.SequenceEqual(other.TypeArgs) && AsmName == other.AsmName && TypeName == other.TypeName;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + TypeArgs.ContentHashCode();
+        hash = hash * 31 + AsmName.GetHashCode();
+        hash = hash * 31 + TypeName.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("TypeId (");
+      using (printer.IndentCookie()) {
+        printer.Print("typeArgs = "); TypeArgs.PrintEx(printer); printer.Println();
+        printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
+        printer.Print("typeName = "); TypeName.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
+    }
+  }
+  
+  
+  /// <summary>
   /// <p>Generated from: IlModel.kt:24</p>
   /// </summary>
-  public sealed class TypeId : IPrintable, IEquatable<TypeId>
-  {
+  public abstract class TypeIdBase{
     //fields
     //public fields
     [NotNull] public string AsmName {get; private set;}
@@ -3697,7 +3794,7 @@ namespace org.jacodb.api.net.generated.models
     
     //private fields
     //primary constructor
-    public TypeId(
+    protected TypeIdBase(
       [NotNull] string asmName,
       [NotNull] string typeName
     )
@@ -3710,22 +3807,52 @@ namespace org.jacodb.api.net.generated.models
     }
     //secondary constructor
     //deconstruct trait
-    public void Deconstruct([NotNull] out string asmName, [NotNull] out string typeName)
-    {
-      asmName = AsmName;
-      typeName = TypeName;
-    }
     //statics
     
-    public static CtxReadDelegate<TypeId> Read = (ctx, reader) => 
+    public static CtxReadDelegate<TypeIdBase> Read = Polymorphic<TypeIdBase>.ReadAbstract(TypeIdBase_Unknown.Read);
+    
+    public static CtxWriteDelegate<TypeIdBase> Write = Polymorphic<TypeIdBase>.Write;
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    //hash code trait
+    //pretty print
+    //toString
+  }
+  
+  
+  public sealed class TypeIdBase_Unknown : TypeIdBase
+  {
+    //fields
+    //public fields
+    
+    //private fields
+    //primary constructor
+    public TypeIdBase_Unknown(
+      [NotNull] string asmName,
+      [NotNull] string typeName
+    ) : base (
+      asmName,
+      typeName
+     ) 
+    {
+    }
+    //secondary constructor
+    //deconstruct trait
+    //statics
+    
+    public static new CtxReadDelegate<TypeIdBase_Unknown> Read = (ctx, reader) => 
     {
       var asmName = reader.ReadString();
       var typeName = reader.ReadString();
-      var _result = new TypeId(asmName, typeName);
+      var _result = new TypeIdBase_Unknown(asmName, typeName);
       return _result;
     };
     
-    public static CtxWriteDelegate<TypeId> Write = (ctx, writer, value) => 
+    public static new CtxWriteDelegate<TypeIdBase_Unknown> Write = (ctx, writer, value) => 
     {
       writer.Write(value.AsmName);
       writer.Write(value.TypeName);
@@ -3741,9 +3868,9 @@ namespace org.jacodb.api.net.generated.models
       if (ReferenceEquals(null, obj)) return false;
       if (ReferenceEquals(this, obj)) return true;
       if (obj.GetType() != GetType()) return false;
-      return Equals((TypeId) obj);
+      return Equals((TypeIdBase_Unknown) obj);
     }
-    public bool Equals(TypeId other)
+    public bool Equals(TypeIdBase_Unknown other)
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
@@ -3762,7 +3889,7 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("TypeId (");
+      printer.Println("TypeIdBase_Unknown (");
       using (printer.IndentCookie()) {
         printer.Print("asmName = "); AsmName.PrintEx(printer); printer.Println();
         printer.Print("typeName = "); TypeName.PrintEx(printer); printer.Println();

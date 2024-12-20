@@ -45,11 +45,6 @@ public class IlCall(IlMethod method, List<IlExpr> args) : IlExpr
             string.Join(", ", Args.Select(p => p.ToString())));
     }
 
-    public bool IsInitializeArray()
-    {
-        return (method.DeclaringType?.Name.Contains("RuntimeHelpers") ?? false) && Name == "InitializeArray";
-    }
-
     public bool Returns()
     {
         return ReturnType != IlInstanceBuilder.GetType(typeof(void));

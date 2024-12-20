@@ -95,7 +95,7 @@ namespace org.jacodb.api.net.generated.models
     public static  CtxWriteDelegate<List<IlTypeDto>> WriteIlTypeDtoList = IlTypeDto.Write.List();
     public static  CtxWriteDelegate<List<IlDto>> WriteIlDtoList = IlDto.Write.List();
     
-    protected override long SerializationHash => -1254477867872549445L;
+    protected override long SerializationHash => 7950792047261741369L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -136,6 +136,100 @@ namespace org.jacodb.api.net.generated.models
     public static IlSigModel GetIlSigModel(this IlModel ilModel)
     {
       return ilModel.GetOrCreateExtension("ilSigModel", () => new IlSigModel());
+    }
+  }
+  
+  
+  /// <summary>
+  /// <p>Generated from: IlSigModel.kt:27</p>
+  /// </summary>
+  public sealed class IlAsmDto : IPrintable, IEquatable<IlAsmDto>
+  {
+    //fields
+    //public fields
+    [NotNull] public string Name {get; private set;}
+    [NotNull] public string Location {get; private set;}
+    
+    //private fields
+    //primary constructor
+    public IlAsmDto(
+      [NotNull] string name,
+      [NotNull] string location
+    )
+    {
+      if (name == null) throw new ArgumentNullException("name");
+      if (location == null) throw new ArgumentNullException("location");
+      
+      Name = name;
+      Location = location;
+    }
+    //secondary constructor
+    //deconstruct trait
+    public void Deconstruct([NotNull] out string name, [NotNull] out string location)
+    {
+      name = Name;
+      location = Location;
+    }
+    //statics
+    
+    public static CtxReadDelegate<IlAsmDto> Read = (ctx, reader) => 
+    {
+      var name = reader.ReadString();
+      var location = reader.ReadString();
+      var _result = new IlAsmDto(name, location);
+      return _result;
+    };
+    
+    public static CtxWriteDelegate<IlAsmDto> Write = (ctx, writer, value) => 
+    {
+      writer.Write(value.Name);
+      writer.Write(value.Location);
+    };
+    
+    //constants
+    
+    //custom body
+    //methods
+    //equals trait
+    public override bool Equals(object obj)
+    {
+      if (ReferenceEquals(null, obj)) return false;
+      if (ReferenceEquals(this, obj)) return true;
+      if (obj.GetType() != GetType()) return false;
+      return Equals((IlAsmDto) obj);
+    }
+    public bool Equals(IlAsmDto other)
+    {
+      if (ReferenceEquals(null, other)) return false;
+      if (ReferenceEquals(this, other)) return true;
+      return Name == other.Name && Location == other.Location;
+    }
+    //hash code trait
+    public override int GetHashCode()
+    {
+      unchecked {
+        var hash = 0;
+        hash = hash * 31 + Name.GetHashCode();
+        hash = hash * 31 + Location.GetHashCode();
+        return hash;
+      }
+    }
+    //pretty print
+    public void Print(PrettyPrinter printer)
+    {
+      printer.Println("IlAsmDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("name = "); Name.PrintEx(printer); printer.Println();
+        printer.Print("location = "); Location.PrintEx(printer); printer.Println();
+      }
+      printer.Print(")");
+    }
+    //toString
+    public override string ToString()
+    {
+      var printer = new SingleLinePrettyPrinter();
+      Print(printer);
+      return printer.ToString();
     }
   }
   
@@ -228,21 +322,21 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlSigModel.kt:27</p>
+  /// <p>Generated from: IlSigModel.kt:31</p>
   /// </summary>
   public sealed class PublicationResponse : IPrintable, IEquatable<PublicationResponse>
   {
     //fields
     //public fields
-    [NotNull] public List<string> ReachableAsms {get; private set;}
-    [NotNull] public List<List<string>> ReferencedAsms {get; private set;}
+    [NotNull] public List<IlAsmDto> ReachableAsms {get; private set;}
+    [NotNull] public List<List<IlAsmDto>> ReferencedAsms {get; private set;}
     [NotNull] public List<IlTypeDto> ReachableTypes {get; private set;}
     
     //private fields
     //primary constructor
     public PublicationResponse(
-      [NotNull] List<string> reachableAsms,
-      [NotNull] List<List<string>> referencedAsms,
+      [NotNull] List<IlAsmDto> reachableAsms,
+      [NotNull] List<List<IlAsmDto>> referencedAsms,
       [NotNull] List<IlTypeDto> reachableTypes
     )
     {
@@ -256,7 +350,7 @@ namespace org.jacodb.api.net.generated.models
     }
     //secondary constructor
     //deconstruct trait
-    public void Deconstruct([NotNull] out List<string> reachableAsms, [NotNull] out List<List<string>> referencedAsms, [NotNull] out List<IlTypeDto> reachableTypes)
+    public void Deconstruct([NotNull] out List<IlAsmDto> reachableAsms, [NotNull] out List<List<IlAsmDto>> referencedAsms, [NotNull] out List<IlTypeDto> reachableTypes)
     {
       reachableAsms = ReachableAsms;
       referencedAsms = ReferencedAsms;
@@ -266,24 +360,24 @@ namespace org.jacodb.api.net.generated.models
     
     public static CtxReadDelegate<PublicationResponse> Read = (ctx, reader) => 
     {
-      var reachableAsms = ReadStringList(ctx, reader);
-      var referencedAsms = ReadStringListList(ctx, reader);
+      var reachableAsms = ReadIlAsmDtoList(ctx, reader);
+      var referencedAsms = ReadIlAsmDtoListList(ctx, reader);
       var reachableTypes = ReadIlTypeDtoList(ctx, reader);
       var _result = new PublicationResponse(reachableAsms, referencedAsms, reachableTypes);
       return _result;
     };
-    public static CtxReadDelegate<List<string>> ReadStringList = JetBrains.Rd.Impl.Serializers.ReadString.List();
-    public static CtxReadDelegate<List<List<string>>> ReadStringListList = JetBrains.Rd.Impl.Serializers.ReadString.List().List();
+    public static CtxReadDelegate<List<IlAsmDto>> ReadIlAsmDtoList = IlAsmDto.Read.List();
+    public static CtxReadDelegate<List<List<IlAsmDto>>> ReadIlAsmDtoListList = IlAsmDto.Read.List().List();
     public static CtxReadDelegate<List<IlTypeDto>> ReadIlTypeDtoList = IlTypeDto.Read.List();
     
     public static CtxWriteDelegate<PublicationResponse> Write = (ctx, writer, value) => 
     {
-      WriteStringList(ctx, writer, value.ReachableAsms);
-      WriteStringListList(ctx, writer, value.ReferencedAsms);
+      WriteIlAsmDtoList(ctx, writer, value.ReachableAsms);
+      WriteIlAsmDtoListList(ctx, writer, value.ReferencedAsms);
       WriteIlTypeDtoList(ctx, writer, value.ReachableTypes);
     };
-    public static  CtxWriteDelegate<List<string>> WriteStringList = JetBrains.Rd.Impl.Serializers.WriteString.List();
-    public static  CtxWriteDelegate<List<List<string>>> WriteStringListList = JetBrains.Rd.Impl.Serializers.WriteString.List().List();
+    public static  CtxWriteDelegate<List<IlAsmDto>> WriteIlAsmDtoList = IlAsmDto.Write.List();
+    public static  CtxWriteDelegate<List<List<IlAsmDto>>> WriteIlAsmDtoListList = IlAsmDto.Write.List().List();
     public static  CtxWriteDelegate<List<IlTypeDto>> WriteIlTypeDtoList = IlTypeDto.Write.List();
     
     //constants

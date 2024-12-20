@@ -550,17 +550,22 @@ static class BlockTacLineBuilder
                     var ilMethod =
                         ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
 
+                    if (ilMethod.DeclaringType?.FullName == "System.Runtime.CompilerServices.RuntimeHelpers" &&
+                        ilMethod.Name == "InitializeArray")
+                    {
+                        var arr = blockBuilder.Pop();
+                        var fld = blockBuilder.Pop();
+                        
+                        break;
+                    }
+                    
+
                     var rawArgs = ilMethod.Parameters.Select(t => blockBuilder.Pop()).ToList();
                     rawArgs.Reverse();
                     var args = rawArgs.Zip(ilMethod.Parameters)
                         .Select(IlExpr (ap) => blockBuilder.EnsureTyped(ap.First, ap.Second.Type)).ToList();
 
                     var ilCall = new IlCall(ilMethod, args);
-                    if (ilCall.IsInitializeArray())
-                    {
-                        blockBuilder.InlineInitArray(ilCall.Args);
-                        break;
-                    }
 
                     if (ilCall.Returns())
                     {
@@ -570,7 +575,6 @@ static class BlockTacLineBuilder
                     }
                     else
                         blockBuilder.NewLine(new IlCallStmt(ilCall));
-
                     break;
                 }
                 case "callvirt":

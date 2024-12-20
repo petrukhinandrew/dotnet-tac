@@ -260,10 +260,12 @@ public static class RdSerializer
                 type: merged.Type.GetTypeId()),
             IlErrVar err => new IlVarAccessDto(kind: IlVarKind.err, index: err.Index, type: err.Type.GetTypeId()),
             IlCall.Argument arg => new IlArgAccessDto(index: arg.Index, type: arg.Type.GetTypeId()),
+            // TODO check usage of type 
             IlCall call => new IlCallDto(method: call.Method.GetRefId(), args: call.Args.Select(SerializeExpr).ToList(),
-                type: new TypeId("", "")),
+                type: new TypeId([], "", "")),
+            // TODO check usage of type 
             IlCallIndirect calli => new IlCalliDto(signature: SerializeSignature(calli.Signature),
-                type: new TypeId("", ""),
+                type: new TypeId([], "", ""),
                 ftn: calli.Callee.SerializeExpr(), args: calli.Arguments.Select(SerializeExpr).ToList()),
             IlUnaryOperation or IlBinaryOperation => expr.SerializeOp(),
             IlNewExpr newExpr => new IlNewExprDto(newExpr.Type.GetTypeId()),
@@ -400,10 +402,11 @@ static class KeyBuilder
         if (type is null)
         {
             Console.WriteLine("Null type");
-            return new TypeId("", "");
+            return new TypeId(asmName: "", typeName: "", typeArgs: []);
         }
 
-        return new TypeId(asmName: type.AsmName, typeName: type.FullName);
+        return new TypeId(asmName: type.AsmName, typeName: type.FullName,
+            typeArgs: type.GenericArgs.Select(TypeIdBase (t) => t.GetTypeId()).ToList());
     }
 
     public static TypeId GetRefId(this IlType type)

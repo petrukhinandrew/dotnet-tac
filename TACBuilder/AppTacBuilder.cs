@@ -93,8 +93,8 @@ public class AppTacBuilder
         return IlInstanceBuilder.GetFreshTypes();
     }
 
-    public static Dictionary<string, List<string>> GetBuiltAssemblies()
+    public static List<IlAssembly> GetBuiltAssemblies()
     {
-        return IlInstanceBuilder.GetAsmDependencyGraph();
+        return IlInstanceBuilder.GetAssemblies();
     }
 }

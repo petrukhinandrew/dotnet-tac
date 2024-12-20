@@ -13,6 +13,10 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
 
     public bool BuiltAtLeastOnce => _builtAtLeastOnce;
     internal bool _builtAtLeastOnce = false;
+
+    internal List<IlType> ArrayTypesRegister = new();
+    internal List<int> ArrayDimsRegister = new();
+    
     internal IlExpr? SwitchRegister;
     internal int? SwitchBranch;
 

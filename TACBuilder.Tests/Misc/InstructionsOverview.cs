@@ -983,4 +983,18 @@ public class RomaExamples
             return 1;
         return 2;
     }
+
+    public static void BoolArr()
+    {
+        bool[] arr = [true, false, false];
+        long[] lArr = [1, 2, 3, 4];
+    }
+
+    public class NG<T>
+    {
+    }
+
+    public class NG
+    {
+    }
 }

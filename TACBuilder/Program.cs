@@ -72,7 +72,10 @@ class Program
             var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
             var serialized = RdSerializer.Serialize(instances);
 
-            return new PublicationResponse(asmDepGraph.Keys.ToList(), asmDepGraph.Values.ToList(), serialized);
+            return new PublicationResponse(asmDepGraph.Select(asm => new IlAsmDto(asm.Name, asm.Location)).ToList(),
+                asmDepGraph.Select(asm =>
+                    asm.ReferencedAssemblies.Select(referenced => new IlAsmDto(referenced.Name, referenced.Location))
+                        .ToList()).ToList(), serialized);
         });
         connection.Connect(opts.Port);
     }
@@ -80,12 +83,12 @@ class Program
     private static void RunConsole(StartOptions opts)
     {
         AppTacBuilder builder = new();
-        AppTacBuilder.FilterSingleMethodFromRootAsm(opts.InputFiles.First(), "LdelemA");
+        // AppTacBuilder.FilterSingleMethodFromRootAsm(opts.InputFiles.First(), "LdelemA");
         // AppTacBuilder.IncludeMsCoreLib();
         foreach (var file in opts.InputFiles)
         {
             Debug.Assert(File.Exists(file));
-            // AppTacBuilder.IncludeRootAsm(file);
+            AppTacBuilder.IncludeRootAsm(file);
         }
 
         foreach (var file in opts.InputFiles)
