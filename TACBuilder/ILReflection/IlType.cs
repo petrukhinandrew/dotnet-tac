@@ -132,7 +132,30 @@ public class IlType(Type type) : IlMember(type)
 
     // TODO may be split into method parameter and type parameter, if needed 
     public bool IsGenericParameter => _type.IsGenericParameter;
+
+    public bool HasRefTypeConstraint => IsGenericParameter &&
+                                        _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes
+                                            .ReferenceTypeConstraint);
+
+    public bool HasNotNullValueTypeConstraint => IsGenericParameter &&
+                                                 _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes
+                                                     .NotNullableValueTypeConstraint);
+
+    public bool HasDefaultCtorConstraint => IsGenericParameter &&
+                                            _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes
+                                                .DefaultConstructorConstraint);
+
+    public bool IsCovariant => IsGenericParameter &&
+                               _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Covariant);
+
+    public bool IsContravariant => IsGenericParameter &&
+                                   _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant);
+
     public bool IsGenericDefinition => _type.IsGenericTypeDefinition;
+
+    public IlType? GenericDefinition =>
+        IsGenericType ? IlInstanceBuilder.GetType(_type.GetGenericTypeDefinition()) : null;
+
     public bool IsGenericType => _type.IsGenericType;
     public virtual bool IsUnmanaged => _type.IsUnmanaged();
 

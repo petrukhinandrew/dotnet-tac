@@ -23,6 +23,7 @@ public static class RdSerializer
                 new IlFieldDto(fieldType: field.Type!.GetTypeId(),
                     name: field.Name,
                     isStatic: field.IsStatic,
+                    isConstructed: field.IsConstructed,
                     attrs: field.Attributes.Select(a => a.SerializeAttr()).ToList())).ToList();
             List<IlMethodDto> methods = type.Methods.Select(SerializeMethod).ToList();
             List<TypeId> interfaces = type.Interfaces.Select(t => t.GetTypeId()).ToList();
@@ -43,13 +44,21 @@ public static class RdSerializer
                     interfaces: interfaces,
                     targetType: pointerType.TargetType.GetTypeId(),
                     genericArgs: pointerType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
-                    isGenericParam: pointerType.IsGenericParameter,
-                    isGenericDefinition: pointerType.IsGenericDefinition,
                     isManaged: pointerType.IsManaged,
                     isValueType: false,
                     attrs: attrs,
                     fields: fields,
-                    methods: methods
+                    methods: methods,
+                    isConstructed: pointerType.IsConstructed,
+                    isGenericType: pointerType.IsGenericType,
+                    isGenericParam: pointerType.IsGenericParameter,
+                    isGenericDefinition: pointerType.IsGenericDefinition,
+                    genericDefinition: pointerType.GenericDefinition?.GetTypeId(),
+                    isCovariant: pointerType.IsCovariant,
+                    isContravariant: pointerType.IsContravariant,
+                    hasRefTypeConstraint: pointerType.HasRefTypeConstraint,
+                    hasNotNullValueTypeConstraint: pointerType.HasNotNullValueTypeConstraint,
+                    hasDefaultCtorConstraint: pointerType.HasDefaultCtorConstraint
                 ),
                 IlStructType structType => new IlStructTypeDto(
                     asmName: structType.AsmName,
@@ -62,13 +71,21 @@ public static class RdSerializer
                     baseType: structType.BaseType?.GetTypeId(),
                     interfaces: interfaces,
                     genericArgs: structType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
-                    isGenericParam: structType.IsGenericParameter,
-                    isGenericDefinition: structType.IsGenericDefinition,
                     isManaged: structType.IsManaged,
                     isValueType: structType.IsValueType,
                     attrs: attrs,
                     fields: fields,
-                    methods: methods
+                    methods: methods,
+                    isConstructed: structType.IsConstructed,
+                    isGenericType: structType.IsGenericType,
+                    isGenericParam: structType.IsGenericParameter,
+                    isGenericDefinition: structType.IsGenericDefinition,
+                    genericDefinition: structType.GenericDefinition?.GetTypeId(),
+                    isCovariant: structType.IsCovariant,
+                    isContravariant: structType.IsContravariant,
+                    hasRefTypeConstraint: structType.HasRefTypeConstraint,
+                    hasNotNullValueTypeConstraint: structType.HasNotNullValueTypeConstraint,
+                    hasDefaultCtorConstraint: structType.HasDefaultCtorConstraint
                 ),
                 IlEnumType enumType => new IlEnumTypeDto(
                     asmName: enumType.AsmName,
@@ -82,13 +99,21 @@ public static class RdSerializer
                     baseType: enumType.BaseType?.GetTypeId(),
                     interfaces: interfaces,
                     genericArgs: enumType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
-                    isGenericParam: enumType.IsGenericParameter,
-                    isGenericDefinition: enumType.IsGenericDefinition,
                     isManaged: enumType.IsManaged,
                     isValueType: enumType.IsValueType,
                     attrs: attrs,
                     fields: fields,
                     methods: methods,
+                    isConstructed: enumType.IsConstructed,
+                    isGenericType: enumType.IsGenericType,
+                    isGenericParam: enumType.IsGenericParameter,
+                    isGenericDefinition: enumType.IsGenericDefinition,
+                    genericDefinition: enumType.GenericDefinition?.GetTypeId(),
+                    isCovariant: enumType.IsCovariant,
+                    isContravariant: enumType.IsContravariant,
+                    hasRefTypeConstraint: enumType.HasRefTypeConstraint,
+                    hasNotNullValueTypeConstraint: enumType.HasNotNullValueTypeConstraint,
+                    hasDefaultCtorConstraint: enumType.HasDefaultCtorConstraint,
                     names: enumType.NameToValueMapping.Keys.ToList(),
                     values: enumType.NameToValueMapping.Values.Select(v => v.SerializeConst()).ToList()
                 ),
@@ -103,13 +128,21 @@ public static class RdSerializer
                     baseType: primitiveType.BaseType?.GetTypeId(),
                     interfaces: interfaces,
                     genericArgs: primitiveType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
-                    isGenericParam: primitiveType.IsGenericParameter,
-                    isGenericDefinition: primitiveType.IsGenericDefinition,
                     isManaged: primitiveType.IsManaged,
                     isValueType: primitiveType.IsValueType,
                     attrs: attrs,
                     fields: fields,
-                    methods: methods
+                    methods: methods,
+                    isConstructed: primitiveType.IsConstructed,
+                    isGenericType: primitiveType.IsGenericType,
+                    isGenericParam: primitiveType.IsGenericParameter,
+                    isGenericDefinition: primitiveType.IsGenericDefinition,
+                    genericDefinition: primitiveType.GenericDefinition?.GetTypeId(),
+                    isCovariant: primitiveType.IsCovariant,
+                    isContravariant: primitiveType.IsContravariant,
+                    hasRefTypeConstraint: primitiveType.HasRefTypeConstraint,
+                    hasNotNullValueTypeConstraint: primitiveType.HasNotNullValueTypeConstraint,
+                    hasDefaultCtorConstraint: primitiveType.HasDefaultCtorConstraint
                 ),
                 IlClassType classType => new IlClassTypeDto(
                     asmName: classType.AsmName,
@@ -122,13 +155,21 @@ public static class RdSerializer
                     baseType: classType.BaseType?.GetTypeId(),
                     interfaces: interfaces,
                     genericArgs: classType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
-                    isGenericParam: classType.IsGenericParameter,
-                    isGenericDefinition: classType.IsGenericDefinition,
                     isManaged: classType.IsManaged,
                     isValueType: classType.IsValueType,
                     attrs: attrs,
                     fields: fields,
-                    methods: methods
+                    methods: methods,
+                    isConstructed: classType.IsConstructed,
+                    isGenericType: classType.IsGenericType,
+                    isGenericParam: classType.IsGenericParameter,
+                    isGenericDefinition: classType.IsGenericDefinition,
+                    genericDefinition: classType.GenericDefinition?.GetTypeId(),
+                    isCovariant: classType.IsCovariant,
+                    isContravariant: classType.IsContravariant,
+                    hasRefTypeConstraint: classType.HasRefTypeConstraint,
+                    hasNotNullValueTypeConstraint: classType.HasNotNullValueTypeConstraint,
+                    hasDefaultCtorConstraint: classType.HasDefaultCtorConstraint
                 ),
                 IlArrayType arrayType => new IlArrayTypeDto(
                     asmName: arrayType.AsmName,
@@ -142,13 +183,21 @@ public static class RdSerializer
                     baseType: arrayType.BaseType?.GetTypeId(),
                     interfaces: interfaces,
                     genericArgs: arrayType.GenericArgs.Select(a => a.GetTypeId()).ToList(),
-                    isGenericParam: arrayType.IsGenericParameter,
-                    isGenericDefinition: arrayType.IsGenericDefinition,
                     isManaged: arrayType.IsManaged,
                     isValueType: arrayType.IsValueType,
                     attrs: attrs,
                     fields: fields,
-                    methods: methods
+                    methods: methods,
+                    isConstructed: arrayType.IsConstructed,
+                    isGenericType: arrayType.IsGenericType,
+                    isGenericParam: arrayType.IsGenericParameter,
+                    isGenericDefinition: arrayType.IsGenericDefinition,
+                    genericDefinition: arrayType.GenericDefinition?.GetTypeId(),
+                    isCovariant: arrayType.IsCovariant,
+                    isContravariant: arrayType.IsContravariant,
+                    hasRefTypeConstraint: arrayType.HasRefTypeConstraint,
+                    hasNotNullValueTypeConstraint: arrayType.HasNotNullValueTypeConstraint,
+                    hasDefaultCtorConstraint: arrayType.HasDefaultCtorConstraint
                 ),
                 _ => throw new NotImplementedException(),
             };
@@ -390,7 +439,8 @@ public static class RdSerializer
                 };
                 return res;
             }).ToList(),
-            rawInstList: SerializeMethodBody(method)
+            rawInstList: SerializeMethodBody(method),
+            isConstructed: method.IsConstructed
         );
     }
 }
