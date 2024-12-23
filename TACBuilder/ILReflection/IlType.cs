@@ -23,10 +23,10 @@ public class IlType(Type type) : IlMember(type)
         Logger.LogInformation("Constructing {Name}", Name);
         DeclaringAssembly = IlInstanceBuilder.GetAssembly(_type.Assembly);
         DeclaringType = _type.DeclaringType == null ? null : IlInstanceBuilder.GetType(_type.DeclaringType);
-        if (_type.IsGenericType)
-        {
-            GenericArgs.AddRange(_type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList());
-        }
+        // if (_type.IsGenericType)
+        // {
+        //     GenericArgs.AddRange(_type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList());
+        // }
 
         Attributes = _type.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
@@ -111,8 +111,8 @@ public class IlType(Type type) : IlMember(type)
 
     public string Namespace => _type.Namespace ?? "";
 
-    public string FullName => _type + (_type.IsGenericType
-        ? string.Join(",", _type.GenericTypeArguments.Select(ta => ta.MetadataToken.ToString()))
+    public string FullName => _type + (IsGenericType
+        ? string.Join(",", GenericArgs.Select(ta => ta.MetadataToken.ToString()))
         : "");
 
     public int ModuleToken => _type.Module.MetadataToken;
@@ -121,7 +121,7 @@ public class IlType(Type type) : IlMember(type)
     public IlType? DeclaringType { get; private set; }
     public IlType? BaseType { get; private set; }
     public List<IlType> Interfaces { get; } = new();
-    public List<IlType> GenericArgs { get; private set; } = new();
+    public List<IlType> GenericArgs => _type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList();
 
     public HashSet<IlMethod> Methods { get; } = new();
     public HashSet<IlField> Fields { get; } = new();
@@ -153,8 +153,8 @@ public class IlType(Type type) : IlMember(type)
 
     public bool IsGenericDefinition => _type.IsGenericTypeDefinition;
 
-    public IlType? GenericDefinition =>
-        IsGenericType ? IlInstanceBuilder.GetType(_type.GetGenericTypeDefinition()) : null;
+    public IlType? GenericDefinition =
+        type is { IsGenericType: true, IsGenericTypeDefinition: false } ? IlInstanceBuilder.GetType(type.GetGenericTypeDefinition()) : null;
 
     public bool IsGenericType => _type.IsGenericType;
     public virtual bool IsUnmanaged => _type.IsUnmanaged();

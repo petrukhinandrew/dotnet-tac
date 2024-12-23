@@ -10,10 +10,15 @@ public class ILConstructQueue : Queue<IlCacheable>
     public new void Enqueue(IlCacheable item)
     {
         base.Enqueue(item);
-        if (item is IlAssembly assembly)
-            _builtAssemblies.Add(assembly);
-        if (item is IlType type)
-            _freshInstances.Add(type);
+        switch (item)
+        {
+            case IlAssembly assembly:
+                _builtAssemblies.Add(assembly);
+                break;
+            case IlType type:
+                _freshInstances.Add(type);
+                break;
+        }
     }
 
     public List<IlType> FreshInstances => _freshInstances;

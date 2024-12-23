@@ -4,19 +4,14 @@ using JetBrains.Rd;
 using JetBrains.Rd.Impl;
 using JetBrains.Rd.Tasks;
 using org.jacodb.api.net.generated.models;
+using TACBuilder.ILReflection;
+using TACBuilder.Serialization;
 
 namespace TACBuilder;
 
-public class RdConnection
+public class RdConnection(AppTacBuilder builder)
 {
-    private LifetimeDefinition _lifetimeDef = Lifetime.Eternal.CreateNested();
-    private readonly Func<PublicationRequest, PublicationResponse> _asmReqCallback;
-
-    public RdConnection(Func<PublicationRequest, PublicationResponse> asmReqCallback)
-    {
-        _asmReqCallback = asmReqCallback;
-        SpinAndTerminate();
-    }
+    private readonly LifetimeDefinition _lifetimeDef = Lifetime.Eternal.CreateNested();
 
     public void Connect(int port)
     {
@@ -34,7 +29,29 @@ public class RdConnection
                     protocol.Scheduler.Queue(() =>
                     {
                         ilModel.GetIlSigModel().Publication.SetSync((lt, request) =>
-                            _asmReqCallback(request)
+                        {
+                            foreach (var target in request.RootAsms)
+                            {
+                                AppTacBuilder.IncludeRootAsm(target);
+                                builder.Build(target);
+                            }
+
+                            var instances = AppTacBuilder.GetFreshInstances();
+                            Console.WriteLine(
+                                $".net built {instances.Count} instances with total of {instances.Select(it => (it as IlType).Methods.Count).Sum()}");
+                            var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
+                            var serialized = RdSerializer.Serialize(instances);
+
+                            return new PublicationResponse(
+                                asmDepGraph.Select(asm => new IlAsmDto(asm.Name, asm.Location)).ToList(),
+                                asmDepGraph.Select(asm =>
+                                    asm.ReferencedAssemblies.Select(referenced =>
+                                            new IlAsmDto(referenced.Name, referenced.Location))
+                                        .ToList()).ToList(), serialized);
+                        });
+
+                        ilModel.GetIlSigModel().GenericSubstitutions.SetSync((lt, request) =>
+                            RdSerializer.Serialize(request.Select(builder.MakeGenericType).ToList())
                         );
                     });
                 });

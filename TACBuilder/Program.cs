@@ -58,25 +58,7 @@ class Program
     private static void RunRd(StartOptions opts)
     {
         AppTacBuilder builder = new();
-        var connection = new RdConnection(req =>
-        {
-            foreach (var target in req.RootAsms)
-            {
-                AppTacBuilder.IncludeRootAsm(target);
-                builder.Build(target);
-            }
-
-            var instances = AppTacBuilder.GetFreshInstances();
-            Console.WriteLine(
-                $".net built {instances.Count} instances with total of {instances.Select(it => (it as IlType).Methods.Count).Sum()}");
-            var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
-            var serialized = RdSerializer.Serialize(instances);
-
-            return new PublicationResponse(asmDepGraph.Select(asm => new IlAsmDto(asm.Name, asm.Location)).ToList(),
-                asmDepGraph.Select(asm =>
-                    asm.ReferencedAssemblies.Select(referenced => new IlAsmDto(referenced.Name, referenced.Location))
-                        .ToList()).ToList(), serialized);
-        });
+        var connection = new RdConnection(builder);
         connection.Connect(opts.Port);
     }
 
@@ -97,6 +79,11 @@ class Program
         var serialized =
             RdSerializer.Serialize(IlInstanceBuilder
                 .GetFreshTypes());
+        var listDef = IlInstanceBuilder.GetType(typeof(List<int>)).GenericDefinition!;
+        var intDef = IlInstanceBuilder.GetType(typeof(int));
+        var typeId = new TypeId([intDef.GetTypeId()], listDef.AsmName, listDef.FullName);
+        var t = builder.MakeGenericType(typeId);
+        Console.WriteLine("");
     }
 
     static void HandleParseError(IEnumerable<Error> errs)

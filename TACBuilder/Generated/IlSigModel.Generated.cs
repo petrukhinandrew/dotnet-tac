@@ -44,58 +44,42 @@ namespace org.jacodb.api.net.generated.models
     //fields
     //public fields
     [NotNull] public IRdEndpoint<PublicationRequest, PublicationResponse> Publication => _Publication;
-    [NotNull] public IRdEndpoint<PublicationRequest, List<IlTypeDto>> CallForAsm => _CallForAsm;
-    [NotNull] public ISignal<PublicationRequest> AsmRequest => _AsmRequest;
-    [NotNull] public ISignal<List<IlDto>> AsmResponse => _AsmResponse;
+    [NotNull] public IRdEndpoint<List<TypeId>, List<IlTypeDto>> GenericSubstitutions => _GenericSubstitutions;
     
     //private fields
     [NotNull] private readonly RdCall<PublicationRequest, PublicationResponse> _Publication;
-    [NotNull] private readonly RdCall<PublicationRequest, List<IlTypeDto>> _CallForAsm;
-    [NotNull] private readonly RdSignal<PublicationRequest> _AsmRequest;
-    [NotNull] private readonly RdSignal<List<IlDto>> _AsmResponse;
+    [NotNull] private readonly RdCall<List<TypeId>, List<IlTypeDto>> _GenericSubstitutions;
     
     //primary constructor
     private IlSigModel(
       [NotNull] RdCall<PublicationRequest, PublicationResponse> publication,
-      [NotNull] RdCall<PublicationRequest, List<IlTypeDto>> callForAsm,
-      [NotNull] RdSignal<PublicationRequest> asmRequest,
-      [NotNull] RdSignal<List<IlDto>> asmResponse
+      [NotNull] RdCall<List<TypeId>, List<IlTypeDto>> genericSubstitutions
     )
     {
       if (publication == null) throw new ArgumentNullException("publication");
-      if (callForAsm == null) throw new ArgumentNullException("callForAsm");
-      if (asmRequest == null) throw new ArgumentNullException("asmRequest");
-      if (asmResponse == null) throw new ArgumentNullException("asmResponse");
+      if (genericSubstitutions == null) throw new ArgumentNullException("genericSubstitutions");
       
       _Publication = publication;
-      _CallForAsm = callForAsm;
-      _AsmRequest = asmRequest;
-      _AsmResponse = asmResponse;
-      _AsmRequest.Async = true;
-      _AsmResponse.Async = true;
+      _GenericSubstitutions = genericSubstitutions;
       BindableChildren.Add(new KeyValuePair<string, object>("publication", _Publication));
-      BindableChildren.Add(new KeyValuePair<string, object>("callForAsm", _CallForAsm));
-      BindableChildren.Add(new KeyValuePair<string, object>("asmRequest", _AsmRequest));
-      BindableChildren.Add(new KeyValuePair<string, object>("asmResponse", _AsmResponse));
+      BindableChildren.Add(new KeyValuePair<string, object>("genericSubstitutions", _GenericSubstitutions));
     }
     //secondary constructor
     internal IlSigModel (
     ) : this (
       new RdCall<PublicationRequest, PublicationResponse>(PublicationRequest.Read, PublicationRequest.Write, PublicationResponse.Read, PublicationResponse.Write),
-      new RdCall<PublicationRequest, List<IlTypeDto>>(PublicationRequest.Read, PublicationRequest.Write, ReadIlTypeDtoList, WriteIlTypeDtoList),
-      new RdSignal<PublicationRequest>(PublicationRequest.Read, PublicationRequest.Write),
-      new RdSignal<List<IlDto>>(ReadIlDtoList, WriteIlDtoList)
+      new RdCall<List<TypeId>, List<IlTypeDto>>(ReadTypeIdList, WriteTypeIdList, ReadIlTypeDtoList, WriteIlTypeDtoList)
     ) {}
     //deconstruct trait
     //statics
     
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlTypeDto>> ReadIlTypeDtoList = IlTypeDto.Read.List();
-    public static CtxReadDelegate<List<IlDto>> ReadIlDtoList = IlDto.Read.List();
     
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlTypeDto>> WriteIlTypeDtoList = IlTypeDto.Write.List();
-    public static  CtxWriteDelegate<List<IlDto>> WriteIlDtoList = IlDto.Write.List();
     
-    protected override long SerializationHash => 7950792047261741369L;
+    protected override long SerializationHash => -1254625028312812736L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -117,9 +101,7 @@ namespace org.jacodb.api.net.generated.models
       printer.Println("IlSigModel (");
       using (printer.IndentCookie()) {
         printer.Print("publication = "); _Publication.PrintEx(printer); printer.Println();
-        printer.Print("callForAsm = "); _CallForAsm.PrintEx(printer); printer.Println();
-        printer.Print("asmRequest = "); _AsmRequest.PrintEx(printer); printer.Println();
-        printer.Print("asmResponse = "); _AsmResponse.PrintEx(printer); printer.Println();
+        printer.Print("genericSubstitutions = "); _GenericSubstitutions.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
