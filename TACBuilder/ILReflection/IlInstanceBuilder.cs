@@ -9,7 +9,6 @@ public static class IlInstanceBuilder
     private static readonly ILConstructQueue _queue = new();
     private static readonly ILCache _cache = new();
     private static readonly AssemblyCache _assemblyCache = new();
-    internal static readonly List<Func<Assembly, bool>> AssemblyFilters = new();
     internal static readonly List<Func<Type, bool>> TypeFilters = new();
     internal static readonly List<Func<MethodBase, bool>> MethodFilters = new();
 
@@ -33,12 +32,7 @@ public static class IlInstanceBuilder
         Construct();
         return meta;
     }
-
-    public static void AddAssemblyFilter(Func<Assembly, bool> filter)
-    {
-        AssemblyFilters.Add(filter);
-    }
-
+    
     public static void AddTypeFilter(Func<Type, bool> filter)
     {
         TypeFilters.Add(filter);

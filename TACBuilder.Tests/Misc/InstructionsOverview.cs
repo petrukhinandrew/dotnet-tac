@@ -998,3 +998,8 @@ public class RomaExamples
     {
     }
 }
+
+class ArrayList<T> : List<T> where T : struct, IEquatable<T>
+{
+    
+}

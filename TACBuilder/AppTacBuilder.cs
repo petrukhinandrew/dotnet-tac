@@ -35,7 +35,6 @@ public class AppTacBuilder
 
     public static void IncludeTACBuilder()
     {
-        IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.GetName().ToString().StartsWith("TACBuilder"));
         IlInstanceBuilder.AddTypeFilter(type =>
             type.Assembly.GetName().ToString().StartsWith("TACBuilder"));
         IlInstanceBuilder.AddMethodFilter(method =>
@@ -44,7 +43,6 @@ public class AppTacBuilder
 
     public static void IncludeRootAsm(string rootAssemblyPath)
     {
-        IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
         IlInstanceBuilder.AddTypeFilter(type =>
             type.Assembly.Location == rootAssemblyPath);
         IlInstanceBuilder.AddMethodFilter(method =>
@@ -53,44 +51,10 @@ public class AppTacBuilder
 
     public static void IncludeRootAsm(AssemblyName asmName)
     {
-        IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.GetName().FullName == asmName.FullName);
         IlInstanceBuilder.AddTypeFilter(type =>
             type.Assembly.GetName().FullName == asmName.FullName);
         IlInstanceBuilder.AddMethodFilter(method =>
             (method.ReflectedType ?? method.DeclaringType)!.Assembly.GetName().FullName == asmName.FullName);
-    }
-
-    public static void IncludeMsCoreLib()
-    {
-        IlInstanceBuilder.AddAssemblyFilter(assembly =>
-            assembly.GetName().FullName.StartsWith("System.Private.CoreLib"));
-        IlInstanceBuilder.AddTypeFilter(type =>
-            type.Assembly.GetName().FullName.StartsWith("System.Private.CoreLib"));
-        IlInstanceBuilder.AddMethodFilter(method =>
-            (method.ReflectedType ?? method.DeclaringType)!.Assembly.FullName.StartsWith("System.Private.CoreLib"));
-    }
-
-    public static void FilterSingleMethodFromRootAsm(string rootAssemblyPath, string methodName)
-    {
-        IlInstanceBuilder.AddAssemblyFilter(assembly => assembly.Location == rootAssemblyPath);
-        IlInstanceBuilder.AddTypeFilter(type =>
-            type.Assembly.Location == rootAssemblyPath);
-        IlInstanceBuilder.AddMethodFilter(method =>
-            (method.ReflectedType ?? method.DeclaringType)!.Assembly.Location == rootAssemblyPath &&
-            method.Name.StartsWith(methodName));
-    }
-
-    public static void FilterMethodsFromSingleMSCoreLibType(string rootAssemblyPath, string typeNamePart)
-    {
-        IlInstanceBuilder.AddAssemblyFilter(assembly =>
-            assembly.GetName().FullName.StartsWith("System.Private.CoreLib") || assembly.Location == rootAssemblyPath);
-        IlInstanceBuilder.AddTypeFilter(type =>
-            type.Assembly.GetName().FullName.StartsWith("System.Private.CoreLib") ||
-            type.Assembly.Location == rootAssemblyPath);
-        IlInstanceBuilder.AddTypeFilter(type => type.Name.StartsWith(typeNamePart));
-        // IlInstanceBuilder.AddMethodFilter(call =>
-        //     (call.ReflectedType ?? call.DeclaringType)!.Assembly.Location == rootAssemblyPath);
-        IlInstanceBuilder.AddMethodFilter(method => method.DeclaringType!.Name.StartsWith(typeNamePart));
     }
 
     public static List<IlType> GetFreshInstances()
@@ -111,7 +75,6 @@ public class AppTacBuilder
     private Type MakeGenericTypeFrom(TypeId typeId)
     {
         var topLevelType = FindTypeUnsafe(typeId.AsmName, typeId.TypeName);
-        Console.WriteLine($"current topLevel is {topLevelType}");
         Debug.Assert(topLevelType.IsGenericTypeDefinition || !topLevelType.IsGenericType, topLevelType.ToString());
         return typeId.TypeArgs.Count == 0
             ? topLevelType

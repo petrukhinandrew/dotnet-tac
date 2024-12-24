@@ -9,7 +9,8 @@ namespace TACBuilder;
 
 class Program
 {
-    public class StartOptions
+    // ReSharper disable once ClassNeverInstantiated.Local
+    private class StartOptions
     {
         [Option('m', "mode", Required = true, HelpText = "The mode to use (rd, console)", Default = "console")]
         public string Mode { get; set; }
@@ -65,8 +66,6 @@ class Program
     private static void RunConsole(StartOptions opts)
     {
         AppTacBuilder builder = new();
-        // AppTacBuilder.FilterSingleMethodFromRootAsm(opts.InputFiles.First(), "LdelemA");
-        // AppTacBuilder.IncludeMsCoreLib();
         foreach (var file in opts.InputFiles)
         {
             Debug.Assert(File.Exists(file));
@@ -79,14 +78,9 @@ class Program
         var serialized =
             RdSerializer.Serialize(IlInstanceBuilder
                 .GetFreshTypes());
-        var listDef = IlInstanceBuilder.GetType(typeof(List<int>)).GenericDefinition!;
-        var intDef = IlInstanceBuilder.GetType(typeof(int));
-        var typeId = new TypeId([intDef.GetTypeId()], listDef.AsmName, listDef.FullName);
-        var t = builder.MakeGenericType(typeId);
-        Console.WriteLine("");
     }
 
-    static void HandleParseError(IEnumerable<Error> errs)
+    private static void HandleParseError(IEnumerable<Error> errs)
     {
         Console.WriteLine("Error parsing start options:");
         foreach (var err in errs)

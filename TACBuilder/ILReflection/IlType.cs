@@ -154,7 +154,9 @@ public class IlType(Type type) : IlMember(type)
     public bool IsGenericDefinition => _type.IsGenericTypeDefinition;
 
     public IlType? GenericDefinition =
-        type is { IsGenericType: true, IsGenericTypeDefinition: false } ? IlInstanceBuilder.GetType(type.GetGenericTypeDefinition()) : null;
+        type is { IsGenericType: true, IsGenericTypeDefinition: false }
+            ? IlInstanceBuilder.GetType(type.GetGenericTypeDefinition())
+            : null;
 
     public bool IsGenericType => _type.IsGenericType;
     public virtual bool IsUnmanaged => _type.IsUnmanaged();
@@ -232,13 +234,18 @@ public class IlEnumType(Type type) : IlValueType(type)
     public override bool IsManaged => false;
     public override bool IsUnmanaged => true;
 
-    public IlType UnderlyingType = IlInstanceBuilder.GetType(Enum.GetUnderlyingType(type));
+    // TODO #2 
+    public IlType UnderlyingType = type.IsGenericTypeParameter
+        ? IlInstanceBuilder.GetType(typeof(object))
+        : IlInstanceBuilder.GetType(Enum.GetUnderlyingType(type));
+
     public Dictionary<string, IlConstant> NameToValueMapping = new();
 
     public override void Construct()
     {
         Debug.Assert(Type.IsEnum);
         base.Construct();
+        if (Type.IsGenericTypeDefinition) return;
         foreach (var value in Enum.GetValues(Type))
         {
             var name = Enum.GetName(Type, value) ?? "";

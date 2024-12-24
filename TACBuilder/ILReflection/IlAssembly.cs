@@ -10,6 +10,7 @@ public class IlAssembly(Assembly assembly) : IlCacheable
     public string? Location { get; private set; }
     public HashSet<IlType> Types { get; } = new();
 
+    // TODO #2 may be introduced in construct 
     public List<IlAssembly> ReferencedAssemblies { get; } =
         assembly.GetReferencedAssemblies().Select(IlInstanceBuilder.GetAssembly).ToList();
 
@@ -20,10 +21,8 @@ public class IlAssembly(Assembly assembly) : IlCacheable
     {
         Location = _assembly.Location;
         Logger.LogInformation("Constructed {Name}", Name);
-        if (IlInstanceBuilder.AssemblyFilters.All(f => !f(_assembly))) return;
-
-        // TODO CRITICAL
-        var types = _assembly.GetTypes(); //.Where(t => t.IsGenericTypeDefinition || !t.IsGenericType);
+        
+        var types = _assembly.GetTypes();
         foreach (var type in types)
         {
             Types.Add(IlInstanceBuilder.GetType(type));
