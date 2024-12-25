@@ -8,6 +8,15 @@ using Exception = System.Exception;
 
 namespace TACBuilder.ILReflection;
 
+/*
+ * baseType
+ * interfaces
+ * genericConstraints
+ * genericDefn
+ * genericArgs
+ * declType
+ */
+
 public class IlType(Type type) : IlMember(type)
 {
     private readonly Type _type = type;
@@ -18,22 +27,40 @@ public class IlType(Type type) : IlMember(type)
         System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static |
         System.Reflection.BindingFlags.DeclaredOnly;
 
+    public IlType? DeclaringType { get; private set; }
+    public IlType? BaseType { get; private set; }
+    public List<IlType> Interfaces { get; } = [];
+    public List<IlType> GenericArgs = [];
+
+    public IlType? GenericDefinition;
+
     public override void Construct()
     {
         Logger.LogInformation("Constructing {Name}", Name);
         DeclaringAssembly = IlInstanceBuilder.GetAssembly(_type.Assembly);
-        DeclaringType = _type.DeclaringType == null ? null : IlInstanceBuilder.GetType(_type.DeclaringType);
-        // if (_type.IsGenericType)
-        // {
-        //     GenericArgs.AddRange(_type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList());
-        // }
-
-        Attributes = _type.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
-
         DeclaringAssembly.EnsureTypeAttached(this);
-        if (IlInstanceBuilder.TypeFilters.All(f => !f(_type))) return;
-        BaseType = _type.BaseType == null ? null : IlInstanceBuilder.GetType(_type.BaseType);
+        if (_type.DeclaringType != null)
+        {
+            DeclaringType = IlInstanceBuilder.GetType(_type.DeclaringType);
+        }
+
+        if (_type.BaseType != null)
+        {
+            BaseType = IlInstanceBuilder.GetType(_type.BaseType);
+        }
+
+        if (_type.IsGenericType)
+        {
+            GenericDefinition = IlInstanceBuilder.GetType(_type.GetGenericTypeDefinition());
+        }
+
+        GenericArgs.AddRange(_type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList());
         Interfaces.AddRange(_type.GetInterfaces().Select(IlInstanceBuilder.GetType));
+
+        Attributes.AddRange(_type.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList());
+
+        if (IlInstanceBuilder.TypeFilters.All(f => !f(_type))) return;
+
         var fields = _type.GetFields(BindingFlags);
         foreach (var field in fields)
         {
@@ -51,22 +78,94 @@ public class IlType(Type type) : IlMember(type)
         IsConstructed = true;
     }
 
-    public virtual IlType ExpectedStackType()
+    public IlAssembly DeclaringAssembly { get; private set; }
+    public string AsmName => _type.Assembly.GetName().ToString();
+
+    public string Namespace => type.Namespace ?? DeclaringType?.Namespace ?? "";
+
+    public new readonly string Name = type.Name;
+    public string FullName => Namespace + "." + Name;
+
+    public int ModuleToken => _type.Module.MetadataToken;
+    public int MetadataToken => _type.MetadataToken;
+    public List<IlAttribute> Attributes { get; } = [];
+
+    public HashSet<IlMethod> Methods { get; } = new();
+    public HashSet<IlField> Fields { get; } = new();
+
+    public Type Type => _type;
+    public bool IsValueType => _type.IsValueType;
+    public virtual bool IsManaged => !_type.IsUnmanaged();
+
+    public bool IsGenericParameter => _type.IsGenericParameter;
+
+    public bool HasRefTypeConstraint => IsGenericParameter &&
+                                        _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes
+                                            .ReferenceTypeConstraint);
+
+    public bool HasNotNullValueTypeConstraint => IsGenericParameter &&
+                                                 _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes
+                                                     .NotNullableValueTypeConstraint);
+
+    public bool HasDefaultCtorConstraint => IsGenericParameter &&
+                                            _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes
+                                                .DefaultConstructorConstraint);
+
+    public bool IsCovariant => IsGenericParameter &&
+                               _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Covariant);
+
+    public bool IsContravariant => IsGenericParameter &&
+                                   _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant);
+
+    public bool IsGenericDefinition => _type.IsGenericTypeDefinition;
+
+
+    public bool IsGenericType => _type.IsGenericType;
+    public virtual bool IsUnmanaged => _type.IsUnmanaged();
+
+    public virtual IlType ExpectedStackType() => this;
+
+    internal void EnsureFieldAttached(IlField ilField)
     {
-        return this;
+        Fields.Add(ilField);
     }
 
-    public IlArrayType MakeArrayType()
+    internal void EnsureMethodAttached(IlMethod ilMethod)
     {
-        return (IlArrayType)IlInstanceBuilder.GetType(Type.MakeArrayType());
+        Methods.Add(ilMethod);
     }
 
-    public IlType MeetWith(IlType another)
+    public override string ToString()
     {
-        return MeeetIlTypes(this, another);
+        return Name.Split("`").First() +
+               (GenericArgs.Count > 0 ? $"<{string.Join(", ", GenericArgs.Select(ga => ga.ToString()))}>" : "");
     }
 
-    private static IlType MeeetIlTypes(IlType? left, IlType? right)
+    public override bool Equals(object? obj)
+    {
+        return obj is IlType other && _type == other._type;
+    }
+
+    public override int GetHashCode()
+    {
+        return _type.GetHashCode();
+    }
+}
+
+// TODO #2 makegenericType should be introduced here, not in AppTacBuilder
+internal static class IlTypeHelpers
+{
+    public static IlArrayType MakeArrayType(this IlType type)
+    {
+        return (IlArrayType)IlInstanceBuilder.GetType(type.Type.MakeArrayType());
+    }
+
+    public static IlType MeetWith(this IlType type, IlType another)
+    {
+        return MeetIlTypes(type, another);
+    }
+
+    private static IlType MeetIlTypes(IlType? left, IlType? right)
     {
         if (left == null || right == null) return IlInstanceBuilder.GetType(typeof(object));
         if (left is IlPointerType lp && right is IlPointerType rp)
@@ -105,161 +204,4 @@ public class IlType(Type type) : IlMember(type)
 
         return bestCandidate ?? MeetTypes(left.BaseType, right.BaseType);
     }
-
-    public IlAssembly DeclaringAssembly { get; private set; }
-    public string AsmName => _type.Assembly.GetName().ToString();
-
-    public string Namespace => _type.Namespace ?? "";
-
-    public string FullName => _type + (IsGenericType
-        ? string.Join(",", GenericArgs.Select(ta => ta.MetadataToken.ToString()))
-        : "");
-
-    public int ModuleToken => _type.Module.MetadataToken;
-    public int MetadataToken => _type.MetadataToken;
-    public List<IlAttribute> Attributes { get; private set; }
-    public IlType? DeclaringType { get; private set; }
-    public IlType? BaseType { get; private set; }
-    public List<IlType> Interfaces { get; } = new();
-    public List<IlType> GenericArgs => _type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList();
-
-    public HashSet<IlMethod> Methods { get; } = new();
-    public HashSet<IlField> Fields { get; } = new();
-    public new string Name => _type.Name;
-    public Type Type => _type;
-    public bool IsValueType => _type.IsValueType;
-    public virtual bool IsManaged => !_type.IsUnmanaged();
-
-    // TODO may be split into method parameter and type parameter, if needed 
-    public bool IsGenericParameter => _type.IsGenericParameter;
-
-    public bool HasRefTypeConstraint => IsGenericParameter &&
-                                        _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes
-                                            .ReferenceTypeConstraint);
-
-    public bool HasNotNullValueTypeConstraint => IsGenericParameter &&
-                                                 _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes
-                                                     .NotNullableValueTypeConstraint);
-
-    public bool HasDefaultCtorConstraint => IsGenericParameter &&
-                                            _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes
-                                                .DefaultConstructorConstraint);
-
-    public bool IsCovariant => IsGenericParameter &&
-                               _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Covariant);
-
-    public bool IsContravariant => IsGenericParameter &&
-                                   _type.GenericParameterAttributes.HasFlag(GenericParameterAttributes.Contravariant);
-
-    public bool IsGenericDefinition => _type.IsGenericTypeDefinition;
-
-    public IlType? GenericDefinition =
-        type is { IsGenericType: true, IsGenericTypeDefinition: false }
-            ? IlInstanceBuilder.GetType(type.GetGenericTypeDefinition())
-            : null;
-
-    public bool IsGenericType => _type.IsGenericType;
-    public virtual bool IsUnmanaged => _type.IsUnmanaged();
-
-    internal void EnsureFieldAttached(IlField ilField)
-    {
-        Fields.Add(ilField);
-    }
-
-    internal void EnsureMethodAttached(IlMethod ilMethod)
-    {
-        Methods.Add(ilMethod);
-    }
-
-    public override string ToString()
-    {
-        return Name.Split("`").First() +
-               (GenericArgs.Count > 0 ? $"<{string.Join(", ", GenericArgs.Select(ga => ga.ToString()))}>" : "");
-    }
-
-    public override bool Equals(object? obj)
-    {
-        return obj is IlType other && _type == other._type;
-    }
-
-    public override int GetHashCode()
-    {
-        return _type.GetHashCode();
-    }
 }
-
-public class IlPointerType(Type targetType) : IlType(targetType)
-{
-    public override bool IsManaged => false;
-    public override bool IsUnmanaged => true;
-    public IlType TargetType => IlInstanceBuilder.GetType(Type);
-    public new string FullName => base.FullName + "*";
-}
-
-public class IlValueType(Type type) : IlType(type);
-
-public class IlReferenceType(Type type) : IlType(type)
-{
-    public override bool IsManaged => true;
-    public override bool IsUnmanaged => false;
-}
-
-public class IlPrimitiveType(Type type) : IlValueType(type)
-{
-    public override bool IsManaged => false;
-    public override bool IsUnmanaged => true;
-
-    public override IlPrimitiveType ExpectedStackType()
-    {
-        if (Type == typeof(IntPtr) || Type == typeof(UIntPtr))
-            return (IlPrimitiveType)
-                IlInstanceBuilder.GetType(Type);
-        return (IlPrimitiveType)(Type.GetTypeCode(Type) switch
-        {
-            TypeCode.Boolean => IlInstanceBuilder.GetType(typeof(bool)),
-            TypeCode.Char => IlInstanceBuilder.GetType(typeof(char)),
-            TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 => IlInstanceBuilder.GetType(typeof(int)),
-            TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(uint)),
-            TypeCode.Int64 => IlInstanceBuilder.GetType(typeof(long)),
-            TypeCode.UInt64 => IlInstanceBuilder.GetType(typeof(ulong)),
-            TypeCode.Single => IlInstanceBuilder.GetType(typeof(float)),
-            TypeCode.Double => IlInstanceBuilder.GetType(typeof(double)),
-            _ => throw new NotSupportedException("unhandled primitive stack type " + ToString()),
-        });
-    }
-}
-
-public class IlEnumType(Type type) : IlValueType(type)
-{
-    public override bool IsManaged => false;
-    public override bool IsUnmanaged => true;
-
-    // TODO #2 
-    public IlType UnderlyingType = type.IsGenericTypeParameter
-        ? IlInstanceBuilder.GetType(typeof(object))
-        : IlInstanceBuilder.GetType(Enum.GetUnderlyingType(type));
-
-    public Dictionary<string, IlConstant> NameToValueMapping = new();
-
-    public override void Construct()
-    {
-        Debug.Assert(Type.IsEnum);
-        base.Construct();
-        if (Type.IsGenericTypeDefinition) return;
-        foreach (var value in Enum.GetValues(Type))
-        {
-            var name = Enum.GetName(Type, value) ?? "";
-            NameToValueMapping.TryAdd(name, IlConstant.From(value));
-        }
-    }
-}
-
-// TODO add null value getter for such thing 
-public class IlStructType(Type type) : IlValueType(type);
-
-public class IlArrayType(Type type) : IlReferenceType(type)
-{
-    public IlType ElementType => IlInstanceBuilder.GetType(Type.GetElementType()!);
-}
-
-public class IlClassType(Type type) : IlReferenceType(type);

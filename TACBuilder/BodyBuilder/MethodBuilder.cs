@@ -64,7 +64,7 @@ class MethodBuilder(IlMethod method)
         }
         catch (KnownBug kb)
         {
-            Console.WriteLine(kb.Message + " found at " + (method.DeclaringType?.Type.ToString() ?? " ") + " " +
+            Console.WriteLine(kb.Message + " found at " + (method.DeclaringType?.ToString() ?? " ") + " " +
                               method);
             return [];
         }
@@ -125,12 +125,13 @@ class MethodBuilder(IlMethod method)
                 Tac.Add(line);
             }
 
-            
+
             if (tacBlocksIndexed.Count > i + 1 && successors.ContainsKey(bb.IlFirst) &&
                 successors[bb.IlFirst].Count > 0 && successors[bb.IlFirst][0] != tacBlocksIndexed[i + 1].Key)
             {
                 Tac.Add(new IlGotoStmt(successors[bb.IlFirst][0]));
             }
+
             ilToTacMapping[bb.Meta.Exit.idx] = Tac.Count - 1;
         }
 

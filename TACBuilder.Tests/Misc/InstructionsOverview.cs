@@ -1,7 +1,5 @@
-using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using TACBuilder;
 
 #pragma warning disable CS0219
 #pragma warning disable CS8500
@@ -15,8 +13,7 @@ namespace TACBuilder
     }
 }
 
-namespace Usvm.IL.Test.Instructions
-{
+namespace Usvm.IL.Test.Instructions {
     [AttributeUsage(AttributeTargets.All)]
     public class CustomAttribute(string value) : Attribute
     {
@@ -1000,6 +997,11 @@ public class RomaExamples
 }
 
 class ArrayList<T> : List<T> where T : struct, IEquatable<T>
+{
+    
+}
+
+class ArrayListString : List<string>
 {
     
 }
