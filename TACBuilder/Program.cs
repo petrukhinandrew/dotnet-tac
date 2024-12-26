@@ -65,7 +65,6 @@ class Program
 
     private static void RunConsole(StartOptions opts)
     {
-        Console.WriteLine(typeof(List<List<int>>).GetGenericTypeDefinition());
         AppTacBuilder builder = new();
         foreach (var file in opts.InputFiles)
         {
@@ -90,4 +89,3 @@ class Program
         }
     }
 }
-

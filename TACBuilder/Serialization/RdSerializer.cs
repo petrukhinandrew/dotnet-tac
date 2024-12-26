@@ -411,9 +411,13 @@ public static class RdSerializer
             attrs: method.Attributes.Select(SerializeAttr).ToList(),
             isStatic: method.IsStatic,
             name: method.Name,
+            isGeneric: method.IsGeneric,
+            isGenericDefinition: method.IsGenericMethodDefinition,
+            signature: method.Signature,
             parameters: method.Parameters
                 .Select(p => new IlParameterDto(p.Position, p.Type.GetTypeId(), p.Name, null,
                     attrs: p.Attributes.Select(a => a.SerializeAttr()).ToList())).ToList(),
+            genericArgs: method.GenericArgs.Select(arg => arg.GetTypeId()).ToList(),
             resolved: method.IsConstructed,
             locals: method.LocalVars.Select(v =>
                 new IlLocalVarDto(type: v.Type.GetTypeId(), index: v.Index, isPinned: v.IsPinned)).ToList(),

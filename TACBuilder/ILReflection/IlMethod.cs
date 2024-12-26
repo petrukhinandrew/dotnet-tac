@@ -140,12 +140,23 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     public List<IParameter> Parameters { get; } = new();
     public bool HasMethodBody { get; private set; }
     public bool HasThis { get; private set; }
-    public new string Name => _methodBase.Name;
+
+    public new string Name => _methodBase.Name +
+                              (_methodBase.IsGenericMethod ? $"`{_methodBase.GetGenericArguments().Length}" : "");
 
     public string Signature =>
-        $"{ReturnType!.FullName} {_methodBase.Name}({string.Join(",", Parameters.Select(p => p.Type.FullName))})";
+        $"{ReturnType!.FullName} {DeclaringType?.FullName ?? ""}.{Name}{GenericSignatureExtra}({string.Join(",", Parameters.Select(p => p.Type.FullName))})";
+
+    public string NonGenericSignature =>
+        $"{ReturnType!.FullName} {DeclaringType?.FullName ?? ""}.{Name}({string.Join(",", Parameters.Select(p => p.Type.FullName))})";
+
+    private string GenericSignatureExtra =>
+        IsGeneric
+            ? $"<{string.Join(",", GenericArgs.Select(t => t.Name))}>"
+            : "";
 
     public bool IsGeneric => _methodBase.IsGenericMethod;
+    public bool IsGenericMethodDefinition => _methodBase.IsGenericMethodDefinition;
     public bool IsStatic => _methodBase.IsStatic;
     public new bool IsConstructed = false;
 

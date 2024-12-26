@@ -28,6 +28,7 @@ public class IlType(Type type) : IlMember(type)
         System.Reflection.BindingFlags.DeclaredOnly;
 
     public IlType? DeclaringType { get; private set; }
+    public IlMethod? DeclaringMethod { get; private set; }
     public IlType? BaseType { get; private set; }
     public List<IlType> Interfaces { get; } = [];
     public List<IlType> GenericArgs = [];
@@ -42,6 +43,11 @@ public class IlType(Type type) : IlMember(type)
         if (_type.DeclaringType != null)
         {
             DeclaringType = IlInstanceBuilder.GetType(_type.DeclaringType);
+        }
+
+        if (_type.IsGenericParameter && _type.DeclaringMethod != null)
+        {
+            DeclaringMethod = IlInstanceBuilder.GetMethod(_type.DeclaringMethod);
         }
 
         if (_type.BaseType != null)
@@ -84,7 +90,19 @@ public class IlType(Type type) : IlMember(type)
     public string Namespace => type.Namespace ?? DeclaringType?.Namespace ?? "";
 
     public new readonly string Name = type.Name;
-    public string FullName => Namespace + "." + Name;
+
+    public string FullName => ConstructFullName();
+
+    private string ConstructFullName()
+    {
+        if (IsGenericType && _type.IsGenericMethodParameter)
+            return DeclaringMethod!.NonGenericSignature + "!" + Name;
+        if (IsGenericType && _type.IsGenericTypeParameter)
+            return DeclaringType!.FullName + "!" + Name;
+        if (DeclaringType != null)
+            return DeclaringType.FullName + "+" + Name;
+        return Namespace == "" ? Name : Namespace + "." + Name;
+    }
 
     public int ModuleToken => _type.Module.MetadataToken;
     public int MetadataToken => _type.MetadataToken;
