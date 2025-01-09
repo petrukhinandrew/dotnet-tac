@@ -55,14 +55,11 @@ public interface IlConstant : IlValue
 
     private static IlArrayConst ResolveArrayConst(ICollection collection)
     {
-        var values = new List<IlConstant>();
-        foreach (var v in collection)
-        {
-            values.Add(From(v));
-        }
-
+        var values = (from object? v in collection select From(v)).ToList();
         if (collection == null) throw new Exception("unexpected array constant " + collection);
-        return new IlArrayConst((IlInstanceBuilder.GetType(values[0].Type.Type.MakeArrayType()) as IlArrayType)!, values);
+        return new IlArrayConst(
+            (IlInstanceBuilder.GetType(collection.GetType().GetGenericArguments()[0].MakeArrayType()) as IlArrayType)!,
+            values);
     }
 }
 
