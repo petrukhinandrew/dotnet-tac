@@ -1899,12 +1899,8 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public TypeId ReturnType {get; private set;}
     [NotNull] public List<IlAttrDto> Attrs {get; private set;}
     public bool IsStatic {get; private set;}
-    public bool IsGeneric {get; private set;}
-    public bool IsGenericDefinition {get; private set;}
-    [NotNull] public string Signature {get; private set;}
     [NotNull] public string Name {get; private set;}
     [NotNull] public List<IlParameterDto> Parameters {get; private set;}
-    [NotNull] public List<TypeId> GenericArgs {get; private set;}
     public bool Resolved {get; private set;}
     [NotNull] public List<IlLocalVarDto> Locals {get; private set;}
     [NotNull] public List<IlTempVarDto> Temps {get; private set;}
@@ -1912,6 +1908,10 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public List<IlEhScopeDto> EhScopes {get; private set;}
     [NotNull] public List<IlStmtDto> RawInstList {get; private set;}
     public bool IsConstructed {get; private set;}
+    public bool IsGeneric {get; private set;}
+    public bool IsGenericDefinition {get; private set;}
+    [NotNull] public string Signature {get; private set;}
+    [NotNull] public List<TypeId> GenericArgs {get; private set;}
     
     //private fields
     //primary constructor
@@ -1919,42 +1919,38 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] TypeId returnType,
       [NotNull] List<IlAttrDto> attrs,
       bool isStatic,
-      bool isGeneric,
-      bool isGenericDefinition,
-      [NotNull] string signature,
       [NotNull] string name,
       [NotNull] List<IlParameterDto> parameters,
-      [NotNull] List<TypeId> genericArgs,
       bool resolved,
       [NotNull] List<IlLocalVarDto> locals,
       [NotNull] List<IlTempVarDto> temps,
       [NotNull] List<IlErrVarDto> errs,
       [NotNull] List<IlEhScopeDto> ehScopes,
       [NotNull] List<IlStmtDto> rawInstList,
-      bool isConstructed
+      bool isConstructed,
+      bool isGeneric,
+      bool isGenericDefinition,
+      [NotNull] string signature,
+      [NotNull] List<TypeId> genericArgs
     )
     {
       if (returnType == null) throw new ArgumentNullException("returnType");
       if (attrs == null) throw new ArgumentNullException("attrs");
-      if (signature == null) throw new ArgumentNullException("signature");
       if (name == null) throw new ArgumentNullException("name");
       if (parameters == null) throw new ArgumentNullException("parameters");
-      if (genericArgs == null) throw new ArgumentNullException("genericArgs");
       if (locals == null) throw new ArgumentNullException("locals");
       if (temps == null) throw new ArgumentNullException("temps");
       if (errs == null) throw new ArgumentNullException("errs");
       if (ehScopes == null) throw new ArgumentNullException("ehScopes");
       if (rawInstList == null) throw new ArgumentNullException("rawInstList");
+      if (signature == null) throw new ArgumentNullException("signature");
+      if (genericArgs == null) throw new ArgumentNullException("genericArgs");
       
       ReturnType = returnType;
       Attrs = attrs;
       IsStatic = isStatic;
-      IsGeneric = isGeneric;
-      IsGenericDefinition = isGenericDefinition;
-      Signature = signature;
       Name = name;
       Parameters = parameters;
-      GenericArgs = genericArgs;
       Resolved = resolved;
       Locals = locals;
       Temps = temps;
@@ -1962,6 +1958,10 @@ namespace org.jacodb.api.net.generated.models
       EhScopes = ehScopes;
       RawInstList = rawInstList;
       IsConstructed = isConstructed;
+      IsGeneric = isGeneric;
+      IsGenericDefinition = isGenericDefinition;
+      Signature = signature;
+      GenericArgs = genericArgs;
     }
     //secondary constructor
     //deconstruct trait
@@ -1972,12 +1972,8 @@ namespace org.jacodb.api.net.generated.models
       var returnType = TypeId.Read(ctx, reader);
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var isStatic = reader.ReadBool();
-      var isGeneric = reader.ReadBool();
-      var isGenericDefinition = reader.ReadBool();
-      var signature = reader.ReadString();
       var name = reader.ReadString();
       var parameters = ReadIlParameterDtoList(ctx, reader);
-      var genericArgs = ReadTypeIdList(ctx, reader);
       var resolved = reader.ReadBool();
       var locals = ReadIlLocalVarDtoList(ctx, reader);
       var temps = ReadIlTempVarDtoList(ctx, reader);
@@ -1985,29 +1981,29 @@ namespace org.jacodb.api.net.generated.models
       var ehScopes = ReadIlEhScopeDtoList(ctx, reader);
       var rawInstList = ReadIlStmtDtoList(ctx, reader);
       var isConstructed = reader.ReadBool();
-      var _result = new IlMethodDto(returnType, attrs, isStatic, isGeneric, isGenericDefinition, signature, name, parameters, genericArgs, resolved, locals, temps, errs, ehScopes, rawInstList, isConstructed);
+      var isGeneric = reader.ReadBool();
+      var isGenericDefinition = reader.ReadBool();
+      var signature = reader.ReadString();
+      var genericArgs = ReadTypeIdList(ctx, reader);
+      var _result = new IlMethodDto(returnType, attrs, isStatic, name, parameters, resolved, locals, temps, errs, ehScopes, rawInstList, isConstructed, isGeneric, isGenericDefinition, signature, genericArgs);
       return _result;
     };
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
     public static CtxReadDelegate<List<IlParameterDto>> ReadIlParameterDtoList = IlParameterDto.Read.List();
-    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlLocalVarDto>> ReadIlLocalVarDtoList = IlLocalVarDto.Read.List();
     public static CtxReadDelegate<List<IlTempVarDto>> ReadIlTempVarDtoList = IlTempVarDto.Read.List();
     public static CtxReadDelegate<List<IlErrVarDto>> ReadIlErrVarDtoList = IlErrVarDto.Read.List();
     public static CtxReadDelegate<List<IlEhScopeDto>> ReadIlEhScopeDtoList = IlEhScopeDto.Read.List();
     public static CtxReadDelegate<List<IlStmtDto>> ReadIlStmtDtoList = IlStmtDto.Read.List();
+    public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     
     public static new CtxWriteDelegate<IlMethodDto> Write = (ctx, writer, value) => 
     {
       TypeId.Write(ctx, writer, value.ReturnType);
       WriteIlAttrDtoList(ctx, writer, value.Attrs);
       writer.Write(value.IsStatic);
-      writer.Write(value.IsGeneric);
-      writer.Write(value.IsGenericDefinition);
-      writer.Write(value.Signature);
       writer.Write(value.Name);
       WriteIlParameterDtoList(ctx, writer, value.Parameters);
-      WriteTypeIdList(ctx, writer, value.GenericArgs);
       writer.Write(value.Resolved);
       WriteIlLocalVarDtoList(ctx, writer, value.Locals);
       WriteIlTempVarDtoList(ctx, writer, value.Temps);
@@ -2015,15 +2011,19 @@ namespace org.jacodb.api.net.generated.models
       WriteIlEhScopeDtoList(ctx, writer, value.EhScopes);
       WriteIlStmtDtoList(ctx, writer, value.RawInstList);
       writer.Write(value.IsConstructed);
+      writer.Write(value.IsGeneric);
+      writer.Write(value.IsGenericDefinition);
+      writer.Write(value.Signature);
+      WriteTypeIdList(ctx, writer, value.GenericArgs);
     };
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
     public static  CtxWriteDelegate<List<IlParameterDto>> WriteIlParameterDtoList = IlParameterDto.Write.List();
-    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlLocalVarDto>> WriteIlLocalVarDtoList = IlLocalVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlTempVarDto>> WriteIlTempVarDtoList = IlTempVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlErrVarDto>> WriteIlErrVarDtoList = IlErrVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlEhScopeDto>> WriteIlEhScopeDtoList = IlEhScopeDto.Write.List();
     public static  CtxWriteDelegate<List<IlStmtDto>> WriteIlStmtDtoList = IlStmtDto.Write.List();
+    public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     
     //constants
     
@@ -2041,7 +2041,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && IsStatic == other.IsStatic && IsGeneric == other.IsGeneric && IsGenericDefinition == other.IsGenericDefinition && Signature == other.Signature && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && GenericArgs.SequenceEqual(other.GenericArgs) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList) && IsConstructed == other.IsConstructed;
+      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && IsStatic == other.IsStatic && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList) && IsConstructed == other.IsConstructed && IsGeneric == other.IsGeneric && IsGenericDefinition == other.IsGenericDefinition && Signature == other.Signature && GenericArgs.SequenceEqual(other.GenericArgs);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2051,12 +2051,8 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + ReturnType.GetHashCode();
         hash = hash * 31 + Attrs.ContentHashCode();
         hash = hash * 31 + IsStatic.GetHashCode();
-        hash = hash * 31 + IsGeneric.GetHashCode();
-        hash = hash * 31 + IsGenericDefinition.GetHashCode();
-        hash = hash * 31 + Signature.GetHashCode();
         hash = hash * 31 + Name.GetHashCode();
         hash = hash * 31 + Parameters.ContentHashCode();
-        hash = hash * 31 + GenericArgs.ContentHashCode();
         hash = hash * 31 + Resolved.GetHashCode();
         hash = hash * 31 + Locals.ContentHashCode();
         hash = hash * 31 + Temps.ContentHashCode();
@@ -2064,6 +2060,10 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + EhScopes.ContentHashCode();
         hash = hash * 31 + RawInstList.ContentHashCode();
         hash = hash * 31 + IsConstructed.GetHashCode();
+        hash = hash * 31 + IsGeneric.GetHashCode();
+        hash = hash * 31 + IsGenericDefinition.GetHashCode();
+        hash = hash * 31 + Signature.GetHashCode();
+        hash = hash * 31 + GenericArgs.ContentHashCode();
         return hash;
       }
     }
@@ -2075,12 +2075,8 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("returnType = "); ReturnType.PrintEx(printer); printer.Println();
         printer.Print("attrs = "); Attrs.PrintEx(printer); printer.Println();
         printer.Print("isStatic = "); IsStatic.PrintEx(printer); printer.Println();
-        printer.Print("isGeneric = "); IsGeneric.PrintEx(printer); printer.Println();
-        printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
-        printer.Print("signature = "); Signature.PrintEx(printer); printer.Println();
         printer.Print("name = "); Name.PrintEx(printer); printer.Println();
         printer.Print("parameters = "); Parameters.PrintEx(printer); printer.Println();
-        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
         printer.Print("resolved = "); Resolved.PrintEx(printer); printer.Println();
         printer.Print("locals = "); Locals.PrintEx(printer); printer.Println();
         printer.Print("temps = "); Temps.PrintEx(printer); printer.Println();
@@ -2088,6 +2084,10 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("ehScopes = "); EhScopes.PrintEx(printer); printer.Println();
         printer.Print("rawInstList = "); RawInstList.PrintEx(printer); printer.Println();
         printer.Print("isConstructed = "); IsConstructed.PrintEx(printer); printer.Println();
+        printer.Print("isGeneric = "); IsGeneric.PrintEx(printer); printer.Println();
+        printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
+        printer.Print("signature = "); Signature.PrintEx(printer); printer.Println();
+        printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
