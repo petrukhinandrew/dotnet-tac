@@ -22,7 +22,7 @@ There are multiple situations, from simple to complex:
 4. Generic type parameter, nested: `namespace.declaringType+declarintType!typeName`
 5. Generic method parameter: `methodNonGenericSignature!typeName`
 
-#### Method
+#### Method signature
 
 There are 2 situations: 
 

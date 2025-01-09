@@ -78,6 +78,7 @@ class Program
         var serialized =
             RdSerializer.Serialize(IlInstanceBuilder
                 .GetFreshTypes());
+        // typeof(List<int>).IsSubclassOf(typeof(IList<int>))
     }
 
     private static void HandleParseError(IEnumerable<Error> errs)

@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Microsoft.VisualBasic.FileIO;
 
 #pragma warning disable CS0219
 #pragma warning disable CS8500
@@ -1001,6 +1002,19 @@ class ArrayList<T> : List<T> where T : struct, IEquatable<T>
 {
 }
 
-class ArrayListString : List<string>
-{
-}
+// List<string> 
+// 
+
+class ArrayListString : List<string>;
+
+class ArrayListInt : List<int>;
+
+class ArrayListStringChild : ArrayListString;
+class ArrayListIntChild : ArrayListInt;
+
+// class T;
+
+// class N<Z>;
+// class C<X> : N<N<C<C<X>>>> {
+//     N<C<T>> cast(C<T> c) { return c; }
+// }
