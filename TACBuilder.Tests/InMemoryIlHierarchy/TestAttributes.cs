@@ -1,4 +1,4 @@
 namespace TACBuilder.Tests.InMemoryIlHierarchy;
 
-[AttributeUsage(AttributeTargets.Class)]
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
 public class InMemoryHierarchyTestEntryAttribute(Type[] expectedChildren) : Attribute;
