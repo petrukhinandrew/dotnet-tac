@@ -6,14 +6,6 @@ using Microsoft.VisualBasic.FileIO;
 #pragma warning disable CS8500
 #pragma warning disable
 
-namespace TACBuilder
-{
-    public class AppTacBuilder
-    {
-        public int Number;
-    }
-}
-
 namespace Usvm.IL.Test.Instructions
 {
     [AttributeUsage(AttributeTargets.All)]
@@ -1010,6 +1002,7 @@ class ArrayListString : List<string>;
 class ArrayListInt : List<int>;
 
 class ArrayListStringChild : ArrayListString;
+
 class ArrayListIntChild : ArrayListInt;
 
 // class T;

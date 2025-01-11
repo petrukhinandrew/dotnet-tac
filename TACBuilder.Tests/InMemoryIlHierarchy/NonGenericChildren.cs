@@ -15,4 +15,23 @@ public class NonGenericChildren
     public class GenericChildStructInt : GenericBaseStruct<int>;
 
     public class GenericChildStructIntChild : GenericChildStructInt;
+
+    [InMemoryHierarchyTestEntry([
+        typeof(GenericClassInterfaceChild),
+        typeof(GenericClassAbstractChild),
+        typeof(GenericClassCommonChild)
+    ])]
+    public class GenericClassBase<T> where T : ITypeParamBase;
+
+    public interface ITypeParamBase;
+
+    public abstract class TypeParamBase : ITypeParamBase;
+
+    public class TypeParamChild : TypeParamBase;
+
+    public class GenericClassInterfaceChild : GenericClassBase<ITypeParamBase>;
+
+    public class GenericClassAbstractChild : GenericClassBase<TypeParamBase>;
+
+    public class GenericClassCommonChild : GenericClassBase<TypeParamChild>;
 }

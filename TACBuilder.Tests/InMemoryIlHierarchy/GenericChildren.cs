@@ -1,17 +1,14 @@
 namespace TACBuilder.Tests.InMemoryIlHierarchy;
 
-public class GenericChildren
-{
-    [InMemoryHierarchyTestEntry([
-        typeof(GenericClassBase<ITypeParamBase>), 
-        typeof(GenericClassBase<TypeParamBase>),
-        typeof(GenericClassBase<TypeParamChild>)
-    ])]
-    public class GenericClassBase<T> where T : ITypeParamBase;
+class SingleParamBase<T>;
 
-    public interface ITypeParamBase;
+class SingleParamAny<G> : SingleParamBase<G>;
 
-    public abstract class TypeParamBase : ITypeParamBase;
+class SingleParamClass<T> : SingleParamBase<T> where T : class;
 
-    public class TypeParamChild : TypeParamBase;
-}
+class SingleParamStruct<T> : SingleParamBase<T> where T : struct;
+// class TwoParamBase<T1, T2>;
+//
+// class TwoParamChildOptimistic<T1, T2> : TwoParamBase<T2, T1>;
+//
+// class TwoParamChildClass<T1, T2>: 

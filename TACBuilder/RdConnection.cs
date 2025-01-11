@@ -51,7 +51,7 @@ public class RdConnection(AppTacBuilder builder)
                         });
 
                         ilModel.GetIlSigModel().GenericSubstitutions.SetSync((lt, request) =>
-                            RdSerializer.Serialize(request.Select(builder.MakeGenericType).ToList())
+                            RdSerializer.Serialize(request.Select(builder.MakeGenericType).Where(t => t != null).ToList())
                         );
                     });
                 });

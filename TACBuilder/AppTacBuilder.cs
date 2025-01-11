@@ -67,24 +67,36 @@ public class AppTacBuilder
         return IlInstanceBuilder.GetAssemblies();
     }
 
-    public IlType MakeGenericType(TypeId typeId)
+    public IlType? MakeGenericType(TypeId typeId)
     {
-        return IlInstanceBuilder.GetType(MakeGenericTypeFrom(typeId));
+        var gt = MakeGenericTypeFrom(typeId);
+        if (gt == null) return null;
+        var result = IlInstanceBuilder.GetType(gt);
+        IlInstanceBuilder.Construct();
+        return result;
     }
 
-    private Type MakeGenericTypeFrom(TypeId typeId)
+    private Type? MakeGenericTypeFrom(TypeId typeId)
     {
         var topLevelType = FindTypeUnsafe(typeId.AsmName, typeId.TypeName);
         Debug.Assert(topLevelType.IsGenericTypeDefinition || !topLevelType.IsGenericType, topLevelType.ToString());
-        return typeId.TypeArgs.Count == 0
-            ? topLevelType
-            : topLevelType.MakeGenericType(typeId.TypeArgs.Select(t => MakeGenericTypeFrom((TypeId)t)).ToArray());
+        try
+        {
+            return typeId.TypeArgs.Count == 0
+                ? topLevelType
+                : topLevelType.MakeGenericType(typeId.TypeArgs.Select(t => MakeGenericTypeFrom((TypeId)t)).ToArray());
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private Type FindTypeUnsafe(string asmName, string typeName)
     {
         var asm = BuiltAssemblies.Single(asm => asm.Name == asmName);
-        var possibleTypes = asm.Types.Where(t => t.FullName == typeName).Select(ilt => ilt.Type).ToList();
+        var possibleTypes = asm.Types.Where(t => t.FullName == typeName && (!t.IsGenericType || t.IsGenericDefinition))
+            .Select(ilt => ilt.Type).ToList();
         return possibleTypes.Single();
     }
 }

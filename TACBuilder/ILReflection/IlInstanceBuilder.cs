@@ -43,7 +43,7 @@ public static class IlInstanceBuilder
         MethodFilters.Add(filter);
     }
 
-    private static void Construct()
+    internal static void Construct()
     {
         while (_queue.TryDequeue(out var instance))
         {
