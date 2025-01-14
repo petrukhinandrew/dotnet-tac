@@ -65,6 +65,12 @@ public class IlType(Type type) : IlMember(type)
 
         Attributes.AddRange(_type.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList());
 
+        foreach (var ctor in _type.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic |
+                                                   BindingFlags.Instance | BindingFlags.Static))
+        {
+            Methods.Add(IlInstanceBuilder.GetMethod(ctor));
+        }
+
         if (IlInstanceBuilder.TypeFilters.All(f => !f(_type))) return;
 
         var fields = _type.GetFields(BindingFlags);

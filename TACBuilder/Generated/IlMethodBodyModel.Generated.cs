@@ -6034,6 +6034,7 @@ namespace org.jacodb.api.net.generated.models
   /// </summary>
   public sealed class IlShrOpDto : IlBinaryOpDto
   {
+    [NotNull] private readonly IlExprDto _lhv;
     //fields
     //public fields
     
@@ -6051,8 +6052,9 @@ namespace org.jacodb.api.net.generated.models
       isChecked,
       isUnsigned,
       type
-     ) 
+     )
     {
+      _lhv = lhv;
     }
     //secondary constructor
     //deconstruct trait

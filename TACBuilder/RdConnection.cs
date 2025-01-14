@@ -16,43 +16,52 @@ public class RdConnection(AppTacBuilder builder)
     public void Connect(int port)
     {
         var lifetime = _lifetimeDef.Lifetime;
+        lifetime.OnTermination(() => Console.WriteLine("lifetime terminated"));
         SingleThreadScheduler.RunOnSeparateThread(lifetime, "Client", scheduler =>
             {
-                var wire = new SocketWire.Client(lifetime, scheduler, port, "Client");
-                var idKind = IdKind.Client;
-                var serializers = new Serializers();
-                var protocol = new Protocol("client side", serializers, new Identities(idKind), scheduler, wire,
-                    lifetime);
                 scheduler.Queue(() =>
                 {
+                    var wire = new SocketWire.Client(lifetime, scheduler, port, "Client");
+                    var idKind = IdKind.Client;
+                    var serializers = new Serializers();
+                    var protocol = new Protocol("client side", serializers, new Identities(idKind), scheduler, wire,
+                        lifetime);
                     var ilModel = new IlModel(lifetime, protocol);
-                    protocol.Scheduler.Queue(() =>
+
+                    ilModel.GetIlSigModel().Publication.SetSync((lt, request) =>
                     {
-                        ilModel.GetIlSigModel().Publication.SetSync((lt, request) =>
+                        foreach (var target in request.RootAsms)
                         {
-                            foreach (var target in request.RootAsms)
+                            AppTacBuilder.IncludeRootAsm(target);
+                            builder.Build(target);
+                        }
+
+                        var instances = AppTacBuilder.GetFreshInstances();
+                        Console.WriteLine(
+                            $".net built {instances.Count} instances with total of {instances.Select(it => (it as IlType).Methods.Count).Sum()}");
+                        var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
+                        var serialized = RdSerializer.Serialize(instances);
+
+                        return new PublicationResponse(
+                            asmDepGraph.Select(asm => new IlAsmDto(asm.Name, asm.Location)).ToList(),
+                            asmDepGraph.Select(asm =>
+                                asm.ReferencedAssemblies.Select(referenced =>
+                                        new IlAsmDto(referenced.Name, referenced.Location))
+                                    .ToList()).ToList(), serialized);
+                    });
+
+                    ilModel.GetIlSigModel().GenericSubstitutions.SetSync(
+                        (lt, request) =>
+                            request.Select(builder.MakeGenericType).Select(v => v switch
                             {
-                                AppTacBuilder.IncludeRootAsm(target);
-                                builder.Build(target);
-                            }
-
-                            var instances = AppTacBuilder.GetFreshInstances();
-                            Console.WriteLine(
-                                $".net built {instances.Count} instances with total of {instances.Select(it => (it as IlType).Methods.Count).Sum()}");
-                            var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
-                            var serialized = RdSerializer.Serialize(instances);
-
-                            return new PublicationResponse(
-                                asmDepGraph.Select(asm => new IlAsmDto(asm.Name, asm.Location)).ToList(),
-                                asmDepGraph.Select(asm =>
-                                    asm.ReferencedAssemblies.Select(referenced =>
-                                            new IlAsmDto(referenced.Name, referenced.Location))
-                                        .ToList()).ToList(), serialized);
-                        });
-
-                        ilModel.GetIlSigModel().GenericSubstitutions.SetSync((lt, request) =>
-                            RdSerializer.Serialize(request.Select(builder.MakeGenericType).Where(t => t != null).ToList())
-                        );
+                                null => null,
+                                _ => RdSerializer.Serialize([v]).Single()
+                            }).ToList()
+                    );
+                    ilModel.GetIlSigModel().Close.Advise(lifetime, () =>
+                    {
+                        Console.WriteLine(".net start terminating");
+                        Environment.Exit(0);
                     });
                 });
             }
@@ -61,7 +70,7 @@ public class RdConnection(AppTacBuilder builder)
 
     public async void SpinAndTerminate()
     {
-        await Task.Delay(10_000);
+        await Task.Delay(100);
         _lifetimeDef.Terminate();
     }
 }

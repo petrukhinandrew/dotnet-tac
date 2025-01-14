@@ -45,41 +45,48 @@ namespace org.jacodb.api.net.generated.models
     //public fields
     [NotNull] public IRdEndpoint<PublicationRequest, PublicationResponse> Publication => _Publication;
     [NotNull] public IRdEndpoint<List<TypeId>, List<IlTypeDto>> GenericSubstitutions => _GenericSubstitutions;
+    [NotNull] public ISignal<Unit> Close => _Close;
     
     //private fields
     [NotNull] private readonly RdCall<PublicationRequest, PublicationResponse> _Publication;
     [NotNull] private readonly RdCall<List<TypeId>, List<IlTypeDto>> _GenericSubstitutions;
+    [NotNull] private readonly RdSignal<Unit> _Close;
     
     //primary constructor
     private IlSigModel(
       [NotNull] RdCall<PublicationRequest, PublicationResponse> publication,
-      [NotNull] RdCall<List<TypeId>, List<IlTypeDto>> genericSubstitutions
+      [NotNull] RdCall<List<TypeId>, List<IlTypeDto>> genericSubstitutions,
+      [NotNull] RdSignal<Unit> close
     )
     {
       if (publication == null) throw new ArgumentNullException("publication");
       if (genericSubstitutions == null) throw new ArgumentNullException("genericSubstitutions");
+      if (close == null) throw new ArgumentNullException("close");
       
       _Publication = publication;
       _GenericSubstitutions = genericSubstitutions;
+      _Close = close;
       BindableChildren.Add(new KeyValuePair<string, object>("publication", _Publication));
       BindableChildren.Add(new KeyValuePair<string, object>("genericSubstitutions", _GenericSubstitutions));
+      BindableChildren.Add(new KeyValuePair<string, object>("close", _Close));
     }
     //secondary constructor
     internal IlSigModel (
     ) : this (
       new RdCall<PublicationRequest, PublicationResponse>(PublicationRequest.Read, PublicationRequest.Write, PublicationResponse.Read, PublicationResponse.Write),
-      new RdCall<List<TypeId>, List<IlTypeDto>>(ReadTypeIdList, WriteTypeIdList, ReadIlTypeDtoList, WriteIlTypeDtoList)
+      new RdCall<List<TypeId>, List<IlTypeDto>>(ReadTypeIdList, WriteTypeIdList, ReadIlTypeDtoNullableList, WriteIlTypeDtoNullableList),
+      new RdSignal<Unit>(JetBrains.Rd.Impl.Serializers.ReadVoid, JetBrains.Rd.Impl.Serializers.WriteVoid)
     ) {}
     //deconstruct trait
     //statics
     
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
-    public static CtxReadDelegate<List<IlTypeDto>> ReadIlTypeDtoList = IlTypeDto.Read.List();
+    public static CtxReadDelegate<List<IlTypeDto>> ReadIlTypeDtoNullableList = IlTypeDto.Read.NullableClass().List();
     
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
-    public static  CtxWriteDelegate<List<IlTypeDto>> WriteIlTypeDtoList = IlTypeDto.Write.List();
+    public static  CtxWriteDelegate<List<IlTypeDto>> WriteIlTypeDtoNullableList = IlTypeDto.Write.NullableClass().List();
     
-    protected override long SerializationHash => -1254625028312812736L;
+    protected override long SerializationHash => -4291866564617915204L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -102,6 +109,7 @@ namespace org.jacodb.api.net.generated.models
       using (printer.IndentCookie()) {
         printer.Print("publication = "); _Publication.PrintEx(printer); printer.Println();
         printer.Print("genericSubstitutions = "); _GenericSubstitutions.PrintEx(printer); printer.Println();
+        printer.Print("close = "); _Close.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }

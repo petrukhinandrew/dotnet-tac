@@ -60,7 +60,7 @@ public class IlEnumType(Type type) : IlValueType(type)
     {
         Debug.Assert(Type.IsEnum);
         base.Construct();
-        if (Type.IsGenericTypeParameter || Type.IsGenericTypeDefinition) return;
+        if (Type.IsGenericTypeParameter || Type.GetGenericArguments().Any(arg => arg.IsGenericTypeParameter)) return;
         foreach (var value in Enum.GetValues(Type))
         {
             var name = Enum.GetName(Type, value) ?? "";

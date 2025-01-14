@@ -86,8 +86,10 @@ public class AppTacBuilder
                 ? topLevelType
                 : topLevelType.MakeGenericType(typeId.TypeArgs.Select(t => MakeGenericTypeFrom((TypeId)t)).ToArray());
         }
-        catch
+        catch(Exception e)
         {
+            Console.WriteLine(e.Message);
+            Console.WriteLine(e.StackTrace);
             return null;
         }
     }
