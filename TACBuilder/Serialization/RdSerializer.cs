@@ -1,4 +1,4 @@
-#define TEST_DUMPSIGNATURES
+// #define TEST_DUMPSIGNATURES
 using System.Diagnostics;
 using org.jacodb.api.net.generated.models;
 using TACBuilder.BodyBuilder;

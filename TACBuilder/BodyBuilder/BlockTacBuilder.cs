@@ -160,6 +160,6 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
 
     public override string ToString()
     {
-        return IlFirst.ToString();
+        return $"{Meta.Entry.idx} {Meta.Exit.idx}";
     }
 }

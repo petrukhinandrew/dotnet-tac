@@ -7,6 +7,7 @@ using System.Reflection.Metadata.Ecma335;
 using System.Reflection.PortableExecutable;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using TACBuilder.BodyBuilder;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
@@ -421,7 +422,7 @@ static class BlockTacLineBuilder
                 case "leave.s":
                 {
                     ILInstr target = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlGotoStmt(target.idx));
+                    blockBuilder.NewLine(new IlLeaveStmt(target.idx));
                     blockBuilder.ClearStack();
                     return true;
                 }
@@ -555,10 +556,10 @@ static class BlockTacLineBuilder
                     {
                         var arr = blockBuilder.Pop();
                         var fld = blockBuilder.Pop();
-                        
+
                         break;
                     }
-                    
+
 
                     var rawArgs = ilMethod.Parameters.Select(t => blockBuilder.Pop()).ToList();
                     rawArgs.Reverse();
@@ -575,6 +576,7 @@ static class BlockTacLineBuilder
                     }
                     else
                         blockBuilder.NewLine(new IlCallStmt(ilCall));
+
                     break;
                 }
                 case "callvirt":

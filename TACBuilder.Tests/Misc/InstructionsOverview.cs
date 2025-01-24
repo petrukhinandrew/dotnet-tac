@@ -691,7 +691,7 @@ namespace Usvm.IL.Test.Instructions
                 string sf = "second finally";
             }
         }
-
+        
         public static void TryEndingWithCatch()
         {
             try

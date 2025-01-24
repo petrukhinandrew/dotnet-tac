@@ -68,11 +68,22 @@ public abstract class IlBranchStmt(int target) : IlStmt()
     public int Target = target;
 }
 
+/*
+ * for debug purposes, should not be sent into jacodb
+ */
+public class IlLeaveStmt(int target) : IlBranchStmt(target)
+{
+    public override string ToString()
+    {
+        return $"leave {Target}";
+    }
+}
+
 public class IlGotoStmt(int target) : IlBranchStmt(target)
 {
     public override string ToString()
     {
-        return "goto " + Target;
+        return $"goto {Target}";
     }
 }
 
@@ -118,6 +129,8 @@ public class IlEndFilterStmt(IlExpr value) : IlEhStmt
 
 public class IlEndFinallyStmt : IlEhStmt
 {
+    public bool IsMutable = true;
+
     public override string ToString()
     {
         return "endfinally";

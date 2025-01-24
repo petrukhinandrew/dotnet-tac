@@ -66,30 +66,44 @@ public interface IlConstant : IlValue
 public class IlNullConst : IlConstant
 {
     public IlType Type => IlInstanceBuilder.GetType(typeof(object));
+
+    public override string ToString() => "null";
 }
 
 public class IlBoolConst(bool value) : IlConstant
 {
     public IlType Type => IlInstanceBuilder.GetType(typeof(bool));
     public bool Value => value;
+    public override string ToString() => value.ToString();
 }
 
 public class IlStringConst(string value) : IlConstant
 {
     public IlType Type => IlInstanceBuilder.GetType(typeof(string));
     public string Value => value;
+    public override string ToString() => value;
 }
 
 public class IlEnumConst(IlEnumType enumType, IlConstant underlyingValue) : IlConstant
 {
     public IlType Type => enumType;
     public IlConstant Value => underlyingValue;
+
+    public override string ToString()
+    {
+        return underlyingValue.ToString();
+    }
 }
 
 public class IlArrayConst(IlArrayType arrayType, IEnumerable<IlConstant> values) : IlConstant
 {
     public IlType Type => arrayType;
     public List<IlConstant> Values => values.ToList();
+
+    public override string ToString()
+    {
+        return $"[{string.Join(", ", Values.Select(v => v.ToString()))}]";
+    }
 }
 
 public class IlTypeRef(IlType type) : IlConstant

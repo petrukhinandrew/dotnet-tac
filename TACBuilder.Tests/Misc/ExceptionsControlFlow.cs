@@ -2,213 +2,179 @@ using System.Diagnostics;
 
 #pragma warning disable CS0162
 
-namespace IntegrationTests
+namespace IntegrationTests;
+
+public class ExceptionsControlFlow
 {
-    public class ExceptionsControlFlow
+    public static int TestWithHandlers(int x, int y)
     {
-        public static int TestWithHandlers(int x, int y)
+        int addition = 1;
+        try
         {
-            int addition = 1;
+            return x / y;
+        }
+        catch (OverflowException)
+        {
+            return addition + 100500;
+        }
+        catch (DivideByZeroException) when (x == 100)
+        {
+            return addition + 90;
+        }
+        finally
+        {
+            addition++;
+        }
+
+        return checked(x + y);
+    }
+
+    public static int TestWithHandlers1()
+    {
+        var res = 1;
+        try
+        {
+            res += 1;
+        }
+        catch (DivideByZeroException)
+        {
+            res += 11;
+        }
+        catch (ArgumentException)
+        {
+            res += 12;
+        }
+        catch (NullReferenceException)
+        {
+            res += 10;
+        }
+        finally
+        {
+            res++;
+        }
+
+        return res;
+    }
+
+    public static int CatchRuntimeException(int x, int y)
+    {
+        try
+        {
+            return x / y;
+        }
+        catch (DivideByZeroException)
+        {
+            return -42;
+        }
+    }
+
+    public static int SimpleFilterBlock(int x, int y)
+    {
+        try
+        {
+            return x / y;
+        }
+        catch (DivideByZeroException) when (x == 42)
+        {
+            return -42;
+        }
+    }
+
+    private static bool ThrowNullReference()
+    {
+        throw new NullReferenceException();
+    }
+
+    public static int ExceptionInsideFilter(int x, int y)
+    {
+        var a = 0;
+        try
+        {
+            return x / y;
+        }
+        catch (DivideByZeroException e) when (ThrowNullReference())
+        {
+            a = 3;
+        }
+        finally
+        {
+            a = 5;
+        }
+
+        return a;
+    }
+
+    public static int ReturnMinWithAssert(int x, int y)
+    {
+        Debug.Assert(x <= y);
+        return x;
+    }
+
+    public static int TestWithAssert(int x, int y)
+    {
+        if (x < 0)
+        {
+            Debug.Assert(x <= y);
+        }
+        else
+        {
+            x = y;
+            Debug.Assert(x > y);
+        }
+
+        return x;
+    }
+
+    public static int TestWithNestedFinallyHandlers(int x, int y)
+    {
+        int addition = 1;
+        try
+        {
+        }
+        finally
+        {
             try
             {
-                return x / y;
-            }
-            catch (OverflowException)
-            {
-                return addition + 100500;
-            }
-            catch (DivideByZeroException) when (x == 100)
-            {
-                return addition + 90;
             }
             finally
             {
-                addition++;
+                addition += 10;
             }
 
-            return checked(x + y);
+            addition += 100;
         }
 
-        public static int TestWithHandlers1()
+        return addition;
+    }
+
+    public static void AnotherNestedFinally(int a)
+    {
+        try
         {
-            var res = 1;
+            a += 10;
+        }
+        finally
+        {
             try
             {
-                throw null;
-            }
-            catch (DivideByZeroException)
-            {
-                res += 11;
-            }
-            catch (ArgumentException)
-            {
-                res += 12;
-            }
-            catch (NullReferenceException)
-            {
-                res += 10;
+                a += 100;
             }
             finally
             {
-                res++;
-            }
-
-            return res;
-        }
-
-        public static int CatchRuntimeException(int x, int y)
-        {
-            try
-            {
-                return x / y;
-            }
-            catch (DivideByZeroException)
-            {
-                return -42;
             }
         }
+    }
 
-        public static int SimpleFilterBlock(int x, int y)
-        {
-            try
-            {
-                return x / y;
-            }
-            catch (DivideByZeroException) when (x == 42)
-            {
-                return -42;
-            }
-        }
-
-        private static bool ThrowNullReference()
+    public static void FilterOrder(int x)
+    {
+        bool ThrowException()
         {
             throw new NullReferenceException();
         }
 
-        public static int ExceptionInsideFilter(int x, int y)
+        var a = 0;
+        try
         {
-            var a = 0;
-            try
-            {
-                return x / y;
-            }
-            catch (DivideByZeroException e) when (ThrowNullReference())
-            {
-                a = 3;
-            }
-            finally
-            {
-                a = 5;
-            }
-
-            return a;
-        }
-
-        public static int ReturnMinWithAssert(int x, int y)
-        {
-            Debug.Assert(x <= y);
-            return x;
-        }
-
-        public static int TestWithAssert(int x, int y)
-        {
-            if (x < 0)
-            {
-                Debug.Assert(x <= y);
-            }
-            else
-            {
-                x = y;
-                Debug.Assert(x > y);
-            }
-
-            return x;
-        }
-
-        public static int TestWithNestedFinallyHandlers(int x, int y)
-        {
-            int addition = 1;
-            try
-            {
-            }
-            finally
-            {
-                try
-                {
-                }
-                finally
-                {
-                    addition += 10;
-                }
-
-                addition += 100;
-            }
-
-            return addition;
-        }
-
-        public static void AnotherNestedFinally(int a)
-        {
-            try
-            {
-                a += 10;
-            }
-            finally
-            {
-                try
-                {
-                    a += 100;
-                }
-                finally
-                {
-                }
-            }
-        }
-
-        public static void FilterOrder(int x)
-        {
-            bool ThrowException()
-            {
-                throw new NullReferenceException();
-            }
-
-            var a = 0;
-            try
-            {
-                try
-                {
-                    a = 1;
-                    throw new Exception();
-                }
-                catch (Exception) when (a == 1 && (x & 0b0001) == 0)
-                {
-                    a = 3;
-                }
-                catch (Exception) when (a == 1 && (x & 0b0010) == 0)
-                {
-                    ThrowException();
-                }
-            }
-            catch (Exception) when ((x & 0b0100) == 0 && ThrowException())
-            {
-                a = 4;
-            }
-            catch (Exception) when (a == 3 && (x & 0b1000) == 0)
-            {
-                ThrowException();
-            }
-        }
-
-
-        public static void TwoFilters(int x)
-        {
-            bool ThrowException()
-            {
-                throw new NullReferenceException();
-            }
-
-            var a = 0;
-
             try
             {
                 a = 1;
@@ -223,186 +189,222 @@ namespace IntegrationTests
                 ThrowException();
             }
         }
-
-        public static int TryWith2Leaves(bool f)
+        catch (Exception) when ((x & 0b0100) == 0 && ThrowException())
         {
-            int res = 0;
-            try
-            {
-                if (f)
-                    return 100;
-            }
-            finally
-            {
-                res = 42;
-            }
+            a = 4;
+        }
+        catch (Exception) when (a == 3 && (x & 0b1000) == 0)
+        {
+            ThrowException();
+        }
+    }
 
-            res++;
-            return res;
+
+    public static void TwoFilters(int x)
+    {
+        bool ThrowException()
+        {
+            throw new NullReferenceException();
         }
 
-        private static int Always42() => 42;
-        private static int Always84() => Always42() * 2;
+        var a = 0;
 
-        public static int FilterInsideFinally(bool f)
+        try
         {
-            int globalMemory = 0;
+            a = 1;
+            throw new Exception();
+        }
+        catch (Exception) when (a == 1 && (x & 0b0001) == 0)
+        {
+            a = 3;
+        }
+        catch (Exception) when (a == 1 && (x & 0b0010) == 0)
+        {
+            ThrowException();
+        }
+    }
+
+    public static int TryWith2Leaves(bool f)
+    {
+        int res = 0;
+        try
+        {
+            if (f)
+                return 100;
+        }
+        finally
+        {
+            res = 42;
+        }
+
+        res++;
+        return res;
+    }
+
+    private static int Always42() => 42;
+    private static int Always84() => Always42() * 2;
+
+    public static int FilterInsideFinally(bool f)
+    {
+        int globalMemory = 0;
+        try
+        {
+            globalMemory++;
+        }
+        finally
+        {
             try
+            {
+                globalMemory += 10;
+                throw new Exception();
+            }
+            catch (Exception) when ((globalMemory += 100) > 50 && f && Always42() == 42)
+            {
+                globalMemory += 1000;
+            }
+
+            globalMemory += 10000;
+        }
+
+        globalMemory += 100000;
+        return globalMemory;
+    }
+
+
+    public static int NestedTryCatchFinally()
+    {
+        int globalMemory = 0;
+        try
+        {
+            try
+            {
+                throw new Exception();
+            }
+            catch (Exception)
+            {
+                globalMemory = 42;
+            }
+            finally
             {
                 globalMemory++;
             }
-            finally
-            {
-                try
-                {
-                    globalMemory += 10;
-                    throw new Exception();
-                }
-                catch (Exception) when ((globalMemory += 100) > 50 && f && Always42() == 42)
-                {
-                    globalMemory += 1000;
-                }
-
-                globalMemory += 10000;
-            }
-
-            globalMemory += 100000;
-            return globalMemory;
+        }
+        catch (Exception)
+        {
+            globalMemory = 12;
+        }
+        finally
+        {
+            globalMemory++;
         }
 
+        return globalMemory;
+    }
 
-        public static int NestedTryCatchFinally()
+    public static int ConcreteThrow()
+    {
+        throw new NullReferenceException("Null reference!");
+    }
+
+    public static int ConcreteThrowInCall()
+    {
+        try
         {
-            int globalMemory = 0;
-            try
+            ConcreteThrow();
+        }
+        catch (Exception)
+        {
+            return 1;
+        }
+
+        return 2;
+    }
+
+    public static int CallInsideFinally(bool f)
+    {
+        int res = 0;
+        try
+        {
+            res += Always42();
+        }
+        finally
+        {
+            if (f)
             {
                 try
                 {
-                    throw new Exception();
-                }
-                catch (Exception)
-                {
-                    globalMemory = 42;
+                    res += Always42();
                 }
                 finally
                 {
-                    globalMemory++;
+                    res += Always84();
                 }
             }
-            catch (Exception)
-            {
-                globalMemory = 12;
-            }
-            finally
-            {
-                globalMemory++;
-            }
-
-            return globalMemory;
         }
 
-        public static int ConcreteThrow()
+        return res;
+    }
+
+    private class Disposable : IDisposable
+    {
+        public void Dispose()
         {
-            throw new NullReferenceException("Null reference!");
         }
+    }
 
-        public static int ConcreteThrowInCall()
+    public static int NestedTryBlocks()
+    {
+        var res = 1;
+        try
         {
-            try
-            {
-                ConcreteThrow();
-            }
-            catch (Exception)
-            {
-                return 1;
-            }
-
-            return 2;
-        }
-
-        public static int CallInsideFinally(bool f)
-        {
-            int res = 0;
-            try
-            {
-                res += Always42();
-            }
-            finally
-            {
-                if (f)
-                {
-                    try
-                    {
-                        res += Always42();
-                    }
-                    finally
-                    {
-                        res += Always84();
-                    }
-                }
-            }
-
-            return res;
-        }
-
-        private class Disposable : IDisposable
-        {
-            public void Dispose()
-            {
-            }
-        }
-
-        public static int NestedTryBlocks()
-        {
-            var res = 1;
             try
             {
                 try
                 {
-                    try
+                    using (var a = new Disposable())
                     {
-                        using (var a = new Disposable())
-                        {
-                            throw null;
-                        }
+                        throw null;
                     }
-                    catch (NullReferenceException e)
-                    {
-                        res += e.HResult;
-                    }
-                    catch
-                    {
-                        res += 1;
-                    }
-                    finally
-                    {
-                        res *= 2;
-                    }
+                }
+                catch (NullReferenceException e)
+                {
+                    res += e.HResult;
                 }
                 catch
                 {
-                    res += 2;
+                    res += 1;
                 }
                 finally
                 {
-                    res *= 3;
+                    res *= 2;
                 }
             }
             catch
             {
-                res += 3;
+                res += 2;
             }
             finally
             {
-                res *= 4;
+                res *= 3;
             }
-
-            return res;
+        }
+        catch
+        {
+            res += 3;
+        }
+        finally
+        {
+            res *= 4;
         }
 
-        public static int NestedTryBlocks1(bool f)
+        return res;
+    }
+
+    public static int NestedTryBlocks1(bool f)
+    {
+        var res = 1;
+        try
         {
-            var res = 1;
             try
             {
                 try
@@ -415,67 +417,67 @@ namespace IntegrationTests
                             {
                                 try
                                 {
-                                    try
+                                    using (var a = new Disposable())
                                     {
-                                        using (var a = new Disposable())
-                                        {
-                                            throw null;
-                                        }
+                                        throw null;
                                     }
-                                    catch (NullReferenceException e)
-                                    {
-                                        res += e.HResult;
-                                        if (f) throw null;
-                                    }
-                                    catch
-                                    {
-                                        res += 1;
-                                    }
-                                    finally
-                                    {
-                                        res *= 2;
-                                    }
+                                }
+                                catch (NullReferenceException e)
+                                {
+                                    res += e.HResult;
+                                    if (f) throw null;
                                 }
                                 catch
                                 {
-                                    if (f) throw null;
-                                    res += 2;
+                                    res += 1;
+                                }
+                                finally
+                                {
+                                    res *= 2;
                                 }
                             }
                             catch
                             {
-                                res += 3;
+                                if (f) throw null;
+                                res += 2;
                             }
                         }
                         catch
                         {
-                            res += 4;
+                            res += 3;
                         }
                     }
-                    finally
+                    catch
                     {
-                        res *= 6;
+                        res += 4;
                     }
                 }
                 finally
                 {
-                    res *= 5;
-                    if (f) throw null;
+                    res *= 6;
                 }
             }
             finally
             {
-                res *= 4;
+                res *= 5;
                 if (f) throw null;
             }
-
-            return res;
+        }
+        finally
+        {
+            res *= 4;
+            if (f) throw null;
         }
 
+        return res;
+    }
 
-        public static int NestedTryBlocks2()
+
+    public static int NestedTryBlocks2()
+    {
+        var res = 1;
+        try
         {
-            var res = 1;
             try
             {
                 try
@@ -488,31 +490,24 @@ namespace IntegrationTests
                             {
                                 try
                                 {
-                                    try
+                                    using (var a = new Disposable())
                                     {
-                                        using (var a = new Disposable())
-                                        {
-                                            throw null;
-                                        }
-                                    }
-                                    catch (DivideByZeroException)
-                                    {
-                                        res += 1;
+                                        throw null;
                                     }
                                 }
                                 catch (DivideByZeroException)
                                 {
-                                    res += 2;
+                                    res += 1;
                                 }
                             }
-                            catch (NullReferenceException) when (ThrowNullReference())
+                            catch (DivideByZeroException)
                             {
                                 res += 2;
                             }
                         }
-                        catch (DivideByZeroException)
+                        catch (NullReferenceException) when (ThrowNullReference())
                         {
-                            res += 3;
+                            res += 2;
                         }
                     }
                     catch (DivideByZeroException)
@@ -522,115 +517,119 @@ namespace IntegrationTests
                 }
                 catch (DivideByZeroException)
                 {
-                    res += 4;
-                }
-            }
-            catch (NullReferenceException)
-            {
-                res *= 100;
-            }
-
-            return res;
-        }
-
-        public static int NestedFinally()
-        {
-            var res = 0;
-            try
-            {
-                throw null;
-            }
-            finally
-            {
-                try
-                {
-                    res += 1;
-                }
-                finally
-                {
-                    res += 2;
-                    try
-                    {
-                        res += 3;
-                    }
-                    finally
-                    {
-                        throw null;
-                    }
-                }
-            }
-
-            return res;
-        }
-
-        public static int NestedFilter(int a)
-        {
-            var res = 0;
-            try
-            {
-                throw null;
-            }
-            catch (NullReferenceException e) when (a > 0)
-            {
-                res += 1;
-            }
-            finally
-            {
-                res *= 2;
-            }
-
-            return res;
-        }
-
-        public static int NestedFilter1(int a)
-        {
-            var res = 0;
-            try
-            {
-                throw null;
-            }
-            catch (NullReferenceException e) when (NestedFilter(a) > 0)
-            {
-                res += 1;
-            }
-            finally
-            {
-                res *= 2;
-            }
-
-            return res;
-        }
-
-        public static int NestedTryFinally()
-        {
-            var res = 0;
-            try
-            {
-                try
-                {
-                    ThrowNullReference();
-                }
-                finally
-                {
                     res += 3;
                 }
             }
-            catch (NullReferenceException)
+            catch (DivideByZeroException)
+            {
+                res += 4;
+            }
+        }
+        catch (NullReferenceException)
+        {
+            res *= 100;
+        }
+
+        return res;
+    }
+
+    public static int NestedFinally()
+    {
+        var res = 0;
+        try
+        {
+            throw null;
+        }
+        finally
+        {
+            try
             {
                 res += 1;
             }
             finally
             {
-                res *= 2;
+                res += 2;
+                try
+                {
+                    res += 3;
+                }
+                finally
+                {
+                    throw null;
+                }
             }
-
-            return res;
         }
 
-        public static void ForcedFault()
+        return res;
+    }
+
+    public static int NestedFilter(int a)
+    {
+        var res = 0;
+        try
         {
-            using var d = new Disposable();
             throw null;
         }
+        catch (NullReferenceException e) when (a > 0)
+        {
+            res += 1;
+        }
+        finally
+        {
+            res *= 2;
+        }
+
+        return res;
+    }
+
+    public static int NestedFilter1(int a)
+    {
+        var res = 0;
+        try
+        {
+            throw null;
+        }
+        catch (NullReferenceException e) when (NestedFilter(a) > 0)
+        {
+            res += 1;
+        }
+        finally
+        {
+            res *= 2;
+        }
+
+        return res;
+    }
+
+    public static int NestedTryFinally()
+    {
+        var res = 0;
+        try
+        {
+            try
+            {
+                ThrowNullReference();
+            }
+            finally
+            {
+                res += 3;
+            }
+        }
+        catch (NullReferenceException)
+        {
+            res += 1;
+        }
+        finally
+        {
+            res *= 2;
+        }
+
+        return res;
+    }
+
+    public static void ForcedFault()
+    {
+        using var d = new Disposable();
+        throw null;
     }
 }

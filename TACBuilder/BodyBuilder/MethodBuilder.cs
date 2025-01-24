@@ -56,6 +56,7 @@ class MethodBuilder(IlMethod method)
             }
 
             ComposeTac();
+            EhScopes.ForEach(scope => Debug.Assert(scope.tacLoc.te < scope.tacLoc.hb));
             var idx = 0;
             foreach (var tmp in Temps.SelectMany(keyValuePair => keyValuePair.Value))
             {
@@ -66,6 +67,11 @@ class MethodBuilder(IlMethod method)
         {
             Console.WriteLine(kb.Message + " found at " + (method.DeclaringType?.ToString() ?? " ") + " " +
                               method);
+            return [];
+        }
+        catch
+        {
+            Console.WriteLine(_method.Name + " FAIL");
             return [];
         }
 
@@ -125,9 +131,15 @@ class MethodBuilder(IlMethod method)
                 Tac.Add(line);
             }
 
+            if (bb.TacLines.Count == 0)
+            {
+                ilToTacMapping[bb.Meta.Exit.idx] = Tac.Count;
+                continue;
+            }
 
             if (tacBlocksIndexed.Count > i + 1 && successors.ContainsKey(bb.IlFirst) &&
-                successors[bb.IlFirst].Count > 0 && successors[bb.IlFirst][0] != tacBlocksIndexed[i + 1].Key)
+                successors[bb.IlFirst].Count > 0 && successors[bb.IlFirst][0] != tacBlocksIndexed[i + 1].Key &&
+                bb.TacLines.Last() is not IlLeaveStmt && bb.TacLines.Last() is not IlGotoStmt)
             {
                 Tac.Add(new IlGotoStmt(successors[bb.IlFirst][0]));
             }
@@ -155,7 +167,7 @@ class MethodBuilder(IlMethod method)
                 scope.tacLoc.hb = (int)hbv!;
             if (ilToTacMapping.TryGetValue(scope.ilLoc.he, out var hev))
                 scope.tacLoc.he = (int)hev!;
-            if (scope.tacLoc.hb > scope.tacLoc.he)
+            if (scope.tacLoc.te >= scope.tacLoc.hb || scope.tacLoc.hb > scope.tacLoc.he)
                 Console.WriteLine(method.Name);
         }
     }

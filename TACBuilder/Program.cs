@@ -75,10 +75,8 @@ class Program
         foreach (var file in opts.InputFiles)
             builder.Build(file);
         var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
-        var serialized =
-            RdSerializer.Serialize(IlInstanceBuilder
-                .GetFreshTypes());
-        // typeof(List<int>).IsSubclassOf(typeof(IList<int>))
+        var freshTypes = IlInstanceBuilder.GetFreshTypes();
+        var serialized = RdSerializer.Serialize(freshTypes);
     }
 
     private static void HandleParseError(IEnumerable<Error> errs)

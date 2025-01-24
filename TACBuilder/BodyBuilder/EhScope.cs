@@ -31,6 +31,22 @@ public abstract class EhScope
             };
         }
 
+        public void ShiftRight(int index, int delta)
+        {
+            if (tb > index) tb += delta;
+            if (te > index) te += delta;
+            if (hb > index) hb += delta;
+            if (he > index) he += delta;
+        }
+
+        public void ShiftLeft(int index, int delta)
+        {
+            if (tb > index) tb -= delta;
+            if (te > index) te -= delta;
+            if (hb > index) hb -= delta;
+            if (he > index) he -= delta;
+        }
+
         public override string ToString() => $"loc: {tb} {te} {hb} {he}";
 
         public override int GetHashCode()
@@ -45,6 +61,7 @@ public abstract class EhScope
     }
 
     public ScopeLocation ilLoc, tacLoc = new();
+    public abstract EhScope ShiftedRightAt(int delta);
 }
 
 // TODO check if still needed
@@ -62,6 +79,14 @@ class CatchScope(Type type) : EhScopeWithVarIdx(type)
         return new CatchScope((clause.ehcType as rewriterEhcType.CatchEH)!.type)
         {
             ilLoc = ScopeLocation.FromClause(clause)
+        };
+    }
+
+    public override CatchScope ShiftedRightAt(int delta)
+    {
+        return new CatchScope(type)
+        {
+            tacLoc = { tb = tacLoc.tb + delta, te = tacLoc.te + delta, hb = tacLoc.hb + delta, he = tacLoc.he + delta }
         };
     }
 
@@ -96,6 +121,15 @@ public class FilterScope() : EhScopeWithVarIdx(typeof(Exception))
         return scope;
     }
 
+    public override FilterScope ShiftedRightAt(int delta)
+    {
+        return new FilterScope
+        {
+            fbt = fbt + delta,
+            tacLoc = { tb = tacLoc.tb + delta, te = tacLoc.te + delta, hb = tacLoc.hb + delta, he = tacLoc.he + delta }
+        };
+    }
+
     public override string ToString()
     {
         return $"filter: {tacLoc.ToString()} {fbt}";
@@ -122,6 +156,14 @@ class FaultScope : EhScope
         };
     }
 
+    public override FaultScope ShiftedRightAt(int delta)
+    {
+        return new FaultScope
+        {
+            tacLoc = { tb = tacLoc.tb + delta, te = tacLoc.te + delta, hb = tacLoc.hb + delta, he = tacLoc.he + delta }
+        };
+    }
+
     public override string ToString()
     {
         return $"fault {tacLoc.ToString()}";
@@ -145,6 +187,14 @@ class FinallyScope : EhScope
         return new FinallyScope
         {
             ilLoc = ScopeLocation.FromClause(clause)
+        };
+    }
+
+    public override FinallyScope ShiftedRightAt(int delta)
+    {
+        return new FinallyScope
+        {
+            tacLoc = { tb = tacLoc.tb + delta, te = tacLoc.te + delta, hb = tacLoc.hb + delta, he = tacLoc.he + delta }
         };
     }
 

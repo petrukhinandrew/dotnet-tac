@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using Xunit.Abstractions;
+using Xunit.Sdk;
 
 namespace TACBuilder.Tests.Misc;
 
@@ -45,6 +46,184 @@ public class LogUtilsFixture(ITestOutputHelper testOutputHelper)
 public class Finally(ITestOutputHelper testOutputHelper)
 {
     private LogUtilsFixture logUtils = new(testOutputHelper);
+
+    [Fact]
+    public void InsertAsAdd()
+    {
+        var l = new List<int>();
+        l.Insert(0, 0);
+        l.Insert(1, 1);
+    }
+
+    public void MultipleEndFinally()
+    {
+        try
+        {
+        }
+        finally
+        {
+            var a = Math.Ceiling(1.0 + 4.0);
+            if (a < 5.0)
+            {
+                a -= 1;
+            }
+            else
+            {
+                a += 1;
+            }
+        }
+    }
+
+    [Fact]
+    public void ThrowInFinally()
+    {
+        int x = 1;
+        try
+        {
+            try
+            {
+                throw new NullReferenceException("A");
+            }
+            finally
+            {
+                logUtils.LogFinally(message: "B not thrown Yet");
+                throw new Exception("B");
+            }
+            // inline here 
+        }
+        catch (NullReferenceException ex)
+        {
+            logUtils.LogCatch(message: ex.Message);
+        }
+        catch (Exception ex)
+        {
+            logUtils.LogCatch(message: ex.Message);
+        }
+        finally
+        {
+            // only endfinally -> outter catch + finally  
+        }
+        // 
+    }
+
+    [Fact]
+    public void ThrowInTryUnhandled()
+    {
+        Assert.ThrowsAny<NullReferenceException>(() =>
+        {
+            try
+            {
+                throw null;
+            }
+            finally
+            {
+                logUtils.LogFinally();
+            }
+        });
+    }
+
+    [Fact]
+    public void ThrowInTryCaught()
+    {
+        try
+        {
+            // 1
+            try
+            {
+                // 2
+                throw null;
+            }
+            finally
+            {
+                logUtils.LogFinally();
+            }
+        }
+        catch
+        {
+            logUtils.LogCatch();
+        }
+    }
+
+    [Fact]
+    public void ReturnInTry()
+    {
+        try
+        {
+            logUtils.LogTry();
+            return;
+        }
+        catch
+        {
+            logUtils.LogCatch();
+        }
+        finally
+        {
+            logUtils.LogFinally();
+        }
+
+        logUtils.LogCatch();
+    }
+
+    public void NotNested()
+    {
+        try
+        {
+            logUtils.LogTry();
+        }
+        finally
+        {
+            logUtils.LogFinally();
+        }
+    }
+
+    public void NestedInTry()
+    {
+        try
+        {
+            logUtils.LogTry();
+            try
+            {
+                logUtils.LogTry();
+            }
+            finally
+            {
+                logUtils.LogFinally();
+            }
+
+            logUtils.LogTry();
+        }
+        finally
+        {
+            logUtils.LogFinally();
+        }
+    }
+
+    public void NestedInFinally()
+    {
+        try
+        {
+            logUtils.LogTry();
+            // leave
+        }
+        finally
+        {
+            logUtils.LogFinally();
+            try
+            {
+                logUtils.LogTry();
+                // leave X
+            }
+            finally
+            {
+                logUtils.LogFinally();
+            }
+
+            logUtils.LogFinally();
+        }
+        // finaly
+        // { }
+        // X
+    }
 
     [Fact]
     public void Workaround()
@@ -269,20 +448,60 @@ public class CatchOrdering(ITestOutputHelper testOutputHelper)
     {
         try
         {
-            throw null;
-        }
-        catch (NullReferenceException e)
-        {
-            logUtils.LogCatch();
-            throw;
-        }
-        catch (Exception e)
-        {
-            logUtils.LogCatch();
+            try
+            {
+                throw null;
+            }
+            catch (Exception e)
+            {
+                logUtils.LogCatch();
+            }
+            finally
+            {
+                // logUtils.LogFinally();
+            }
         }
         finally
         {
             logUtils.LogFinally();
+        }
+    }
+}
+
+public class FinallyMultipleExit(ITestOutputHelper testOutputHelper)
+{
+    private LogUtilsFixture logUtils = new(testOutputHelper);
+
+    [Fact]
+    public void Simple()
+    {
+        try
+        {
+            if (TestUtils.ConstTrue())
+            {
+                logUtils.LogTry();
+                return;
+            }
+            else if (TestUtils.ConstFalse())
+            {
+                logUtils.LogTry();
+                return;
+            }
+            else
+            {
+                return;
+            }
+        }
+        finally
+        {
+            if (TestUtils.ConstTrue())
+            {
+                throw null;
+            }
+            else
+            {
+                logUtils.LogFinally();
+            }
         }
     }
 }
