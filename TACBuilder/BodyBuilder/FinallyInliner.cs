@@ -15,6 +15,8 @@ public class FinallyInliner(List<EhScope> scopes) : TacBodyPostProcessor
             .Order(new EhScopeNestingComparer()).Select(s => (FinallyScope)s).ToList();
 
         if (finallyScopes.Count == 0) return lines;
+
+
         foreach (var scope in finallyScopes)
         {
             // reserve finally scope
@@ -30,18 +32,28 @@ public class FinallyInliner(List<EhScope> scopes) : TacBodyPostProcessor
             var shiftIdx = scope.tacLoc.hb;
 
             var currentInlineIdx = scope.tacLoc.he + 1;
-
+            var jumpPool = new Dictionary<int, int>();
             // actual inlining 
             for (var (i, delta) = (scope.tacLoc.tb, 0); i + delta <= scope.tacLoc.te; i++)
             {
                 if (lines[i + delta] is not IlLeaveStmt leaveStmt || leaveStmt.Target <= scope.tacLoc.te) continue;
                 // TODO check if it is not a jump over multiple finally 
+                if (jumpPool.TryGetValue(leaveStmt.Target, out var jumpTgt))
+                {
+                    lines[i + delta] = new IlGotoStmt(jumpTgt);
+                    continue;
+                }
+
+                jumpPool.Add(leaveStmt.Target + scopeSize, currentInlineIdx);
                 lines[i + delta] = new IlGotoStmt(currentInlineIdx);
                 // TODO check goto or leave 
                 lines.InsertRange(currentInlineIdx, scopeLines);
+
+                Scopes.ForEach(s => { s.tacLoc.ShiftRight(currentInlineIdx, scopeSize); });
                 
                 // this should be done after moving all the scopes with shift right
-                var duplicatedScopes = Scopes.Where(s => s.IsNestedInHandler(scope)).Select(s => s.ShiftedRightAt(currentInlineIdx - scope.tacLoc.hb)).ToList();
+                var duplicatedScopes = Scopes.Where(s => s.IsNestedInHandler(scope))
+                    .Select(s => s.ShiftedRightAt(currentInlineIdx - scope.tacLoc.hb)).ToList();
                 Scopes.AddRange(duplicatedScopes);
 
                 for (var j = 0; j < scopeSize; j++)
@@ -62,8 +74,6 @@ public class FinallyInliner(List<EhScope> scopes) : TacBodyPostProcessor
                         lines[currentInlineIdx + j] = new IlGotoStmt(leaveStmt.Target + scopeSize);
                 }
 
-                Scopes.ForEach(s => { s.tacLoc.ShiftRight(currentInlineIdx, scopeSize); });
-
                 foreach (var (line, idx) in lines.Indexed()
                              .Where((_, it) => it < currentInlineIdx || it >= currentInlineIdx + scopeSize))
                 {
@@ -72,19 +82,13 @@ public class FinallyInliner(List<EhScope> scopes) : TacBodyPostProcessor
                         branch.Target += scopeSize;
                     }
                 }
+                
 
                 currentInlineIdx += scopeSize;
                 delta += scopeSize;
             }
         }
 
-        // TODO may fail somehow 
-        // if (!Scopes.Where(s => s is FinallyScope)
-        //     .All(s => lines[s.tacLoc.he] is IlEndFinallyStmt or IlThrowStmt))
-        // {
-        //     Console.WriteLine("finally err");
-        // }
-        // Scopes.RemoveAll(s => s is FinallyScope);
         return lines;
     }
 
@@ -146,6 +150,10 @@ internal static class EhStmtExt
                parentScope.tacLoc.hb <= scope.tacLoc.hb && scope.tacLoc.he <= parentScope.tacLoc.he;
     }
 
+    public static bool IsInSegment(this EhScope scope, int l, int r)
+    {
+        return l <= scope.tacLoc.tb && scope.tacLoc.he <= r;
+    }
     public static bool IsNestedInHandler(this EhScope scope, EhScope parentScope)
     {
         return parentScope.tacLoc.hb <= scope.tacLoc.tb && scope.tacLoc.he <= parentScope.tacLoc.he;

@@ -33,18 +33,18 @@ public abstract class EhScope
 
         public void ShiftRight(int index, int delta)
         {
-            if (tb > index) tb += delta;
-            if (te > index) te += delta;
-            if (hb > index) hb += delta;
-            if (he > index) he += delta;
+            if (tb >= index) tb += delta;
+            if (te >= index) te += delta;
+            if (hb >= index) hb += delta;
+            if (he >= index) he += delta;
         }
 
         public void ShiftLeft(int index, int delta)
         {
-            if (tb > index) tb -= delta;
-            if (te > index) te -= delta;
-            if (hb > index) hb -= delta;
-            if (he > index) he -= delta;
+            if (tb >= index) tb -= delta;
+            if (te >= index) te -= delta;
+            if (hb >= index) hb -= delta;
+            if (he >= index) he -= delta;
         }
 
         public override string ToString() => $"loc: {tb} {te} {hb} {he}";

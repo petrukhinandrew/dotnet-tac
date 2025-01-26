@@ -55,6 +55,23 @@ public class Finally(ITestOutputHelper testOutputHelper)
         l.Insert(1, 1);
     }
 
+    public void SimpleTryCatchFinally()
+    {
+        try
+        {
+            logUtils.LogTry();
+        }
+        catch (Exception e)
+        {
+            logUtils.LogCatch(message: e.Message);
+        }
+        // target
+        finally
+        {
+            logUtils.LogFinally();
+        }
+    }
+
     public void MultipleEndFinally()
     {
         try
@@ -89,7 +106,6 @@ public class Finally(ITestOutputHelper testOutputHelper)
                 logUtils.LogFinally(message: "B not thrown Yet");
                 throw new Exception("B");
             }
-            // inline here 
         }
         catch (NullReferenceException ex)
         {
@@ -99,11 +115,6 @@ public class Finally(ITestOutputHelper testOutputHelper)
         {
             logUtils.LogCatch(message: ex.Message);
         }
-        finally
-        {
-            // only endfinally -> outter catch + finally  
-        }
-        // 
     }
 
     [Fact]
@@ -127,10 +138,8 @@ public class Finally(ITestOutputHelper testOutputHelper)
     {
         try
         {
-            // 1
             try
             {
-                // 2
                 throw null;
             }
             finally

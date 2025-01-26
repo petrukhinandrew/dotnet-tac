@@ -66,6 +66,7 @@ public class IlReturnStmt(IlExpr? retVal) : IlStmt()
 public abstract class IlBranchStmt(int target) : IlStmt()
 {
     public int Target = target;
+    public abstract IlBranchStmt Copy();
 }
 
 /*
@@ -77,6 +78,11 @@ public class IlLeaveStmt(int target) : IlBranchStmt(target)
     {
         return $"leave {Target}";
     }
+
+    public override IlBranchStmt Copy()
+    {
+        return new IlLeaveStmt(Target);
+    }
 }
 
 public class IlGotoStmt(int target) : IlBranchStmt(target)
@@ -84,6 +90,11 @@ public class IlGotoStmt(int target) : IlBranchStmt(target)
     public override string ToString()
     {
         return $"goto {Target}";
+    }
+
+    public override IlBranchStmt Copy()
+    {
+        return new IlGotoStmt(Target);
     }
 }
 
@@ -93,7 +104,12 @@ public class IlIfStmt(IlExpr cond, int target) : IlBranchStmt(target)
 
     public override string ToString()
     {
-        return $"if {cond.ToString()} goto {Target}";
+        return $"if {Condition.ToString()} goto {Target}";
+    }
+
+    public override IlBranchStmt Copy()
+    {
+        return new IlIfStmt(Condition, Target);
     }
 }
 

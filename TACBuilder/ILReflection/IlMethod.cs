@@ -129,15 +129,14 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public override void Construct()
         {
             var builder = new MethodBuilder(method);
-            var lines = builder.Build();
-            var finallyInliner = new FinallyInliner(builder.EhScopes);
-            var leaveConverter = new LeaveStmtConverter();
-            if (method.Name == "NestedInTry")
-            {
-                Console.WriteLine("kek");
-            }
-            Lines = leaveConverter.Process(finallyInliner.Process(lines));
-            method.Scopes = finallyInliner.Scopes;
+            Lines = builder.Build();
+
+            if (!method.IsConstructed || Lines.Count == 0) return;
+
+            // TODO introduce features chain or so 
+
+            var inlineFeature = new TacFinallyInliner(method);
+            inlineFeature.Transform();
         }
     }
 
