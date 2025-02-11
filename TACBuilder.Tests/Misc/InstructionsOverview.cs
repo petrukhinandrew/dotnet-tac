@@ -691,7 +691,7 @@ namespace Usvm.IL.Test.Instructions
                 string sf = "second finally";
             }
         }
-        
+
         public static void TryEndingWithCatch()
         {
             try
@@ -1011,3 +1011,37 @@ class ArrayListIntChild : ArrayListInt;
 // class C<X> : N<N<C<C<X>>>> {
 //     N<C<T>> cast(C<T> c) { return c; }
 // }
+
+public class SlavaCases()
+{
+    public string Source()
+    {
+        return "unsafe data";
+    }
+
+    public string Kek(string arg)
+    {
+        return "";
+    }
+
+    public void Sink(string arg)
+    {
+    }
+
+    public string Id(string arg)
+    {
+        var tmp = arg;
+        arg = "";
+        Kek(arg);
+        return tmp;
+    }
+    
+    public void Test()
+    {
+        var data = Source();
+
+        var result = Id(data);
+
+        Sink(result);
+    }
+}

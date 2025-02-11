@@ -118,8 +118,6 @@ public class TacFinallyInliner(IlMethod method) : TacTransformerIndexImpl(method
         var finallyScopes = GetFinallyScopesSortedByNesting();
 
         if (finallyScopes.Count == 0) return;
-        if (method.Name == "SimpleTryCatchFinally")
-            Console.WriteLine("kek");
         foreach (var scope in finallyScopes)
         {
             var handlerSize = scope.tacLoc.he - scope.tacLoc.hb + 1;

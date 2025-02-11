@@ -514,3 +514,41 @@ public class FinallyMultipleExit(ITestOutputHelper testOutputHelper)
         }
     }
 }
+public class SlavaCases(ITestOutputHelper testOutputHelper)
+{
+    public string Source()
+    {
+        return "unsafe data";
+    }
+
+    public string Kek(string arg)
+    {
+        return "";
+    }
+
+    public void Sink(string arg)
+    {
+    }
+
+    public string Id(string arg)
+    {
+        var tmp = arg;
+        arg = "";
+        Kek(arg);
+        return tmp;
+    }
+
+    [Fact]
+    public void Overview()
+    {
+        testOutputHelper.WriteLine(Id("123"));
+    }
+    public void Test()
+    {
+        var data = Source();
+
+        var result = Id(data);
+
+        Sink(result);
+    }
+}

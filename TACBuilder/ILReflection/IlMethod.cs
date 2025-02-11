@@ -137,6 +137,12 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
             var inlineFeature = new TacFinallyInliner(method);
             inlineFeature.Transform();
+            // TODO maybe introduce another feature
+            Lines = Lines.Select(stmt => stmt switch
+            {
+                IlLeaveStmt lst => new IlGotoStmt(lst.Target),
+                _ => stmt
+            }).ToList();
         }
     }
 
