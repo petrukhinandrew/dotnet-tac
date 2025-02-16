@@ -3,10 +3,10 @@ using TACBuilder.Exprs;
 
 namespace TACBuilder.ILReflection;
 
-public class IlPointerType(Type targetType) : IlType(targetType)
+public class IlPointerType(Type targetType, bool isUnmanaged = true) : IlType(targetType)
 {
-    public override bool IsManaged => false;
-    public override bool IsUnmanaged => true;
+    public override bool IsManaged => !isUnmanaged;
+    public override bool IsUnmanaged => isUnmanaged;
     public IlType TargetType => IlInstanceBuilder.GetType(Type);
     public new string FullName => base.FullName + "*";
 }

@@ -32,7 +32,7 @@ public static class IlInstanceBuilder
         Construct();
         return meta;
     }
-    
+
     public static void AddTypeFilter(Func<Type, bool> filter)
     {
         TypeFilters.Add(filter);
@@ -104,8 +104,10 @@ public static class IlInstanceBuilder
 
     private static IlType CreateIlType(Type type)
     {
-        if (type.IsPointer || type.IsByRef)
+        if (type.IsPointer)
             return new IlPointerType(type.GetElementType()!);
+        if (type.IsByRef)
+            return new IlPointerType(type.GetElementType()!, false);
         if (type.IsPrimitive) return new IlPrimitiveType(type);
         if (type.IsEnum) return new IlEnumType(type);
         if (type.IsValueType) return new IlStructType(type);

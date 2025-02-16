@@ -1044,4 +1044,9 @@ public class SlavaCases()
 
         Sink(result);
     }
+
+    public void StrRef(out string arg)
+    {
+        arg = "kek";
+    }
 }

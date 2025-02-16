@@ -378,8 +378,9 @@ static class BlockTacLineBuilder
                 {
                     IlExpr val = blockBuilder.Pop();
                     IlValue addr = (IlValue)blockBuilder.Pop();
+                    // TODO check if there is another type fetch option 
                     blockBuilder.NewLine(new ILAssignStmt(
-                        PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(object))),
+                        PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(val.Type.Type)),
                         val));
                     break;
                 }
