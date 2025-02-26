@@ -61,6 +61,7 @@ public class RdConnection(AppTacBuilder builder)
                     ilModel.GetIlSigModel().Close.Advise(lifetime, () =>
                     {
                         Console.WriteLine(".net start terminating");
+                        _lifetimeDef.Terminate();
                         Environment.Exit(0);
                     });
                 });

@@ -46,7 +46,7 @@ public class IlErrVar(IlType type, int index) : IlVar
     }
 }
 
-public class IlMerged(string name) : IlValue
+public class IlMerged(string name) : IlSimpleValue
 {
     private string _name = name;
     private IlType? _type;

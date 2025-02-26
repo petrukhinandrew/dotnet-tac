@@ -115,7 +115,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
     public void Push(IlExpr expr, int optInstrIdx = -1)
     {
         var instrIdx = optInstrIdx == -1 ? CurInstr.idx : optInstrIdx;
-        if (expr is IlValue)
+        if (expr is IlSimpleValue)
         {
             _stack.Push(expr.Coerced());
         }

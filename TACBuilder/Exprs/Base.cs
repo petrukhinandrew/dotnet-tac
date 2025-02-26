@@ -15,7 +15,11 @@ public interface IlExpr
 
 public interface IlValue : IlExpr;
 
-public interface IlLocal : IlValue;
+public interface IlSimpleValue : IlValue;
+
+public interface IlComplexValue : IlValue;
+
+public interface IlLocal : IlSimpleValue;
 
 public interface IlVar : IlLocal
 {

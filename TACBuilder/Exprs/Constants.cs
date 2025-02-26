@@ -6,7 +6,7 @@ using TACBuilder.Utils;
 
 namespace TACBuilder.Exprs;
 
-public interface IlConstant : IlValue
+public interface IlConstant : IlSimpleValue
 {
     public static IlConstant From(object? obj)
     {

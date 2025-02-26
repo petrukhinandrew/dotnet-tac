@@ -2,12 +2,12 @@ using TACBuilder.ILReflection;
 
 namespace TACBuilder.Exprs;
 
-public interface ILRefExpr : IlValue
+public interface ILRefExpr : IlComplexValue
 {
     public IlExpr Value { get; }
 }
 
-public interface ILDerefExpr : IlValue
+public interface ILDerefExpr : IlComplexValue
 {
     public IlExpr Value { get; }
 }

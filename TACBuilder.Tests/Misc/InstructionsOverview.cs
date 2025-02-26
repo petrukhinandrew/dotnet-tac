@@ -1035,7 +1035,7 @@ public class SlavaCases()
         Kek(arg);
         return tmp;
     }
-    
+
     public void Test()
     {
         var data = Source();
@@ -1048,5 +1048,60 @@ public class SlavaCases()
     public void StrRef(out string arg)
     {
         arg = "kek";
+    }
+
+    public struct NullCheckStruct
+    {
+        public int X;
+    }
+
+    public class NullCheckClass;
+    public enum NullCheckEnum
+    {
+        Kek, Lol
+    }
+    [Fact]
+    public int NullabilityCheck()
+    {
+        NullCheckClass unsound = new NullCheckClass();
+        NullCheckStruct? mbNull = null;
+        mbNull = null;
+        mbNull = new NullCheckStruct();
+        int[] kek = null;
+        return mbNull.Value.X;
+    }
+
+    public int TestField = 1;
+
+    public int FieldWorkaround(int a, int b)
+    {
+        TestField = a + b * 2;
+        a = TestField - 1;
+        b += a;
+        TestField = b - a;
+        return TestField;
+    }
+}
+
+[AttributeUsage(AttributeTargets.Method)]
+public class SastMethodTest() : Attribute
+{
+    public bool ExpectedVulnerability;
+}
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+public class SastClassTest : Attribute;
+
+[SastClassTest]
+public class SaastOverviewTest
+{
+    [SastMethodTest(ExpectedVulnerability = true)]
+    public void MyFirstTest()
+    {
+    }
+
+    [SastMethodTest(ExpectedVulnerability = false)]
+    public void MySecondTest()
+    {
     }
 }

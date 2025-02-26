@@ -35,7 +35,7 @@ public class IlNewArrayExpr(IlArrayType type, IlExpr size) : IlExpr
     }
 }
 
-public class IlFieldAccess(IlField field, IlExpr? instance = null) : IlValue
+public class IlFieldAccess(IlField field, IlExpr? instance = null) : IlComplexValue
 {
     public IlField Field => field;
     public IlType DeclaringType => field.DeclaringType;
@@ -65,7 +65,7 @@ public class IlFieldAccess(IlField field, IlExpr? instance = null) : IlValue
     }
 }
 
-public class IlArrayAccess(IlExpr arrRef, IlExpr idx) : IlValue
+public class IlArrayAccess(IlExpr arrRef, IlExpr idx) : IlComplexValue
 {
     public IlType Type => (arrRef.Type as IlArrayType)?.ElementType ??
                           throw new Exception($"not an array type: {arrRef} with {arrRef.Type}");
