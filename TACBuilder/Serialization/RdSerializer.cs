@@ -239,7 +239,7 @@ public static class RdSerializer
     {
         return stmt switch
         {
-            ILAssignStmt assignStmt => new IlAssignStmtDto(lhv: (IlValueDto)SerializeExpr(assignStmt.Lhs),
+            IlAssignStmt assignStmt => new IlAssignStmtDto(lhv: (IlValueDto)SerializeExpr(assignStmt.Lhs),
                 rhv: SerializeExpr(assignStmt.Rhs)),
             IlCallStmt callStmt => new IlCallStmtDto((IlCallDto)callStmt.Call.SerializeExpr()),
             IlCalliStmt calliStmt => new IlCalliStmtDto((IlCalliDto)calliStmt.Call.SerializeExpr()),

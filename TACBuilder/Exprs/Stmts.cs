@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using org.jacodb.api.net.generated.models;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
@@ -21,11 +22,10 @@ public abstract class IlStmt()
     }
 }
 
-public class ILAssignStmt(IlValue lhs, IlExpr rhs) : IlStmt()
+public class IlAssignStmt(IlValue lhs, IlExpr rhs) : IlStmt()
 {
     public readonly IlValue Lhs = lhs;
     public readonly IlExpr Rhs = rhs;
-
     public override string ToString()
     {
         return Lhs.ToString() + " = " + Rhs.ToString();

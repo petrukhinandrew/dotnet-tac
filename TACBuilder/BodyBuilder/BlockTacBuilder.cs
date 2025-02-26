@@ -104,7 +104,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
         pos = pos == -1 ? TacLines.Count : pos;
         TacLines.InsertRange(pos,
             _extraAssignments.OrderBy(p => p.Key.ToString())
-                .Select(p => new ILAssignStmt(p.Key, p.Value)));
+                .Select(p => new IlAssignStmt(p.Key, p.Value)));
     }
 
     public IlExpr Pop()
@@ -122,7 +122,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
         else
         {
             var tmp = GetNewTemp(expr, instrIdx);
-            NewLine(new ILAssignStmt(tmp, expr));
+            NewLine(new IlAssignStmt(tmp, expr));
             _stack.Push(tmp.Coerced());
         }
     }

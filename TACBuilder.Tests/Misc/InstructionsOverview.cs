@@ -1083,6 +1083,15 @@ public class SlavaCases()
     }
 }
 
+public class RomaCases()
+{
+    public int Ge(int a, int b, bool flag)
+    {
+        if (flag) return 0;
+        return a >= b ? 1 : 0;
+    }
+}
+
 [AttributeUsage(AttributeTargets.Method)]
 public class SastMethodTest() : Attribute
 {
