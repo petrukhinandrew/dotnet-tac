@@ -22,10 +22,19 @@ public abstract class IlStmt()
     }
 }
 
-public class IlAssignStmt(IlValue lhs, IlExpr rhs) : IlStmt()
+public class IlAssignStmt : IlStmt
 {
-    public readonly IlValue Lhs = lhs;
-    public readonly IlExpr Rhs = rhs;
+    public readonly IlValue Lhs;
+    public readonly IlExpr Rhs;
+
+    public IlAssignStmt(IlValue lhs, IlExpr rhs)
+    {
+        Lhs = lhs;
+        Rhs = rhs;
+        Debug.Assert(!(lhs is IlComplexValue && rhs is IlComplexValue));
+        Debug.Assert(lhs is IlSimpleValue || rhs is IlSimpleValue or not IlValue);
+    }
+
     public override string ToString()
     {
         return Lhs.ToString() + " = " + Rhs.ToString();
