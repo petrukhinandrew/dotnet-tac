@@ -2,12 +2,12 @@ using TACBuilder.ILReflection;
 
 namespace TACBuilder.Exprs;
 
-public interface ILRefExpr : IlComplexValue
+public interface ILRefExpr : IlSimpleValue
 {
     public IlExpr Value { get; }
 }
 
-public interface ILDerefExpr : IlComplexValue
+public interface ILDerefExpr : IlSimpleValue
 {
     public IlExpr Value { get; }
 }
@@ -24,6 +24,9 @@ public abstract class PointerExprTypeResolver
         };
     }
 }
+// call (managedRef) no temp
+// managedRef = ...
+// var = managedRef + 1
 
 public class IlManagedRef(IlExpr value) : ILRefExpr
 {
@@ -38,7 +41,7 @@ public class IlManagedRef(IlExpr value) : ILRefExpr
     }
 }
 
-public class IlUnmanagedRef(IlExpr value) : ILRefExpr
+public class IlUnmanagedRef(IlExpr value) : ILRefExpr, IlComplexValue
 {
     public IlExpr Value => value;
 
@@ -65,7 +68,7 @@ public class IlManagedDeref(IlExpr byRefVal) : ILDerefExpr
     }
 }
 
-public class IlUnmanagedDeref : ILDerefExpr
+public class IlUnmanagedDeref : ILDerefExpr, IlComplexValue
 {
     public IlUnmanagedDeref(IlExpr pointedVal, IlType expectedType)
     {

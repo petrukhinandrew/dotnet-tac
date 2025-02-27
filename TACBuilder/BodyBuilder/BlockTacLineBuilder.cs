@@ -985,8 +985,7 @@ static class BlockTacLineBuilder
                     IlExpr lhs = blockBuilder.Pop();
                     IlExpr rhs = IlConstant.BrFalseWith(lhs);
                     ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCneOp(lhs, rhs), tb.idx));
+                    blockBuilder.NewLine(new IlIfStmt(new IlCneOp(lhs, rhs), tb.idx));
                     return true;
                 }
                 case "brnull":
@@ -999,8 +998,7 @@ static class BlockTacLineBuilder
                     IlExpr lhs = blockBuilder.Pop();
                     IlExpr rhs = IlConstant.BrFalseWith(lhs);
                     ILInstr tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCeqOp(lhs, rhs), tb.idx));
+                    blockBuilder.NewLine(new IlIfStmt(new IlCeqOp(lhs, rhs), tb.idx));
                     return true;
                 }
                 case "newobj":
