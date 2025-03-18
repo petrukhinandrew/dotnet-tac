@@ -147,6 +147,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     }
 
     public IlType? DeclaringType { get; private set; }
+    public IlMethod? BaseMethod { get; private set; }
     public List<IlAttribute> Attributes { get; private set; }
     public List<IlType> GenericArgs { get; } = new();
     public IlType? ReturnType { get; private set; }
@@ -196,6 +197,16 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     {
         if (IsConstructed) return;
         DeclaringType = IlInstanceBuilder.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
+        if (_methodBase is MethodInfo methodInfo)
+        {
+            BaseMethod = IlInstanceBuilder.GetMethod(methodInfo);
+            ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
+        }
+        else
+        {
+            ReturnType = IlInstanceBuilder.GetType(typeof(void));
+        }
+        
         Logger.LogInformation("Constructing {Type} {Name}", DeclaringType.Name, Name);
         Attributes = _methodBase.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
@@ -207,11 +218,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
                 GenericArgs.Add(IlInstanceBuilder.GetType(arg));
             }
         }
-
-        ReturnType = _methodBase is MethodInfo methodInfo
-            ? IlInstanceBuilder.GetType(methodInfo.ReturnType)
-            : IlInstanceBuilder.GetType(typeof(void));
-
+        
         Debug.Assert(Parameters.Count == 0);
 
         var explicitThis = _methodBase.CallingConvention.HasFlag(CallingConventions.ExplicitThis);

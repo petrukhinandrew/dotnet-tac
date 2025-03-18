@@ -1056,10 +1056,13 @@ public class SlavaCases()
     }
 
     public class NullCheckClass;
+
     public enum NullCheckEnum
     {
-        Kek, Lol
+        Kek,
+        Lol
     }
+
     [Fact]
     public int NullabilityCheck()
     {
@@ -1081,6 +1084,34 @@ public class SlavaCases()
         TestField = b - a;
         return TestField;
     }
+
+    public struct StorageStruct(string v)
+    {
+        public string V = v;
+        public string VV = v + "kek";
+        public string Get() => V;
+    }
+
+    public void WriteStructRef(ref StorageStruct s, string str)
+    {
+        s.V = str;
+        var t = 1;
+        ref var x = ref t;
+        ManagedAdd(ref x);
+        x += 1;
+    }
+
+    public void UnexpectedThis()
+    {
+        var s = new StorageStruct("");
+        WriteStructRef(ref s, Source());
+        Sink(s.Get());
+    } 
+    public void ManagedAdd(ref int x)
+    {
+        var xXx = x + 1;
+        x += 1;
+    }
 }
 
 public class RomaCases()
@@ -1089,6 +1120,24 @@ public class RomaCases()
     {
         if (flag) return 0;
         return a >= b ? 1 : 0;
+    }
+
+    public int Shl(int a, int b)
+    {
+        if (a != 0 || b >= 0)
+        {
+            return a << b;
+        }
+
+        return 0;
+    }
+
+    public unsafe int InconsistentPtr(int a, int i)
+    {
+        var ptr = &a;
+        var casted = (byte*)ptr;
+        *(int*)(casted + i) = 322;
+        return 0;
     }
 }
 

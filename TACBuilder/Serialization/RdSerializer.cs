@@ -444,7 +444,8 @@ public static class RdSerializer
                 return res;
             }).ToList(),
             rawInstList: SerializeMethodBody(method),
-            isConstructed: method.IsConstructed
+            isConstructed: method.IsConstructed,
+            baseMethod: method.BaseMethod.GetRefIdNullable() 
         );
     }
 }
@@ -476,5 +477,10 @@ static class KeyBuilder
     public static InstanceId GetRefId(this IlMethod method)
     {
         return new InstanceId(type: method.DeclaringType!.GetTypeId(), name: method.Signature);
+    }
+
+    public static InstanceId? GetRefIdNullable(this IlMethod? method)
+    {
+        return method is null ? null : GetRefId(method);
     }
 }

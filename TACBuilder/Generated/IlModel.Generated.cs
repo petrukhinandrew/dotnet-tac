@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => -5233379986265628042L;
+    protected override long SerializationHash => -1338205526355587415L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -1912,6 +1912,7 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public List<IlEhScopeDto> EhScopes {get; private set;}
     [NotNull] public List<IlStmtDto> RawInstList {get; private set;}
     public bool IsConstructed {get; private set;}
+    [Nullable] public InstanceId BaseMethod {get; private set;}
     
     //private fields
     //primary constructor
@@ -1931,7 +1932,8 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] List<IlErrVarDto> errs,
       [NotNull] List<IlEhScopeDto> ehScopes,
       [NotNull] List<IlStmtDto> rawInstList,
-      bool isConstructed
+      bool isConstructed,
+      [Nullable] InstanceId baseMethod
     )
     {
       if (returnType == null) throw new ArgumentNullException("returnType");
@@ -1962,6 +1964,7 @@ namespace org.jacodb.api.net.generated.models
       EhScopes = ehScopes;
       RawInstList = rawInstList;
       IsConstructed = isConstructed;
+      BaseMethod = baseMethod;
     }
     //secondary constructor
     //deconstruct trait
@@ -1985,7 +1988,8 @@ namespace org.jacodb.api.net.generated.models
       var ehScopes = ReadIlEhScopeDtoList(ctx, reader);
       var rawInstList = ReadIlStmtDtoList(ctx, reader);
       var isConstructed = reader.ReadBool();
-      var _result = new IlMethodDto(returnType, attrs, isStatic, isGeneric, isGenericDefinition, signature, name, parameters, genericArgs, resolved, locals, temps, errs, ehScopes, rawInstList, isConstructed);
+      var baseMethod = ReadInstanceIdNullable(ctx, reader);
+      var _result = new IlMethodDto(returnType, attrs, isStatic, isGeneric, isGenericDefinition, signature, name, parameters, genericArgs, resolved, locals, temps, errs, ehScopes, rawInstList, isConstructed, baseMethod);
       return _result;
     };
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -1996,6 +2000,7 @@ namespace org.jacodb.api.net.generated.models
     public static CtxReadDelegate<List<IlErrVarDto>> ReadIlErrVarDtoList = IlErrVarDto.Read.List();
     public static CtxReadDelegate<List<IlEhScopeDto>> ReadIlEhScopeDtoList = IlEhScopeDto.Read.List();
     public static CtxReadDelegate<List<IlStmtDto>> ReadIlStmtDtoList = IlStmtDto.Read.List();
+    public static CtxReadDelegate<InstanceId> ReadInstanceIdNullable = InstanceId.Read.NullableClass();
     
     public static new CtxWriteDelegate<IlMethodDto> Write = (ctx, writer, value) => 
     {
@@ -2015,6 +2020,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlEhScopeDtoList(ctx, writer, value.EhScopes);
       WriteIlStmtDtoList(ctx, writer, value.RawInstList);
       writer.Write(value.IsConstructed);
+      WriteInstanceIdNullable(ctx, writer, value.BaseMethod);
     };
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
     public static  CtxWriteDelegate<List<IlParameterDto>> WriteIlParameterDtoList = IlParameterDto.Write.List();
@@ -2024,6 +2030,7 @@ namespace org.jacodb.api.net.generated.models
     public static  CtxWriteDelegate<List<IlErrVarDto>> WriteIlErrVarDtoList = IlErrVarDto.Write.List();
     public static  CtxWriteDelegate<List<IlEhScopeDto>> WriteIlEhScopeDtoList = IlEhScopeDto.Write.List();
     public static  CtxWriteDelegate<List<IlStmtDto>> WriteIlStmtDtoList = IlStmtDto.Write.List();
+    public static  CtxWriteDelegate<InstanceId> WriteInstanceIdNullable = InstanceId.Write.NullableClass();
     
     //constants
     
@@ -2041,7 +2048,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && IsStatic == other.IsStatic && IsGeneric == other.IsGeneric && IsGenericDefinition == other.IsGenericDefinition && Signature == other.Signature && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && GenericArgs.SequenceEqual(other.GenericArgs) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList) && IsConstructed == other.IsConstructed;
+      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && IsStatic == other.IsStatic && IsGeneric == other.IsGeneric && IsGenericDefinition == other.IsGenericDefinition && Signature == other.Signature && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && GenericArgs.SequenceEqual(other.GenericArgs) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList) && IsConstructed == other.IsConstructed && Equals(BaseMethod, other.BaseMethod);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2064,6 +2071,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + EhScopes.ContentHashCode();
         hash = hash * 31 + RawInstList.ContentHashCode();
         hash = hash * 31 + IsConstructed.GetHashCode();
+        hash = hash * 31 + (BaseMethod != null ? BaseMethod.GetHashCode() : 0);
         return hash;
       }
     }
@@ -2088,6 +2096,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("ehScopes = "); EhScopes.PrintEx(printer); printer.Println();
         printer.Print("rawInstList = "); RawInstList.PrintEx(printer); printer.Println();
         printer.Print("isConstructed = "); IsConstructed.PrintEx(printer); printer.Println();
+        printer.Print("baseMethod = "); BaseMethod.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -3014,7 +3023,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:150</p>
+  /// <p>Generated from: IlModel.kt:151</p>
   /// </summary>
   public sealed class IlSignatureDto : IlDto
   {
