@@ -1,6 +1,8 @@
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using TACBuilder.Exprs;
 using TACBuilder.Utils;
@@ -28,9 +30,15 @@ public class IlType(Type type) : IlMember(type)
         System.Reflection.BindingFlags.DeclaredOnly;
 
     public IlType? DeclaringType { get; private set; }
+    
+    public int Size { get; private set; }
+    
     public IlMethod? DeclaringMethod { get; private set; }
+    
     public IlType? BaseType { get; private set; }
+    
     public List<IlType> Interfaces { get; } = [];
+    
     public List<IlType> GenericArgs = [];
 
     public IlType? GenericDefinition;
@@ -44,7 +52,9 @@ public class IlType(Type type) : IlMember(type)
         {
             DeclaringType = IlInstanceBuilder.GetType(_type.DeclaringType);
         }
-
+        
+        Size = SizeOf(_type);
+        
         if (_type.IsGenericParameter && _type.DeclaringMethod != null)
         {
             DeclaringMethod = IlInstanceBuilder.GetMethod(_type.DeclaringMethod);
@@ -90,6 +100,12 @@ public class IlType(Type type) : IlMember(type)
         IsConstructed = true;
     }
 
+    private int SizeOf(Type type)
+    {
+        // if (type == typeof(IntPtr) || type == typeof(UIntPtr) || type.IsByRef )
+        return 0;
+    }
+    
     public IlAssembly DeclaringAssembly { get; private set; }
     public string AsmName => _type.Assembly.GetName().ToString();
 

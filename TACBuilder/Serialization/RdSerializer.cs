@@ -445,7 +445,8 @@ public static class RdSerializer
             }).ToList(),
             rawInstList: SerializeMethodBody(method),
             isConstructed: method.IsConstructed,
-            baseMethod: method.BaseMethod.GetRefIdNullable() 
+            baseMethod: method.BaseMethod.GetRefIdNullable(),
+            isVirtual: method._methodBase.IsVirtual
         );
     }
 }

@@ -11,7 +11,7 @@ namespace TACBuilder.ILReflection;
 
 public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 {
-    private readonly MethodBase _methodBase = methodBase;
+    public readonly MethodBase _methodBase = methodBase;
 
     public interface IParameter
     {
@@ -199,7 +199,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         DeclaringType = IlInstanceBuilder.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
         if (_methodBase is MethodInfo methodInfo)
         {
-            BaseMethod = IlInstanceBuilder.GetMethod(methodInfo);
+            BaseMethod = IlInstanceBuilder.GetMethod(methodInfo.GetBaseDefinition());
             ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
         }
         else

@@ -1,6 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Reflection.Metadata;
+using System.Runtime.CompilerServices;
 
 namespace TACBuilder.ILReflection;
 
@@ -92,7 +93,7 @@ public static class IlInstanceBuilder
         var asm = _assemblyCache.Get(assemblyName);
         return GetAssembly(asm);
     }
-
+    
     internal static IlType GetType(Type type)
     {
         if (_cache.TryGetType(type, out var meta)) return meta;
