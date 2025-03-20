@@ -113,7 +113,7 @@ public class IlType(Type type) : IlMember(type)
 
     public new readonly string Name = type.Name;
 
-    public string FullName => ConstructFullName();
+    public virtual string FullName => ConstructFullName();
 
     private string ConstructFullName()
     {

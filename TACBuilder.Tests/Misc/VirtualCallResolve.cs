@@ -4,11 +4,12 @@ using Xunit.Abstractions;
 namespace TACBuilder.Tests.Misc;
 
 public class AParam;
-public class BParam: AParam;
+
+public class BParam : AParam;
 
 public class A(ITestOutputHelper helper)
 {
-    public virtual AParam Kek(BParam p)
+    public AParam Kek(BParam p)
     {
         helper.WriteLine("Akek");
         return new AParam();
@@ -17,11 +18,13 @@ public class A(ITestOutputHelper helper)
 
 public class B(ITestOutputHelper helper) : A(helper)
 {
-    public override BParam Kek(BParam p)
+    public new virtual BParam Kek(BParam p)
     {
         return new BParam();
     }
 }
+
+
 
 public class VirtualCallResolve(ITestOutputHelper helper)
 {

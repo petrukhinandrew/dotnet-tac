@@ -8,7 +8,7 @@ public class IlPointerType(Type targetType, bool isUnmanaged = true) : IlType(ta
     public override bool IsManaged => !isUnmanaged;
     public override bool IsUnmanaged => isUnmanaged;
     public IlType TargetType => IlInstanceBuilder.GetType(Type);
-    public new string FullName => base.FullName + "*";
+    public override string FullName => (isUnmanaged ? "*" : "&") +  base.FullName;
 }
 
 public class IlValueType(Type type) : IlType(type);

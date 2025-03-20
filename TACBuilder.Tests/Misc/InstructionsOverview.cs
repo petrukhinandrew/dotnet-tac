@@ -1106,13 +1106,15 @@ public class SlavaCases()
         var s = new StorageStruct("");
         WriteStructRef(ref s, Source());
         Sink(s.Get());
-    } 
+    }
+
     public void ManagedAdd(ref int x)
     {
         var xXx = x + 1;
         x += 1;
     }
 }
+
 
 public class RomaCases()
 {
@@ -1138,6 +1140,18 @@ public class RomaCases()
         var casted = (byte*)ptr;
         *(int*)(casted + i) = 322;
         return 0;
+    }
+
+    class ManagedInstance
+    {
+    }
+
+    [Fact]
+    public unsafe void RawPointerToManagedInstance()
+    {
+        ManagedInstance i = new ManagedInstance();
+        var ptr = &i;
+        ref var m = ref i;
     }
 }
 
