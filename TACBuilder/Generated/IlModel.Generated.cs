@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => -4398620885872587098L;
+    protected override long SerializationHash => -2569662940650366085L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -119,7 +119,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:85</p>
+  /// <p>Generated from: IlModel.kt:87</p>
   /// </summary>
   public sealed class IlArrayTypeDto : IlReferenceTypeDto
   {
@@ -143,7 +143,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -170,7 +172,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -208,7 +212,9 @@ namespace org.jacodb.api.net.generated.models
       var baseType = ReadTypeIdNullable(ctx, reader);
       var interfaces = ReadTypeIdList(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
+      var isInterface = reader.ReadBool();
       var isGenericType = reader.ReadBool();
+      var genericParameterConstraints = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isGenericDefinition = reader.ReadBool();
       var genericDefinition = ReadTypeIdNullable(ctx, reader);
@@ -223,7 +229,7 @@ namespace org.jacodb.api.net.generated.models
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
       var elementType = TypeId.Read(ctx, reader);
-      var _result = new IlArrayTypeDto(elementType, asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isGenericType, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlArrayTypeDto(elementType, asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -246,7 +252,9 @@ namespace org.jacodb.api.net.generated.models
       WriteTypeIdNullable(ctx, writer, value.BaseType);
       WriteTypeIdList(ctx, writer, value.Interfaces);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsInterface);
       writer.Write(value.IsGenericType);
+      WriteTypeIdList(ctx, writer, value.GenericParameterConstraints);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsGenericDefinition);
       WriteTypeIdNullable(ctx, writer, value.GenericDefinition);
@@ -284,7 +292,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(ElementType, other.ElementType) && AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericType == other.IsGenericType && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(ElementType, other.ElementType) && AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -304,7 +312,9 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + (BaseType != null ? BaseType.GetHashCode() : 0);
         hash = hash * 31 + Interfaces.ContentHashCode();
         hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsInterface.GetHashCode();
         hash = hash * 31 + IsGenericType.GetHashCode();
+        hash = hash * 31 + GenericParameterConstraints.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsGenericDefinition.GetHashCode();
         hash = hash * 31 + (GenericDefinition != null ? GenericDefinition.GetHashCode() : 0);
@@ -339,7 +349,9 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("baseType = "); BaseType.PrintEx(printer); printer.Println();
         printer.Print("interfaces = "); Interfaces.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isInterface = "); IsInterface.PrintEx(printer); printer.Println();
         printer.Print("isGenericType = "); IsGenericType.PrintEx(printer); printer.Println();
+        printer.Print("genericParameterConstraints = "); GenericParameterConstraints.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
         printer.Print("genericDefinition = "); GenericDefinition.PrintEx(printer); printer.Println();
@@ -367,7 +379,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:89</p>
+  /// <p>Generated from: IlModel.kt:91</p>
   /// </summary>
   public sealed class IlAttrDto : IlDto
   {
@@ -486,7 +498,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:134</p>
+  /// <p>Generated from: IlModel.kt:136</p>
   /// </summary>
   public sealed class IlCatchScopeDto : IlEhScopeDto
   {
@@ -583,7 +595,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:83</p>
+  /// <p>Generated from: IlModel.kt:85</p>
   /// </summary>
   public sealed class IlClassTypeDto : IlReferenceTypeDto
   {
@@ -605,7 +617,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -632,7 +646,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -667,7 +683,9 @@ namespace org.jacodb.api.net.generated.models
       var baseType = ReadTypeIdNullable(ctx, reader);
       var interfaces = ReadTypeIdList(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
+      var isInterface = reader.ReadBool();
       var isGenericType = reader.ReadBool();
+      var genericParameterConstraints = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isGenericDefinition = reader.ReadBool();
       var genericDefinition = ReadTypeIdNullable(ctx, reader);
@@ -681,7 +699,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlClassTypeDto(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isGenericType, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlClassTypeDto(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -704,7 +722,9 @@ namespace org.jacodb.api.net.generated.models
       WriteTypeIdNullable(ctx, writer, value.BaseType);
       WriteTypeIdList(ctx, writer, value.Interfaces);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsInterface);
       writer.Write(value.IsGenericType);
+      WriteTypeIdList(ctx, writer, value.GenericParameterConstraints);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsGenericDefinition);
       WriteTypeIdNullable(ctx, writer, value.GenericDefinition);
@@ -741,7 +761,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericType == other.IsGenericType && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -760,7 +780,9 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + (BaseType != null ? BaseType.GetHashCode() : 0);
         hash = hash * 31 + Interfaces.ContentHashCode();
         hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsInterface.GetHashCode();
         hash = hash * 31 + IsGenericType.GetHashCode();
+        hash = hash * 31 + GenericParameterConstraints.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsGenericDefinition.GetHashCode();
         hash = hash * 31 + (GenericDefinition != null ? GenericDefinition.GetHashCode() : 0);
@@ -794,7 +816,9 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("baseType = "); BaseType.PrintEx(printer); printer.Println();
         printer.Print("interfaces = "); Interfaces.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isInterface = "); IsInterface.PrintEx(printer); printer.Println();
         printer.Print("isGenericType = "); IsGenericType.PrintEx(printer); printer.Println();
+        printer.Print("genericParameterConstraints = "); GenericParameterConstraints.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
         printer.Print("genericDefinition = "); GenericDefinition.PrintEx(printer); printer.Println();
@@ -913,7 +937,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:127</p>
+  /// <p>Generated from: IlModel.kt:129</p>
   /// </summary>
   public abstract class IlEhScopeDto : IlDto
   {
@@ -1052,7 +1076,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:72</p>
+  /// <p>Generated from: IlModel.kt:74</p>
   /// </summary>
   public sealed class IlEnumTypeDto : IlValueTypeDto
   {
@@ -1080,7 +1104,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -1107,7 +1133,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -1149,7 +1177,9 @@ namespace org.jacodb.api.net.generated.models
       var baseType = ReadTypeIdNullable(ctx, reader);
       var interfaces = ReadTypeIdList(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
+      var isInterface = reader.ReadBool();
       var isGenericType = reader.ReadBool();
+      var genericParameterConstraints = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isGenericDefinition = reader.ReadBool();
       var genericDefinition = ReadTypeIdNullable(ctx, reader);
@@ -1166,7 +1196,7 @@ namespace org.jacodb.api.net.generated.models
       var underlyingType = TypeId.Read(ctx, reader);
       var names = ReadStringList(ctx, reader);
       var values = ReadIlConstDtoList(ctx, reader);
-      var _result = new IlEnumTypeDto(underlyingType, names, values, asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isGenericType, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlEnumTypeDto(underlyingType, names, values, asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<List<string>> ReadStringList = JetBrains.Rd.Impl.Serializers.ReadString.List();
@@ -1191,7 +1221,9 @@ namespace org.jacodb.api.net.generated.models
       WriteTypeIdNullable(ctx, writer, value.BaseType);
       WriteTypeIdList(ctx, writer, value.Interfaces);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsInterface);
       writer.Write(value.IsGenericType);
+      WriteTypeIdList(ctx, writer, value.GenericParameterConstraints);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsGenericDefinition);
       WriteTypeIdNullable(ctx, writer, value.GenericDefinition);
@@ -1233,7 +1265,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(UnderlyingType, other.UnderlyingType) && Names.SequenceEqual(other.Names) && Values.SequenceEqual(other.Values) && AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericType == other.IsGenericType && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(UnderlyingType, other.UnderlyingType) && Names.SequenceEqual(other.Names) && Values.SequenceEqual(other.Values) && AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1255,7 +1287,9 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + (BaseType != null ? BaseType.GetHashCode() : 0);
         hash = hash * 31 + Interfaces.ContentHashCode();
         hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsInterface.GetHashCode();
         hash = hash * 31 + IsGenericType.GetHashCode();
+        hash = hash * 31 + GenericParameterConstraints.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsGenericDefinition.GetHashCode();
         hash = hash * 31 + (GenericDefinition != null ? GenericDefinition.GetHashCode() : 0);
@@ -1292,7 +1326,9 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("baseType = "); BaseType.PrintEx(printer); printer.Println();
         printer.Print("interfaces = "); Interfaces.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isInterface = "); IsInterface.PrintEx(printer); printer.Println();
         printer.Print("isGenericType = "); IsGenericType.PrintEx(printer); printer.Println();
+        printer.Print("genericParameterConstraints = "); GenericParameterConstraints.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
         printer.Print("genericDefinition = "); GenericDefinition.PrintEx(printer); printer.Println();
@@ -1320,7 +1356,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:125</p>
+  /// <p>Generated from: IlModel.kt:127</p>
   /// </summary>
   public sealed class IlErrVarDto : IlVarDto
   {
@@ -1405,7 +1441,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:141</p>
+  /// <p>Generated from: IlModel.kt:143</p>
   /// </summary>
   public sealed class IlFaultScopeDto : IlEhScopeDto
   {
@@ -1502,7 +1538,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:97</p>
+  /// <p>Generated from: IlModel.kt:99</p>
   /// </summary>
   public sealed class IlFieldDto : IlDto
   {
@@ -1622,7 +1658,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:137</p>
+  /// <p>Generated from: IlModel.kt:139</p>
   /// </summary>
   public sealed class IlFilterScopeDto : IlEhScopeDto
   {
@@ -1726,7 +1762,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:143</p>
+  /// <p>Generated from: IlModel.kt:145</p>
   /// </summary>
   public sealed class IlFinallyScopeDto : IlEhScopeDto
   {
@@ -1823,7 +1859,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:119</p>
+  /// <p>Generated from: IlModel.kt:121</p>
   /// </summary>
   public sealed class IlLocalVarDto : IlVarDto
   {
@@ -1915,7 +1951,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:146</p>
+  /// <p>Generated from: IlModel.kt:148</p>
   /// </summary>
   public sealed class IlMethodDto : IlDto
   {
@@ -2143,7 +2179,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:106</p>
+  /// <p>Generated from: IlModel.kt:108</p>
   /// </summary>
   public sealed class IlParameterDto : IPrintable, IEquatable<IlParameterDto>
   {
@@ -2266,7 +2302,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:64</p>
+  /// <p>Generated from: IlModel.kt:66</p>
   /// </summary>
   public sealed class IlPointerTypeDto : IlTypeDto
   {
@@ -2290,7 +2326,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -2317,7 +2355,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -2355,7 +2395,9 @@ namespace org.jacodb.api.net.generated.models
       var baseType = ReadTypeIdNullable(ctx, reader);
       var interfaces = ReadTypeIdList(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
+      var isInterface = reader.ReadBool();
       var isGenericType = reader.ReadBool();
+      var genericParameterConstraints = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isGenericDefinition = reader.ReadBool();
       var genericDefinition = ReadTypeIdNullable(ctx, reader);
@@ -2370,7 +2412,7 @@ namespace org.jacodb.api.net.generated.models
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
       var targetType = TypeId.Read(ctx, reader);
-      var _result = new IlPointerTypeDto(targetType, asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isGenericType, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlPointerTypeDto(targetType, asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -2393,7 +2435,9 @@ namespace org.jacodb.api.net.generated.models
       WriteTypeIdNullable(ctx, writer, value.BaseType);
       WriteTypeIdList(ctx, writer, value.Interfaces);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsInterface);
       writer.Write(value.IsGenericType);
+      WriteTypeIdList(ctx, writer, value.GenericParameterConstraints);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsGenericDefinition);
       WriteTypeIdNullable(ctx, writer, value.GenericDefinition);
@@ -2431,7 +2475,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(TargetType, other.TargetType) && AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericType == other.IsGenericType && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(TargetType, other.TargetType) && AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2451,7 +2495,9 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + (BaseType != null ? BaseType.GetHashCode() : 0);
         hash = hash * 31 + Interfaces.ContentHashCode();
         hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsInterface.GetHashCode();
         hash = hash * 31 + IsGenericType.GetHashCode();
+        hash = hash * 31 + GenericParameterConstraints.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsGenericDefinition.GetHashCode();
         hash = hash * 31 + (GenericDefinition != null ? GenericDefinition.GetHashCode() : 0);
@@ -2486,7 +2532,9 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("baseType = "); BaseType.PrintEx(printer); printer.Println();
         printer.Print("interfaces = "); Interfaces.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isInterface = "); IsInterface.PrintEx(printer); printer.Println();
         printer.Print("isGenericType = "); IsGenericType.PrintEx(printer); printer.Println();
+        printer.Print("genericParameterConstraints = "); GenericParameterConstraints.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
         printer.Print("genericDefinition = "); GenericDefinition.PrintEx(printer); printer.Println();
@@ -2514,7 +2562,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:70</p>
+  /// <p>Generated from: IlModel.kt:72</p>
   /// </summary>
   public sealed class IlPrimitiveTypeDto : IlValueTypeDto
   {
@@ -2536,7 +2584,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -2563,7 +2613,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -2598,7 +2650,9 @@ namespace org.jacodb.api.net.generated.models
       var baseType = ReadTypeIdNullable(ctx, reader);
       var interfaces = ReadTypeIdList(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
+      var isInterface = reader.ReadBool();
       var isGenericType = reader.ReadBool();
+      var genericParameterConstraints = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isGenericDefinition = reader.ReadBool();
       var genericDefinition = ReadTypeIdNullable(ctx, reader);
@@ -2612,7 +2666,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlPrimitiveTypeDto(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isGenericType, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlPrimitiveTypeDto(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -2635,7 +2689,9 @@ namespace org.jacodb.api.net.generated.models
       WriteTypeIdNullable(ctx, writer, value.BaseType);
       WriteTypeIdList(ctx, writer, value.Interfaces);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsInterface);
       writer.Write(value.IsGenericType);
+      WriteTypeIdList(ctx, writer, value.GenericParameterConstraints);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsGenericDefinition);
       WriteTypeIdNullable(ctx, writer, value.GenericDefinition);
@@ -2672,7 +2728,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericType == other.IsGenericType && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2691,7 +2747,9 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + (BaseType != null ? BaseType.GetHashCode() : 0);
         hash = hash * 31 + Interfaces.ContentHashCode();
         hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsInterface.GetHashCode();
         hash = hash * 31 + IsGenericType.GetHashCode();
+        hash = hash * 31 + GenericParameterConstraints.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsGenericDefinition.GetHashCode();
         hash = hash * 31 + (GenericDefinition != null ? GenericDefinition.GetHashCode() : 0);
@@ -2725,7 +2783,9 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("baseType = "); BaseType.PrintEx(printer); printer.Println();
         printer.Print("interfaces = "); Interfaces.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isInterface = "); IsInterface.PrintEx(printer); printer.Println();
         printer.Print("isGenericType = "); IsGenericType.PrintEx(printer); printer.Println();
+        printer.Print("genericParameterConstraints = "); GenericParameterConstraints.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
         printer.Print("genericDefinition = "); GenericDefinition.PrintEx(printer); printer.Println();
@@ -2753,7 +2813,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:81</p>
+  /// <p>Generated from: IlModel.kt:83</p>
   /// </summary>
   public abstract class IlReferenceTypeDto : IlTypeDto
   {
@@ -2775,7 +2835,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -2802,7 +2864,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -2858,7 +2922,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -2885,7 +2951,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -2920,7 +2988,9 @@ namespace org.jacodb.api.net.generated.models
       var baseType = ReadTypeIdNullable(ctx, reader);
       var interfaces = ReadTypeIdList(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
+      var isInterface = reader.ReadBool();
       var isGenericType = reader.ReadBool();
+      var genericParameterConstraints = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isGenericDefinition = reader.ReadBool();
       var genericDefinition = ReadTypeIdNullable(ctx, reader);
@@ -2934,7 +3004,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlReferenceTypeDto_Unknown(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isGenericType, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlReferenceTypeDto_Unknown(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -2957,7 +3027,9 @@ namespace org.jacodb.api.net.generated.models
       WriteTypeIdNullable(ctx, writer, value.BaseType);
       WriteTypeIdList(ctx, writer, value.Interfaces);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsInterface);
       writer.Write(value.IsGenericType);
+      WriteTypeIdList(ctx, writer, value.GenericParameterConstraints);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsGenericDefinition);
       WriteTypeIdNullable(ctx, writer, value.GenericDefinition);
@@ -2994,7 +3066,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericType == other.IsGenericType && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -3013,7 +3085,9 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + (BaseType != null ? BaseType.GetHashCode() : 0);
         hash = hash * 31 + Interfaces.ContentHashCode();
         hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsInterface.GetHashCode();
         hash = hash * 31 + IsGenericType.GetHashCode();
+        hash = hash * 31 + GenericParameterConstraints.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsGenericDefinition.GetHashCode();
         hash = hash * 31 + (GenericDefinition != null ? GenericDefinition.GetHashCode() : 0);
@@ -3047,7 +3121,9 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("baseType = "); BaseType.PrintEx(printer); printer.Println();
         printer.Print("interfaces = "); Interfaces.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isInterface = "); IsInterface.PrintEx(printer); printer.Println();
         printer.Print("isGenericType = "); IsGenericType.PrintEx(printer); printer.Println();
+        printer.Print("genericParameterConstraints = "); GenericParameterConstraints.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
         printer.Print("genericDefinition = "); GenericDefinition.PrintEx(printer); printer.Println();
@@ -3075,7 +3151,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:167</p>
+  /// <p>Generated from: IlModel.kt:169</p>
   /// </summary>
   public sealed class IlSignatureDto : IlDto
   {
@@ -3180,7 +3256,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:79</p>
+  /// <p>Generated from: IlModel.kt:81</p>
   /// </summary>
   public sealed class IlStructTypeDto : IlValueTypeDto
   {
@@ -3202,7 +3278,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -3229,7 +3307,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -3264,7 +3344,9 @@ namespace org.jacodb.api.net.generated.models
       var baseType = ReadTypeIdNullable(ctx, reader);
       var interfaces = ReadTypeIdList(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
+      var isInterface = reader.ReadBool();
       var isGenericType = reader.ReadBool();
+      var genericParameterConstraints = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isGenericDefinition = reader.ReadBool();
       var genericDefinition = ReadTypeIdNullable(ctx, reader);
@@ -3278,7 +3360,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlStructTypeDto(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isGenericType, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlStructTypeDto(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -3301,7 +3383,9 @@ namespace org.jacodb.api.net.generated.models
       WriteTypeIdNullable(ctx, writer, value.BaseType);
       WriteTypeIdList(ctx, writer, value.Interfaces);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsInterface);
       writer.Write(value.IsGenericType);
+      WriteTypeIdList(ctx, writer, value.GenericParameterConstraints);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsGenericDefinition);
       WriteTypeIdNullable(ctx, writer, value.GenericDefinition);
@@ -3338,7 +3422,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericType == other.IsGenericType && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -3357,7 +3441,9 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + (BaseType != null ? BaseType.GetHashCode() : 0);
         hash = hash * 31 + Interfaces.ContentHashCode();
         hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsInterface.GetHashCode();
         hash = hash * 31 + IsGenericType.GetHashCode();
+        hash = hash * 31 + GenericParameterConstraints.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsGenericDefinition.GetHashCode();
         hash = hash * 31 + (GenericDefinition != null ? GenericDefinition.GetHashCode() : 0);
@@ -3391,7 +3477,9 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("baseType = "); BaseType.PrintEx(printer); printer.Println();
         printer.Print("interfaces = "); Interfaces.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isInterface = "); IsInterface.PrintEx(printer); printer.Println();
         printer.Print("isGenericType = "); IsGenericType.PrintEx(printer); printer.Println();
+        printer.Print("genericParameterConstraints = "); GenericParameterConstraints.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
         printer.Print("genericDefinition = "); GenericDefinition.PrintEx(printer); printer.Println();
@@ -3419,7 +3507,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:123</p>
+  /// <p>Generated from: IlModel.kt:125</p>
   /// </summary>
   public sealed class IlTempVarDto : IlVarDto
   {
@@ -3522,7 +3610,9 @@ namespace org.jacodb.api.net.generated.models
     [Nullable] public TypeId BaseType {get; private set;}
     [NotNull] public List<TypeId> Interfaces {get; private set;}
     [NotNull] public List<TypeId> GenericArgs {get; private set;}
+    public bool IsInterface {get; private set;}
     public bool IsGenericType {get; private set;}
+    [NotNull] public List<TypeId> GenericParameterConstraints {get; private set;}
     public bool IsGenericParam {get; private set;}
     public bool IsGenericDefinition {get; private set;}
     [Nullable] public TypeId GenericDefinition {get; private set;}
@@ -3552,7 +3642,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -3574,6 +3666,7 @@ namespace org.jacodb.api.net.generated.models
       if (fullname == null) throw new ArgumentNullException("fullname");
       if (interfaces == null) throw new ArgumentNullException("interfaces");
       if (genericArgs == null) throw new ArgumentNullException("genericArgs");
+      if (genericParameterConstraints == null) throw new ArgumentNullException("genericParameterConstraints");
       if (attrs == null) throw new ArgumentNullException("attrs");
       if (fields == null) throw new ArgumentNullException("fields");
       if (methods == null) throw new ArgumentNullException("methods");
@@ -3590,7 +3683,9 @@ namespace org.jacodb.api.net.generated.models
       BaseType = baseType;
       Interfaces = interfaces;
       GenericArgs = genericArgs;
+      IsInterface = isInterface;
       IsGenericType = isGenericType;
+      GenericParameterConstraints = genericParameterConstraints;
       IsGenericParam = isGenericParam;
       IsGenericDefinition = isGenericDefinition;
       GenericDefinition = genericDefinition;
@@ -3644,7 +3739,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -3671,7 +3768,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -3706,7 +3805,9 @@ namespace org.jacodb.api.net.generated.models
       var baseType = ReadTypeIdNullable(ctx, reader);
       var interfaces = ReadTypeIdList(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
+      var isInterface = reader.ReadBool();
       var isGenericType = reader.ReadBool();
+      var genericParameterConstraints = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isGenericDefinition = reader.ReadBool();
       var genericDefinition = ReadTypeIdNullable(ctx, reader);
@@ -3720,7 +3821,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlTypeDto_Unknown(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isGenericType, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlTypeDto_Unknown(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -3743,7 +3844,9 @@ namespace org.jacodb.api.net.generated.models
       WriteTypeIdNullable(ctx, writer, value.BaseType);
       WriteTypeIdList(ctx, writer, value.Interfaces);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsInterface);
       writer.Write(value.IsGenericType);
+      WriteTypeIdList(ctx, writer, value.GenericParameterConstraints);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsGenericDefinition);
       WriteTypeIdNullable(ctx, writer, value.GenericDefinition);
@@ -3780,7 +3883,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericType == other.IsGenericType && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -3799,7 +3902,9 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + (BaseType != null ? BaseType.GetHashCode() : 0);
         hash = hash * 31 + Interfaces.ContentHashCode();
         hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsInterface.GetHashCode();
         hash = hash * 31 + IsGenericType.GetHashCode();
+        hash = hash * 31 + GenericParameterConstraints.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsGenericDefinition.GetHashCode();
         hash = hash * 31 + (GenericDefinition != null ? GenericDefinition.GetHashCode() : 0);
@@ -3833,7 +3938,9 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("baseType = "); BaseType.PrintEx(printer); printer.Println();
         printer.Print("interfaces = "); Interfaces.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isInterface = "); IsInterface.PrintEx(printer); printer.Println();
         printer.Print("isGenericType = "); IsGenericType.PrintEx(printer); printer.Println();
+        printer.Print("genericParameterConstraints = "); GenericParameterConstraints.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
         printer.Print("genericDefinition = "); GenericDefinition.PrintEx(printer); printer.Println();
@@ -3861,7 +3968,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:68</p>
+  /// <p>Generated from: IlModel.kt:70</p>
   /// </summary>
   public abstract class IlValueTypeDto : IlTypeDto
   {
@@ -3883,7 +3990,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -3910,7 +4019,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -3966,7 +4077,9 @@ namespace org.jacodb.api.net.generated.models
       [Nullable] TypeId baseType,
       [NotNull] List<TypeId> interfaces,
       [NotNull] List<TypeId> genericArgs,
+      bool isInterface,
       bool isGenericType,
+      [NotNull] List<TypeId> genericParameterConstraints,
       bool isGenericParam,
       bool isGenericDefinition,
       [Nullable] TypeId genericDefinition,
@@ -3993,7 +4106,9 @@ namespace org.jacodb.api.net.generated.models
       baseType,
       interfaces,
       genericArgs,
+      isInterface,
       isGenericType,
+      genericParameterConstraints,
       isGenericParam,
       isGenericDefinition,
       genericDefinition,
@@ -4028,7 +4143,9 @@ namespace org.jacodb.api.net.generated.models
       var baseType = ReadTypeIdNullable(ctx, reader);
       var interfaces = ReadTypeIdList(ctx, reader);
       var genericArgs = ReadTypeIdList(ctx, reader);
+      var isInterface = reader.ReadBool();
       var isGenericType = reader.ReadBool();
+      var genericParameterConstraints = ReadTypeIdList(ctx, reader);
       var isGenericParam = reader.ReadBool();
       var isGenericDefinition = reader.ReadBool();
       var genericDefinition = ReadTypeIdNullable(ctx, reader);
@@ -4042,7 +4159,7 @@ namespace org.jacodb.api.net.generated.models
       var attrs = ReadIlAttrDtoList(ctx, reader);
       var fields = ReadIlFieldDtoList(ctx, reader);
       var methods = ReadIlMethodDtoList(ctx, reader);
-      var _result = new IlValueTypeDto_Unknown(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isGenericType, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
+      var _result = new IlValueTypeDto_Unknown(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
@@ -4065,7 +4182,9 @@ namespace org.jacodb.api.net.generated.models
       WriteTypeIdNullable(ctx, writer, value.BaseType);
       WriteTypeIdList(ctx, writer, value.Interfaces);
       WriteTypeIdList(ctx, writer, value.GenericArgs);
+      writer.Write(value.IsInterface);
       writer.Write(value.IsGenericType);
+      WriteTypeIdList(ctx, writer, value.GenericParameterConstraints);
       writer.Write(value.IsGenericParam);
       writer.Write(value.IsGenericDefinition);
       WriteTypeIdNullable(ctx, writer, value.GenericDefinition);
@@ -4102,7 +4221,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsGenericType == other.IsGenericType && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -4121,7 +4240,9 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + (BaseType != null ? BaseType.GetHashCode() : 0);
         hash = hash * 31 + Interfaces.ContentHashCode();
         hash = hash * 31 + GenericArgs.ContentHashCode();
+        hash = hash * 31 + IsInterface.GetHashCode();
         hash = hash * 31 + IsGenericType.GetHashCode();
+        hash = hash * 31 + GenericParameterConstraints.ContentHashCode();
         hash = hash * 31 + IsGenericParam.GetHashCode();
         hash = hash * 31 + IsGenericDefinition.GetHashCode();
         hash = hash * 31 + (GenericDefinition != null ? GenericDefinition.GetHashCode() : 0);
@@ -4155,7 +4276,9 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("baseType = "); BaseType.PrintEx(printer); printer.Println();
         printer.Print("interfaces = "); Interfaces.PrintEx(printer); printer.Println();
         printer.Print("genericArgs = "); GenericArgs.PrintEx(printer); printer.Println();
+        printer.Print("isInterface = "); IsInterface.PrintEx(printer); printer.Println();
         printer.Print("isGenericType = "); IsGenericType.PrintEx(printer); printer.Println();
+        printer.Print("genericParameterConstraints = "); GenericParameterConstraints.PrintEx(printer); printer.Println();
         printer.Print("isGenericParam = "); IsGenericParam.PrintEx(printer); printer.Println();
         printer.Print("isGenericDefinition = "); IsGenericDefinition.PrintEx(printer); printer.Println();
         printer.Print("genericDefinition = "); GenericDefinition.PrintEx(printer); printer.Println();
@@ -4183,7 +4306,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:114</p>
+  /// <p>Generated from: IlModel.kt:116</p>
   /// </summary>
   public abstract class IlVarDto : IlDto
   {

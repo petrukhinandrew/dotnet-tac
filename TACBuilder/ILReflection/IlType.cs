@@ -31,6 +31,7 @@ public class IlType(Type type) : IlMember(type)
     
     public IlType? BaseType { get; private set; }
     
+    public bool IsInterface => _type.IsInterface;
     public List<IlType> Interfaces { get; } = [];
     
     public List<IlType> GenericArgs = [];
@@ -64,6 +65,11 @@ public class IlType(Type type) : IlMember(type)
             GenericDefinition = IlInstanceBuilder.GetType(_type.GetGenericTypeDefinition());
         }
 
+        if (_type.IsGenericParameter)
+        {
+            GenericParameterConstraints.AddRange(_type.GetGenericParameterConstraints().Select(IlInstanceBuilder.GetType));
+        }
+        
         GenericArgs.AddRange(_type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList());
         Interfaces.AddRange(_type.GetInterfaces().Select(IlInstanceBuilder.GetType));
 
@@ -147,7 +153,8 @@ public class IlType(Type type) : IlMember(type)
 
     public bool IsGenericDefinition => _type.IsGenericTypeDefinition;
 
-
+    public List<IlType> GenericParameterConstraints = [];
+    
     public bool IsGenericType => _type.IsGenericType;
     public virtual bool IsUnmanaged => _type.IsUnmanaged();
 
