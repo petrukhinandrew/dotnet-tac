@@ -10,6 +10,7 @@ public class IlField(FieldInfo fieldInfo) : IlMember(fieldInfo)
     public bool IsStatic => _fieldInfo.IsStatic;
     public IlType? Type { get; private set; }
     public new string Name => _fieldInfo.Name;
+    public int Offset { get; private set; }
     public int ModuleToken => _fieldInfo.Module.MetadataToken;
     public int MetadataToken => _fieldInfo.MetadataToken;
     public object? GetValue(object? value) => _fieldInfo.GetValue(value);
@@ -20,6 +21,7 @@ public class IlField(FieldInfo fieldInfo) : IlMember(fieldInfo)
     {
         DeclaringType = IlInstanceBuilder.GetType((_fieldInfo.ReflectedType ?? _fieldInfo.DeclaringType)!);
         Type = IlInstanceBuilder.GetType(_fieldInfo.FieldType);
+        Offset = LayoutUtils.CalculateOffsetOf(_fieldInfo);
         Attributes = _fieldInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
         DeclaringType.EnsureFieldAttached(this);
         IsConstructed = true;

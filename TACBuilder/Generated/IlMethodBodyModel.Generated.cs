@@ -6203,7 +6203,7 @@ namespace org.jacodb.api.net.generated.models
     //pretty print
     public void Print(PrettyPrinter printer)
     {
-      printer.Println("IlNullableExprDto (");
+      printer.Println("IlSizeOfExprDto (");
       using (printer.IndentCookie()) {
         printer.Print("targetType = "); TargetType.PrintEx(printer); printer.Println();
         printer.Print("type = "); Type.PrintEx(printer); printer.Println();

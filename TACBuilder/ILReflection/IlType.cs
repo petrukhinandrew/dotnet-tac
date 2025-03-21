@@ -1,12 +1,6 @@
-using System.Diagnostics;
-using System.Diagnostics.Tracing;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using TACBuilder.Exprs;
 using TACBuilder.Utils;
-using Exception = System.Exception;
 
 namespace TACBuilder.ILReflection;
 
@@ -53,7 +47,7 @@ public class IlType(Type type) : IlMember(type)
             DeclaringType = IlInstanceBuilder.GetType(_type.DeclaringType);
         }
         
-        Size = SizeOf(_type);
+        Size = LayoutUtils.SizeOf(_type);
         
         if (_type.IsGenericParameter && _type.DeclaringMethod != null)
         {
@@ -98,12 +92,6 @@ public class IlType(Type type) : IlMember(type)
         }
 
         IsConstructed = true;
-    }
-
-    private int SizeOf(Type type)
-    {
-        // if (type == typeof(IntPtr) || type == typeof(UIntPtr) || type.IsByRef )
-        return 0;
     }
     
     public IlAssembly DeclaringAssembly { get; private set; }
