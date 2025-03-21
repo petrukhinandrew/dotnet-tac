@@ -1,11 +1,6 @@
-using System.Collections;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
-using TACBuilder.ILTAC.TypeSystem;
 
 namespace TACBuilder.Utils;
 

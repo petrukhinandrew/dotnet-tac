@@ -1,6 +1,5 @@
 using System.Diagnostics;
 using System.Reflection;
-using JetBrains.Util.Util;
 using org.jacodb.api.net.generated.models;
 using TACBuilder.ILReflection;
 

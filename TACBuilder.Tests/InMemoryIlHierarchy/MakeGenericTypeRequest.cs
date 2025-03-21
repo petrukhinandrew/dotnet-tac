@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using org.jacodb.api.net.generated.models;
 
 namespace TACBuilder.Tests.InMemoryIlHierarchy;

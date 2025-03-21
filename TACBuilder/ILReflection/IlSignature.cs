@@ -1,12 +1,7 @@
 using System.Collections.Immutable;
-using System.Numerics;
-using System;
 using System.Reflection;
-using System.Reflection.Emit;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
-using System.Runtime.InteropServices;
-using System.Xml.Serialization;
 
 namespace TACBuilder.ILReflection;
 

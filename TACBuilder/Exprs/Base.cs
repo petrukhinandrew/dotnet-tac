@@ -1,8 +1,4 @@
-using System.Collections;
-using System.Collections.ObjectModel;
-using System.Reflection;
 using TACBuilder.ILReflection;
-using TACBuilder.Utils;
 
 namespace TACBuilder.Exprs;
 

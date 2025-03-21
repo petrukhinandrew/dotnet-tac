@@ -1,5 +1,3 @@
-using TACBuilder.Serialization;
-
 namespace TACBuilder.ILReflection;
 
 public class ILConstructQueue : Queue<IlCacheable>

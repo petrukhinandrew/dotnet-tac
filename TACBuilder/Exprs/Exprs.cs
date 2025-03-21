@@ -1,7 +1,5 @@
-using System.Diagnostics;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
-using TACBuilder.Utils;
 
 namespace TACBuilder.ILTAC.TypeSystem;
 

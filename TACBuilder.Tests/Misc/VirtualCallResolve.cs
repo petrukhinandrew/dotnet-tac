@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Xunit.Abstractions;
 
 namespace TACBuilder.Tests.Misc;

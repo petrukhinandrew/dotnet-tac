@@ -1,9 +1,6 @@
 ﻿using System.Diagnostics;
 using CommandLine;
-using org.jacodb.api.net.generated.models;
 using TACBuilder.ILReflection;
-using TACBuilder.Serialization;
-using TACBuilder.Utils;
 
 namespace TACBuilder;
 

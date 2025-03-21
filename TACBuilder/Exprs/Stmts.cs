@@ -1,7 +1,5 @@
 using System.Diagnostics;
-using org.jacodb.api.net.generated.models;
 using TACBuilder.Exprs;
-using TACBuilder.ILReflection;
 
 namespace TACBuilder.ILTAC.TypeSystem;
 
