@@ -32,6 +32,7 @@ public class IlType(Type type) : IlMember(type)
     public IlType? BaseType { get; private set; }
     
     public bool IsInterface => _type.IsInterface;
+    public bool IsAbstract => _type.IsAbstract;
     public List<IlType> Interfaces { get; } = [];
     
     public List<IlType> GenericArgs = [];
