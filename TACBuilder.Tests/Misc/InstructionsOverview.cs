@@ -1152,6 +1152,10 @@ public class RomaCases()
         ManagedInstance i = new ManagedInstance();
         var ptr = &i;
         ref var m = ref i;
+        byte b = 0;
+        ref var managedBytePtr = ref b;
+        var x = managedBytePtr + 1;
+        managedBytePtr += 1;
     }
 }
 
