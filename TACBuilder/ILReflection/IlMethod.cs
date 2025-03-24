@@ -169,8 +169,15 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             : "";
 
     public bool IsGeneric => _methodBase.IsGenericMethod;
+    
     public bool IsGenericMethodDefinition => _methodBase.IsGenericMethodDefinition;
+    
     public bool IsStatic => _methodBase.IsStatic;
+    
+    public bool IsVirtual => _methodBase.IsVirtual;
+    
+    public bool IsAbstract => _methodBase.IsAbstract;
+    
     public new bool IsConstructed = false;
 
     public TacBody? Body => _tacBody;
@@ -198,7 +205,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         DeclaringType = IlInstanceBuilder.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
         if (_methodBase is MethodInfo methodInfo)
         {
-            BaseMethod = IlInstanceBuilder.GetMethod(methodInfo.GetBaseDefinition());
+            BaseMethod = GetBaseMethod(methodInfo);
             ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
         }
         else
@@ -253,7 +260,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         if (HasMethodBody)
         {
             Logger.LogDebug("Resolving body of {Type} {Name}", DeclaringType.Name, Name);
-            foreach (var locVar in _methodBase.GetMethodBody().LocalVariables.OrderBy(localVar => localVar.LocalIndex))
+            foreach (var locVar in _methodBase.GetMethodBody()!.LocalVariables.OrderBy(localVar => localVar.LocalIndex))
             {
                 LocalVars.Add(new IlLocalVar(IlInstanceBuilder.GetType(locVar.LocalType), locVar.LocalIndex,
                     locVar.IsPinned));
@@ -266,6 +273,16 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         IsConstructed = true;
     }
 
+    private IlMethod GetBaseMethod(MethodInfo methodInfo)
+    {
+        if (!methodInfo.IsVirtual) return this;
+
+        var baseDefn = methodInfo.IsGenericMethod ? methodInfo.GetGenericMethodDefinition() : methodInfo.GetBaseDefinition();
+        var baseDefnDeclType = baseDefn.DeclaringType;
+        return IlInstanceBuilder.GetMethod(methodInfo.GetBaseDefinition());
+    }
+    
+    
     public override bool Equals(object? obj)
     {
         return obj is IlMethod other && _methodBase == other._methodBase;

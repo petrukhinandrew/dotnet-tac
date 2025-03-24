@@ -1180,3 +1180,17 @@ public class SaastOverviewTest
     {
     }
 }
+
+
+interface IVuln
+{
+    string Get();
+}
+
+class Vuln : IVuln
+{
+    public string Get()
+    {
+        return "SastConfigUtils.Source()";
+    }
+}

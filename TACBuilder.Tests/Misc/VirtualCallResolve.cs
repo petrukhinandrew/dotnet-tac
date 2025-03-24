@@ -23,7 +23,45 @@ public class B(ITestOutputHelper helper) : A(helper)
     }
 }
 
+class SastConfigUtils
+{
+    public static string Source()
+    {
+        return "Source";
+    }
 
+    public static void Sink(string s)
+    {
+        Console.WriteLine(s);
+    }
+}
+
+abstract class AContext
+{
+    public virtual string Get()
+    {
+        return SastConfigUtils.Source();
+    }
+
+    public abstract string ActualGet();
+}
+
+class ContextNoVuln1 : AContext
+{
+    public override string ActualGet()
+    {
+        return "";
+    }
+}
+
+class CallsiteClassResolve
+{
+    void Resolve(ContextNoVuln1 kek)
+    {
+        var data = kek.ActualGet();
+        SastConfigUtils.Sink(data);
+    }
+}
 
 public class VirtualCallResolve(ITestOutputHelper helper)
 {

@@ -80,7 +80,7 @@ public static class TypingUtil
         }
     }
 
-    internal static IlExpr WithTypeEnsured(this IlExpr expr, IlType expectedType)
+    private static IlExpr WithTypeEnsured(this IlExpr expr, IlType expectedType)
     {
         // TODO constants optimisations
         return Equals(expr.Type, expectedType) ? expr : new IlConvCastExpr(expectedType, expr);
@@ -90,6 +90,6 @@ public static class TypingUtil
     {
         Debug.Assert(expr.Type != null);
         var coercedType = expr.Type.ExpectedStackType();
-        return expr.WithTypeEnsured(coercedType);
+        return Equals(expr.Type, coercedType) ? expr : new IlConvCastExpr(coercedType, expr);
     }
 }

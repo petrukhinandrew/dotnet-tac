@@ -1300,9 +1300,10 @@ static class BlockTacLineBuilder
         return res;
     }
 
+    // TODO: remove last arg after ensuring it is redundant
     private static IlValue EnsureTyped(this BlockTacBuilder blockBuilder, IlExpr expr, IlType expectedType)
     {
-        var res = expr.WithTypeEnsured(expectedType);
+        var res = expr.Coerced();
         if (res is IlValue value) return value;
         var newTmp = blockBuilder.GetNewTemp(res);
         blockBuilder.NewLine(new IlAssignStmt(newTmp, res));

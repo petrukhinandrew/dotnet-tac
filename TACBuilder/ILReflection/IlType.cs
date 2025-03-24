@@ -15,7 +15,7 @@ namespace TACBuilder.ILReflection;
 
 public class IlType(Type type) : IlMember(type)
 {
-    private readonly Type _type = type;
+    internal readonly Type _type = type;
     public new bool IsConstructed;
 
     private const BindingFlags BindingFlags =

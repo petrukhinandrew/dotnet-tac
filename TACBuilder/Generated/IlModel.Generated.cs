@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => 3253622964258945585L;
+    protected override long SerializationHash => 5169588667545297019L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -1992,6 +1992,7 @@ namespace org.jacodb.api.net.generated.models
     [NotNull] public List<IlStmtDto> RawInstList {get; private set;}
     public bool IsConstructed {get; private set;}
     public bool IsVirtual {get; private set;}
+    public bool IsAbstract {get; private set;}
     [Nullable] public InstanceId BaseMethod {get; private set;}
     
     //private fields
@@ -2014,6 +2015,7 @@ namespace org.jacodb.api.net.generated.models
       [NotNull] List<IlStmtDto> rawInstList,
       bool isConstructed,
       bool isVirtual,
+      bool isAbstract,
       [Nullable] InstanceId baseMethod
     )
     {
@@ -2046,6 +2048,7 @@ namespace org.jacodb.api.net.generated.models
       RawInstList = rawInstList;
       IsConstructed = isConstructed;
       IsVirtual = isVirtual;
+      IsAbstract = isAbstract;
       BaseMethod = baseMethod;
     }
     //secondary constructor
@@ -2071,8 +2074,9 @@ namespace org.jacodb.api.net.generated.models
       var rawInstList = ReadIlStmtDtoList(ctx, reader);
       var isConstructed = reader.ReadBool();
       var isVirtual = reader.ReadBool();
+      var isAbstract = reader.ReadBool();
       var baseMethod = ReadInstanceIdNullable(ctx, reader);
-      var _result = new IlMethodDto(returnType, attrs, isStatic, isGeneric, isGenericDefinition, signature, name, parameters, genericArgs, resolved, locals, temps, errs, ehScopes, rawInstList, isConstructed, isVirtual, baseMethod);
+      var _result = new IlMethodDto(returnType, attrs, isStatic, isGeneric, isGenericDefinition, signature, name, parameters, genericArgs, resolved, locals, temps, errs, ehScopes, rawInstList, isConstructed, isVirtual, isAbstract, baseMethod);
       return _result;
     };
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -2104,6 +2108,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlStmtDtoList(ctx, writer, value.RawInstList);
       writer.Write(value.IsConstructed);
       writer.Write(value.IsVirtual);
+      writer.Write(value.IsAbstract);
       WriteInstanceIdNullable(ctx, writer, value.BaseMethod);
     };
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -2132,7 +2137,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && IsStatic == other.IsStatic && IsGeneric == other.IsGeneric && IsGenericDefinition == other.IsGenericDefinition && Signature == other.Signature && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && GenericArgs.SequenceEqual(other.GenericArgs) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList) && IsConstructed == other.IsConstructed && IsVirtual == other.IsVirtual && Equals(BaseMethod, other.BaseMethod);
+      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && IsStatic == other.IsStatic && IsGeneric == other.IsGeneric && IsGenericDefinition == other.IsGenericDefinition && Signature == other.Signature && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && GenericArgs.SequenceEqual(other.GenericArgs) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList) && IsConstructed == other.IsConstructed && IsVirtual == other.IsVirtual && IsAbstract == other.IsAbstract && Equals(BaseMethod, other.BaseMethod);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2156,6 +2161,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + RawInstList.ContentHashCode();
         hash = hash * 31 + IsConstructed.GetHashCode();
         hash = hash * 31 + IsVirtual.GetHashCode();
+        hash = hash * 31 + IsAbstract.GetHashCode();
         hash = hash * 31 + (BaseMethod != null ? BaseMethod.GetHashCode() : 0);
         return hash;
       }
@@ -2182,6 +2188,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("rawInstList = "); RawInstList.PrintEx(printer); printer.Println();
         printer.Print("isConstructed = "); IsConstructed.PrintEx(printer); printer.Println();
         printer.Print("isVirtual = "); IsVirtual.PrintEx(printer); printer.Println();
+        printer.Print("isAbstract = "); IsAbstract.PrintEx(printer); printer.Println();
         printer.Print("baseMethod = "); BaseMethod.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
@@ -3189,7 +3196,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:170</p>
+  /// <p>Generated from: IlModel.kt:171</p>
   /// </summary>
   public sealed class IlSignatureDto : IlDto
   {
