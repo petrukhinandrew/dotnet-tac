@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.Serialization;
 using org.jacodb.api.net.generated.models;
 using TACBuilder.ILReflection;
 
@@ -66,10 +67,12 @@ public class AppTacBuilder
         return IlInstanceBuilder.GetAssemblies();
     }
 
+    
     public IlType? MakeGenericType(TypeId typeId)
     {
         var gt = MakeGenericTypeFrom(typeId);
         if (gt == null) return null;
+        
         var result = IlInstanceBuilder.GetType(gt);
         IlInstanceBuilder.Construct();
         return result;
@@ -78,26 +81,24 @@ public class AppTacBuilder
     private Type? MakeGenericTypeFrom(TypeId typeId)
     {
         var topLevelType = FindTypeUnsafe(typeId.AsmName, typeId.TypeName);
-        Debug.Assert(topLevelType.IsGenericTypeDefinition || !topLevelType.IsGenericType, topLevelType.ToString());
-        try
+        if (topLevelType == null) return null;
+        if (typeId.TypeArgs.Count == 0) return topLevelType;
+        var args = new List<Type>();
+        foreach (var rawArg in typeId.TypeArgs)
         {
-            return typeId.TypeArgs.Count == 0
-                ? topLevelType
-                : topLevelType.MakeGenericType(typeId.TypeArgs.Select(t => MakeGenericTypeFrom((TypeId)t)).ToArray());
+            if (rawArg is not TypeId argTypeId) throw new SerializationException("typeId expected");
+            var arg = MakeGenericTypeFrom(argTypeId);
+            if (arg == null) return null;
+            args.Add(arg);
         }
-        catch(Exception e)
-        {
-            Console.WriteLine(e.Message);
-            Console.WriteLine(e.StackTrace);
-            return null;
-        }
+        return topLevelType.MakeGenericType(args.ToArray());
     }
 
-    private Type FindTypeUnsafe(string asmName, string typeName)
+    private Type? FindTypeUnsafe(string asmName, string typeName)
     {
         var asm = BuiltAssemblies.Single(asm => asm.Name == asmName);
         var possibleTypes = asm.Types.Where(t => t.FullName == typeName && (!t.IsGenericType || t.IsGenericDefinition))
             .Select(ilt => ilt.Type).ToList();
-        return possibleTypes.Single();
+        return possibleTypes.SingleOrDefault(defaultValue: null);
     }
 }
