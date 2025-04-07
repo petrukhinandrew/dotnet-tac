@@ -1,6 +1,5 @@
 namespace IntegrationTests
 {
-    
     public struct Point
     {
         private int _x;
@@ -12,7 +11,7 @@ namespace IntegrationTests
             _y = y;
         }
 
-        
+
         public bool IsInRect(int left, int top, int right, int bottom)
         {
             if (_x > left && _x < right && _y > bottom && _y < top)
@@ -23,7 +22,7 @@ namespace IntegrationTests
             return false;
         }
 
-        
+
         public void ThrowIfNotOnXAxis()
         {
             if (_y != 0)
@@ -32,7 +31,7 @@ namespace IntegrationTests
             }
         }
 
-        
+
         public static int StaticMethod(Point p)
         {
             if (p._x > 0)

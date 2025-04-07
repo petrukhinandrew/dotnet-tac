@@ -30,7 +30,17 @@ class SastConfigUtils
         return "Source";
     }
 
+    public static short SourceShort()
+    {
+        return 123;
+    }
+    
     public static void Sink(string s)
+    {
+        Console.WriteLine(s);
+    }
+
+    public static void SinkShort(short s)
     {
         Console.WriteLine(s);
     }
@@ -60,6 +70,47 @@ class CallsiteClassResolve
     {
         var data = kek.ActualGet();
         SastConfigUtils.Sink(data);
+    }
+    
+}
+
+class PrimitiveArgCoercion
+{
+    public short Source()
+    {
+        return 123;
+    }
+
+    public void Sink(int i)
+    {
+        Console.WriteLine(i);
+    }
+    
+    public void Check()
+    {
+        var s = Source();
+        Sink(s);
+    }
+}
+
+
+
+public class StructToInterfaceCastTest
+{
+    public interface TestInterfafce;
+
+    public struct TestStruct : TestInterfafce;
+
+    public void Call(TestInterfafce i)
+    {
+        
+    }
+    
+    [Fact]
+    public void SimpleCast()
+    {
+        var s = new TestStruct();
+        Call(s);
     }
 }
 

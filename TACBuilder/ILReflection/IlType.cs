@@ -1,21 +1,13 @@
+using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using TACBuilder.Utils;
 
 namespace TACBuilder.ILReflection;
 
-/*
- * baseType
- * interfaces
- * genericConstraints
- * genericDefn
- * genericArgs
- * declType
- */
-
 public class IlType(Type type) : IlMember(type)
 {
-    internal readonly Type _type = type;
+    private readonly Type _type = type;
     public new bool IsConstructed;
 
     private const BindingFlags BindingFlags =
@@ -24,17 +16,17 @@ public class IlType(Type type) : IlMember(type)
         System.Reflection.BindingFlags.DeclaredOnly;
 
     public IlType? DeclaringType { get; private set; }
-    
+
     public int Size { get; private set; }
-    
+
     public IlMethod? DeclaringMethod { get; private set; }
-    
+
     public IlType? BaseType { get; private set; }
-    
+
     public bool IsInterface => _type.IsInterface;
     public bool IsAbstract => _type.IsAbstract;
     public List<IlType> Interfaces { get; } = [];
-    
+
     public List<IlType> GenericArgs = [];
 
     public IlType? GenericDefinition;
@@ -48,9 +40,9 @@ public class IlType(Type type) : IlMember(type)
         {
             DeclaringType = IlInstanceBuilder.GetType(_type.DeclaringType);
         }
-        
+
         Size = LayoutUtils.SizeOf(_type);
-        
+
         if (_type.IsGenericParameter && _type.DeclaringMethod != null)
         {
             DeclaringMethod = IlInstanceBuilder.GetMethod(_type.DeclaringMethod);
@@ -68,9 +60,10 @@ public class IlType(Type type) : IlMember(type)
 
         if (_type.IsGenericParameter)
         {
-            GenericParameterConstraints.AddRange(_type.GetGenericParameterConstraints().Select(IlInstanceBuilder.GetType));
+            GenericParameterConstraints.AddRange(_type.GetGenericParameterConstraints()
+                .Select(IlInstanceBuilder.GetType));
         }
-        
+
         GenericArgs.AddRange(_type.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList());
         Interfaces.AddRange(_type.GetInterfaces().Select(IlInstanceBuilder.GetType));
 
@@ -100,11 +93,11 @@ public class IlType(Type type) : IlMember(type)
 
         IsConstructed = true;
     }
-    
+
     public IlAssembly DeclaringAssembly { get; private set; }
     public string AsmName => _type.Assembly.GetName().ToString();
 
-    public string Namespace => type.Namespace ?? DeclaringType?.Namespace ?? "";
+    public string Namespace => _type.Namespace ?? DeclaringType?.Namespace ?? "";
 
     public new readonly string Name = type.Name;
 
@@ -129,6 +122,7 @@ public class IlType(Type type) : IlMember(type)
     public HashSet<IlField> Fields { get; } = new();
 
     public Type Type => _type;
+
     public bool IsValueType => _type.IsValueType;
     public virtual bool IsManaged => !_type.IsUnmanaged();
 
@@ -155,7 +149,7 @@ public class IlType(Type type) : IlMember(type)
     public bool IsGenericDefinition => _type.IsGenericTypeDefinition;
 
     public List<IlType> GenericParameterConstraints = [];
-    
+
     public bool IsGenericType => _type.IsGenericType;
     public virtual bool IsUnmanaged => _type.IsUnmanaged();
 
@@ -169,6 +163,27 @@ public class IlType(Type type) : IlMember(type)
     internal void EnsureMethodAttached(IlMethod ilMethod)
     {
         Methods.Add(ilMethod);
+    }
+
+    public IlArrayType MakeArrayType()
+    {
+        var arr = IlInstanceBuilder.GetType(_type.MakeArrayType());
+        Debug.Assert(arr is IlArrayType);
+        return (IlArrayType)arr;
+    }
+
+    public IlPointerType MakePointerType()
+    {
+        var res = IlInstanceBuilder.GetType(_type.MakePointerType());
+        Debug.Assert(res is IlPointerType { IsUnmanaged: true });
+        return (IlPointerType)res;
+    }
+
+    public IlPointerType MakeByRefType()
+    {
+        var res = IlInstanceBuilder.GetType(_type.MakeByRefType());
+        Debug.Assert(res is IlPointerType { IsManaged: true });
+        return (IlPointerType)res;
     }
 
     public override string ToString()
@@ -191,53 +206,47 @@ public class IlType(Type type) : IlMember(type)
 // TODO #2 makegenericType should be introduced here, not in AppTacBuilder
 internal static class IlTypeHelpers
 {
-    public static IlArrayType MakeArrayType(this IlType type)
-    {
-        return (IlArrayType)IlInstanceBuilder.GetType(type.Type.MakeArrayType());
-    }
-
     public static IlType MeetWith(this IlType type, IlType another)
     {
-        return MeetIlTypes(type, another);
-    }
+        if (type is not IlPointerType lp || another is not IlPointerType rp)
+            return IlInstanceBuilder.GetType(MeetTypes(type.Type, another.Type));
 
-    private static IlType MeetIlTypes(IlType? left, IlType? right)
-    {
-        if (left == null || right == null) return IlInstanceBuilder.GetType(typeof(object));
-        if (left is IlPointerType lp && right is IlPointerType rp)
-            return IlInstanceBuilder.GetType(MeetTypes(lp.TargetType.Type, rp.TargetType.Type));
-        return IlInstanceBuilder.GetType(MeetTypes(left.Type, right.Type));
+        Debug.Assert(lp.IsManaged == rp.IsManaged);
+        var elemType = IlInstanceBuilder.GetType(MeetTypes(lp.TargetType.Type, rp.TargetType.Type));
+        var ptr = lp.IsManaged ? elemType.MakeByRefType() : elemType.MakePointerType();
+        return ptr;
     }
 
     private static Type MeetTypes(Type? left, Type? right)
     {
-        if (left == null || right == null) return typeof(object);
-        // TODO defn improper, we may want pointer instead of by ref 
-        if (left.IsByRef && right.IsPointer || left.IsPointer && right.IsByRef)
+        while (true)
         {
-            return MeetTypes(left.GetElementType(), right.GetElementType()).MakeByRefType();
+            if (left == null || right == null) return typeof(object);
+            // TODO check if such condition may occur
+            if (left.IsByRef && right.IsPointer || left.IsPointer && right.IsByRef)
+            {
+                return MeetTypes(left.GetElementType(), right.GetElementType()).MakeByRefType();
+            }
+
+            if (left.IsAssignableTo(right) || left.IsImplicitPrimitiveConvertibleTo(right)) return right;
+            if (right.IsAssignableTo(left) || right.IsImplicitPrimitiveConvertibleTo(left)) return left;
+            var workList = new Queue<Type>();
+            if (left.BaseType != null) workList.Enqueue(left.BaseType);
+
+            if (right.BaseType != null) workList.Enqueue(right.BaseType);
+            foreach (var li in left.GetInterfaces()) workList.Enqueue(li);
+            foreach (var ri in right.GetInterfaces()) workList.Enqueue(ri);
+            Type? bestCandidate = null;
+            while (workList.TryDequeue(out var candidate))
+            {
+                if (!left.IsAssignableTo(candidate) || !right.IsAssignableTo(candidate)) continue;
+
+                if (bestCandidate == null || candidate.IsAssignableTo(bestCandidate)) bestCandidate = candidate;
+            }
+
+            if (bestCandidate != null) return bestCandidate;
+            left = left.BaseType;
+            right = right.BaseType;
         }
-
-        if (left.IsAssignableTo(right) || left.IsImplicitPrimitiveConvertibleTo(right)) return right;
-        if (right.IsAssignableTo(left) || right.IsImplicitPrimitiveConvertibleTo(left)) return left;
-        var workList = new Queue<Type>();
-        if (left.BaseType != null)
-            workList.Enqueue(left.BaseType);
-
-        if (right.BaseType != null)
-            workList.Enqueue(right.BaseType);
-        foreach (var li in left.GetInterfaces())
-            workList.Enqueue(li);
-        foreach (var ri in right.GetInterfaces())
-            workList.Enqueue(ri);
-        Type? bestCandidate = null;
-        while (workList.TryDequeue(out var candidate))
-        {
-            if (left.IsAssignableTo(candidate) && right.IsAssignableTo(candidate))
-                if (bestCandidate == null || candidate.IsAssignableTo(bestCandidate))
-                    bestCandidate = candidate;
-        }
-
-        return bestCandidate ?? MeetTypes(left.BaseType, right.BaseType);
     }
 }

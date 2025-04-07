@@ -1,5 +1,6 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using Xunit.Abstractions;
 
 #pragma warning disable CS0219
 #pragma warning disable CS8500
@@ -1115,8 +1116,55 @@ public class SlavaCases()
 }
 
 
-public class RomaCases()
+public class RomaCases(ITestOutputHelper testOutputHelper)
 {
+    public struct MyStruct
+    {
+        public int Age;
+        public string Name;
+    }
+
+    public int WriteStructConcrete()
+    {
+        var s = new MyStruct { Age = 1, Name = null };
+        var age = s.Age;
+        var name = s.Name;
+        s.Name = name;
+        return 0;
+    }
+
+    public unsafe int StackUnsafe2(int a, int i)
+    {
+        var initValue = a;
+        var ptr = &a;
+        var casted = (byte*)ptr;
+        *(int*)(casted + i) = 322;
+        if (i == 2 && initValue == 5 && a != 21102597)
+        {
+            return -1;
+        }
+
+        return 0;
+    }
+
+    class A
+    {
+        public int Hui = 2;
+        public int V = 1;
+    }
+
+    class B
+    {
+        public int V = 2;
+    }
+    [Fact]
+    public unsafe void ClassPtrCasts()
+    {
+        A a = new A();
+        var b = (B*)(&a);
+        testOutputHelper.WriteLine((*b).V.ToString());
+    }
+    
     public int Ge(int a, int b, bool flag)
     {
         if (flag) return 0;

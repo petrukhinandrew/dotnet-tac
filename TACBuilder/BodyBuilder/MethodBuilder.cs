@@ -176,8 +176,10 @@ class MethodBuilder(IlMethod method)
         if (!Temps.TryGetValue(instrIdx, out var tmps))
         {
             Debug.Assert(internalIdx == 0);
-            tmps = new List<IlTempVar>();
-            tmps.Add(new IlTempVar(tmpIdx, value));
+            tmps =
+            [
+                new IlTempVar(tmpIdx, value)
+            ];
             Temps.Add(instrIdx, tmps);
             return tmps[0];
         }

@@ -80,7 +80,7 @@ public static class TypingUtil
         }
     }
 
-    private static IlExpr WithTypeEnsured(this IlExpr expr, IlType expectedType)
+    internal static IlExpr WithTypeEnsured(this IlExpr expr, IlType expectedType)
     {
         // TODO constants optimisations
         return Equals(expr.Type, expectedType) ? expr : new IlConvCastExpr(expectedType, expr);

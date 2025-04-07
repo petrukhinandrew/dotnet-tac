@@ -35,4 +35,8 @@
       <ProjectReference Include="..\TACBuilder\TACBuilder.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="ExactFeatures\" />
+    </ItemGroup>
+
 </Project>

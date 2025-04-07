@@ -24,10 +24,10 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
     internal ILInstr CurInstr = meta.Entry;
 
     private EvaluationStack<IlExpr> _entryStackState =
-        meta.StackErrType is null ? new() : new([methodBuilder.GetNewErr(meta.StackErrType)]);
+        meta.StackErrType is null ? new EvaluationStack<IlExpr>() : new EvaluationStack<IlExpr>([methodBuilder.GetNewErr(meta.StackErrType)]);
 
     private EvaluationStack<IlExpr> _stack =
-        meta.StackErrType is null ? new() : new([methodBuilder.GetNewErr(meta.StackErrType)]);
+        meta.StackErrType is null ? new EvaluationStack<IlExpr>() : new EvaluationStack<IlExpr>([methodBuilder.GetNewErr(meta.StackErrType)]);
 
     private HashSet<BlockTacBuilder> _preds = new();
     private HashSet<BlockTacBuilder> _succs = new();
@@ -49,7 +49,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
     public bool StackInitIsTheSame()
     {
         if (_preds.Count == 0) return true;
-        EvaluationStack<IlExpr> copy = EvaluationStack<IlExpr>.CopyOf(_entryStackState);
+        var copy = EvaluationStack<IlExpr>.CopyOf(_entryStackState);
 
         var stacks = _preds.Where(bb => bb._builtAtLeastOnce)
             .Select((p, i) => (i, EvaluationStack<IlExpr>.CopyOf(p._stack))).ToList();
@@ -58,8 +58,8 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
         if (stacks.All(s => s.Item2.Count == 0)) return true;
         if (stackLengths.Max() != stackLengths.Min())
             Debug.Assert(stackLengths.Max() == stackLengths.Min(),
-                meta.MethodMeta!.Name + meta.MethodMeta.Parameters.Count);
-        for (int j = 0; j < stackLengths.Max(); j++)
+                Meta.MethodMeta!.Name + Meta.MethodMeta.Parameters.Count);
+        for (var j = 0; j < stackLengths.Max(); j++)
         {
             var values = stacks.Select(s => s.Item2.Pop()).ToList();
             if (values.Distinct().Count() == 1)
@@ -68,7 +68,7 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
                 continue;
             }
 
-            IlMerged tmp = methodBuilder.GetMerged(IlFirst, j);
+            var tmp = methodBuilder.GetMerged(IlFirst, j);
             tmp.MergeOf(values);
             foreach (var (i, p) in _preds.Where(bb => bb._builtAtLeastOnce).Select((v, i) => (i, v)))
             {
