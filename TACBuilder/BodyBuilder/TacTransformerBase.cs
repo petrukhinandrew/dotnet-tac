@@ -66,7 +66,7 @@ public class TacTransformerIndexImpl(IlMethod method) : TacTransformerBase<int>
         }
     }
 
-    public void ApplyToSlice(int pos, int length, Func<IlStmt, IlStmt> action)
+    protected void ApplyToSlice(int pos, int length, Func<IlStmt, IlStmt> action)
     {
         if (_lines == null) return;
         for (int i = pos; i < pos + length; i++)
@@ -75,7 +75,7 @@ public class TacTransformerIndexImpl(IlMethod method) : TacTransformerBase<int>
         }
     }
 
-    public List<IlStmt> SliceCopy(int pos, int length)
+    private List<IlStmt> SliceCopy(int pos, int length)
     {
         if (_lines == null) return [];
         IlStmt[] copy = new IlStmt[length];
@@ -86,21 +86,20 @@ public class TacTransformerIndexImpl(IlMethod method) : TacTransformerBase<int>
         return copy.ToList();
     }
 
-    public void DuplicateSlice(int slicePos, int sliceLength, int dst)
+    protected void DuplicateSlice(int slicePos, int sliceLength, int dst)
     {
         if (_lines == null) return;
         Debug.Assert(dst > slicePos);
         var slice = SliceCopy(slicePos, sliceLength);
         InsertRange(dst, slice);
+
         ApplyToSlice(dst, sliceLength, stmt =>
         {
-            if (stmt is IlBranchStmt branch)
-            {
-                var copy = branch.Copy();
-                copy.Target = copy.Target + dst - slicePos;
-                return copy;
-            }
-            else return stmt;
+            if (stmt is not IlBranchStmt branch) return stmt;
+
+            var copy = branch.Copy();
+            copy.Target = copy.Target + dst - slicePos;
+            return copy;
         });
         var duplicates = _scopes.Where(s => s.IsInSegment(slicePos, slicePos + sliceLength))
             .Select(s => s.ShiftedRightAt(slicePos - s.tacLoc.tb + dst)).ToList();
@@ -132,9 +131,10 @@ public class TacFinallyInliner(IlMethod method) : TacTransformerIndexImpl(method
                     stmt => stmt is IlEndFinallyStmt { IsMutable: true }
                         ? new IlGotoStmt(leaveTarget)
                         : stmt);
+                var pos = inlinePos;
                 ApplyToSlice(scope.tacLoc.tb, scope.tacLoc.te - scope.tacLoc.tb + 1,
                     stmt => stmt is IlLeaveStmt ls && ls.Target == leaveTarget
-                        ? new IlGotoStmt(inlinePos)
+                        ? new IlGotoStmt(pos)
                         : stmt);
                 inlinePos += handlerSize;
             }
