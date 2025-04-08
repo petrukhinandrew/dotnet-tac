@@ -8,15 +8,20 @@ public class IlPointerType(Type targetType, bool isUnmanaged = true) : IlType(ta
     public override bool IsManaged => !isUnmanaged;
     public override bool IsUnmanaged => isUnmanaged;
     public IlType TargetType => IlInstanceBuilder.GetType(Type);
-    public override string FullName => (isUnmanaged ? "*" : "&") +  base.FullName;
+    public override IlType ExpectedStackType() => this;
+    public override string FullName => (isUnmanaged ? "*" : "&") + base.FullName;
 }
 
-public class IlValueType(Type type) : IlType(type);
+public class IlValueType(Type type) : IlType(type)
+{
+    public override IlType ExpectedStackType() => this;
+}
 
 public class IlReferenceType(Type type) : IlType(type)
 {
     public override bool IsManaged => true;
     public override bool IsUnmanaged => false;
+    public override IlType ExpectedStackType() => this;
 }
 
 public class IlPrimitiveType(Type type) : IlValueType(type)
@@ -34,7 +39,7 @@ public class IlPrimitiveType(Type type) : IlValueType(type)
             TypeCode.Boolean => IlInstanceBuilder.GetType(typeof(bool)),
             TypeCode.Char => IlInstanceBuilder.GetType(typeof(char)),
             TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 => IlInstanceBuilder.GetType(typeof(int)),
-            TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(uint)),
+            TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(int)),
             TypeCode.Int64 => IlInstanceBuilder.GetType(typeof(long)),
             TypeCode.UInt64 => IlInstanceBuilder.GetType(typeof(ulong)),
             TypeCode.Single => IlInstanceBuilder.GetType(typeof(float)),

@@ -21,7 +21,13 @@ static class BlockTacLineBuilder
     private static IlValue EnsureTyped(this BlockTacBuilder blockBuilder, IlExpr expr, IlType? expectedType)
     {
         IlExpr typed;
-        if (expectedType != null && expectedType is not IlReferenceType)
+        if (Equals(expectedType, IlInstanceBuilder.GetType(typeof(bool))) &&
+            Equals(expr.Type, IlInstanceBuilder.GetType(typeof(int))))
+        {
+            typed = new IlCeqOp(blockBuilder.EnsureTyped(expr, IlInstanceBuilder.GetType(typeof(int))),
+                new IlInt32Const(1));
+        }
+        else if (expectedType != null && expectedType is not IlReferenceType)
         {
             typed = expr.WithTypeEnsured(expectedType);
         }
@@ -30,7 +36,7 @@ static class BlockTacLineBuilder
             typed = expr.Coerced();
         }
 
-        if (typed is IlValue value) return value;
+        if (typed is IlSimpleValue value) return value;
         var newTmp = blockBuilder.GetNewTemp(typed);
         blockBuilder.NewLine(new IlAssignStmt(newTmp, typed));
         return newTmp;
@@ -336,10 +342,24 @@ static class BlockTacLineBuilder
                 case "stind.i8":
                 {
                     var val = blockBuilder.Pop();
+                    if (val is not IlSimpleValue)
+                    {
+                        var valTmp = blockBuilder.GetNewTemp(val);
+                        blockBuilder.NewLine(new IlAssignStmt(valTmp, val));
+                        val = valTmp;
+                    }
                     var addr = blockBuilder.Pop();
+                    if (addr is not IlSimpleValue)
+                    {
+                        var addrTmp = blockBuilder.GetNewTemp(addr);
+                        blockBuilder.NewLine(new IlAssignStmt(addrTmp, addr));
+                        addr = addrTmp;
+                    }
                     blockBuilder.NewLine(
                         new IlAssignStmt(
-                            PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(int))), val));
+                            PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(int))),
+                            val)
+                    );
                     break;
                 }
                 case "stind.r4":
@@ -623,11 +643,14 @@ static class BlockTacLineBuilder
                 case "ret":
                 {
                     var methodMeta = blockBuilder.Meta.MethodMeta!;
-
+                    var voidType = IlInstanceBuilder.GetType(typeof(void));
                     IlExpr? retVal = null;
-                    if (methodMeta.ReturnType != null &&
-                        !Equals(methodMeta.ReturnType, IlInstanceBuilder.GetType(typeof(void))))
-                        retVal = blockBuilder.EnsureTyped(blockBuilder.Pop(), methodMeta.ReturnType);
+                    if (methodMeta.ReturnType != null && !Equals(methodMeta.ReturnType, voidType))
+                    {
+                        retVal = blockBuilder.Pop();
+                        retVal = blockBuilder.EnsureTyped(retVal, methodMeta.ReturnType);
+                    }
+
                     blockBuilder.NewLine(
                         new IlReturnStmt(retVal)
                     );

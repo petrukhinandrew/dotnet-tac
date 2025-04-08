@@ -988,6 +988,16 @@ public class RomaExamples
     public class NG
     {
     }
+
+    [Fact]
+    public unsafe void BoolToInt()
+    {
+        var b = true;
+        var conv = Convert.ToInt32(b);
+        Assert.Equal(1, conv);
+        var v = (int*)&b;
+        Assert.Equal(1, *v);
+    }
 }
 
 class ArrayList<T> : List<T> where T : struct, IEquatable<T>

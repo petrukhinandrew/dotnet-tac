@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using TACBuilder.Exprs;
+using TACBuilder.ILReflection;
 
 namespace TACBuilder.ILTAC.TypeSystem;
 
@@ -29,7 +30,8 @@ public class IlAssignStmt : IlStmt
     {
         Lhs = lhs;
         Rhs = rhs;
-        Debug.Assert(!(lhs is IlComplexValue && rhs is IlComplexValue));
+        Debug.Assert(!(lhs is IlComplexValue && rhs is IlComplexValue) ||
+                     (lhs is IlUnmanagedDeref && rhs is IlUnmanagedDeref));
         Debug.Assert(lhs is IlSimpleValue || rhs is IlSimpleValue or not IlValue);
     }
 
@@ -105,9 +107,21 @@ public class IlGotoStmt(int target) : IlBranchStmt(target)
     }
 }
 
-public class IlIfStmt(IlExpr cond, int target) : IlBranchStmt(target)
+public class IlIfStmt : IlBranchStmt
 {
-    public IlExpr Condition => cond;
+    private readonly IlExpr _cond;
+
+    public IlIfStmt(IlExpr cond, int target) : base(target)
+    {
+        if (cond.Type != IlInstanceBuilder.GetType(typeof(bool)))
+        {
+            Console.Error.WriteLine("Condition type expected to be bool, got {0}", cond.Type.FullName);
+            throw new ApplicationException();
+        }
+        _cond = cond;
+    }
+
+    public IlExpr Condition => _cond;
 
     public override string ToString()
     {

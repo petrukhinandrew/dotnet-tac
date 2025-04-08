@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
 using TACBuilder.Utils;
 
@@ -153,7 +154,7 @@ public class IlType(Type type) : IlMember(type)
     public bool IsGenericType => _type.IsGenericType;
     public virtual bool IsUnmanaged => _type.IsUnmanaged();
 
-    public virtual IlType ExpectedStackType() => this;
+    public virtual IlType ExpectedStackType() => throw new ApplicationException();
 
     internal void EnsureFieldAttached(IlField ilField)
     {
@@ -248,5 +249,10 @@ internal static class IlTypeHelpers
             left = left.BaseType;
             right = right.BaseType;
         }
+    }
+
+    public static IlType NumericBinOpType(this IlType exactLhs, IlType exactRhs)
+    {
+        return  exactLhs.MeetWith(exactRhs);
     }
 }

@@ -45,8 +45,7 @@ public class IlUnmanagedRef(IlExpr value) : ILRefExpr, IlComplexValue
 {
     public IlExpr Value => value;
 
-    public IlType Type =>
-        IlInstanceBuilder.GetType(value.Type.Type.MakePointerType());
+    public IlType Type => value.Type.MakePointerType();
 
     public override string ToString()
     {
