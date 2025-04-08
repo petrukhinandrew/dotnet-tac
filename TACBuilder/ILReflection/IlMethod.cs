@@ -279,7 +279,14 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
         var baseDefn = methodInfo.IsGenericMethod ? methodInfo.GetGenericMethodDefinition() : methodInfo.GetBaseDefinition();
         var baseDefnDeclType = baseDefn.DeclaringType;
-        return IlInstanceBuilder.GetMethod(methodInfo.GetBaseDefinition());
+        if (baseDefnDeclType?.IsInterface == true) return IlInstanceBuilder.GetMethod(baseDefn);
+        foreach (var iface in baseDefnDeclType!.GetInterfaces())
+        {
+            var mapping = baseDefnDeclType.GetInterfaceMap(iface);
+            var baseMethod = mapping.InterfaceMethods.SingleOrDefault(method => method?.Name == baseDefn.Name, defaultValue: null);
+            if (baseMethod != null) return IlInstanceBuilder.GetMethod(baseMethod);
+        }
+        return IlInstanceBuilder.GetMethod(baseDefn);
     }
     
     

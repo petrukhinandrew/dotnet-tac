@@ -62,6 +62,11 @@ class ContextNoVuln1 : AContext
     {
         return "";
     }
+
+    public new string Get()
+    {
+        return "";
+    }
 }
 
 class CallsiteClassResolve
@@ -127,5 +132,37 @@ public class VirtualCallResolve(ITestOutputHelper helper)
         // b.Kek();
         // ((A)b).Kek();
         // ab.Kek();
+    }
+}
+
+public interface InterfaceMethodLookupBase
+{
+    public void Base();
+}
+
+public interface InterfaceMethodLookup : InterfaceMethodLookupBase
+{
+    public void ChildMethod();
+}
+
+public interface InterfaceAnotherBranch
+{
+    public void AnotherBranch();
+}
+
+public class TestExample : InterfaceMethodLookup, InterfaceAnotherBranch
+{
+    public void Base()
+    {
+        
+    }
+
+    public void ChildMethod()
+    {
+        
+    }
+
+    public void AnotherBranch()
+    {
     }
 }

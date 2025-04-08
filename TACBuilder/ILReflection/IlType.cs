@@ -43,7 +43,7 @@ public class IlType(Type type) : IlMember(type)
         }
 
         Size = LayoutUtils.SizeOf(_type);
-
+        
         if (_type.IsGenericParameter && _type.DeclaringMethod != null)
         {
             DeclaringMethod = IlInstanceBuilder.GetMethod(_type.DeclaringMethod);
