@@ -2,19 +2,19 @@ using TACBuilder.ILReflection;
 
 namespace TACBuilder.Exprs;
 
-public interface ILRefExpr : IlSimpleValue
+public interface IlRefExpr : IlSimpleValue
 {
     public IlExpr Value { get; }
 }
 
-public interface ILDerefExpr : IlSimpleValue
+public interface IlDerefExpr : IlSimpleValue
 {
     public IlExpr Value { get; }
 }
 
 public abstract class PointerExprTypeResolver
 {
-    public static ILDerefExpr Deref(IlExpr instance, IlType? expectedType = null)
+    public static IlDerefExpr Deref(IlExpr instance, IlType? expectedType = null)
     {
         return instance.Type.IsManaged switch
         {
@@ -24,16 +24,12 @@ public abstract class PointerExprTypeResolver
         };
     }
 }
-// call (managedRef) no temp
-// managedRef = ...
-// var = managedRef + 1
 
-public class IlManagedRef(IlExpr value) : ILRefExpr
+public class IlManagedRef(IlExpr value) : IlRefExpr
 {
     public IlExpr Value => value;
 
-    public IlType Type =>
-        IlInstanceBuilder.GetType(value.Type.Type.MakeByRefType());
+    public IlType Type => value.Type.MakeByRefType();
 
     public override string ToString()
     {
@@ -41,7 +37,7 @@ public class IlManagedRef(IlExpr value) : ILRefExpr
     }
 }
 
-public class IlUnmanagedRef(IlExpr value) : ILRefExpr, IlComplexValue
+public class IlUnmanagedRef(IlExpr value) : IlRefExpr, IlComplexValue
 {
     public IlExpr Value => value;
 
@@ -53,7 +49,7 @@ public class IlUnmanagedRef(IlExpr value) : ILRefExpr, IlComplexValue
     }
 }
 
-public class IlManagedDeref(IlExpr byRefVal) : ILDerefExpr
+public class IlManagedDeref(IlExpr byRefVal) : IlDerefExpr
 {
     public IlExpr Value => byRefVal;
 
@@ -67,7 +63,7 @@ public class IlManagedDeref(IlExpr byRefVal) : ILDerefExpr
     }
 }
 
-public class IlUnmanagedDeref : ILDerefExpr, IlComplexValue
+public class IlUnmanagedDeref : IlDerefExpr, IlComplexValue
 {
     public IlUnmanagedDeref(IlExpr pointedVal, IlType expectedType)
     {
