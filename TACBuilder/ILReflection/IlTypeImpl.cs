@@ -8,6 +8,7 @@ public class IlPointerType(Type targetType, bool isUnmanaged = true) : IlType(ta
     public override bool IsManaged => !isUnmanaged;
     public override bool IsUnmanaged => isUnmanaged;
     public IlType TargetType => IlInstanceBuilder.GetType(Type);
+    public override IlType? DeclaringType => TargetType.DeclaringType;
     public override IlType ExpectedStackType() => this;
     public override string FullName => (isUnmanaged ? "*" : "&") + base.FullName;
 }
@@ -80,17 +81,8 @@ public class IlStructType(Type type) : IlValueType(type);
 public class IlArrayType(Type type) : IlReferenceType(type)
 {
     public IlType ElementType => IlInstanceBuilder.GetType(Type.GetElementType()!);
-    protected override string ConstructFullName()
-    {
-        if (IsGenericType && Type.IsGenericMethodParameter)
-            return DeclaringMethod!.NonGenericSignature + "!" + Name;
-        if (IsGenericType && Type.IsGenericTypeParameter)
-            return DeclaringType!.FullName + "!" + Name;
-        if (ElementType.DeclaringType != null)
-            return ElementType.DeclaringType.FullName + "+" + Name;
-        
-        return Namespace == "" ? Name : Namespace + "." + Name;
-    }
+
+    public override IlType? DeclaringType => ElementType.DeclaringType;
 }
 
 public class IlClassType(Type type) : IlReferenceType(type);

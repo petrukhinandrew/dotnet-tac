@@ -73,7 +73,6 @@ class Program
             builder.Build(file);
         var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();
         var freshTypes = IlInstanceBuilder.GetFreshTypes();
-        // var serialized = RdSerializer.Serialize(freshTypes);
     }
 
     private static void HandleParseError(IEnumerable<Error> errs)

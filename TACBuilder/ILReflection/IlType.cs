@@ -17,7 +17,7 @@ public class IlType(Type type) : IlMember(type)
         System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static |
         System.Reflection.BindingFlags.DeclaredOnly;
 
-    public IlType? DeclaringType { get; private set; }
+    public virtual IlType? DeclaringType { get; private set; }
 
     public int Size { get; private set; }
 
@@ -105,7 +105,7 @@ public class IlType(Type type) : IlMember(type)
 
     public virtual string FullName => ConstructFullName();
 
-    protected virtual string ConstructFullName()
+    protected string ConstructFullName()
     {
         if (IsGenericType && _type.IsGenericMethodParameter)
             return DeclaringMethod!.NonGenericSignature + "!" + Name;
