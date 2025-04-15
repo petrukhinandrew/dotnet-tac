@@ -33,7 +33,7 @@ static class BlockTacLineBuilder
         var val = blockBuilder.Pop();
         val = blockBuilder.EnsureTyped(val, instType);
         var addr = blockBuilder.Pop();
-        var typedAddr = blockBuilder.MakeSimpleValue(new IlConvCastExpr(instType.MakePointerType(), addr));
+        var typedAddr = blockBuilder.EnsureTyped(addr, instType.MakePointerType());
         blockBuilder.NewLine(
             new IlAssignStmt(
                 PointerExprTypeResolver.Deref(typedAddr, instType),
