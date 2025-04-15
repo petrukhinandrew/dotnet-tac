@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic.CompilerServices;
 using TACBuilder.Utils;
 
 namespace TACBuilder.ILReflection;
@@ -104,7 +105,7 @@ public class IlType(Type type) : IlMember(type)
 
     public virtual string FullName => ConstructFullName();
 
-    private string ConstructFullName()
+    protected virtual string ConstructFullName()
     {
         if (IsGenericType && _type.IsGenericMethodParameter)
             return DeclaringMethod!.NonGenericSignature + "!" + Name;
@@ -251,8 +252,13 @@ internal static class IlTypeHelpers
         }
     }
 
-    public static IlType NumericBinOpType(this IlType exactLhs, IlType exactRhs)
+    public static IlType NumericBinOpType(this IlType lhs, IlType rhs)
     {
-        return  exactLhs.MeetWith(exactRhs);
+        Debug.Assert(lhs is not IlReferenceType && rhs is not IlReferenceType);
+        if (lhs is IlPrimitiveType && rhs is IlPrimitiveType)
+            return lhs.MeetWith(rhs);
+        if (lhs is IlPointerType lp) return lp;
+        if (rhs is IlPointerType rp) return rp;
+        throw new ApplicationException("Illegal NumericBinOpType");
     }
 }

@@ -30,9 +30,16 @@ public class IlAssignStmt : IlStmt
     {
         Lhs = lhs;
         Rhs = rhs;
-        Debug.Assert(!(lhs is IlComplexValue && rhs is IlComplexValue) ||
-                     (lhs is IlUnmanagedDeref && rhs is IlUnmanagedDeref));
-        Debug.Assert(lhs is IlSimpleValue || rhs is IlSimpleValue or not IlValue);
+        Debug.Assert(
+            !(Lhs.Type is IlPrimitiveType && Rhs.Type is IlPrimitiveType) || Lhs.Type.Equals(Rhs.Type),
+            $"Primitive type assign fail {Rhs.Type} = {Lhs.Type}"
+        );
+
+        Debug.Assert(
+            !(Lhs.Type is IlReferenceType && Rhs.Type is IlReferenceType) ||
+            Lhs.Type.Type.IsAssignableFrom(Rhs.Type.Type),
+            $"Reference type assign fail {Rhs.Type} = {Lhs.Type}"
+        );
     }
 
     public override string ToString()
@@ -109,19 +116,13 @@ public class IlGotoStmt(int target) : IlBranchStmt(target)
 
 public class IlIfStmt : IlBranchStmt
 {
-    private readonly IlExpr _cond;
-
     public IlIfStmt(IlExpr cond, int target) : base(target)
     {
-        if (cond.Type != IlInstanceBuilder.GetType(typeof(bool)))
-        {
-            Console.Error.WriteLine("Condition type expected to be bool, got {0}", cond.Type.FullName);
-            throw new ApplicationException();
-        }
-        _cond = cond;
+        Debug.Assert(cond.Type.Equals(IlInstanceBuilder.GetType(typeof(bool))));
+        Condition = cond;
     }
 
-    public IlExpr Condition => _cond;
+    public IlExpr Condition { get; }
 
     public override string ToString()
     {

@@ -1,12 +1,11 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using TACBuilder.BodyBuilder;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
-namespace TACBuilder;
+namespace TACBuilder.BodyBuilder;
 
 static class BlockTacLineBuilder
 {
@@ -18,28 +17,59 @@ static class BlockTacLineBuilder
         blockBuilder.NewLine(new IlAssignStmt(blockBuilder.Locals[idx], typedValue));
     }
 
+    private static void LdIndTyped(this BlockTacBuilder blockBuilder, Type rawValueType, Type rawStackType)
+    {
+        var addr = blockBuilder.Pop();
+        var valueType = IlInstanceBuilder.GetType(rawValueType);
+        var stackType = IlInstanceBuilder.GetType(rawStackType);
+        var deref = PointerExprTypeResolver.Deref(addr, valueType);
+        var typed = blockBuilder.EnsureTyped(deref, stackType);
+        blockBuilder.Push(typed);
+    }
+
+    private static void StIndTyped(this BlockTacBuilder blockBuilder, Type rawInstType)
+    {
+        var instType = IlInstanceBuilder.GetType(rawInstType);
+        var val = blockBuilder.Pop();
+        val = blockBuilder.EnsureTyped(val, instType);
+        var addr = blockBuilder.Pop();
+        var typedAddr = blockBuilder.MakeSimpleValue(new IlConvCastExpr(instType.MakePointerType(), addr));
+        blockBuilder.NewLine(
+            new IlAssignStmt(
+                PointerExprTypeResolver.Deref(typedAddr, instType),
+                val)
+        );
+    }
+
+    private static IlSimpleValue MakeSimpleValue(this BlockTacBuilder blockBuilder, IlExpr expr)
+    {
+        if (expr is IlSimpleValue value) return value;
+        var newTmp = blockBuilder.GetNewTemp(expr);
+        blockBuilder.NewLine(new IlAssignStmt(newTmp, expr));
+        return newTmp;
+    }
+
     private static IlValue EnsureTyped(this BlockTacBuilder blockBuilder, IlExpr expr, IlType? expectedType)
     {
-        IlExpr typed;
-        if (Equals(expectedType, IlInstanceBuilder.GetType(typeof(bool))) &&
-            Equals(expr.Type, IlInstanceBuilder.GetType(typeof(int))))
+        if (expr is IlNullConst && expectedType != null)
         {
-            typed = new IlCeqOp(blockBuilder.EnsureTyped(expr, IlInstanceBuilder.GetType(typeof(int))),
-                new IlInt32Const(1));
-        }
-        else if (expectedType != null && expectedType is not IlReferenceType)
-        {
-            typed = expr.WithTypeEnsured(expectedType);
-        }
-        else
-        {
-            typed = expr.Coerced();
+            return new IlNullConst(expectedType);
         }
 
-        if (typed is IlSimpleValue value) return value;
-        var newTmp = blockBuilder.GetNewTemp(typed);
-        blockBuilder.NewLine(new IlAssignStmt(newTmp, typed));
-        return newTmp;
+        if (expr.Type.Equals(expectedType))
+        {
+            return blockBuilder.MakeSimpleValue(expr);
+        }
+
+        if (expectedType != null)
+            return blockBuilder.MakeSimpleValue(new IlConvCastExpr(expectedType, blockBuilder.MakeSimpleValue(expr)));
+        
+        return blockBuilder.MakeSimpleValue(expr);
+    }
+
+    private static IlValue EnsureBool(this BlockTacBuilder blockBuilder, IlExpr expr)
+    {
+        return blockBuilder.EnsureTyped(expr, IlInstanceBuilder.GetType(typeof(bool)));
     }
 
     /*
@@ -61,9 +91,11 @@ static class BlockTacLineBuilder
                 var target = (ILInstrOperand.Target)switchBranch.arg;
                 Debug.Assert(blockBuilder.SwitchRegister is not null);
                 // targets.Add(target.value);
+                IlExpr comparison = new IlCeqOp(blockBuilder.SwitchRegister,
+                    new IlInt32Const(switchBranch.Value));
+                var typed = blockBuilder.EnsureBool(comparison);
                 blockBuilder.NewLine(new IlIfStmt(
-                    new IlCeqOp(blockBuilder.SwitchRegister,
-                        new IlInt32Const(switchBranch.Value)),
+                    typed,
                     target.value.idx
                 ));
                 blockBuilder.Successors.ForEach(s => s.SwitchRegister = blockBuilder.SwitchRegister);
@@ -280,50 +312,64 @@ static class BlockTacLineBuilder
                     break;
                 }
                 case "ldind.i1":
+                {
+                    blockBuilder.LdIndTyped(typeof(sbyte), typeof(int));
+                    break;
+                }
                 case "ldind.i2":
+                {
+                    blockBuilder.LdIndTyped(typeof(short), typeof(int));
+                    break;
+                }
                 case "ldind.i4":
+                {
+                    blockBuilder.LdIndTyped(typeof(int), typeof(int));
+                    break;
+                }
                 case "ldind.u1":
+                {
+                    blockBuilder.LdIndTyped(typeof(byte), typeof(int));
+                    break;
+                }
                 case "ldind.u2":
+                {
+                    blockBuilder.LdIndTyped(typeof(ushort), typeof(int));
+                    break;
+                }
                 case "ldind.u4":
                 {
-                    var addr = blockBuilder.Pop();
-                    var intType = IlInstanceBuilder.GetType(typeof(int));
-                    var deref = PointerExprTypeResolver.Deref(addr, intType);
-                    blockBuilder.Push(deref);
+                    blockBuilder.LdIndTyped(typeof(uint), typeof(int));
                     break;
                 }
                 case "ldind.u8":
+                {
+                    blockBuilder.LdIndTyped(typeof(ulong), typeof(long));
+                    break;
+                }
                 case "ldind.i8":
                 {
-                    var addr = blockBuilder.Pop();
-                    var longType = IlInstanceBuilder.GetType(typeof(long));
-                    var deref = PointerExprTypeResolver.Deref(addr, longType);
-                    blockBuilder.Push(deref);
+                    blockBuilder.LdIndTyped(typeof(long), typeof(long));
                     break;
                 }
                 case "ldind.r4":
+                {
+                    blockBuilder.LdIndTyped(typeof(float), typeof(float));
+                    break;
+                }
                 case "ldind.r8":
                 {
-                    var addr = blockBuilder.Pop();
-                    var floatType = IlInstanceBuilder.GetType(typeof(NFloat));
-                    var deref = PointerExprTypeResolver.Deref(addr, floatType);
-                    blockBuilder.Push(deref);
+                    blockBuilder.LdIndTyped(typeof(double), typeof(double));
                     break;
                 }
                 case "ldind.i":
                 {
-                    var addr = blockBuilder.Pop();
-                    var nintType = IlInstanceBuilder.GetType(typeof(nint));
-                    var deref = PointerExprTypeResolver.Deref(addr, nintType);
-                    blockBuilder.Push(deref);
+                    blockBuilder.LdIndTyped(typeof(nint), typeof(nint));
                     break;
                 }
-
                 case "ldind.ref":
                 {
                     var addr = blockBuilder.Pop();
-                    var objType = IlInstanceBuilder.GetType(typeof(object));
-                    var deref = PointerExprTypeResolver.Deref(addr, objType);
+                    var deref = PointerExprTypeResolver.Deref(addr, null);
                     blockBuilder.Push(deref);
                     break;
                 }
@@ -337,56 +383,52 @@ static class BlockTacLineBuilder
                 }
 
                 case "stind.i1":
+                {
+                    blockBuilder.StIndTyped(typeof(sbyte));
+                    break;
+                }
+
                 case "stind.i2":
+                {
+                    blockBuilder.StIndTyped(typeof(short));
+                    break;
+                }
                 case "stind.i4":
+                    blockBuilder.StIndTyped(typeof(int));
+                    break;
                 case "stind.i8":
                 {
-                    var val = blockBuilder.Pop();
-                    if (val is not IlSimpleValue)
-                    {
-                        var valTmp = blockBuilder.GetNewTemp(val);
-                        blockBuilder.NewLine(new IlAssignStmt(valTmp, val));
-                        val = valTmp;
-                    }
-                    var addr = blockBuilder.Pop();
-                    if (addr is not IlSimpleValue)
-                    {
-                        var addrTmp = blockBuilder.GetNewTemp(addr);
-                        blockBuilder.NewLine(new IlAssignStmt(addrTmp, addr));
-                        addr = addrTmp;
-                    }
-                    blockBuilder.NewLine(
-                        new IlAssignStmt(
-                            PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(int))),
-                            val)
-                    );
+                    blockBuilder.StIndTyped(typeof(long));
                     break;
                 }
                 case "stind.r4":
                 {
-                    var val = blockBuilder.Pop();
-                    var addr = (IlValue)blockBuilder.Pop();
-                    blockBuilder.NewLine(new IlAssignStmt(
-                        PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(float))),
-                        val));
+                    blockBuilder.StIndTyped(typeof(float));
+                    // var val = blockBuilder.Pop();
+                    // var addr = (IlValue)blockBuilder.Pop();
+                    // blockBuilder.NewLine(new IlAssignStmt(
+                    //     PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(float))),
+                    //     val));
                     break;
                 }
                 case "stind.r8":
                 {
-                    var val = blockBuilder.Pop();
-                    var addr = blockBuilder.Pop();
-                    blockBuilder.NewLine(new IlAssignStmt(
-                        PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(double))),
-                        val));
+                    blockBuilder.StIndTyped(typeof(double));
+                    // var val = blockBuilder.Pop();
+                    // var addr = blockBuilder.Pop();
+                    // blockBuilder.NewLine(new IlAssignStmt(
+                    //     PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(double))),
+                    //     val));
                     break;
                 }
                 case "stind.i":
                 {
-                    var val = blockBuilder.Pop();
-                    var addr = blockBuilder.Pop();
-                    blockBuilder.NewLine(new IlAssignStmt(
-                        PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(nint))),
-                        val));
+                    blockBuilder.StIndTyped(typeof(nint));
+                    // var val = blockBuilder.Pop();
+                    // var addr = blockBuilder.Pop();
+                    // blockBuilder.NewLine(new IlAssignStmt(
+                    //     PointerExprTypeResolver.Deref(addr, IlInstanceBuilder.GetType(typeof(nint))),
+                    //     val));
                     break;
                 }
                 case "stind.ref":
@@ -476,7 +518,7 @@ static class BlockTacLineBuilder
                     break;
                 }
                 case "ldnull":
-                    blockBuilder.Push(new IlNullConst());
+                    blockBuilder.Push(new IlNullConst(IlInstanceBuilder.GetType(typeof(object))));
                     break;
                 case "ldc.i4.m1":
                 case "ldc.i4.M1":
@@ -890,9 +932,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCeqOp(lhs, rhs),
-                        tb.idx));
+                    var comparison = new IlCeqOp(lhs, rhs);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "bne.un":
@@ -901,9 +943,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCneOp(lhs, rhs),
-                        tb.idx));
+                    var comparison = new IlCneOp(lhs, rhs);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "bge":
@@ -912,9 +954,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCgeOp(lhs, rhs),
-                        tb.idx));
+                    var comparison = new IlCgeOp(lhs, rhs);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "bge.un":
@@ -923,9 +965,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCgeOp(lhs, rhs, isUnsigned: true),
-                        tb.idx));
+                    var comparison = new IlCgeOp(lhs, rhs, isUnsigned: true);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "bgt":
@@ -934,9 +976,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCgtOp(lhs, rhs),
-                        tb.idx));
+                    var comparison = new IlCgtOp(lhs, rhs);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "bgt.un":
@@ -945,9 +987,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCgtOp(lhs, rhs, isUnsigned: true),
-                        tb.idx));
+                    var comparison = new IlCgtOp(lhs, rhs, isUnsigned: true);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "ble":
@@ -956,9 +998,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCleOp(lhs, rhs),
-                        tb.idx));
+                    var comparison = new IlCleOp(lhs, rhs);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "ble.un":
@@ -967,9 +1009,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCleOp(lhs, rhs, isUnsigned: true),
-                        tb.idx));
+                    var comparison = new IlCleOp(lhs, rhs, isUnsigned: true);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "blt":
@@ -978,9 +1020,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCltOp(lhs, rhs),
-                        tb.idx));
+                    var comparison = new IlCltOp(lhs, rhs);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "blt.un":
@@ -989,9 +1031,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(
-                        new IlCltOp(lhs, rhs, isUnsigned: true),
-                        tb.idx));
+                    var comparison = new IlCltOp(lhs, rhs, isUnsigned: true);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "brinst":
@@ -1002,7 +1044,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     IlExpr rhs = IlConstant.BrFalseWith(lhs);
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(new IlCneOp(lhs, rhs), tb.idx));
+                    var comparison = new IlCneOp(lhs, rhs);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "brnull":
@@ -1015,7 +1059,9 @@ static class BlockTacLineBuilder
                     var lhs = blockBuilder.Pop();
                     IlExpr rhs = IlConstant.BrFalseWith(lhs);
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
-                    blockBuilder.NewLine(new IlIfStmt(new IlCeqOp(lhs, rhs), tb.idx));
+                    var comparison = new IlCeqOp(lhs, rhs);
+                    var typed = blockBuilder.EnsureBool(comparison);
+                    blockBuilder.NewLine(new IlIfStmt(typed, tb.idx));
                     return true;
                 }
                 case "newobj":

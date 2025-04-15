@@ -6,18 +6,37 @@ public class RomaCases(ITestOutputHelper testOutputHelper)
 {
     public struct MyStruct
     {
-        public int Age;
-        public string Name;
+        public int x;
+        public int y;
     }
+    
+        public unsafe int SymbolicStructWrite(int i)
+        {
+            var array = new MyStruct[2];
+            array[0] = new MyStruct() { x = 5 };
+            array[1] = new MyStruct() { y = 1 };
+            fixed (MyStruct* ptr = &array[0])
+            {
+                var casted = (byte*)ptr;
+                *(int*)(casted + i) = 500;
+                if (array[0].y == 500 && i != 4)
+                {
+                    return -1;
+                }
 
-    public int WriteStructConcrete()
-    {
-        var s = new MyStruct { Age = 1, Name = null };
-        var age = s.Age;
-        var name = s.Name;
-        s.Name = name;
-        return 0;
-    }
+                return 0;
+            }
+        }
+    
+
+    // public int WriteStructConcrete()
+    // {
+    //     var s = new MyStruct { Age = 1, Name = null };
+    //     var age = s.Age;
+    //     var name = s.Name;
+    //     s.Name = name;
+    //     return 0;
+    // }
 
     public unsafe int StackUnsafe1(int a, int i)
     {

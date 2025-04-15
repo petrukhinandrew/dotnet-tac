@@ -39,7 +39,7 @@ public class IlPrimitiveType(Type type) : IlValueType(type)
             TypeCode.Boolean => IlInstanceBuilder.GetType(typeof(bool)),
             TypeCode.Char => IlInstanceBuilder.GetType(typeof(char)),
             TypeCode.SByte or TypeCode.Int16 or TypeCode.Int32 => IlInstanceBuilder.GetType(typeof(int)),
-            TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(int)),
+            TypeCode.Byte or TypeCode.UInt16 or TypeCode.UInt32 => IlInstanceBuilder.GetType(typeof(uint)),
             TypeCode.Int64 => IlInstanceBuilder.GetType(typeof(long)),
             TypeCode.UInt64 => IlInstanceBuilder.GetType(typeof(ulong)),
             TypeCode.Single => IlInstanceBuilder.GetType(typeof(float)),
@@ -80,6 +80,17 @@ public class IlStructType(Type type) : IlValueType(type);
 public class IlArrayType(Type type) : IlReferenceType(type)
 {
     public IlType ElementType => IlInstanceBuilder.GetType(Type.GetElementType()!);
+    protected override string ConstructFullName()
+    {
+        if (IsGenericType && Type.IsGenericMethodParameter)
+            return DeclaringMethod!.NonGenericSignature + "!" + Name;
+        if (IsGenericType && Type.IsGenericTypeParameter)
+            return DeclaringType!.FullName + "!" + Name;
+        if (ElementType.DeclaringType != null)
+            return ElementType.DeclaringType.FullName + "+" + Name;
+        
+        return Namespace == "" ? Name : Namespace + "." + Name;
+    }
 }
 
 public class IlClassType(Type type) : IlReferenceType(type);

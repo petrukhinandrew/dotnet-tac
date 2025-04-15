@@ -10,7 +10,7 @@ public interface IlConstant : IlSimpleValue
 {
     public static IlConstant From(object? obj)
     {
-        if (obj == null || obj is DBNull) return new IlNullConst();
+        if (obj is null or DBNull) return new IlNullConst(IlInstanceBuilder.GetType(typeof(object)));
         if (obj.GetType().IsEnum)
         {
             return new IlEnumConst((IlEnumType)IlInstanceBuilder.GetType(obj.GetType()),
@@ -48,7 +48,8 @@ public interface IlConstant : IlSimpleValue
         var t = expr.Type;
         if (t is IlEnumType enumType) t = enumType.UnderlyingType;
         if (t is IlPrimitiveType) t = expr.Coerced().Type;
-        if (t is IlReferenceType or IlPointerType) return new IlNullConst();
+        if (t is IlReferenceType rt) return new IlNullConst(rt);
+        if (t is IlPointerType pt) return new IlNullConst(pt.TargetType);
         if (t.Equals(IlInstanceBuilder.GetType(typeof(bool)))) return new IlBoolConst(false);
         return new IlInt32Const(0);
     }
@@ -63,9 +64,9 @@ public interface IlConstant : IlSimpleValue
     }
 }
 
-public class IlNullConst : IlConstant
+public class IlNullConst(IlType type) : IlConstant
 {
-    public IlType Type => IlInstanceBuilder.GetType(typeof(object));
+    public IlType Type => type;
 
     public override string ToString() => "null";
 }
