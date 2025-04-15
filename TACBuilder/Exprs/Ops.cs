@@ -93,35 +93,35 @@ class IlShrOp(IlExpr lhs, IlExpr rhs, bool isUnsigned = false)
 class IlCeqOp(IlExpr lhs, IlExpr rhs)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned: false)
 {
-    public override IlType Type => IlInstanceBuilder.GetType(typeof(int));
+    public override IlType Type => IlInstanceBuilder.GetType(typeof(bool));
 }
 
 class IlCneOp(IlExpr lhs, IlExpr rhs)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned: true)
 {
-    public override IlType Type => IlInstanceBuilder.GetType(typeof(int));
+    public override IlType Type => IlInstanceBuilder.GetType(typeof(bool));
 }
 
 class IlCgtOp(IlExpr lhs, IlExpr rhs, bool isUnsigned = false)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned)
 {
-    public override IlType Type => IlInstanceBuilder.GetType(typeof(int));
+    public override IlType Type => IlInstanceBuilder.GetType(typeof(bool));
 }
 
 class IlCgeOp(IlExpr lhs, IlExpr rhs, bool isUnsigned = false)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned)
 {
-    public override IlType Type => IlInstanceBuilder.GetType(typeof(int));
+    public override IlType Type => IlInstanceBuilder.GetType(typeof(bool));
 }
 
 class IlCltOp(IlExpr lhs, IlExpr rhs, bool isUnsigned = false)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned)
 {
-    public override IlType Type => IlInstanceBuilder.GetType(typeof(int));
+    public override IlType Type => IlInstanceBuilder.GetType(typeof(bool));
 }
 
 class IlCleOp(IlExpr lhs, IlExpr rhs, bool isUnsigned = false)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned)
 {
-    public override IlType Type => IlInstanceBuilder.GetType(typeof(int));
+    public override IlType Type => IlInstanceBuilder.GetType(typeof(bool));
 }
