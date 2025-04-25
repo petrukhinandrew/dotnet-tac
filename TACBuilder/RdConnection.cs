@@ -52,11 +52,14 @@ public class RdConnection(AppTacBuilder builder)
 
                     ilModel.GetIlSigModel().GenericSubstitutions.SetSync(
                         (lt, request) =>
-                            request.Select(builder.MakeGenericType).Select(v => v switch
+                        {
+                            Console.Error.WriteLine(".net built generic substitutions");
+                            return request.Select(builder.MakeGenericType).Select(v => v switch
                             {
                                 null => null,
                                 _ => RdSerializer.Serialize([v]).Single()
-                            }).ToList()
+                            }).ToList();
+                        }
                     );
                     ilModel.GetIlSigModel().Close.Advise(lifetime, () =>
                     {

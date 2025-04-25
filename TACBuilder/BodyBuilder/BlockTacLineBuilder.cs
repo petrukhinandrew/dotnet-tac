@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 using TACBuilder.ILTAC.TypeSystem;
-using TACBuilder.Utils;
 
 namespace TACBuilder.BodyBuilder;
 
@@ -929,8 +928,8 @@ static class BlockTacLineBuilder
                 case "beq":
                 case "beq.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCeqOp(lhs, rhs);
                     var typed = blockBuilder.EnsureBool(comparison);
@@ -940,8 +939,8 @@ static class BlockTacLineBuilder
                 case "bne.un":
                 case "bne.un.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCneOp(lhs, rhs);
                     var typed = blockBuilder.EnsureBool(comparison);
@@ -951,8 +950,8 @@ static class BlockTacLineBuilder
                 case "bge":
                 case "bge.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCgeOp(lhs, rhs);
                     var typed = blockBuilder.EnsureBool(comparison);
@@ -962,8 +961,8 @@ static class BlockTacLineBuilder
                 case "bge.un":
                 case "bge.un.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCgeOp(lhs, rhs, isUnsigned: true);
                     var typed = blockBuilder.EnsureBool(comparison);
@@ -973,8 +972,8 @@ static class BlockTacLineBuilder
                 case "bgt":
                 case "bgt.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCgtOp(lhs, rhs);
                     var typed = blockBuilder.EnsureBool(comparison);
@@ -984,8 +983,8 @@ static class BlockTacLineBuilder
                 case "bgt.un":
                 case "bgt.un.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCgtOp(lhs, rhs, isUnsigned: true);
                     var typed = blockBuilder.EnsureBool(comparison);
@@ -995,8 +994,8 @@ static class BlockTacLineBuilder
                 case "ble":
                 case "ble.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCleOp(lhs, rhs);
                     var typed = blockBuilder.EnsureBool(comparison);
@@ -1006,8 +1005,8 @@ static class BlockTacLineBuilder
                 case "ble.un":
                 case "ble.un.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCleOp(lhs, rhs, isUnsigned: true);
                     var typed = blockBuilder.EnsureBool(comparison);
@@ -1017,8 +1016,8 @@ static class BlockTacLineBuilder
                 case "blt":
                 case "blt.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCltOp(lhs, rhs);
                     var typed = blockBuilder.EnsureBool(comparison);
@@ -1028,8 +1027,8 @@ static class BlockTacLineBuilder
                 case "blt.un":
                 case "blt.un.s":
                 {
-                    var lhs = blockBuilder.Pop();
                     var rhs = blockBuilder.Pop();
+                    var lhs = blockBuilder.Pop();
                     var tb = ((ILInstrOperand.Target)blockBuilder.CurInstr.arg).value;
                     var comparison = new IlCltOp(lhs, rhs, isUnsigned: true);
                     var typed = blockBuilder.EnsureBool(comparison);

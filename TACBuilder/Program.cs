@@ -68,7 +68,7 @@ class Program
             Debug.Assert(File.Exists(file));
             AppTacBuilder.IncludeRootAsm(file);
         }
-
+        // AppTacBuilder.IncludeMsCorLib();
         foreach (var file in opts.InputFiles)
             builder.Build(file);
         var asmDepGraph = AppTacBuilder.GetBuiltAssemblies();

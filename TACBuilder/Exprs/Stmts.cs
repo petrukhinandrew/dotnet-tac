@@ -30,16 +30,14 @@ public class IlAssignStmt : IlStmt
     {
         Lhs = lhs;
         Rhs = rhs;
-        Debug.Assert(
-            !(Lhs.Type is IlPrimitiveType && Rhs.Type is IlPrimitiveType) || Lhs.Type.Equals(Rhs.Type),
-            $"Primitive type assign fail {Rhs.Type} = {Lhs.Type}"
-        );
-
-        Debug.Assert(
-            !(Lhs.Type is IlReferenceType && Rhs.Type is IlReferenceType) ||
-            Lhs.Type.Type.IsAssignableFrom(Rhs.Type.Type),
-            $"Reference type assign fail {Rhs.Type} = {Lhs.Type}"
-        );
+        switch (Lhs.Type)
+        {
+            case IlPrimitiveType when Rhs.Type is IlPrimitiveType && !Lhs.Type.Equals(Rhs.Type):
+                throw new ArgumentException($"Primitive type assign fail {Rhs.Type} = {Lhs.Type}");
+            case IlReferenceType when Rhs.Type is IlReferenceType &&
+                                      !Lhs.Type.Type.IsAssignableFrom(Rhs.Type.Type):
+                throw new ArgumentException($"Reference type assign fail {Rhs.Type} = {Lhs.Type}");
+        }
     }
 
     public override string ToString()

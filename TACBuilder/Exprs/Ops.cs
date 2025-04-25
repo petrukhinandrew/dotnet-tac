@@ -63,31 +63,31 @@ class IlRemOp(IlExpr lhs, IlExpr rhs, bool isUnsigned = false)
 class IlAndOp(IlExpr lhs, IlExpr rhs)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned: false)
 {
-    public override IlType Type => Lhs.Type.NumericBinOpType(Rhs.Type);
+    public override IlType Type => IlTypeHelpers.IntegerOpType(Lhs.Type, Rhs.Type);
 }
 
 class IlOrOp(IlExpr lhs, IlExpr rhs)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned: false)
 {
-    public override IlType Type => Lhs.Type.NumericBinOpType(Rhs.Type);
+    public override IlType Type => IlTypeHelpers.IntegerOpType(Lhs.Type, Rhs.Type);
 }
 
 class IlXorOp(IlExpr lhs, IlExpr rhs)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned: false)
 {
-    public override IlType Type => Lhs.Type.NumericBinOpType(Rhs.Type);
+    public override IlType Type => IlTypeHelpers.IntegerOpType(Lhs.Type, Rhs.Type);
 }
 
 class IlShlOp(IlExpr lhs, IlExpr rhs)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned: false)
 {
-    public override IlType Type => Lhs.Type.NumericBinOpType(Rhs.Type);
+    public override IlType Type => IlTypeHelpers.ShiftOpType(Lhs.Type, Rhs.Type);
 }
 
 class IlShrOp(IlExpr lhs, IlExpr rhs, bool isUnsigned = false)
     : IlBinaryOperation(lhs, rhs, isChecked: false, isUnsigned)
 {
-    public override IlType Type => Lhs.Type.NumericBinOpType(Rhs.Type);
+    public override IlType Type => IlTypeHelpers.ShiftOpType(Lhs.Type, Rhs.Type);
 }
 
 class IlCeqOp(IlExpr lhs, IlExpr rhs)

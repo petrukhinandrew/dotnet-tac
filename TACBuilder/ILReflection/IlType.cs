@@ -44,7 +44,7 @@ public class IlType(Type type) : IlMember(type)
         }
 
         Size = LayoutUtils.SizeOf(_type);
-        
+
         if (_type.IsGenericParameter && _type.DeclaringMethod != null)
         {
             DeclaringMethod = IlInstanceBuilder.GetMethod(_type.DeclaringMethod);
@@ -250,6 +250,44 @@ internal static class IlTypeHelpers
             left = left.BaseType;
             right = right.BaseType;
         }
+    }
+
+    public static IlPrimitiveType IntegerOpType(IlType left, IlType right)
+    {
+        if (left is not IlPrimitiveType || right is not IlPrimitiveType)
+        {
+            throw new ArgumentException($"integer op operands non primitive {left} {right}");
+        }
+
+        var nintType = IlInstanceBuilder.GetType(typeof(nint));
+        if (Equals(left, nintType) ||
+            Equals(right, nintType))
+        {
+            return (IlPrimitiveType)nintType;
+        }
+
+        var intType = IlInstanceBuilder.GetType(typeof(int));
+        var longType = IlInstanceBuilder.GetType(typeof(long));
+        if (left.Equals(intType) && right.Equals(intType))
+        {
+            return (IlPrimitiveType)intType;
+        }
+
+        if (left.Equals(longType) && right.Equals(longType))
+        {
+            return (IlPrimitiveType)longType;
+        }
+
+        throw new ArgumentException($"bad integer operands types: {left}, {right}");
+    }
+
+    public static IlPrimitiveType ShiftOpType(IlType left, IlType right)
+    {
+        Debug.Assert(left is IlPrimitiveType && right is IlPrimitiveType);
+
+        var longType = IlInstanceBuilder.GetType(typeof(long));
+        Debug.Assert(!right.Equals(longType));
+        return (IlPrimitiveType)left;
     }
 
     public static IlType NumericBinOpType(this IlType lhs, IlType rhs)

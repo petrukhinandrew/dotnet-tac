@@ -138,4 +138,17 @@ public class SlavaCases()
             return "SastConfigUtils.Source()";
         }
     }
+
+    public class Storage
+    {
+        public int V;
+        
+    }
+    public delegate void AssignValue(Storage s);
+    public static void DelegateWorkaround()
+    {
+        var s = new Storage();
+        AssignValue assn = storage => { storage.V = 1; };
+        assn(s);
+    }
 }

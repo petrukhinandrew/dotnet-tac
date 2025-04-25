@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
+using CommandLine;
 using org.jacodb.api.net.generated.models;
 using TACBuilder.ILReflection;
 
@@ -40,7 +41,13 @@ public class AppTacBuilder
         IlInstanceBuilder.AddMethodFilter(method =>
             (method.ReflectedType ?? method.DeclaringType)!.Assembly.GetName().ToString().StartsWith("TACBuilder"));
     }
-
+    public static void IncludeMsCorLib()
+    {
+        IlInstanceBuilder.AddTypeFilter(type =>
+            type.Assembly.GetName().ToString().StartsWith("System.Private.CoreLib"));
+        IlInstanceBuilder.AddMethodFilter(method =>
+            (method.ReflectedType ?? method.DeclaringType)!.Assembly.GetName().ToString().StartsWith("System.Private.CoreLib"));
+    }
     public static void IncludeRootAsm(string rootAssemblyPath)
     {
         IlInstanceBuilder.AddTypeFilter(type =>
@@ -70,28 +77,40 @@ public class AppTacBuilder
     
     public IlType? MakeGenericType(TypeId typeId)
     {
+        Console.WriteLine("HUI 981291821");
         var gt = MakeGenericTypeFrom(typeId);
+        Console.WriteLine("HUI 575757");
         if (gt == null) return null;
         
         var result = IlInstanceBuilder.GetType(gt);
         IlInstanceBuilder.Construct();
+        Console.WriteLine("HUI 82828228");
         return result;
     }
 
     private Type? MakeGenericTypeFrom(TypeId typeId)
     {
-        var topLevelType = FindTypeUnsafe(typeId.AsmName, typeId.TypeName);
-        if (topLevelType == null) return null;
-        if (typeId.TypeArgs.Count == 0) return topLevelType;
-        var args = new List<Type>();
-        foreach (var rawArg in typeId.TypeArgs)
+        try
         {
-            if (rawArg is not TypeId argTypeId) throw new SerializationException("typeId expected");
-            var arg = MakeGenericTypeFrom(argTypeId);
-            if (arg == null) return null;
-            args.Add(arg);
+            var topLevelType = FindTypeUnsafe(typeId.AsmName, typeId.TypeName);
+            if (topLevelType == null) return null;
+            if (typeId.TypeArgs.Count == 0) return topLevelType;
+            var args = new List<Type>();
+            foreach (var rawArg in typeId.TypeArgs)
+            {
+                if (rawArg is not TypeId argTypeId) throw new SerializationException("typeId expected");
+                var arg = MakeGenericTypeFrom(argTypeId);
+                if (arg == null) return null;
+                args.Add(arg);
+            }
+
+            return topLevelType.MakeGenericType(args.ToArray());
         }
-        return topLevelType.MakeGenericType(args.ToArray());
+        catch (Exception e)
+        {
+            Console.Error.WriteLine(e);
+            return null;
+        }
     }
 
     private Type? FindTypeUnsafe(string asmName, string typeName)

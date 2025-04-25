@@ -169,15 +169,15 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             : "";
 
     public bool IsGeneric => _methodBase.IsGenericMethod;
-    
+
     public bool IsGenericMethodDefinition => _methodBase.IsGenericMethodDefinition;
-    
+
     public bool IsStatic => _methodBase.IsStatic;
-    
+
     public bool IsVirtual => _methodBase.IsVirtual;
-    
+
     public bool IsAbstract => _methodBase.IsAbstract;
-    
+
     public new bool IsConstructed = false;
 
     public TacBody? Body => _tacBody;
@@ -212,7 +212,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         {
             ReturnType = IlInstanceBuilder.GetType(typeof(void));
         }
-        
+
         Logger.LogInformation("Constructing {Type} {Name}", DeclaringType.Name, Name);
         Attributes = _methodBase.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
@@ -224,7 +224,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
                 GenericArgs.Add(IlInstanceBuilder.GetType(arg));
             }
         }
-        
+
         Debug.Assert(Parameters.Count == 0);
 
         var explicitThis = _methodBase.CallingConvention.HasFlag(CallingConventions.ExplicitThis);
@@ -277,19 +277,31 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     {
         if (!methodInfo.IsVirtual) return this;
 
-        var baseDefn = methodInfo.IsGenericMethod ? methodInfo.GetGenericMethodDefinition() : methodInfo.GetBaseDefinition();
+        var baseDefn = methodInfo.IsGenericMethod
+            ? methodInfo.GetGenericMethodDefinition()
+            : methodInfo.GetBaseDefinition();
         var baseDefnDeclType = baseDefn.DeclaringType;
+
         if (baseDefnDeclType?.IsInterface == true) return IlInstanceBuilder.GetMethod(baseDefn);
+
         foreach (var iface in baseDefnDeclType!.GetInterfaces())
         {
             var mapping = baseDefnDeclType.GetInterfaceMap(iface);
-            var baseMethod = mapping.InterfaceMethods.SingleOrDefault(method => method?.Name == baseDefn.Name, defaultValue: null);
+
+            var baseMethod =
+                mapping.InterfaceMethods.SingleOrDefault(method =>
+                        method?.Name == baseDefn.Name &&
+                        method.ReturnType == baseDefn.ReturnType &&
+                        method.GetParameters().Select(p => p.ParameterType)
+                            .SequenceEqual(baseDefn.GetParameters().Select(p => p.ParameterType)),
+                    defaultValue: null);
             if (baseMethod != null) return IlInstanceBuilder.GetMethod(baseMethod);
         }
+
         return IlInstanceBuilder.GetMethod(baseDefn);
     }
-    
-    
+
+
     public override bool Equals(object? obj)
     {
         return obj is IlMethod other && _methodBase == other._methodBase;
