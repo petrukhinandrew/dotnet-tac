@@ -19,7 +19,7 @@ public interface TacLinesTransformerBase<TPos>
     public  void RemoveRange(TPos begin, TPos end);
 }
 
-internal class TacLinesTransformerIndexImpl(IlMethod method) : TacLinesTransformerBase<int>
+public class TacLinesTransformerIndexImpl(IlMethod method) : TacLinesTransformerBase<int>
 {
     protected List<IlStmt>? _lines => method.Body?.Lines;
     protected List<EhScope> _scopes => method.Scopes;
