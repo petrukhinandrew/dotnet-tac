@@ -132,19 +132,20 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             new TacFinallyClauseInliner(),
             new TacLeaveStmtEliminator()
         ]);
+        
         public TacBody(IlMethod method)
         {
             _method = method;
+            method._tacBody = this;
             var builder = new MethodBuilder(_method);
             Lines = builder.Build();
             
+            var transformed = _transformersChain.ApplyTo(_method);
+            Debug.Assert(Equals(transformed, _method));
         }
 
         public override void Construct()
         {
-            if (!_method.IsConstructed || Lines.Count == 0) return;
-            var transformed = _transformersChain.ApplyTo(_method);
-            Debug.Assert(Equals(transformed, _method));
         }
     }
 
@@ -256,7 +257,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             }
 
             _ilBody = IlInstanceBuilder.GetMethodIlBody(this);
-            _tacBody = IlInstanceBuilder.GetMethodTacBody(this);
+            IlInstanceBuilder.GetMethodTacBody(this);
         }
 
         // TODO may be improper decision

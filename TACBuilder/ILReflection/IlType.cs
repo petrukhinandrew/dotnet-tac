@@ -18,7 +18,7 @@ public class IlType(Type type) : IlMember(type)
 
     public virtual IlType? DeclaringType { get; private set; }
 
-    public int Size { get; private set; }
+    public readonly int Size = LayoutUtils.SizeOf(type);
 
     public IlMethod? DeclaringMethod { get; private set; }
 
@@ -41,8 +41,6 @@ public class IlType(Type type) : IlMember(type)
         {
             DeclaringType = IlInstanceBuilder.GetType(_type.DeclaringType);
         }
-
-        Size = LayoutUtils.SizeOf(_type);
 
         if (_type.IsGenericParameter && _type.DeclaringMethod != null)
         {
@@ -254,61 +252,70 @@ internal static class IlTypeHelpers
 
     public static IlPrimitiveType IntegerOpType(IlType left, IlType right)
     {
-        if (left is IlEnumType leftEnum)
+        var l = left;
+        var r = right;
+        if (l is IlEnumType leftEnum)
         {
-            left = leftEnum.UnderlyingType;
+            l = leftEnum.UnderlyingType;
         }
 
-        if (right is IlEnumType rightEnum)
+        if (r is IlEnumType rightEnum)
         {
-            right = rightEnum.UnderlyingType;
+            r = rightEnum.UnderlyingType;
         }
-        if (left is not IlPrimitiveType || right is not IlPrimitiveType)
+        
+        var boolType = IlInstanceBuilder.GetType(typeof(bool)) as IlPrimitiveType;
+        if (Equals(l, boolType) && Equals(r, boolType)) return boolType;
+        
+        if (l is not IlPrimitiveType lp || r is not IlPrimitiveType rp)
         {
             throw new ArgumentException($"integer op operands non primitive {left} {right}");
         }
-
-        var nintType = IlInstanceBuilder.GetType(typeof(nint));
-        if (Equals(left, nintType) ||
-            Equals(right, nintType))
-        {
-            return (IlPrimitiveType)nintType;
-        }
-
-        var intType = IlInstanceBuilder.GetType(typeof(int));
-        var longType = IlInstanceBuilder.GetType(typeof(long));
-        if (left.Equals(intType) && right.Equals(intType))
-        {
-            return (IlPrimitiveType)intType;
-        }
-
-        if (left.Equals(longType) && right.Equals(longType))
-        {
-            return (IlPrimitiveType)longType;
-        }
-
-        throw new ArgumentException($"bad integer operands types: {left}, {right}");
+        List<IlPrimitiveType> primitiveTypes = [lp.ExpectedStackType(), rp.ExpectedStackType()];
+        return primitiveTypes.MaxBy(it => it.Size)!;
+        // var nintType = IlInstanceBuilder.GetType(typeof(nint));
+        // if (Equals(left, nintType) ||
+        //     Equals(right, nintType))
+        // {
+        //     return (IlPrimitiveType)nintType;
+        // }
+        //
+        // var intType = IlInstanceBuilder.GetType(typeof(int));
+        // var longType = IlInstanceBuilder.GetType(typeof(long));
+        // if (left.Equals(intType) && right.Equals(intType))
+        // {
+        //     return (IlPrimitiveType)intType;
+        // }
+        //
+        // if (left.Equals(longType) && right.Equals(longType))
+        // {
+        //     return (IlPrimitiveType)longType;
+        // }
+        //
+        // throw new ArgumentException($"bad integer operands types: {left}, {right}");
     }
 
     public static IlPrimitiveType ShiftOpType(IlType left, IlType right)
     {
-        if (left is IlEnumType leftEnum)
+        var l = left;
+        var r = right;
+        if (l is IlEnumType leftEnum)
         {
-            left = leftEnum.UnderlyingType;
+            l = leftEnum.UnderlyingType;
         }
 
-        if (right is IlEnumType rightEnum)
+        if (r is IlEnumType rightEnum)
         {
-            right = rightEnum.UnderlyingType;
+            r = rightEnum.UnderlyingType;
         }
-        if (left is not IlPrimitiveType || right is not IlPrimitiveType)
+        if (l is not IlPrimitiveType || r is not IlPrimitiveType)
         {
-            Console.WriteLine($"shift op operands non primitive {left} {right}");
+            Console.WriteLine($"shift op operands non primitive {l} {r}");
         }
         
         var longType = IlInstanceBuilder.GetType(typeof(long));
         Debug.Assert(!right.Equals(longType));
-        return (IlPrimitiveType)left;
+        return (IlPrimitiveType)l;
     }
 
     public static IlType NumericBinOpType(this IlType lhs, IlType rhs)
@@ -317,10 +324,16 @@ internal static class IlTypeHelpers
         {
             Console.WriteLine($"numeric op operands non reference type {lhs}, {rhs}");
         }
-        if (lhs is IlPrimitiveType && rhs is IlPrimitiveType)
-            return lhs.MeetWith(rhs);
-        if (lhs is IlPointerType lp) return lp;
-        if (rhs is IlPointerType rp) return rp;
-        throw new ApplicationException("Illegal NumericBinOpType");
+
+        var l = lhs;
+        var r = rhs;
+        if (l is IlEnumType lEnum) l = lEnum.UnderlyingType;
+        if (r is IlEnumType rEnum) r = rEnum.UnderlyingType;
+        
+        if (l is IlPrimitiveType && r is IlPrimitiveType)
+            return l.MeetWith(r);
+        if (l is IlPointerType lp) return lp;
+        if (r is IlPointerType rp) return rp;
+        throw new ApplicationException($"Illegal NumericBinOpType {l}, {r}");
     }
 }
