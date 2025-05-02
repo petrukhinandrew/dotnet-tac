@@ -209,14 +209,16 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     private static List<IParameter> ConstructParameters(MethodBase methodBase)
     {
         List<IParameter> res = [];
+        var paramIdx = 0;
         if (methodBase.CallingConvention.HasFlag(CallingConventions.HasThis) || methodBase.CallingConvention.HasFlag(CallingConventions.ExplicitThis))
         {
             var declaringType = ResolveDeclaringType(methodBase);
             res.Add(IlInstanceBuilder.GetThisParameter(declaringType));
+            paramIdx += 1;
         }
 
         var parameters = methodBase.GetParameters()
-            .OrderBy(parameter => parameter.Position).Select(IParameter (it, idx) => IlInstanceBuilder.GetMethodParameter(it, idx)).ToList();
+            .OrderBy(parameter => parameter.Position).Select(IParameter (it) => IlInstanceBuilder.GetMethodParameter(it, paramIdx++)).ToList();
         res.AddRange(parameters);
         return res;
     }

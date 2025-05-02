@@ -16,6 +16,11 @@ public class RomaCases(ITestOutputHelper testOutputHelper)
         public int y;
     }
 
+    public unsafe int ArrayStore(int[] a, int i)
+    {
+        a[i] = 5;
+        return a[i];
+    }
     public unsafe int SymbolicStructWrite(int i)
     {
         var array = new MyStruct[2];
