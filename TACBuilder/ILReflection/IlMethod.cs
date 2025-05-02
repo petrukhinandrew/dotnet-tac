@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using TACBuilder.BodyBuilder;
+using TACBuilder.BodyBuilder.TacTransformer;
 using TACBuilder.Exprs;
 using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
@@ -29,10 +30,10 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         public string FullName => fullName();
         public IlType Type { get; } = IlInstanceBuilder.GetType(parameterInfo.ParameterType);
 
-        public List<IlAttribute> Attributes { get; } =
-            parameterInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
+        public List<IlAttribute> Attributes => parameterInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
-        public IlConstant DefaultValue { get; } = IlConstant.From(parameterInfo.DefaultValue);
+        public IlConstant DefaultValue => IlConstant.From(parameterInfo.DefaultValue);
+        
         public new bool IsConstructed = true;
         private bool IsOut => parameterInfo.IsOut;
         private bool IsIn => parameterInfo.IsIn;
@@ -50,8 +51,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         {
             if (IsOut) return $"out {Type} {Name}";
             if (IsIn) return $"in {Type} {Name}";
-            if (IsRetVal) return $"retval {Type} {Name}";
-            return $"{Type} {Name}";
+            return (IsRetVal ? "retval " : "") + $"{Type} {Name}";
         }
 
         public override string ToString()
@@ -91,22 +91,16 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         }
     }
 
-    public class IlBody(IlMethod method) : IlCacheable
+    public class IlBody : IlCacheable
     {
-        private ILBodyParser _bodyParser;
-        private CFG _cfg;
+        private readonly ILBodyParser _bodyParser;
+        private readonly CFG _cfg;
 
-        public ILInstr Instructions => _bodyParser.Instructions;
-        public List<ehClause> EhClauses => _bodyParser.EhClauses;
-        public List<IlBasicBlock> BasicBlocks => _cfg.BasicBlocks;
-        public List<int> StartBlocksIndices => _cfg.StartBlocksIndices;
-
-        public override void Construct()
+        public IlBody(IlMethod method)
         {
             _bodyParser = new ILBodyParser(method._methodBase);
             _bodyParser.Parse();
             _cfg = new CFG(_bodyParser.Instructions, _bodyParser.EhClauses);
-
             foreach (var bb in _cfg.BasicBlocks)
             {
                 bb.AttachToMethod(method);
@@ -117,31 +111,40 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
                 method.Scopes.Add(EhScope.FromClause(clause));
             }
 
-            method._tacBody = IlInstanceBuilder.GetMethodTacBody(method);
         }
-    }
 
-    public class TacBody(IlMethod method) : IlCacheable
-    {
-        public List<IlStmt> Lines { get; private set; }
+        public ILInstr Instructions => _bodyParser.Instructions;
+        public List<ehClause> EhClauses => _bodyParser.EhClauses;
+        public List<IlBasicBlock> BasicBlocks => _cfg.BasicBlocks;
+        public List<int> StartBlocksIndices => _cfg.StartBlocksIndices;
 
         public override void Construct()
         {
-            var builder = new MethodBuilder(method);
+        }
+    }
+
+    public class TacBody : IlCacheable
+    {
+        private readonly IlMethod _method;
+        public List<IlStmt> Lines { get; internal set; }
+
+        private readonly TacTransformersChain _transformersChain = new([
+            new TacFinallyClauseInliner(),
+            new TacLeaveStmtEliminator()
+        ]);
+        public TacBody(IlMethod method)
+        {
+            _method = method;
+            var builder = new MethodBuilder(_method);
             Lines = builder.Build();
+            
+        }
 
-            if (!method.IsConstructed || Lines.Count == 0) return;
-
-            // TODO introduce features chain or so 
-
-            var inlineFeature = new TacFinallyInliner(method);
-            inlineFeature.Transform();
-            // TODO maybe introduce another feature
-            Lines = Lines.Select(stmt => stmt switch
-            {
-                IlLeaveStmt lst => new IlGotoStmt(lst.Target),
-                _ => stmt
-            }).ToList();
+        public override void Construct()
+        {
+            if (!_method.IsConstructed || Lines.Count == 0) return;
+            var transformed = _transformersChain.ApplyTo(_method);
+            Debug.Assert(Equals(transformed, _method));
         }
     }
 
@@ -253,6 +256,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
             }
 
             _ilBody = IlInstanceBuilder.GetMethodIlBody(this);
+            _tacBody = IlInstanceBuilder.GetMethodTacBody(this);
         }
 
         // TODO may be improper decision

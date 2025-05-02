@@ -204,7 +204,6 @@ public class IlType(Type type) : IlMember(type)
     }
 }
 
-// TODO #2 makegenericType should be introduced here, not in AppTacBuilder
 internal static class IlTypeHelpers
 {
     public static IlType MeetWith(this IlType type, IlType another)

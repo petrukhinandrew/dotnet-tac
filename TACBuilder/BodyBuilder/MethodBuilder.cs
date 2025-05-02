@@ -69,7 +69,7 @@ class MethodBuilder(IlMethod method)
         }
         catch (Exception e)
         {
-            Console.WriteLine(_method.Name + " FAIL" + e.Message);
+            Console.WriteLine(_method.Name + " FAIL" + e.Message  + "\n" + e.StackTrace);
             return [];
         }
 

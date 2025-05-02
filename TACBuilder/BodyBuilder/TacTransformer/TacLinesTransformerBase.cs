@@ -2,7 +2,7 @@ using System.Diagnostics;
 using TACBuilder.ILReflection;
 using TACBuilder.ILTAC.TypeSystem;
 
-namespace TACBuilder.BodyBuilder;
+namespace TACBuilder.BodyBuilder.TacTransformer;
 
 /*
  * Raw transformer over TAC list (either array-like or linked-list-like)
@@ -11,21 +11,15 @@ namespace TACBuilder.BodyBuilder;
  * 2. Any insertion or deletion may change EhScope tacLoc
  * 3. Transformer is responsible for method TAC, it keeps method fields consistency itself
  */
-public interface TacTransformerBase<TPos>
+public interface TacLinesTransformerBase<TPos>
 {
     public void Insert(TPos pos, IlStmt stmt) => InsertRange(pos, [stmt]);
     public void InsertRange(TPos pos, IEnumerable<IlStmt> stmts);
-
-    public void Remove(TPos pos) => RemoveRange(pos, pos);
-    public void RemoveRange(TPos begin, TPos end);
+    public  void Remove(TPos pos) => RemoveRange(pos, pos);
+    public  void RemoveRange(TPos begin, TPos end);
 }
 
-public interface TacTransformStrategyBase
-{
-    public void Transform();
-}
-
-public class TacTransformerIndexImpl(IlMethod method) : TacTransformerBase<int>
+internal class TacLinesTransformerIndexImpl(IlMethod method) : TacLinesTransformerBase<int>
 {
     protected List<IlStmt>? _lines => method.Body?.Lines;
     protected List<EhScope> _scopes => method.Scopes;
@@ -66,7 +60,7 @@ public class TacTransformerIndexImpl(IlMethod method) : TacTransformerBase<int>
         }
     }
 
-    protected void ApplyToSlice(int pos, int length, Func<IlStmt, IlStmt> action)
+    public void ApplyToSlice(int pos, int length, Func<IlStmt, IlStmt> action)
     {
         if (_lines == null) return;
         for (int i = pos; i < pos + length; i++)
@@ -75,7 +69,7 @@ public class TacTransformerIndexImpl(IlMethod method) : TacTransformerBase<int>
         }
     }
 
-    private List<IlStmt> SliceCopy(int pos, int length)
+    public List<IlStmt> SliceCopy(int pos, int length)
     {
         if (_lines == null) return [];
         IlStmt[] copy = new IlStmt[length];
@@ -86,7 +80,7 @@ public class TacTransformerIndexImpl(IlMethod method) : TacTransformerBase<int>
         return copy.ToList();
     }
 
-    protected void DuplicateSlice(int slicePos, int sliceLength, int dst)
+    public void DuplicateSlice(int slicePos, int sliceLength, int dst)
     {
         if (_lines == null) return;
         Debug.Assert(dst > slicePos);
@@ -105,55 +99,4 @@ public class TacTransformerIndexImpl(IlMethod method) : TacTransformerBase<int>
             .Select(s => s.ShiftedRightAt(slicePos - s.tacLoc.tb + dst)).ToList();
         _scopes.AddRange(duplicates);
     }
-}
-
-public class TacFinallyInliner(IlMethod method) : TacTransformerIndexImpl(method), TacTransformStrategyBase
-{
-    public void Transform()
-    {
-        if (_lines == null) return;
-        var init = new IlStmt[_lines.Count];
-        _lines.CopyTo(init, 0);
-        var finallyScopes = GetFinallyScopesSortedByNesting();
-
-        if (finallyScopes.Count == 0) return;
-        foreach (var scope in finallyScopes)
-        {
-            var handlerSize = scope.tacLoc.he - scope.tacLoc.hb + 1;
-            var inlinePos = scope.tacLoc.he + 1;
-            for (var i = scope.tacLoc.tb; i <= scope.tacLoc.te; i++)
-            {
-                if (_lines[i] is not IlLeaveStmt leaveStmt || leaveStmt.Target <= scope.tacLoc.te) continue;
-                DuplicateSlice(scope.tacLoc.hb, handlerSize, inlinePos);
-                var leaveTarget = leaveStmt.Target;
-
-                ApplyToSlice(inlinePos, handlerSize,
-                    stmt => stmt is IlEndFinallyStmt { IsMutable: true }
-                        ? new IlGotoStmt(leaveTarget)
-                        : stmt);
-                var pos = inlinePos;
-                ApplyToSlice(scope.tacLoc.tb, scope.tacLoc.te - scope.tacLoc.tb + 1,
-                    stmt => stmt is IlLeaveStmt ls && ls.Target == leaveTarget
-                        ? new IlGotoStmt(pos)
-                        : stmt);
-                inlinePos += handlerSize;
-            }
-
-            FixInitialFinallyScope(scope.tacLoc.hb, scope.tacLoc.he);
-        }
-    }
-
-    /*
-     * Args are segment ends inclusively
-     */
-    private void FixInitialFinallyScope(int begin, int end)
-    {
-        for (var i = begin; i <= end; i++)
-        {
-            if (_lines![i] is IlEndFinallyStmt) _lines[i] = new IlEndFinallyStmt { IsMutable = false };
-        }
-    }
-
-    private List<FinallyScope> GetFinallyScopesSortedByNesting() => _scopes.Where(it => it is FinallyScope)
-        .Order(new EhScopeNestingComparer()).Select(s => (FinallyScope)s).ToList();
 }
