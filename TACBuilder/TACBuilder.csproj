@@ -21,4 +21,7 @@
             <_Parameter1>TACBuilder.Tests</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\TACBuilder.ReflectionUtils\TACBuilder.ReflectionUtils.csproj" />
+    </ItemGroup>
 </Project>

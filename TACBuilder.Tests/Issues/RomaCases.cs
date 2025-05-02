@@ -2,6 +2,12 @@ using Xunit.Abstractions;
 
 namespace TACBuilder.Tests.Issues;
 
+public struct MyStruct
+{
+    public int z;
+    public int y;
+}
+
 public class RomaCases(ITestOutputHelper testOutputHelper)
 {
     public struct MyStruct

@@ -88,8 +88,12 @@ public static class TypingUtil
 
     internal static IlExpr Coerced(this IlExpr expr)
     {
-        Debug.Assert(expr.Type != null);
-        var coercedType = expr.Type.ExpectedStackType();
+        if (expr.Type == null)
+        {
+            Console.Error.WriteLine("null il type");
+        }
+        // Debug.Assert(expr.Type != null);
+        var coercedType = expr.Type!.ExpectedStackType();
         return Equals(expr.Type, coercedType) ? expr : new IlConvCastExpr(coercedType, expr);
     }
 }

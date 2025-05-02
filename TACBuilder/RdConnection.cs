@@ -54,7 +54,7 @@ public class RdConnection(AppTacBuilder builder)
                         (lt, request) =>
                         {
                             Console.Error.WriteLine(".net built generic substitutions");
-                            return request.Select(builder.MakeGenericType).Select(v => v switch
+                            return request.Select(builder.GetType).Select(v => v switch
                             {
                                 null => null,
                                 _ => RdSerializer.Serialize([v]).Single()

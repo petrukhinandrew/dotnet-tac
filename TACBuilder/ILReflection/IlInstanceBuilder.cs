@@ -169,14 +169,14 @@ public static class IlInstanceBuilder
     internal static IlMethod.IlBody GetMethodIlBody(IlMethod method)
     {
         var instance = new IlMethod.IlBody(method);
-        _queue.Enqueue(instance);
+        instance.Construct();
         return instance;
     }
 
     internal static IlMethod.TacBody GetMethodTacBody(IlMethod method)
     {
         var instance = new IlMethod.TacBody(method);
-        _queue.Enqueue(instance);
+        instance.Construct();
         return instance;
     }
 

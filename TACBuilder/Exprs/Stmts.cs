@@ -36,7 +36,7 @@ public class IlAssignStmt : IlStmt
                 throw new ArgumentException($"Primitive type assign fail {Rhs.Type} = {Lhs.Type}");
             case IlReferenceType when Rhs.Type is IlReferenceType &&
                                       !Lhs.Type.Type.IsAssignableFrom(Rhs.Type.Type):
-                throw new ArgumentException($"Reference type assign fail {Rhs.Type} = {Lhs.Type}");
+                throw new ArgumentException($"Reference type assign fail {Lhs.Type} = {Rhs.Type}");
         }
     }
 

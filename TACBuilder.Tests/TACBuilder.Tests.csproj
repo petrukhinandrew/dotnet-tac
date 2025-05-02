@@ -32,6 +32,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\TACBuilder.ReflectionUtils\TACBuilder.ReflectionUtils.csproj" />
       <ProjectReference Include="..\TACBuilder\TACBuilder.csproj" />
     </ItemGroup>
 

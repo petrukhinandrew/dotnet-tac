@@ -6,9 +6,9 @@ public class IlField(FieldInfo fieldInfo) : IlMember(fieldInfo)
 {
     // TODO attributes
     private readonly FieldInfo _fieldInfo = fieldInfo;
-    public IlType? DeclaringType { get; private set; }
+    public readonly IlType DeclaringType = IlInstanceBuilder.GetType((fieldInfo.ReflectedType ?? fieldInfo.DeclaringType)!);
     public bool IsStatic => _fieldInfo.IsStatic;
-    public IlType? Type { get; private set; }
+    public readonly IlType Type = IlInstanceBuilder.GetType(fieldInfo.FieldType);
     public new string Name => _fieldInfo.Name;
     public int Offset { get; private set; }
     public int ModuleToken => _fieldInfo.Module.MetadataToken;
@@ -19,8 +19,6 @@ public class IlField(FieldInfo fieldInfo) : IlMember(fieldInfo)
 
     public override void Construct()
     {
-        DeclaringType = IlInstanceBuilder.GetType((_fieldInfo.ReflectedType ?? _fieldInfo.DeclaringType)!);
-        Type = IlInstanceBuilder.GetType(_fieldInfo.FieldType);
         Offset = LayoutUtils.CalculateOffsetOf(_fieldInfo);
         Attributes = _fieldInfo.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
         DeclaringType.EnsureFieldAttached(this);

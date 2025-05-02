@@ -457,7 +457,7 @@ public static class RdSerializer
                     FilterScope filterScope => new IlFilterScopeDto(tb: filterScope.tacLoc.tb,
                         te: filterScope.tacLoc.te, hb: filterScope.tacLoc.hb, he: filterScope.tacLoc.he,
                         fb: filterScope.fbt),
-                    CatchScope catchScope => new IlCatchScopeDto(tb: catchScope.tacLoc.tb,
+                    CatchScope catchScope => new IlCatchScopeDto(excType: IlInstanceBuilder.GetType(catchScope.Type).GetTypeId() , tb: catchScope.tacLoc.tb,
                         te: catchScope.tacLoc.te, hb: catchScope.tacLoc.hb, he: catchScope.tacLoc.he),
 
                     FinallyScope finallyScope => new IlFinallyScopeDto(tb: finallyScope.tacLoc.tb,
@@ -487,8 +487,11 @@ static class KeyBuilder
             return new TypeId(asmName: "", typeName: "", typeArgs: []);
         }
 
-        return new TypeId(asmName: type.AsmName, typeName: type.FullName,
-            typeArgs: type.GenericArgs.Select(TypeIdBase (t) => t.GetTypeId()).ToList());
+        return new TypeId(
+            asmName: type.AsmName,
+            typeName: type.FullName,
+            typeArgs: type.GenericArgs.Select(TypeIdBase (t) => t.GetTypeId()).ToList()
+        );
     }
 
     public static TypeId GetRefId(this IlType type)

@@ -3,14 +3,13 @@ using TACBuilder.Exprs;
 
 namespace TACBuilder.ILReflection;
 
-public class IlPointerType(Type targetType, bool isUnmanaged = true) : IlType(targetType)
+public class IlPointerType(Type targetType, bool isUnmanaged = true) : IlType(isUnmanaged ? targetType.MakePointerType() : targetType.MakeByRefType())
 {
     public override bool IsManaged => !isUnmanaged;
     public override bool IsUnmanaged => isUnmanaged;
-    public IlType TargetType => IlInstanceBuilder.GetType(Type);
+    public IlType TargetType => IlInstanceBuilder.GetType(targetType);
     public override IlType? DeclaringType => TargetType.DeclaringType;
     public override IlType ExpectedStackType() => this;
-    public override string FullName => (isUnmanaged ? "*" : "&") + base.FullName;
 }
 
 public class IlValueType(Type type) : IlType(type)

@@ -59,6 +59,10 @@ public class ILBodyParser(MethodBase methodBase)
                 Debug.Assert(_offsetToInstr[fd] is not null);
             }
 
+            if (c.type is ehcType.Catch excType)
+            {
+                IlInstanceBuilder.GetType(excType.type);
+            }
             rewriterEhcType type = c.type switch
             {
                 ehcType.Filter f => new rewriterEhcType.FilterEH(_offsetToInstr[fd]),

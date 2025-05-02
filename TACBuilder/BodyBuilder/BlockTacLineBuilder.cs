@@ -1080,6 +1080,8 @@ static class BlockTacLineBuilder
                         args.Add(arg);
                     }
 
+                    args.Reverse();
+                    
                     var ctorCall = new IlCall(ilMethod, args);
                     blockBuilder.NewLine(new IlCallStmt(ctorCall));
                     blockBuilder.Push(newInstance);

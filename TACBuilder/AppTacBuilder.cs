@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.Serialization;
-using CommandLine;
 using org.jacodb.api.net.generated.models;
 using TACBuilder.ILReflection;
+using TACBuilder.ReflectionUtils;
 
 
 namespace TACBuilder;
@@ -75,49 +75,75 @@ public class AppTacBuilder
     }
 
     
-    public IlType? MakeGenericType(TypeId typeId)
+    public IlType? GetType(TypeId typeId)
     {
-        Console.WriteLine("HUI 981291821");
-        var gt = MakeGenericTypeFrom(typeId);
-        Console.WriteLine("HUI 575757");
+        var gt = MakeTypeFrom(typeId);
         if (gt == null) return null;
         
         var result = IlInstanceBuilder.GetType(gt);
         IlInstanceBuilder.Construct();
-        Console.WriteLine("HUI 82828228");
         return result;
     }
 
-    private Type? MakeGenericTypeFrom(TypeId typeId)
+    private Type? MakeTypeFrom(TypeId typeId)
     {
+        var typeIsGenericParam = typeId.TypeName.Contains('!');
+
+        var topLevelType = typeIsGenericParam
+            ? FindGenericParameter(typeId.AsmName, typeId.TypeName)
+            : FindType(typeId.AsmName, typeId.TypeName);
+
+        if (topLevelType == null)
+        {
+            return null;
+        }
+
+        if (typeId.TypeArgs.Count == 0) return topLevelType;
+
+        var (groundType, qualifiers) = topLevelType.GroundAndQualifiers();
+
+        var args = new List<Type>();
+        foreach (var rawArg in typeId.TypeArgs)
+        {
+            if (rawArg is not TypeId argTypeId) throw new SerializationException("typeId expected");
+            var arg = MakeTypeFrom(argTypeId);
+            if (arg == null) return null;
+            args.Add(arg);
+        }
+
         try
         {
-            var topLevelType = FindTypeUnsafe(typeId.AsmName, typeId.TypeName);
-            if (topLevelType == null) return null;
-            if (typeId.TypeArgs.Count == 0) return topLevelType;
-            var args = new List<Type>();
-            foreach (var rawArg in typeId.TypeArgs)
-            {
-                if (rawArg is not TypeId argTypeId) throw new SerializationException("typeId expected");
-                var arg = MakeGenericTypeFrom(argTypeId);
-                if (arg == null) return null;
-                args.Add(arg);
-            }
-
-            return topLevelType.MakeGenericType(args.ToArray());
+            var substitution = groundType.MakeGenericType(args.ToArray());
+            var qualifiedSubst = substitution.AttachQualifiers(qualifiers);
+            return qualifiedSubst;
         }
-        catch (Exception e)
+        catch
         {
-            Console.Error.WriteLine(e);
             return null;
         }
     }
 
-    private Type? FindTypeUnsafe(string asmName, string typeName)
+    private Type? FindType(string asmName, string typeName)
     {
-        var asm = BuiltAssemblies.Single(asm => asm.Name == asmName);
-        var possibleTypes = asm.Types.Where(t => t.FullName == typeName && (!t.IsGenericType || t.IsGenericDefinition))
-            .Select(ilt => ilt.Type).ToList();
-        return possibleTypes.SingleOrDefault(defaultValue: null);
+        var asm = BuiltAssemblies.SingleOrDefault(asm => asm?.Name == asmName, defaultValue: null);
+        var type = asm?._assembly.GetType(typeName);
+        return type;
+    }
+
+    private Type? FindGenericParameter(string asmName, string typeName)
+    {
+        Debug.Assert(typeName.Contains('!'));
+
+        var typeNameTokens = typeName.Split('!');
+        Debug.Assert(typeNameTokens.Length == 2);
+        var (declTypeName, paramName) = (typeNameTokens[0], typeNameTokens[1]);
+
+        var asm = BuiltAssemblies.SingleOrDefault(asm => asm?.Name == asmName, defaultValue: null);
+        var declType = asm?._assembly.GetType(declTypeName);
+
+        if (declType == null) return null;
+
+        Debug.Assert(declType.IsGenericTypeDefinition);
+        return declType.GetGenericArguments().FirstOrDefault(p => p.Name == paramName);
     }
 }

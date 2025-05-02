@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACBuilder", "TACBuilder\TA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACBuilder.Tests", "TACBuilder.Tests\TACBuilder.Tests.csproj", "{5B570B69-7705-4DB0-AEA8-FC84B1A01DA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TACBuilder.ReflectionUtils", "TACBuilder.ReflectionUtils\TACBuilder.ReflectionUtils.csproj", "{EEAE577E-3B5D-4469-B9C9-6F90FC54B160}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{5B570B69-7705-4DB0-AEA8-FC84B1A01DA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5B570B69-7705-4DB0-AEA8-FC84B1A01DA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5B570B69-7705-4DB0-AEA8-FC84B1A01DA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEAE577E-3B5D-4469-B9C9-6F90FC54B160}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEAE577E-3B5D-4469-B9C9-6F90FC54B160}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEAE577E-3B5D-4469-B9C9-6F90FC54B160}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEAE577E-3B5D-4469-B9C9-6F90FC54B160}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

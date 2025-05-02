@@ -1,8 +1,7 @@
 using System.Diagnostics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic.CompilerServices;
+using TACBuilder.ReflectionUtils;
 using TACBuilder.Utils;
 
 namespace TACBuilder.ILReflection;
@@ -103,7 +102,7 @@ public class IlType(Type type) : IlMember(type)
 
     public new readonly string Name = type.Name;
 
-    public virtual string FullName => ConstructFullName();
+    public virtual string FullName => type.ConstructFullName();
 
     protected string ConstructFullName()
     {
@@ -212,8 +211,10 @@ internal static class IlTypeHelpers
     {
         if (type is not IlPointerType lp || another is not IlPointerType rp)
             return IlInstanceBuilder.GetType(MeetTypes(type.Type, another.Type));
-
-        Debug.Assert(lp.IsManaged == rp.IsManaged);
+        if (lp.IsManaged != rp.IsManaged)
+        {
+            Console.Error.WriteLine("Cannot meet with managed types");
+        }
         var elemType = IlInstanceBuilder.GetType(MeetTypes(lp.TargetType.Type, rp.TargetType.Type));
         var ptr = lp.IsManaged ? elemType.MakeByRefType() : elemType.MakePointerType();
         return ptr;
@@ -254,6 +255,15 @@ internal static class IlTypeHelpers
 
     public static IlPrimitiveType IntegerOpType(IlType left, IlType right)
     {
+        if (left is IlEnumType leftEnum)
+        {
+            left = leftEnum.UnderlyingType;
+        }
+
+        if (right is IlEnumType rightEnum)
+        {
+            right = rightEnum.UnderlyingType;
+        }
         if (left is not IlPrimitiveType || right is not IlPrimitiveType)
         {
             throw new ArgumentException($"integer op operands non primitive {left} {right}");
@@ -283,8 +293,20 @@ internal static class IlTypeHelpers
 
     public static IlPrimitiveType ShiftOpType(IlType left, IlType right)
     {
-        Debug.Assert(left is IlPrimitiveType && right is IlPrimitiveType);
+        if (left is IlEnumType leftEnum)
+        {
+            left = leftEnum.UnderlyingType;
+        }
 
+        if (right is IlEnumType rightEnum)
+        {
+            right = rightEnum.UnderlyingType;
+        }
+        if (left is not IlPrimitiveType || right is not IlPrimitiveType)
+        {
+            Console.WriteLine($"shift op operands non primitive {left} {right}");
+        }
+        
         var longType = IlInstanceBuilder.GetType(typeof(long));
         Debug.Assert(!right.Equals(longType));
         return (IlPrimitiveType)left;
@@ -292,7 +314,10 @@ internal static class IlTypeHelpers
 
     public static IlType NumericBinOpType(this IlType lhs, IlType rhs)
     {
-        Debug.Assert(lhs is not IlReferenceType && rhs is not IlReferenceType);
+        if (lhs is IlReferenceType && rhs is IlReferenceType)
+        {
+            Console.WriteLine($"numeric op operands non reference type {lhs}, {rhs}");
+        }
         if (lhs is IlPrimitiveType && rhs is IlPrimitiveType)
             return lhs.MeetWith(rhs);
         if (lhs is IlPointerType lp) return lp;

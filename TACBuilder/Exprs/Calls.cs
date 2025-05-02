@@ -47,7 +47,7 @@ public class IlCall(IlMethod method, List<IlExpr> args) : IlExpr
 
     public bool Returns()
     {
-        return ReturnType != IlInstanceBuilder.GetType(typeof(void));
+        return !Equals(ReturnType, IlInstanceBuilder.GetType(typeof(void)));
     }
 
     public override bool Equals(object? obj)

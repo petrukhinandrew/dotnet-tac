@@ -30,7 +30,7 @@ public class MakeGenericTypeRequest : IDisposable
             ],
             AppTacBuilder.GetBuiltAssemblies().Single(asm => asm.Location == src).Name,
             "TACBuilder.Tests.InMemoryIlHierarchy.SingleParamBase`1");
-        var actual = Record.Exception(() => builder.MakeGenericType(req));
+        var actual = Record.Exception(() => builder.GetType(req));
         Assert.Null(actual);
     }
 }

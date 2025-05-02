@@ -145,14 +145,17 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
         }
     }
 
-    public IlType? DeclaringType { get; private set; }
+    private static IlType ResolveDeclaringType(MethodBase methodBase) => IlInstanceBuilder.GetType((methodBase.ReflectedType ?? methodBase.DeclaringType)!);
+    public readonly IlType DeclaringType = ResolveDeclaringType(methodBase);
+    public readonly List<IlType> GenericArgs = methodBase.IsGenericMethod ? methodBase.GetGenericArguments().Select(arg => IlInstanceBuilder.GetType(arg)).ToList() : [];
+    public readonly IlType ReturnType = methodBase is MethodInfo methodInfo ? IlInstanceBuilder.GetType(methodInfo.ReturnType) : IlInstanceBuilder.GetType(typeof(void));
+    public readonly List<IParameter> Parameters = ConstructParameters(methodBase);
+    
     public IlMethod? BaseMethod { get; private set; }
-    public List<IlAttribute> Attributes { get; private set; }
-    public List<IlType> GenericArgs { get; } = new();
-    public IlType? ReturnType { get; private set; }
-    public List<IParameter> Parameters { get; } = new();
+    public List<IlAttribute> Attributes { get; private set; } = [];
+    
     public bool HasMethodBody { get; private set; }
-    public bool HasThis { get; private set; }
+    public readonly bool HasThis = methodBase.CallingConvention.HasFlag(CallingConventions.HasThis);
 
     public new string Name => _methodBase.Name +
                               (_methodBase.IsGenericMethod ? $"`{_methodBase.GetGenericArguments().Length}" : "");
@@ -199,52 +202,35 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     public int ModuleToken => _methodBase.MetadataToken;
     public int MetadataToken => _methodBase.MetadataToken;
 
+    private static List<IParameter> ConstructParameters(MethodBase methodBase)
+    {
+        List<IParameter> res = [];
+        if (methodBase.CallingConvention.HasFlag(CallingConventions.HasThis) || methodBase.CallingConvention.HasFlag(CallingConventions.ExplicitThis))
+        {
+            var declaringType = ResolveDeclaringType(methodBase);
+            res.Add(IlInstanceBuilder.GetThisParameter(declaringType));
+        }
+
+        var parameters = methodBase.GetParameters()
+            .OrderBy(parameter => parameter.Position).Select(IParameter (it, idx) => IlInstanceBuilder.GetMethodParameter(it, idx)).ToList();
+        res.AddRange(parameters);
+        return res;
+    }
+    
     public override void Construct()
     {
         if (IsConstructed) return;
-        DeclaringType = IlInstanceBuilder.GetType((_methodBase.ReflectedType ?? _methodBase.DeclaringType)!);
+        
         if (_methodBase is MethodInfo methodInfo)
         {
             BaseMethod = GetBaseMethod(methodInfo);
-            ReturnType = IlInstanceBuilder.GetType(methodInfo.ReturnType);
-        }
-        else
-        {
-            ReturnType = IlInstanceBuilder.GetType(typeof(void));
         }
 
         Logger.LogInformation("Constructing {Type} {Name}", DeclaringType.Name, Name);
         Attributes = _methodBase.CustomAttributes.Select(IlInstanceBuilder.GetAttribute).ToList();
 
-        if (_methodBase.IsGenericMethod)
-        {
-            var genericArgs = _methodBase.GetGenericArguments();
-            foreach (var arg in genericArgs)
-            {
-                GenericArgs.Add(IlInstanceBuilder.GetType(arg));
-            }
-        }
-
-        Debug.Assert(Parameters.Count == 0);
-
         var explicitThis = _methodBase.CallingConvention.HasFlag(CallingConventions.ExplicitThis);
-        if (_methodBase.CallingConvention.HasFlag(CallingConventions.HasThis))
-        {
-            HasThis = true;
-            var thisParamType = explicitThis
-                ? IlInstanceBuilder.GetType(_methodBase.GetParameters()[0].ParameterType)
-                : DeclaringType;
-            Parameters.Add(IlInstanceBuilder.GetThisParameter(thisParamType));
-        }
-
-        var methodParams = _methodBase.GetParameters()
-            .OrderBy(parameter => parameter.Position).ToList();
-
-        if (explicitThis) methodParams = methodParams.Skip(1).ToList();
-        foreach (var methodParam in methodParams)
-        {
-            Parameters.Add(IlInstanceBuilder.GetMethodParameter(methodParam, Parameters.Count));
-        }
+        if (explicitThis) throw new Exception("explicit this convention found");
 
         DeclaringType.EnsureMethodAttached(this);
         if (IlInstanceBuilder.MethodFilters.All(f => !f(_methodBase))) return;

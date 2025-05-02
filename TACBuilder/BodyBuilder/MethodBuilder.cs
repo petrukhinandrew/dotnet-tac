@@ -10,12 +10,12 @@ namespace TACBuilder;
 class MethodBuilder(IlMethod method)
 {
     private readonly IlMethod _method = method;
-    public List<IlLocalVar> LocalVars => method.LocalVars;
+    public List<IlLocalVar> LocalVars => _method.LocalVars;
 
     public List<IlValue> Params = new();
     public Dictionary<int, List<IlTempVar>> Temps = new(); //=> method.Temps;
-    public List<IlErrVar> Errs => method.Errs;
-    public List<EhScope> EhScopes => method.Scopes;
+    public List<IlErrVar> Errs => _method.Errs;
+    public List<EhScope> EhScopes => _method.Scopes;
     public readonly Dictionary<(int, int), IlMerged> Merged = new();
     public readonly List<IlStmt> Tac = new();
     public Dictionary<int, BlockTacBuilder> BlockTacBuilders = new();
@@ -58,13 +58,13 @@ class MethodBuilder(IlMethod method)
             var idx = 0;
             foreach (var tmp in Temps.SelectMany(keyValuePair => keyValuePair.Value))
             {
-                method.Temps[idx++] = tmp;
+                _method.Temps[idx++] = tmp;
             }
         }
         catch (KnownBug kb)
         {
-            Console.WriteLine(kb.Message + " found at " + (method.DeclaringType?.ToString() ?? " ") + " " +
-                              method);
+            Console.WriteLine(kb.Message + " found at " + (_method.DeclaringType?.ToString() ?? " ") + " " +
+                              _method);
             return [];
         }
         catch (Exception e)
@@ -153,7 +153,7 @@ class MethodBuilder(IlMethod method)
             }
         }
 
-        foreach (var scope in method.Scopes)
+        foreach (var scope in _method.Scopes)
         {
             if (scope is FilterScope filterScope && ilToTacMapping.TryGetValue(filterScope.fb, out var fbv))
                 filterScope.fbt = (int)fbv!;
@@ -166,7 +166,7 @@ class MethodBuilder(IlMethod method)
             if (ilToTacMapping.TryGetValue(scope.ilLoc.he, out var hev))
                 scope.tacLoc.he = (int)hev!;
             if (scope.tacLoc.te >= scope.tacLoc.hb || scope.tacLoc.hb > scope.tacLoc.he)
-                Console.WriteLine(method.Name);
+                Console.WriteLine(_method.Name);
         }
     }
 

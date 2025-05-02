@@ -1,5 +1,17 @@
 namespace TACBuilder.Tests.Misc;
 
+public class Assignments
+{
+    [Fact]
+    public void MutexToObject()
+    {
+        object mutex = new Mutex();
+        var objType = typeof(object);
+        var mutexType = typeof(Mutex);
+        Assert.True(objType.IsAssignableFrom(mutexType));
+    }
+}
+
 public class CornerCaseClasses
 {
     public void MyVectorUsage()
