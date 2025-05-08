@@ -7,14 +7,19 @@ public static class IlInstanceBuilder
     private static readonly ILConstructQueue _queue = new();
     private static readonly ILCache _cache = new();
     private static readonly AssemblyCache _assemblyCache = new();
-    internal static readonly List<Func<Type, bool>> TypeFilters = [(t => _requireConstruction.Contains(t))];
+    internal static readonly List<Func<Type, bool>> TypeFilters = [
+        (t =>
+        {
+            return _requireConstruction.Contains(t) || (t.IsGenericType && t.GetGenericTypeDefinition() == typeof(Nullable<>)); 
+        })
+    ];
 
     internal static readonly List<Func<MethodBase, bool>> MethodFilters =
     [
         (m =>
         {
             var declType = m.ReflectedType ?? m.DeclaringType;
-            return declType != null && _requireConstruction.Contains(declType);
+            return declType != null && (_requireConstruction.Contains(declType) || (declType.IsGenericType && declType.GetGenericTypeDefinition() == typeof(Nullable<>)));
         })
     ];
 
@@ -33,7 +38,6 @@ public static class IlInstanceBuilder
         typeof(double),
         typeof(nint),
         typeof(nuint),
-        typeof(Nullable<>),
         typeof(string),
         typeof(bool)
     ];
