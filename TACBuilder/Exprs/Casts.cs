@@ -17,8 +17,9 @@ public class IlConvCastExpr(IlType targetType, IlExpr value) : IlCastExpr(target
 {
 }
 
-public class IlBoxExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
+public class IlBoxExpr(IlType targetType, IlExpr value) : IlCastExpr(IlInstanceBuilder.GetType(typeof(object)), value)
 {
+    public IlType BoxedType => targetType;
 }
 
 public class IlUnboxExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)

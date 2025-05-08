@@ -1304,6 +1304,15 @@ static class BlockTacLineBuilder
                     break;
                 }
                 case "unbox":
+                {
+                    var ilType = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
+                    Debug.Assert(ilType.Type.IsValueType);
+                    ilType = ilType.MakeByRefType();
+                    var obj = blockBuilder.Pop();
+                    IlExpr unboxed = new IlUnboxExpr(ilType, obj);
+                    blockBuilder.Push(unboxed);
+                    break;
+                }
                 case "unbox.any":
                 {
                     var ilType = ((ILInstrOperand.ResolvedType)blockBuilder.CurInstr.arg).value;
