@@ -8,7 +8,15 @@ public static class IlInstanceBuilder
     private static readonly ILCache _cache = new();
     private static readonly AssemblyCache _assemblyCache = new();
     internal static readonly List<Func<Type, bool>> TypeFilters = [(t => _requireConstruction.Contains(t))];
-    internal static readonly List<Func<MethodBase, bool>> MethodFilters = new();
+
+    internal static readonly List<Func<MethodBase, bool>> MethodFilters =
+    [
+        (m =>
+        {
+            var declType = m.ReflectedType ?? m.DeclaringType;
+            return declType != null && _requireConstruction.Contains(declType);
+        })
+    ];
 
     private static readonly List<Type> _requireConstruction =
     [

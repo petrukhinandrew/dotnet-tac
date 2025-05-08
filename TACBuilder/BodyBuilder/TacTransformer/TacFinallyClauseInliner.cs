@@ -7,6 +7,7 @@ public class TacFinallyClauseInliner : TacMutatingTransformer
 {
     public IlMethod Transform(IlMethod method)
     {
+        if (method.Body is { Lines.Count: 0 }) return method;
         var indexTransformer = new TacLinesTransformerIndexImpl(method);
         var lines = method.Body?.Lines;
         if (lines == null) return method;
