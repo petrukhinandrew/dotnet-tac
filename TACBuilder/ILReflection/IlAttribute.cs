@@ -11,19 +11,13 @@ public class IlAttribute(CustomAttributeData attribute) : IlCacheable
         public IlConstant Value => value;
     }
 
-    public IlType? Type { get; private set; }
-    public List<IlType> GenericArgs { get; } = new();
+    public readonly IlType Type = IlInstanceBuilder.GetType(attribute.AttributeType);
+    public List<IlType> GenericArgs { get; } = attribute.AttributeType.GetGenericArguments().Select(IlInstanceBuilder.GetType).ToList();
     public Dictionary<string, Argument> NamedArguments { get; } = new();
     public List<Argument> ConstructorArguments { get; } = new();
 
     public override void Construct()
     {
-        Type = IlInstanceBuilder.GetType(attribute.AttributeType);
-        foreach (var arg in attribute.AttributeType.GetGenericArguments())
-        {
-            GenericArgs.Add(IlInstanceBuilder.GetType(arg));
-        }
-
         foreach (var arg in attribute.ConstructorArguments)
         {
             if (arg.Value == null) continue;
