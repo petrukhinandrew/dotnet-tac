@@ -39,6 +39,23 @@ static class BlockTacLineBuilder
                 val)
         );
     }
+    
+    private static List<IlExpr> CallArgs(this BlockTacBuilder blockBuilder, IlMethod method, bool newObj = false)
+    {
+        List<IlExpr> rawArgs = method.Parameters.Select(_ => blockBuilder.Pop()).ToList();
+        if (newObj)
+        {
+            var thisArg = rawArgs.First();
+            rawArgs.RemoveAt(0);
+            rawArgs.Add(thisArg);
+        }
+        rawArgs.Reverse();
+        var typed = rawArgs
+            .Zip(method.Parameters)
+            .Select(IlExpr (ap) => blockBuilder.EnsureTyped(ap.First, ap.Second.Type))
+            .ToList();
+        return typed;
+    }
 
     private static IlSimpleValue MakeSimpleValue(this BlockTacBuilder blockBuilder, IlExpr expr)
     {
@@ -615,12 +632,8 @@ static class BlockTacLineBuilder
 
                         break;
                     }
-
-
-                    var rawArgs = ilMethod.Parameters.Select(_ => blockBuilder.Pop()).ToList();
-                    rawArgs.Reverse();
-                    var args = rawArgs.Zip(ilMethod.Parameters)
-                        .Select(IlExpr (ap) => blockBuilder.EnsureTyped(ap.First, ap.Second.Type)).ToList();
+                    
+                    var args = blockBuilder.CallArgs(ilMethod);
 
                     var ilCall = new IlCall(ilMethod, args);
 
@@ -640,11 +653,7 @@ static class BlockTacLineBuilder
                     var ilMethod =
                         ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
 
-                    var rawArgs = ilMethod.Parameters.Select(_ => blockBuilder.Pop()).ToList();
-                    rawArgs.Reverse();
-                    var args = rawArgs.Zip(ilMethod.Parameters)
-                        .Select(IlExpr (ap) => blockBuilder.EnsureTyped(ap.First, ap.Second.Type)).ToList();
-
+                    var args = blockBuilder.CallArgs(ilMethod);
                     var ilCall = new IlCall(ilMethod, args);
 
                     if (ilCall.Returns())
@@ -686,7 +695,7 @@ static class BlockTacLineBuilder
                     var methodMeta = blockBuilder.Meta.MethodMeta!;
                     var voidType = IlInstanceBuilder.GetType(typeof(void));
                     IlExpr? retVal = null;
-                    if (methodMeta.ReturnType != null && !Equals(methodMeta.ReturnType, voidType))
+                    if (!Equals(methodMeta.ReturnType, voidType))
                     {
                         retVal = blockBuilder.Pop();
                         retVal = blockBuilder.EnsureTyped(retVal, methodMeta.ReturnType);
@@ -1066,22 +1075,13 @@ static class BlockTacLineBuilder
                 case "newobj":
                 {
                     var ilMethod = ((ILInstrOperand.ResolvedMethod)blockBuilder.CurInstr.arg).value;
-                    // ReSharper disable once PossibleUnintendedReferenceComparison
-                    Debug.Assert(ilMethod.ReturnType == IlInstanceBuilder.GetType(typeof(void)));
+                    Debug.Assert(Equals(ilMethod.ReturnType, IlInstanceBuilder.GetType(typeof(void))));
                     var objIlType = ilMethod.DeclaringType!;
                     var allocExpr = new IlNewExpr(objIlType);
                     var newInstance = blockBuilder.GetNewTemp(allocExpr, blockBuilder.CurInstr.idx);
                     blockBuilder.NewLine(new IlAssignStmt(newInstance, allocExpr));
                     blockBuilder.Push(newInstance);
-                    List<IlExpr> args = new();
-                    foreach (var parameter in ilMethod.Parameters)
-                    {
-                        var arg = blockBuilder.EnsureTyped(blockBuilder.Pop(), parameter.Type);
-                        args.Add(arg);
-                    }
-
-                    args.Reverse();
-                    
+                    var args = blockBuilder.CallArgs(ilMethod, newObj: true);
                     var ctorCall = new IlCall(ilMethod, args);
                     blockBuilder.NewLine(new IlCallStmt(ctorCall));
                     blockBuilder.Push(newInstance);

@@ -38,11 +38,9 @@ public class IlCall(IlMethod method, List<IlExpr> args) : IlExpr
             Method.IsGeneric ? $"<{string.Join(", ", Method.GenericArgs.Select(a => a.ToString()))}>" : "";
 
         if (Method.IsStatic)
-            return string.Format("{0} {1}{3}({2})", ReturnType, Name,
-                string.Join(", ", Args.Select(p => p.ToString())), genericExtra);
+            return $"{ReturnType} {Name}{genericExtra}({string.Join(", ", Args.Select(p => p.ToString()))})";
 
-        return string.Format("{0}{1}({2})", Name, genericExtra,
-            string.Join(", ", Args.Select(p => p.ToString())));
+        return $"{Name}{genericExtra}({string.Join(", ", Args.Select(p => p.ToString()))})";
     }
 
     public bool Returns()

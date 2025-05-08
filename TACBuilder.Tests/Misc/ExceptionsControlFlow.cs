@@ -6,6 +6,22 @@ namespace IntegrationTests;
 
 public class ExceptionsControlFlow
 {
+    public static void Simple()
+    {
+        int a = 1;
+        try
+        {
+            a++;
+        }
+        catch (Exception ex)
+        {
+            a += 2;
+        }
+        finally
+        {
+            a += 3;
+        }
+    }
     public static int TestWithHandlers(int x, int y)
     {
         int addition = 1;

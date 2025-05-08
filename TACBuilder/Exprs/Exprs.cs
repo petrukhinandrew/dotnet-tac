@@ -1,7 +1,6 @@
-using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 
-namespace TACBuilder.ILTAC.TypeSystem;
+namespace TACBuilder.Exprs;
 
 public class IlNewExpr(IlType type) : IlExpr
 {
@@ -10,15 +9,6 @@ public class IlNewExpr(IlType type) : IlExpr
     public override string ToString()
     {
         return "new " + Type;
-    }
-}
-
-public static class AlsoExt
-{
-    public static T Also<T>(this T value, Action<T> action)
-    {
-        action(value);
-        return value;
     }
 }
 

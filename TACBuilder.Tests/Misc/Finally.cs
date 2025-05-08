@@ -52,15 +52,18 @@ public class Finally(ITestOutputHelper testOutputHelper)
         l.Insert(1, 1);
     }
 
-    public void SimpleTryCatchFinally()
+    [Fact]
+    public int SimpleTryCatchFinally()
     {
         try
         {
             logUtils.LogTry();
+            return 1;
         }
         catch (Exception e)
         {
             logUtils.LogCatch(message: e.Message);
+            return 2;
         }
         // target
         finally
@@ -127,6 +130,7 @@ public class Finally(ITestOutputHelper testOutputHelper)
             {
                 logUtils.LogFinally();
             }
+            logUtils.LogCatch(message: "not expected");
         });
     }
 
@@ -170,6 +174,7 @@ public class Finally(ITestOutputHelper testOutputHelper)
         logUtils.LogCatch();
     }
 
+    [Fact]
     public void NotNested()
     {
         try
@@ -179,6 +184,7 @@ public class Finally(ITestOutputHelper testOutputHelper)
         finally
         {
             logUtils.LogFinally();
+            throw null;
         }
     }
 

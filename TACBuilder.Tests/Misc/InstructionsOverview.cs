@@ -1,6 +1,5 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using Xunit.Abstractions;
 
 #pragma warning disable CS0219
 #pragma warning disable CS8500
@@ -123,14 +122,20 @@ namespace Usvm.IL.Test.Instructions
             CastClassC? nc = b as CastClassC;
             bool bIsA = b is CastClassC;
         }
-
+        
         public static void Boxing()
         {
             int a = 1;
+            BoxedArg(a);
             object b = a;
+            
             int c = (int)b;
         }
 
+        public static void BoxedArg(object o)
+        {
+            Console.WriteLine("kek");
+        }
         public static void InitObj()
         {
             CastClassC c = new();
@@ -339,9 +344,21 @@ namespace Usvm.IL.Test.Instructions
 
     static class NewInstTests
     {
+        public struct Sample1(int a, string b)
+        {
+            public int A = a;
+            public string B = b;
+        }
+        public class Sample2(int a, string b)
+        {
+            public int A = a;
+            public string B = b;
+        }
         public static void Test1()
         {
             TestStruct instance;
+            Sample1 s = new Sample1(1, "2");
+            Sample2 s2 = new Sample2(2, "3");
         }
 
         public static void ByValue()
@@ -367,7 +384,7 @@ namespace Usvm.IL.Test.Instructions
 
         public static (int, int) Tuple()
         {
-            return new(0, 0);
+            return new(0, 1);
         }
 
         public static void NewInstTest()

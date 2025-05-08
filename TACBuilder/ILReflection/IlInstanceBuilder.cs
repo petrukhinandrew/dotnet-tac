@@ -7,9 +7,28 @@ public static class IlInstanceBuilder
     private static readonly ILConstructQueue _queue = new();
     private static readonly ILCache _cache = new();
     private static readonly AssemblyCache _assemblyCache = new();
-    internal static readonly List<Func<Type, bool>> TypeFilters = new();
+    internal static readonly List<Func<Type, bool>> TypeFilters = [(t => _requireConstruction.Contains(t))];
     internal static readonly List<Func<MethodBase, bool>> MethodFilters = new();
 
+    private static readonly List<Type> _requireConstruction =
+    [
+        typeof(byte),
+        typeof(sbyte),
+        typeof(ushort),
+        typeof(short),
+        typeof(char),
+        typeof(int),
+        typeof(uint),
+        typeof(long),
+        typeof(ulong),
+        typeof(float),
+        typeof(double),
+        typeof(nint),
+        typeof(nuint),
+        typeof(Nullable<>),
+        typeof(string),
+        typeof(bool)
+    ];
     public static IlAssembly BuildFrom(string assemblyPath)
     {
         var meta = GetAssembly(assemblyPath);
