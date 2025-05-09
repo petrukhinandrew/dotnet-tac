@@ -16,6 +16,18 @@ public class RomaCases(ITestOutputHelper testOutputHelper)
         public int y;
     }
 
+    public int ZeroForNull(int? v)
+    {
+        return v ?? 0;
+    }
+
+    public void BoxNullable()
+    {
+        int? i = null;
+        int? j = 5;
+        int ifoo = ZeroForNull(i);
+        int jfoo = ZeroForNull(j);
+    }
     public unsafe int ArrayStore(int[] a, int i)
     {
         a[i] = 5;

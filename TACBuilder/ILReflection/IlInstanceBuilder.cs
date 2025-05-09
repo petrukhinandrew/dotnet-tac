@@ -185,7 +185,8 @@ public static class IlInstanceBuilder
 
     internal static IlMethod.IParameter GetThisParameter(IlType ilType)
     {
-        var instance = new IlMethod.This(ilType);
+        var thisType = ilType is IlReferenceType ? ilType : ilType.MakeByRefType();
+        var instance = new IlMethod.This(thisType);
         _queue.Enqueue(instance);
         return instance;
     }
