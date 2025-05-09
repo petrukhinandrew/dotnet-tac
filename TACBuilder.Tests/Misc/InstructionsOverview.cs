@@ -132,6 +132,16 @@ namespace Usvm.IL.Test.Instructions
             int c = (int)b;
         }
 
+        public static void IsInstCheck()
+        {
+            string? a = null;
+            a = "123";
+            if (a is { } s)
+            {
+                Console.WriteLine(s.GetType());
+            }
+        }
+
         public static void BoxedArg(object o)
         {
             Console.WriteLine("kek");

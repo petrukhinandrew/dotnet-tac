@@ -26,10 +26,12 @@ public class IlUnboxExpr(IlType targetType, IlExpr value) : IlCastExpr(targetTyp
 {
 }
 
-public class IlIsInstExpr(IlType targetType, IlExpr value) : IlCastExpr(targetType, value)
+public class IlIsInstExpr(IlType targetType, IlExpr value) : IlCastExpr(value.Type, value)
 {
+    public IlType ExpectedType => targetType;
+    
     public override string ToString()
     {
-        return $"{Target.ToString()} as {Type}";
+        return $"{Target.ToString()} is {ExpectedType}";
     }
 }
