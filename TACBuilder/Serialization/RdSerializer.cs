@@ -354,27 +354,46 @@ public static class RdSerializer
                 index: arrayAccess.Index.SerializeExpr(), arrayAccess.Type.GetTypeId()),
             IlArrayLength lengthExpr => new IlArrayLengthExprDto(lengthExpr.Array.SerializeExpr(),
                 lengthExpr.Type.GetTypeId()),
-            IlStackAlloc stackAlloc => new IlStackAllocExprDto(size: stackAlloc.Size.SerializeExpr(),
-                type: stackAlloc.Type.GetTypeId()),
-            IlConvCastExpr convExpr => new IlConvExprDto(convExpr.Type.GetTypeId(), convExpr.Target.SerializeExpr(),
-                convExpr.Type.GetTypeId()),
+            IlStackAlloc stackAlloc => new IlStackAllocExprDto(
+                size: stackAlloc.Size.SerializeExpr(),
+                type: stackAlloc.Type.GetTypeId()
+            ),
+            IlConvCastExpr convExpr => new IlConvExprDto(
+                convExpr.Type.GetTypeId(),
+                convExpr.Target.SerializeExpr(),
+                convExpr.Type.GetTypeId()
+            ),
             IlBoxExpr boxExpr => new IlBoxExprDto(
                 targetType: boxExpr.Type.GetTypeId(),
-                operand: boxExpr.Target.SerializeExpr(), 
+                operand: boxExpr.Target.SerializeExpr(),
                 boxedType: boxExpr.BoxedType.GetTypeId(),
                 type: boxExpr.Type.GetRefId()),
-            IlUnboxExpr unboxExpr => new IlUnboxExprDto(targetType: unboxExpr.Type.GetTypeId(), operand: unboxExpr.Target.SerializeExpr(),
-                type: unboxExpr.Type.GetRefId()),
-            IlIsInstExpr isInstExpr => new IlIsInstExprDto(isInstExpr.Type.GetRefId(),
-                isInstExpr.Target.SerializeExpr(), isInstExpr.Type.GetRefId()),
-            IlManagedRef managedRef => new IlManagedRefExprDto(value: managedRef.Value.SerializeExpr(),
-                type: managedRef.Type.GetRefId()),
-            IlManagedDeref managedDeref => new IlManagedDerefExprDto(value: managedDeref.Value.SerializeExpr(),
-                type: managedDeref.Type.GetRefId()),
-            IlUnmanagedRef unmanagedRef => new IlUnmanagedRefExprDto(value: unmanagedRef.Value.SerializeExpr(),
-                type: unmanagedRef.Type.GetRefId()),
-            IlUnmanagedDeref unmanagedDeref => new IlUnmanagedDerefExprDto(value: unmanagedDeref.Value.SerializeExpr(),
-                type: unmanagedDeref.Type.GetRefId()),
+            IlUnboxExpr unboxExpr => new IlUnboxExprDto(
+                targetType: unboxExpr.Type.GetTypeId(),
+                operand: unboxExpr.Target.SerializeExpr(),
+                type: unboxExpr.Type.GetRefId()
+            ),
+            IlIsInstExpr isInstExpr => new IlIsInstExprDto(
+                targetType: isInstExpr.ExpectedType.GetRefId(),
+                operand: isInstExpr.Target.SerializeExpr(),
+                type: isInstExpr.Type.GetRefId()
+            ),
+            IlManagedRef managedRef => new IlManagedRefExprDto(
+                value: managedRef.Value.SerializeExpr(),
+                type: managedRef.Type.GetRefId()
+            ),
+            IlManagedDeref managedDeref => new IlManagedDerefExprDto(
+                value: managedDeref.Value.SerializeExpr(),
+                type: managedDeref.Type.GetRefId()
+            ),
+            IlUnmanagedRef unmanagedRef => new IlUnmanagedRefExprDto(
+                value: unmanagedRef.Value.SerializeExpr(),
+                type: unmanagedRef.Type.GetRefId()
+            ),
+            IlUnmanagedDeref unmanagedDeref => new IlUnmanagedDerefExprDto(
+                value: unmanagedDeref.Value.SerializeExpr(),
+                type: unmanagedDeref.Type.GetRefId()
+            ),
             _ => throw new Exception($"{expr} expr of type {expr.GetType()} serialization not yet supported")
         };
     }
