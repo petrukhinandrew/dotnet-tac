@@ -21,6 +21,12 @@ public class RomaCases(ITestOutputHelper testOutputHelper)
         return v ?? 0;
     }
 
+    public void Minus2()
+    {
+        var a = -2;
+        var b = a + 1;
+    }
+    
     public void BoxNullable()
     {
         int? i = null;

@@ -568,7 +568,13 @@ static class BlockTacLineBuilder
                     blockBuilder.Push(new IlInt32Const(8));
                     break;
                 case "ldc.i4.s":
-                    blockBuilder.Push(new IlInt32Const(((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value));
+                    blockBuilder.Push(
+                        new IlInt32Const(
+                            Convert.ToInt32(
+                                (sbyte)(((ILInstrOperand.Arg8)blockBuilder.CurInstr.arg).value)
+                            )
+                        )
+                    );
                     break;
                 case "ldc.i4":
                     blockBuilder.Push(new IlInt32Const(((ILInstrOperand.Arg32)blockBuilder.CurInstr.arg).value));
