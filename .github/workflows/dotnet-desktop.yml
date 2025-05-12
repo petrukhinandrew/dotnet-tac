@@ -24,8 +24,9 @@ jobs:
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
+      
     - name: Build TACBuilder.UnitTests
-      run: dotnet build 'TACBuilder.UnitTests\TACBuilder.UnitTests.csproj' -c Release
+      run: dotnet build -c Release
 
     - name: Execute unit tests
       run: dotnet test
