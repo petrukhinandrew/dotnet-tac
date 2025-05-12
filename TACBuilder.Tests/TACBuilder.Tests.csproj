@@ -38,6 +38,7 @@
 
     <ItemGroup>
       <Folder Include="ExactFeatures\" />
+      <Folder Include="TypeSystem\" />
     </ItemGroup>
 
 </Project>

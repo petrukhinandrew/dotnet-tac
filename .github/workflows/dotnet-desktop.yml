@@ -10,7 +10,7 @@ jobs:
     runs-on: windows-latest
     env:
       Solution_Name: dotnet-tac
-      Test_Project_Path: TACBuilder.Tests\TACBuilder.Tests.csproj
+      Test_Project_Path: TACBuilder.UnitTests\TACBuilder.UnitTests.csproj
     steps:
     - name: Checkout
       uses: actions/checkout@v4
@@ -24,8 +24,8 @@ jobs:
 
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
-    - name: Publish TACBuilder.Tests
-      run: dotnet publish TACBuilder.Tests\TACBuilder.Tests.csproj --self-contained -r osx-arm64 -c Debug
+    - name: Build TACBuilder.UnitTests
+      run: dotnet build 'TACBuilder.UnitTests\TACBuilder.UnitTests.csproj' -c Release
 
     - name: Execute unit tests
       run: dotnet test
