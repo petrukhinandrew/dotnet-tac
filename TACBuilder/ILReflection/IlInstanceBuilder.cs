@@ -39,7 +39,8 @@ public static class IlInstanceBuilder
         typeof(nint),
         typeof(nuint),
         typeof(string),
-        typeof(bool)
+        typeof(bool),
+        typeof(Array)
     ];
     public static IlAssembly BuildFrom(string assemblyPath)
     {
