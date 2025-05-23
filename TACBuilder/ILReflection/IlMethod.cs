@@ -2,9 +2,9 @@ using System.Diagnostics;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
 using TACBuilder.BodyBuilder;
+using TACBuilder.BodyBuilder.ILBodyParser;
 using TACBuilder.BodyBuilder.TacTransformer;
 using TACBuilder.Exprs;
-using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
 namespace TACBuilder.ILReflection;
@@ -93,14 +93,16 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
     public class IlBody : IlCacheable
     {
-        private readonly ILBodyParser _bodyParser;
+        private readonly IlBodyParser _bodyParser;
         private readonly CFG _cfg;
 
         public IlBody(IlMethod method)
         {
-            _bodyParser = new ILBodyParser(method._methodBase);
+            _bodyParser = new IlBodyParser(method._methodBase);
             _bodyParser.Parse();
             _cfg = new CFG(_bodyParser.Instructions, _bodyParser.EhClauses);
+            method._ilMonoBody = _bodyParser.IlMonoInstructions;
+            method.FilePath = _bodyParser.FilePath;
             foreach (var bb in _cfg.BasicBlocks)
             {
                 bb.AttachToMethod(method);
@@ -113,7 +115,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
         }
 
-        public ILInstr Instructions => _bodyParser.Instructions;
+        public IlInstr Instructions => _bodyParser.Instructions;
         public List<ehClause> EhClauses => _bodyParser.EhClauses;
         public List<IlBasicBlock> BasicBlocks => _cfg.BasicBlocks;
         public List<int> StartBlocksIndices => _cfg.StartBlocksIndices;
@@ -191,9 +193,7 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
 
     public List<IlBasicBlock> BasicBlocks => _ilBody.BasicBlocks;
     public List<int> StartBlocksIndices => _ilBody.StartBlocksIndices;
-    public ILInstr FirstInstruction => _ilBody.Instructions;
-    public List<ehClause> EhClauses => _ilBody.EhClauses;
-
+    public List<IlMonoInst> _ilMonoBody = [];
     public List<IlLocalVar> LocalVars = new();
     public Dictionary<int, IlTempVar> Temps = new();
     public List<IlErrVar> Errs = new();
@@ -202,10 +202,10 @@ public class IlMethod(MethodBase methodBase) : IlMember(methodBase)
     private IlBody _ilBody;
     private TacBody? _tacBody;
     private CFG _cfg;
-    private ILBodyParser _bodyParser;
+    private IlBodyParser _bodyParser;
     public int ModuleToken => _methodBase.MetadataToken;
     public int MetadataToken => _methodBase.MetadataToken;
-
+    public string? FilePath = null;
     private static List<IParameter> ConstructParameters(MethodBase methodBase)
     {
         List<IParameter> res = [];

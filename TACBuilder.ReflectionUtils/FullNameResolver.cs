@@ -85,7 +85,7 @@ public static class FullNameResolver
         var fullName = "";
         if (t.IsUnmanagedFunctionPointer || t.IsFunctionPointer)
         {
-            Console.WriteLine("kringi");
+            // Console.WriteLine("kringi");
         }
         if (t.IsGenericType)
         {

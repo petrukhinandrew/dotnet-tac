@@ -37,7 +37,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:23</p>
+  /// <p>Generated from: IlModel.kt:24</p>
   /// </summary>
   public class IlModel : RdExtBase
   {
@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => -8038923504736244160L;
+    protected override long SerializationHash => 5406026626313613222L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -119,7 +119,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:88</p>
+  /// <p>Generated from: IlModel.kt:91</p>
   /// </summary>
   public sealed class IlArrayTypeDto : IlReferenceTypeDto
   {
@@ -202,7 +202,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlArrayTypeDto> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var moduleToken = reader.ReadInt();
       var typeToken = reader.ReadInt();
       var namespaceName = reader.ReadString();
@@ -235,6 +235,7 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlArrayTypeDto(elementType, asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isAbstract, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -243,7 +244,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlArrayTypeDto> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.ModuleToken);
       writer.Write(value.TypeToken);
       writer.Write(value.NamespaceName);
@@ -274,6 +275,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlMethodDtoList(ctx, writer, value.Methods);
       TypeId.Write(ctx, writer, value.ElementType);
     };
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -296,7 +298,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(ElementType, other.ElementType) && AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(ElementType, other.ElementType) && Equals(AsmName, other.AsmName) && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -385,7 +387,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:92</p>
+  /// <p>Generated from: IlModel.kt:95</p>
   /// </summary>
   public sealed class IlAttrDto : IlDto
   {
@@ -504,7 +506,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:137</p>
+  /// <p>Generated from: IlModel.kt:140</p>
   /// </summary>
   public sealed class IlCatchScopeDto : IlEhScopeDto
   {
@@ -610,7 +612,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:86</p>
+  /// <p>Generated from: IlModel.kt:89</p>
   /// </summary>
   public sealed class IlClassTypeDto : IlReferenceTypeDto
   {
@@ -688,7 +690,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlClassTypeDto> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var moduleToken = reader.ReadInt();
       var typeToken = reader.ReadInt();
       var namespaceName = reader.ReadString();
@@ -720,6 +722,7 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlClassTypeDto(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isAbstract, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -728,7 +731,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlClassTypeDto> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.ModuleToken);
       writer.Write(value.TypeToken);
       writer.Write(value.NamespaceName);
@@ -758,6 +761,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlFieldDtoList(ctx, writer, value.Fields);
       WriteIlMethodDtoList(ctx, writer, value.Methods);
     };
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -780,7 +784,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(AsmName, other.AsmName) && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -867,7 +871,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:33</p>
+  /// <p>Generated from: IlModel.kt:36</p>
   /// </summary>
   public abstract class IlDto{
     //fields
@@ -958,7 +962,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:130</p>
+  /// <p>Generated from: IlModel.kt:133</p>
   /// </summary>
   public abstract class IlEhScopeDto : IlDto
   {
@@ -1097,7 +1101,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:75</p>
+  /// <p>Generated from: IlModel.kt:78</p>
   /// </summary>
   public sealed class IlEnumTypeDto : IlValueTypeDto
   {
@@ -1188,7 +1192,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlEnumTypeDto> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var moduleToken = reader.ReadInt();
       var typeToken = reader.ReadInt();
       var namespaceName = reader.ReadString();
@@ -1225,6 +1229,7 @@ namespace org.jacodb.api.net.generated.models
     };
     public static CtxReadDelegate<List<string>> ReadStringList = JetBrains.Rd.Impl.Serializers.ReadString.List();
     public static CtxReadDelegate<List<IlConstDto>> ReadIlConstDtoList = IlConstDto.Read.List();
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -1233,7 +1238,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlEnumTypeDto> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.ModuleToken);
       writer.Write(value.TypeToken);
       writer.Write(value.NamespaceName);
@@ -1268,6 +1273,7 @@ namespace org.jacodb.api.net.generated.models
     };
     public static  CtxWriteDelegate<List<string>> WriteStringList = JetBrains.Rd.Impl.Serializers.WriteString.List();
     public static  CtxWriteDelegate<List<IlConstDto>> WriteIlConstDtoList = IlConstDto.Write.List();
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -1290,7 +1296,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(UnderlyingType, other.UnderlyingType) && Names.SequenceEqual(other.Names) && Values.SequenceEqual(other.Values) && AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(UnderlyingType, other.UnderlyingType) && Names.SequenceEqual(other.Names) && Values.SequenceEqual(other.Values) && Equals(AsmName, other.AsmName) && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1383,7 +1389,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:128</p>
+  /// <p>Generated from: IlModel.kt:131</p>
   /// </summary>
   public sealed class IlErrVarDto : IlVarDto
   {
@@ -1468,7 +1474,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:145</p>
+  /// <p>Generated from: IlModel.kt:148</p>
   /// </summary>
   public sealed class IlFaultScopeDto : IlEhScopeDto
   {
@@ -1565,7 +1571,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:100</p>
+  /// <p>Generated from: IlModel.kt:103</p>
   /// </summary>
   public sealed class IlFieldDto : IlDto
   {
@@ -1685,7 +1691,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:141</p>
+  /// <p>Generated from: IlModel.kt:144</p>
   /// </summary>
   public sealed class IlFilterScopeDto : IlEhScopeDto
   {
@@ -1789,7 +1795,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:147</p>
+  /// <p>Generated from: IlModel.kt:150</p>
   /// </summary>
   public sealed class IlFinallyScopeDto : IlEhScopeDto
   {
@@ -1886,7 +1892,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:122</p>
+  /// <p>Generated from: IlModel.kt:125</p>
   /// </summary>
   public sealed class IlLocalVarDto : IlVarDto
   {
@@ -1978,7 +1984,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:150</p>
+  /// <p>Generated from: IlModel.kt:153</p>
   /// </summary>
   public sealed class IlMethodDto : IlDto
   {
@@ -2003,6 +2009,7 @@ namespace org.jacodb.api.net.generated.models
     public bool IsVirtual {get; private set;}
     public bool IsAbstract {get; private set;}
     [Nullable] public InstanceId BaseMethod {get; private set;}
+    [Nullable] public string FilePath {get; private set;}
     
     //private fields
     //primary constructor
@@ -2025,7 +2032,8 @@ namespace org.jacodb.api.net.generated.models
       bool isConstructed,
       bool isVirtual,
       bool isAbstract,
-      [Nullable] InstanceId baseMethod
+      [Nullable] InstanceId baseMethod,
+      [Nullable] string filePath
     )
     {
       if (returnType == null) throw new ArgumentNullException("returnType");
@@ -2059,6 +2067,7 @@ namespace org.jacodb.api.net.generated.models
       IsVirtual = isVirtual;
       IsAbstract = isAbstract;
       BaseMethod = baseMethod;
+      FilePath = filePath;
     }
     //secondary constructor
     //deconstruct trait
@@ -2085,7 +2094,8 @@ namespace org.jacodb.api.net.generated.models
       var isVirtual = reader.ReadBool();
       var isAbstract = reader.ReadBool();
       var baseMethod = ReadInstanceIdNullable(ctx, reader);
-      var _result = new IlMethodDto(returnType, attrs, isStatic, isGeneric, isGenericDefinition, signature, name, parameters, genericArgs, resolved, locals, temps, errs, ehScopes, rawInstList, isConstructed, isVirtual, isAbstract, baseMethod);
+      var filePath = ReadStringInternedNullable(ctx, reader);
+      var _result = new IlMethodDto(returnType, attrs, isStatic, isGeneric, isGenericDefinition, signature, name, parameters, genericArgs, resolved, locals, temps, errs, ehScopes, rawInstList, isConstructed, isVirtual, isAbstract, baseMethod, filePath);
       return _result;
     };
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -2097,6 +2107,7 @@ namespace org.jacodb.api.net.generated.models
     public static CtxReadDelegate<List<IlEhScopeDto>> ReadIlEhScopeDtoList = IlEhScopeDto.Read.List();
     public static CtxReadDelegate<List<IlStmtDto>> ReadIlStmtDtoList = IlStmtDto.Read.List();
     public static CtxReadDelegate<InstanceId> ReadInstanceIdNullable = InstanceId.Read.NullableClass();
+    public static CtxReadDelegate<string> ReadStringInternedNullable = JetBrains.Rd.Impl.Serializers.ReadString.Interned("StmtLocInternScope").NullableClass();
     
     public static new CtxWriteDelegate<IlMethodDto> Write = (ctx, writer, value) => 
     {
@@ -2119,6 +2130,7 @@ namespace org.jacodb.api.net.generated.models
       writer.Write(value.IsVirtual);
       writer.Write(value.IsAbstract);
       WriteInstanceIdNullable(ctx, writer, value.BaseMethod);
+      WriteStringInternedNullable(ctx, writer, value.FilePath);
     };
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
     public static  CtxWriteDelegate<List<IlParameterDto>> WriteIlParameterDtoList = IlParameterDto.Write.List();
@@ -2129,6 +2141,7 @@ namespace org.jacodb.api.net.generated.models
     public static  CtxWriteDelegate<List<IlEhScopeDto>> WriteIlEhScopeDtoList = IlEhScopeDto.Write.List();
     public static  CtxWriteDelegate<List<IlStmtDto>> WriteIlStmtDtoList = IlStmtDto.Write.List();
     public static  CtxWriteDelegate<InstanceId> WriteInstanceIdNullable = InstanceId.Write.NullableClass();
+    public static  CtxWriteDelegate<string> WriteStringInternedNullable = JetBrains.Rd.Impl.Serializers.WriteString.Interned("StmtLocInternScope").NullableClass();
     
     //constants
     
@@ -2146,7 +2159,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && IsStatic == other.IsStatic && IsGeneric == other.IsGeneric && IsGenericDefinition == other.IsGenericDefinition && Signature == other.Signature && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && GenericArgs.SequenceEqual(other.GenericArgs) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList) && IsConstructed == other.IsConstructed && IsVirtual == other.IsVirtual && IsAbstract == other.IsAbstract && Equals(BaseMethod, other.BaseMethod);
+      return Equals(ReturnType, other.ReturnType) && Attrs.SequenceEqual(other.Attrs) && IsStatic == other.IsStatic && IsGeneric == other.IsGeneric && IsGenericDefinition == other.IsGenericDefinition && Signature == other.Signature && Name == other.Name && Parameters.SequenceEqual(other.Parameters) && GenericArgs.SequenceEqual(other.GenericArgs) && Resolved == other.Resolved && Locals.SequenceEqual(other.Locals) && Temps.SequenceEqual(other.Temps) && Errs.SequenceEqual(other.Errs) && EhScopes.SequenceEqual(other.EhScopes) && RawInstList.SequenceEqual(other.RawInstList) && IsConstructed == other.IsConstructed && IsVirtual == other.IsVirtual && IsAbstract == other.IsAbstract && Equals(BaseMethod, other.BaseMethod) && Equals(FilePath, other.FilePath);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2172,6 +2185,7 @@ namespace org.jacodb.api.net.generated.models
         hash = hash * 31 + IsVirtual.GetHashCode();
         hash = hash * 31 + IsAbstract.GetHashCode();
         hash = hash * 31 + (BaseMethod != null ? BaseMethod.GetHashCode() : 0);
+        hash = hash * 31 + (FilePath != null ? FilePath.GetHashCode() : 0);
         return hash;
       }
     }
@@ -2199,6 +2213,7 @@ namespace org.jacodb.api.net.generated.models
         printer.Print("isVirtual = "); IsVirtual.PrintEx(printer); printer.Println();
         printer.Print("isAbstract = "); IsAbstract.PrintEx(printer); printer.Println();
         printer.Print("baseMethod = "); BaseMethod.PrintEx(printer); printer.Println();
+        printer.Print("filePath = "); FilePath.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -2213,7 +2228,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:109</p>
+  /// <p>Generated from: IlModel.kt:112</p>
   /// </summary>
   public sealed class IlParameterDto : IPrintable, IEquatable<IlParameterDto>
   {
@@ -2336,7 +2351,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:67</p>
+  /// <p>Generated from: IlModel.kt:70</p>
   /// </summary>
   public sealed class IlPointerTypeDto : IlTypeDto
   {
@@ -2419,7 +2434,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlPointerTypeDto> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var moduleToken = reader.ReadInt();
       var typeToken = reader.ReadInt();
       var namespaceName = reader.ReadString();
@@ -2452,6 +2467,7 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlPointerTypeDto(targetType, asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isAbstract, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -2460,7 +2476,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlPointerTypeDto> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.ModuleToken);
       writer.Write(value.TypeToken);
       writer.Write(value.NamespaceName);
@@ -2491,6 +2507,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlMethodDtoList(ctx, writer, value.Methods);
       TypeId.Write(ctx, writer, value.TargetType);
     };
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -2513,7 +2530,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(TargetType, other.TargetType) && AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(TargetType, other.TargetType) && Equals(AsmName, other.AsmName) && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2602,7 +2619,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:73</p>
+  /// <p>Generated from: IlModel.kt:76</p>
   /// </summary>
   public sealed class IlPrimitiveTypeDto : IlValueTypeDto
   {
@@ -2680,7 +2697,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlPrimitiveTypeDto> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var moduleToken = reader.ReadInt();
       var typeToken = reader.ReadInt();
       var namespaceName = reader.ReadString();
@@ -2712,6 +2729,7 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlPrimitiveTypeDto(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isAbstract, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -2720,7 +2738,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlPrimitiveTypeDto> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.ModuleToken);
       writer.Write(value.TypeToken);
       writer.Write(value.NamespaceName);
@@ -2750,6 +2768,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlFieldDtoList(ctx, writer, value.Fields);
       WriteIlMethodDtoList(ctx, writer, value.Methods);
     };
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -2772,7 +2791,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(AsmName, other.AsmName) && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -2859,7 +2878,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:84</p>
+  /// <p>Generated from: IlModel.kt:87</p>
   /// </summary>
   public abstract class IlReferenceTypeDto : IlTypeDto
   {
@@ -3026,7 +3045,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlReferenceTypeDto_Unknown> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var moduleToken = reader.ReadInt();
       var typeToken = reader.ReadInt();
       var namespaceName = reader.ReadString();
@@ -3058,6 +3077,7 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlReferenceTypeDto_Unknown(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isAbstract, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -3066,7 +3086,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlReferenceTypeDto_Unknown> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.ModuleToken);
       writer.Write(value.TypeToken);
       writer.Write(value.NamespaceName);
@@ -3096,6 +3116,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlFieldDtoList(ctx, writer, value.Fields);
       WriteIlMethodDtoList(ctx, writer, value.Methods);
     };
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -3118,7 +3139,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(AsmName, other.AsmName) && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -3205,7 +3226,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:172</p>
+  /// <p>Generated from: IlModel.kt:176</p>
   /// </summary>
   public sealed class IlSignatureDto : IlDto
   {
@@ -3310,7 +3331,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:82</p>
+  /// <p>Generated from: IlModel.kt:85</p>
   /// </summary>
   public sealed class IlStructTypeDto : IlValueTypeDto
   {
@@ -3388,7 +3409,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlStructTypeDto> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var moduleToken = reader.ReadInt();
       var typeToken = reader.ReadInt();
       var namespaceName = reader.ReadString();
@@ -3420,6 +3441,7 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlStructTypeDto(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isAbstract, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -3428,7 +3450,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlStructTypeDto> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.ModuleToken);
       writer.Write(value.TypeToken);
       writer.Write(value.NamespaceName);
@@ -3458,6 +3480,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlFieldDtoList(ctx, writer, value.Fields);
       WriteIlMethodDtoList(ctx, writer, value.Methods);
     };
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -3480,7 +3503,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(AsmName, other.AsmName) && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -3567,7 +3590,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:126</p>
+  /// <p>Generated from: IlModel.kt:129</p>
   /// </summary>
   public sealed class IlTempVarDto : IlVarDto
   {
@@ -3652,7 +3675,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:35</p>
+  /// <p>Generated from: IlModel.kt:38</p>
   /// </summary>
   public abstract class IlTypeDto : IlDto
   {
@@ -3858,7 +3881,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlTypeDto_Unknown> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var moduleToken = reader.ReadInt();
       var typeToken = reader.ReadInt();
       var namespaceName = reader.ReadString();
@@ -3890,6 +3913,7 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlTypeDto_Unknown(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isAbstract, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -3898,7 +3922,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlTypeDto_Unknown> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.ModuleToken);
       writer.Write(value.TypeToken);
       writer.Write(value.NamespaceName);
@@ -3928,6 +3952,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlFieldDtoList(ctx, writer, value.Fields);
       WriteIlMethodDtoList(ctx, writer, value.Methods);
     };
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -3950,7 +3975,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(AsmName, other.AsmName) && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -4037,7 +4062,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:71</p>
+  /// <p>Generated from: IlModel.kt:74</p>
   /// </summary>
   public abstract class IlValueTypeDto : IlTypeDto
   {
@@ -4204,7 +4229,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlValueTypeDto_Unknown> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var moduleToken = reader.ReadInt();
       var typeToken = reader.ReadInt();
       var namespaceName = reader.ReadString();
@@ -4236,6 +4261,7 @@ namespace org.jacodb.api.net.generated.models
       var _result = new IlValueTypeDto_Unknown(asmName, moduleToken, typeToken, namespaceName, size, name, fullname, isConstructed, declType, baseType, interfaces, genericArgs, isInterface, isAbstract, isGenericType, genericParameterConstraints, isGenericParam, isGenericDefinition, genericDefinition, isCovariant, isContravariant, hasRefTypeConstraint, hasNotNullValueTypeConstraint, hasDefaultCtorConstraint, isValueType, isManaged, attrs, fields, methods);
       return _result;
     };
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     public static CtxReadDelegate<TypeId> ReadTypeIdNullable = TypeId.Read.NullableClass();
     public static CtxReadDelegate<List<TypeId>> ReadTypeIdList = TypeId.Read.List();
     public static CtxReadDelegate<List<IlAttrDto>> ReadIlAttrDtoList = IlAttrDto.Read.List();
@@ -4244,7 +4270,7 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxWriteDelegate<IlValueTypeDto_Unknown> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.ModuleToken);
       writer.Write(value.TypeToken);
       writer.Write(value.NamespaceName);
@@ -4274,6 +4300,7 @@ namespace org.jacodb.api.net.generated.models
       WriteIlFieldDtoList(ctx, writer, value.Fields);
       WriteIlMethodDtoList(ctx, writer, value.Methods);
     };
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     public static  CtxWriteDelegate<TypeId> WriteTypeIdNullable = TypeId.Write.NullableClass();
     public static  CtxWriteDelegate<List<TypeId>> WriteTypeIdList = TypeId.Write.List();
     public static  CtxWriteDelegate<List<IlAttrDto>> WriteIlAttrDtoList = IlAttrDto.Write.List();
@@ -4296,7 +4323,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
+      return Equals(AsmName, other.AsmName) && ModuleToken == other.ModuleToken && TypeToken == other.TypeToken && NamespaceName == other.NamespaceName && Size == other.Size && Name == other.Name && Fullname == other.Fullname && IsConstructed == other.IsConstructed && Equals(DeclType, other.DeclType) && Equals(BaseType, other.BaseType) && Interfaces.SequenceEqual(other.Interfaces) && GenericArgs.SequenceEqual(other.GenericArgs) && IsInterface == other.IsInterface && IsAbstract == other.IsAbstract && IsGenericType == other.IsGenericType && GenericParameterConstraints.SequenceEqual(other.GenericParameterConstraints) && IsGenericParam == other.IsGenericParam && IsGenericDefinition == other.IsGenericDefinition && Equals(GenericDefinition, other.GenericDefinition) && IsCovariant == other.IsCovariant && IsContravariant == other.IsContravariant && HasRefTypeConstraint == other.HasRefTypeConstraint && HasNotNullValueTypeConstraint == other.HasNotNullValueTypeConstraint && HasDefaultCtorConstraint == other.HasDefaultCtorConstraint && IsValueType == other.IsValueType && IsManaged == other.IsManaged && Attrs.SequenceEqual(other.Attrs) && Fields.SequenceEqual(other.Fields) && Methods.SequenceEqual(other.Methods);
     }
     //hash code trait
     public override int GetHashCode()
@@ -4383,7 +4410,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:117</p>
+  /// <p>Generated from: IlModel.kt:120</p>
   /// </summary>
   public abstract class IlVarDto : IlDto
   {
@@ -4506,7 +4533,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:29</p>
+  /// <p>Generated from: IlModel.kt:32</p>
   /// </summary>
   public sealed class TypeId : TypeIdBase
   {
@@ -4535,21 +4562,23 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<TypeId> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var typeName = reader.ReadString();
       var typeArgs = ReadTypeIdBaseList(ctx, reader);
       var _result = new TypeId(typeArgs, asmName, typeName);
       return _result;
     };
     public static CtxReadDelegate<List<TypeIdBase>> ReadTypeIdBaseList = TypeIdBase.Read.List();
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     
     public static new CtxWriteDelegate<TypeId> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.TypeName);
       WriteTypeIdBaseList(ctx, writer, value.TypeArgs);
     };
     public static  CtxWriteDelegate<List<TypeIdBase>> WriteTypeIdBaseList = TypeIdBase.Write.List();
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     
     //constants
     
@@ -4567,7 +4596,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return TypeArgs.SequenceEqual(other.TypeArgs) && AsmName == other.AsmName && TypeName == other.TypeName;
+      return TypeArgs.SequenceEqual(other.TypeArgs) && Equals(AsmName, other.AsmName) && TypeName == other.TypeName;
     }
     //hash code trait
     public override int GetHashCode()
@@ -4602,7 +4631,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlModel.kt:24</p>
+  /// <p>Generated from: IlModel.kt:27</p>
   /// </summary>
   public abstract class TypeIdBase{
     //fields
@@ -4664,17 +4693,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<TypeIdBase_Unknown> Read = (ctx, reader) => 
     {
-      var asmName = reader.ReadString();
+      var asmName = ctx.ReadInterned(reader, "InternScope", JetBrains.Rd.Impl.Serializers.ReadString);
       var typeName = reader.ReadString();
       var _result = new TypeIdBase_Unknown(asmName, typeName);
       return _result;
     };
+    public static CtxReadDelegate<string> ReadStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.ReadString.Interned("InternScope");
     
     public static new CtxWriteDelegate<TypeIdBase_Unknown> Write = (ctx, writer, value) => 
     {
-      writer.Write(value.AsmName);
+      ctx.WriteInterned(writer, value.AsmName, "InternScope", JetBrains.Rd.Impl.Serializers.WriteString);
       writer.Write(value.TypeName);
     };
+    public static  CtxWriteDelegate<string> WriteStringInternedAtInternScope = JetBrains.Rd.Impl.Serializers.WriteString.Interned("InternScope");
     
     //constants
     
@@ -4692,7 +4723,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return AsmName == other.AsmName && TypeName == other.TypeName;
+      return Equals(AsmName, other.AsmName) && TypeName == other.TypeName;
     }
     //hash code trait
     public override int GetHashCode()

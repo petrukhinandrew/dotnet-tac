@@ -56,7 +56,7 @@ namespace org.jacodb.api.net.generated.models
     
     
     
-    protected override long SerializationHash => -2282983157299199343L;
+    protected override long SerializationHash => -452128083975823807L;
     
     protected override Action<ISerializers> Register => RegisterDeclaredTypesSerializers;
     public static void RegisterDeclaredTypesSerializers(ISerializers serializers)
@@ -278,7 +278,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:85</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:90</p>
   /// </summary>
   public sealed class IlAndOpDto : IlBinaryOpDto
   {
@@ -381,7 +381,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:205</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:250</p>
   /// </summary>
   public sealed class IlArgAccessDto : IlValueDto
   {
@@ -467,7 +467,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:153</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:180</p>
   /// </summary>
   public sealed class IlArgListRefDto : IlExprDto
   {
@@ -555,7 +555,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:109</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:125</p>
   /// </summary>
   public sealed class IlArrayAccessDto : IlValueDto
   {
@@ -741,7 +741,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:118</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:135</p>
   /// </summary>
   public sealed class IlArrayLengthExprDto : IlExprDto
   {
@@ -829,7 +829,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:163</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:196</p>
   /// </summary>
   public sealed class IlAssignStmtDto : IlStmtDto
   {
@@ -842,8 +842,11 @@ namespace org.jacodb.api.net.generated.models
     //primary constructor
     public IlAssignStmtDto(
       [NotNull] IlValueDto lhv,
-      [NotNull] IlExprDto rhv
-    )
+      [NotNull] IlExprDto rhv,
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
     {
       if (lhv == null) throw new ArgumentNullException("lhv");
       if (rhv == null) throw new ArgumentNullException("rhv");
@@ -857,17 +860,21 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlAssignStmtDto> Read = (ctx, reader) => 
     {
+      var fileLineIdx = ReadIntNullable(ctx, reader);
       var lhv = IlValueDto.Read(ctx, reader);
       var rhv = IlExprDto.Read(ctx, reader);
-      var _result = new IlAssignStmtDto(lhv, rhv);
+      var _result = new IlAssignStmtDto(lhv, rhv, fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlAssignStmtDto> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
       IlValueDto.Write(ctx, writer, value.Lhv);
       IlExprDto.Write(ctx, writer, value.Rhv);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -885,7 +892,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv);
+      return Equals(Lhv, other.Lhv) && Equals(Rhv, other.Rhv) && Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
@@ -894,6 +901,7 @@ namespace org.jacodb.api.net.generated.models
         var hash = 0;
         hash = hash * 31 + Lhv.GetHashCode();
         hash = hash * 31 + Rhv.GetHashCode();
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -904,6 +912,7 @@ namespace org.jacodb.api.net.generated.models
       using (printer.IndentCookie()) {
         printer.Print("lhv = "); Lhv.PrintEx(printer); printer.Println();
         printer.Print("rhv = "); Rhv.PrintEx(printer); printer.Println();
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -1155,7 +1164,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:130</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:149</p>
   /// </summary>
   public sealed class IlBoxExprDto : IlCastExprDto
   {
@@ -1255,7 +1264,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:189</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:234</p>
   /// </summary>
   public abstract class IlBranchStmtDto : IlStmtDto
   {
@@ -1266,8 +1275,11 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     protected IlBranchStmtDto(
-      int target
-    )
+      int target,
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
     {
       Target = target;
     }
@@ -1298,9 +1310,11 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlBranchStmtDto_Unknown(
-      int target
+      int target,
+      [Nullable] int? fileLineIdx
     ) : base (
-      target
+      target,
+      fileLineIdx
      ) 
     {
     }
@@ -1311,14 +1325,18 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxReadDelegate<IlBranchStmtDto_Unknown> Read = (ctx, reader) => 
     {
       var target = reader.ReadInt();
-      var _result = new IlBranchStmtDto_Unknown(target);
+      var fileLineIdx = ReadIntNullable(ctx, reader);
+      var _result = new IlBranchStmtDto_Unknown(target, fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlBranchStmtDto_Unknown> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Target);
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -1336,7 +1354,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Target == other.Target;
+      return Target == other.Target && Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1344,6 +1362,7 @@ namespace org.jacodb.api.net.generated.models
       unchecked {
         var hash = 0;
         hash = hash * 31 + Target.GetHashCode();
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -1353,6 +1372,7 @@ namespace org.jacodb.api.net.generated.models
       printer.Println("IlBranchStmtDto_Unknown (");
       using (printer.IndentCookie()) {
         printer.Print("target = "); Target.PrintEx(printer); printer.Println();
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -1367,7 +1387,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:119</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:137</p>
   /// </summary>
   public sealed class IlCallDto : IlExprDto
   {
@@ -1465,7 +1485,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:168</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:202</p>
   /// </summary>
   public sealed class IlCallStmtDto : IlStmtDto
   {
@@ -1476,8 +1496,11 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlCallStmtDto(
-      [NotNull] IlCallDto call
-    )
+      [NotNull] IlCallDto call,
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
     {
       if (call == null) throw new ArgumentNullException("call");
       
@@ -1489,15 +1512,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlCallStmtDto> Read = (ctx, reader) => 
     {
+      var fileLineIdx = ReadIntNullable(ctx, reader);
       var call = IlCallDto.Read(ctx, reader);
-      var _result = new IlCallStmtDto(call);
+      var _result = new IlCallStmtDto(call, fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlCallStmtDto> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
       IlCallDto.Write(ctx, writer, value.Call);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -1515,7 +1542,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Call, other.Call);
+      return Equals(Call, other.Call) && Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1523,6 +1550,7 @@ namespace org.jacodb.api.net.generated.models
       unchecked {
         var hash = 0;
         hash = hash * 31 + Call.GetHashCode();
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -1532,6 +1560,7 @@ namespace org.jacodb.api.net.generated.models
       printer.Println("IlCallStmtDto (");
       using (printer.IndentCookie()) {
         printer.Print("call = "); Call.PrintEx(printer); printer.Println();
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -1546,7 +1575,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:156</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:184</p>
   /// </summary>
   public sealed class IlCalliDto : IlExprDto
   {
@@ -1652,7 +1681,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:171</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:206</p>
   /// </summary>
   public sealed class IlCalliStmtDto : IlStmtDto
   {
@@ -1663,8 +1692,11 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlCalliStmtDto(
-      [NotNull] IlCalliDto calli
-    )
+      [NotNull] IlCalliDto calli,
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
     {
       if (calli == null) throw new ArgumentNullException("calli");
       
@@ -1676,15 +1708,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlCalliStmtDto> Read = (ctx, reader) => 
     {
+      var fileLineIdx = ReadIntNullable(ctx, reader);
       var calli = IlCalliDto.Read(ctx, reader);
-      var _result = new IlCalliStmtDto(calli);
+      var _result = new IlCalliStmtDto(calli, fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlCalliStmtDto> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
       IlCalliDto.Write(ctx, writer, value.Calli);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -1702,7 +1738,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Calli, other.Calli);
+      return Equals(Calli, other.Calli) && Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
@@ -1710,6 +1746,7 @@ namespace org.jacodb.api.net.generated.models
       unchecked {
         var hash = 0;
         hash = hash * 31 + Calli.GetHashCode();
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -1719,6 +1756,7 @@ namespace org.jacodb.api.net.generated.models
       printer.Println("IlCalliStmtDto (");
       using (printer.IndentCookie()) {
         printer.Print("calli = "); Calli.PrintEx(printer); printer.Println();
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -1733,7 +1771,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:134</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:155</p>
   /// </summary>
   public sealed class IlCastClassExprDto : IlCastExprDto
   {
@@ -1824,7 +1862,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:124</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:142</p>
   /// </summary>
   public abstract class IlCastExprDto : IlExprDto
   {
@@ -1957,7 +1995,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:90</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:100</p>
   /// </summary>
   public sealed class IlCeqOpDto : IlBinaryOpDto
   {
@@ -2060,7 +2098,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:93</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:106</p>
   /// </summary>
   public sealed class IlCgeOpDto : IlBinaryOpDto
   {
@@ -2163,7 +2201,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:92</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:104</p>
   /// </summary>
   public sealed class IlCgtOpDto : IlBinaryOpDto
   {
@@ -2352,7 +2390,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:95</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:110</p>
   /// </summary>
   public sealed class IlCleOpDto : IlBinaryOpDto
   {
@@ -2455,7 +2493,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:94</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:108</p>
   /// </summary>
   public sealed class IlCltOpDto : IlBinaryOpDto
   {
@@ -2558,7 +2596,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:91</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:102</p>
   /// </summary>
   public sealed class IlCneOpDto : IlBinaryOpDto
   {
@@ -2773,7 +2811,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:129</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:147</p>
   /// </summary>
   public sealed class IlConvExprDto : IlCastExprDto
   {
@@ -2864,7 +2902,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:141</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:164</p>
   /// </summary>
   public abstract class IlDerefExprDto : IlValueDto
   {
@@ -2987,7 +3025,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:83</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:86</p>
   /// </summary>
   public sealed class IlDivOpDto : IlBinaryOpDto
   {
@@ -3176,7 +3214,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:178</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:215</p>
   /// </summary>
   public abstract class IlEhStmtDto : IlStmtDto
   {
@@ -3185,6 +3223,13 @@ namespace org.jacodb.api.net.generated.models
     
     //private fields
     //primary constructor
+    protected IlEhStmtDto(
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
+    {
+    }
     //secondary constructor
     //deconstruct trait
     //statics
@@ -3211,19 +3256,30 @@ namespace org.jacodb.api.net.generated.models
     
     //private fields
     //primary constructor
+    public IlEhStmtDto_Unknown(
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
+    {
+    }
     //secondary constructor
     //deconstruct trait
     //statics
     
     public static new CtxReadDelegate<IlEhStmtDto_Unknown> Read = (ctx, reader) => 
     {
-      var _result = new IlEhStmtDto_Unknown();
+      var fileLineIdx = ReadIntNullable(ctx, reader);
+      var _result = new IlEhStmtDto_Unknown(fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlEhStmtDto_Unknown> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -3241,13 +3297,14 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return true;
+      return Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -3255,6 +3312,9 @@ namespace org.jacodb.api.net.generated.models
     public void Print(PrettyPrinter printer)
     {
       printer.Println("IlEhStmtDto_Unknown (");
+      using (printer.IndentCookie()) {
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
+      }
       printer.Print(")");
     }
     //toString
@@ -3268,7 +3328,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:184</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:226</p>
   /// </summary>
   public sealed class IlEndFaultStmtDto : IlEhStmtDto
   {
@@ -3277,19 +3337,30 @@ namespace org.jacodb.api.net.generated.models
     
     //private fields
     //primary constructor
+    public IlEndFaultStmtDto(
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
+    {
+    }
     //secondary constructor
     //deconstruct trait
     //statics
     
     public static new CtxReadDelegate<IlEndFaultStmtDto> Read = (ctx, reader) => 
     {
-      var _result = new IlEndFaultStmtDto();
+      var fileLineIdx = ReadIntNullable(ctx, reader);
+      var _result = new IlEndFaultStmtDto(fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlEndFaultStmtDto> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -3307,13 +3378,14 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return true;
+      return Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -3321,6 +3393,9 @@ namespace org.jacodb.api.net.generated.models
     public void Print(PrettyPrinter printer)
     {
       printer.Println("IlEndFaultStmtDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
+      }
       printer.Print(")");
     }
     //toString
@@ -3334,7 +3409,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:185</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:229</p>
   /// </summary>
   public sealed class IlEndFilterStmtDto : IlEhStmtDto
   {
@@ -3345,8 +3420,11 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlEndFilterStmtDto(
-      [NotNull] IlExprDto value
-    )
+      [NotNull] IlExprDto value,
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
     {
       if (value == null) throw new ArgumentNullException("value");
       
@@ -3358,15 +3436,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlEndFilterStmtDto> Read = (ctx, reader) => 
     {
+      var fileLineIdx = ReadIntNullable(ctx, reader);
       var value = IlExprDto.Read(ctx, reader);
-      var _result = new IlEndFilterStmtDto(value);
+      var _result = new IlEndFilterStmtDto(value, fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlEndFilterStmtDto> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
       IlExprDto.Write(ctx, writer, value.Value);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -3384,7 +3466,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Value, other.Value);
+      return Equals(Value, other.Value) && Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
@@ -3392,6 +3474,7 @@ namespace org.jacodb.api.net.generated.models
       unchecked {
         var hash = 0;
         hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -3401,6 +3484,7 @@ namespace org.jacodb.api.net.generated.models
       printer.Println("IlEndFilterStmtDto (");
       using (printer.IndentCookie()) {
         printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -3415,7 +3499,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:183</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:223</p>
   /// </summary>
   public sealed class IlEndFinallyStmtDto : IlEhStmtDto
   {
@@ -3424,19 +3508,30 @@ namespace org.jacodb.api.net.generated.models
     
     //private fields
     //primary constructor
+    public IlEndFinallyStmtDto(
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
+    {
+    }
     //secondary constructor
     //deconstruct trait
     //statics
     
     public static new CtxReadDelegate<IlEndFinallyStmtDto> Read = (ctx, reader) => 
     {
-      var _result = new IlEndFinallyStmtDto();
+      var fileLineIdx = ReadIntNullable(ctx, reader);
+      var _result = new IlEndFinallyStmtDto(fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlEndFinallyStmtDto> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -3454,13 +3549,14 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return true;
+      return Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -3468,6 +3564,9 @@ namespace org.jacodb.api.net.generated.models
     public void Print(PrettyPrinter printer)
     {
       printer.Println("IlEndFinallyStmtDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
+      }
       printer.Print(")");
     }
     //toString
@@ -3690,7 +3789,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:105</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:120</p>
   /// </summary>
   public sealed class IlFieldAccessDto : IlValueDto
   {
@@ -3961,7 +4060,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:193</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:238</p>
   /// </summary>
   public sealed class IlGotoStmtDto : IlBranchStmtDto
   {
@@ -3971,9 +4070,11 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlGotoStmtDto(
-      int target
+      int target,
+      [Nullable] int? fileLineIdx
     ) : base (
-      target
+      target,
+      fileLineIdx
      ) 
     {
     }
@@ -3984,14 +4085,18 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxReadDelegate<IlGotoStmtDto> Read = (ctx, reader) => 
     {
       var target = reader.ReadInt();
-      var _result = new IlGotoStmtDto(target);
+      var fileLineIdx = ReadIntNullable(ctx, reader);
+      var _result = new IlGotoStmtDto(target, fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlGotoStmtDto> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Target);
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -4009,7 +4114,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Target == other.Target;
+      return Target == other.Target && Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
@@ -4017,6 +4122,7 @@ namespace org.jacodb.api.net.generated.models
       unchecked {
         var hash = 0;
         hash = hash * 31 + Target.GetHashCode();
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -4026,6 +4132,7 @@ namespace org.jacodb.api.net.generated.models
       printer.Println("IlGotoStmtDto (");
       using (printer.IndentCookie()) {
         printer.Print("target = "); Target.PrintEx(printer); printer.Println();
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -4040,7 +4147,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:196</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:241</p>
   /// </summary>
   public sealed class IlIfStmtDto : IlBranchStmtDto
   {
@@ -4052,9 +4159,11 @@ namespace org.jacodb.api.net.generated.models
     //primary constructor
     public IlIfStmtDto(
       [NotNull] IlExprDto cond,
-      int target
+      int target,
+      [Nullable] int? fileLineIdx
     ) : base (
-      target
+      target,
+      fileLineIdx
      ) 
     {
       if (cond == null) throw new ArgumentNullException("cond");
@@ -4068,16 +4177,20 @@ namespace org.jacodb.api.net.generated.models
     public static new CtxReadDelegate<IlIfStmtDto> Read = (ctx, reader) => 
     {
       var target = reader.ReadInt();
+      var fileLineIdx = ReadIntNullable(ctx, reader);
       var cond = IlExprDto.Read(ctx, reader);
-      var _result = new IlIfStmtDto(cond, target);
+      var _result = new IlIfStmtDto(cond, target, fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlIfStmtDto> Write = (ctx, writer, value) => 
     {
       writer.Write(value.Target);
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
       IlExprDto.Write(ctx, writer, value.Cond);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -4095,7 +4208,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Cond, other.Cond) && Target == other.Target;
+      return Equals(Cond, other.Cond) && Target == other.Target && Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
@@ -4104,6 +4217,7 @@ namespace org.jacodb.api.net.generated.models
         var hash = 0;
         hash = hash * 31 + Cond.GetHashCode();
         hash = hash * 31 + Target.GetHashCode();
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -4114,6 +4228,7 @@ namespace org.jacodb.api.net.generated.models
       using (printer.IndentCookie()) {
         printer.Print("cond = "); Cond.PrintEx(printer); printer.Println();
         printer.Print("target = "); Target.PrintEx(printer); printer.Println();
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -4472,7 +4587,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:135</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:157</p>
   /// </summary>
   public sealed class IlIsInstExprDto : IlCastExprDto
   {
@@ -4563,7 +4678,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:147</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:172</p>
   /// </summary>
   public sealed class IlManagedDerefExprDto : IlDerefExprDto
   {
@@ -4648,7 +4763,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:145</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:168</p>
   /// </summary>
   public sealed class IlManagedRefExprDto : IlRefExprDto
   {
@@ -4821,7 +4936,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:82</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:84</p>
   /// </summary>
   public sealed class IlMulOpDto : IlBinaryOpDto
   {
@@ -5009,7 +5124,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:114</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:130</p>
   /// </summary>
   public sealed class IlNewArrayExprDto : IlExprDto
   {
@@ -5105,7 +5220,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:97</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:112</p>
   /// </summary>
   public sealed class IlNewExprDto : IlExprDto
   {
@@ -5460,7 +5575,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:86</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:92</p>
   /// </summary>
   public sealed class IlOrOpDto : IlBinaryOpDto
   {
@@ -5563,7 +5678,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:138</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:160</p>
   /// </summary>
   public abstract class IlRefExprDto : IlValueDto
   {
@@ -5686,7 +5801,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:84</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:88</p>
   /// </summary>
   public sealed class IlRemOpDto : IlBinaryOpDto
   {
@@ -5789,7 +5904,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:182</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:220</p>
   /// </summary>
   public sealed class IlRethrowStmtDto : IlEhStmtDto
   {
@@ -5798,19 +5913,30 @@ namespace org.jacodb.api.net.generated.models
     
     //private fields
     //primary constructor
+    public IlRethrowStmtDto(
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
+    {
+    }
     //secondary constructor
     //deconstruct trait
     //statics
     
     public static new CtxReadDelegate<IlRethrowStmtDto> Read = (ctx, reader) => 
     {
-      var _result = new IlRethrowStmtDto();
+      var fileLineIdx = ReadIntNullable(ctx, reader);
+      var _result = new IlRethrowStmtDto(fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlRethrowStmtDto> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -5828,13 +5954,14 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return true;
+      return Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -5842,6 +5969,9 @@ namespace org.jacodb.api.net.generated.models
     public void Print(PrettyPrinter printer)
     {
       printer.Println("IlRethrowStmtDto (");
+      using (printer.IndentCookie()) {
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
+      }
       printer.Print(")");
     }
     //toString
@@ -5855,7 +5985,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:174</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:210</p>
   /// </summary>
   public sealed class IlReturnStmtDto : IlStmtDto
   {
@@ -5866,8 +5996,11 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlReturnStmtDto(
-      [Nullable] IlExprDto retVal
-    )
+      [Nullable] IlExprDto retVal,
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
     {
       RetVal = retVal;
     }
@@ -5877,17 +6010,21 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlReturnStmtDto> Read = (ctx, reader) => 
     {
+      var fileLineIdx = ReadIntNullable(ctx, reader);
       var retVal = ReadIlExprDtoNullable(ctx, reader);
-      var _result = new IlReturnStmtDto(retVal);
+      var _result = new IlReturnStmtDto(retVal, fileLineIdx);
       return _result;
     };
     public static CtxReadDelegate<IlExprDto> ReadIlExprDtoNullable = IlExprDto.Read.NullableClass();
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlReturnStmtDto> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
       WriteIlExprDtoNullable(ctx, writer, value.RetVal);
     };
     public static  CtxWriteDelegate<IlExprDto> WriteIlExprDtoNullable = IlExprDto.Write.NullableClass();
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -5905,7 +6042,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(RetVal, other.RetVal);
+      return Equals(RetVal, other.RetVal) && Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
@@ -5913,6 +6050,7 @@ namespace org.jacodb.api.net.generated.models
       unchecked {
         var hash = 0;
         hash = hash * 31 + (RetVal != null ? RetVal.GetHashCode() : 0);
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -5922,6 +6060,7 @@ namespace org.jacodb.api.net.generated.models
       printer.Println("IlReturnStmtDto (");
       using (printer.IndentCookie()) {
         printer.Print("retVal = "); RetVal.PrintEx(printer); printer.Println();
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -5936,7 +6075,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:88</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:96</p>
   /// </summary>
   public sealed class IlShlOpDto : IlBinaryOpDto
   {
@@ -6039,7 +6178,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:89</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:98</p>
   /// </summary>
   public sealed class IlShrOpDto : IlBinaryOpDto
   {
@@ -6142,7 +6281,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:100</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:115</p>
   /// </summary>
   public sealed class IlSizeOfExprDto : IlExprDto
   {
@@ -6230,7 +6369,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:150</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:176</p>
   /// </summary>
   public sealed class IlStackAllocExprDto : IlExprDto
   {
@@ -6318,14 +6457,21 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:161</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:192</p>
   /// </summary>
   public abstract class IlStmtDto{
     //fields
     //public fields
+    [Nullable] public int? FileLineIdx {get; private set;}
     
     //private fields
     //primary constructor
+    protected IlStmtDto(
+      [Nullable] int? fileLineIdx
+    )
+    {
+      FileLineIdx = fileLineIdx;
+    }
     //secondary constructor
     //deconstruct trait
     //statics
@@ -6352,19 +6498,30 @@ namespace org.jacodb.api.net.generated.models
     
     //private fields
     //primary constructor
+    public IlStmtDto_Unknown(
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
+    {
+    }
     //secondary constructor
     //deconstruct trait
     //statics
     
     public static new CtxReadDelegate<IlStmtDto_Unknown> Read = (ctx, reader) => 
     {
-      var _result = new IlStmtDto_Unknown();
+      var fileLineIdx = ReadIntNullable(ctx, reader);
+      var _result = new IlStmtDto_Unknown(fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlStmtDto_Unknown> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -6382,13 +6539,14 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return true;
+      return Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
     {
       unchecked {
         var hash = 0;
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -6396,6 +6554,9 @@ namespace org.jacodb.api.net.generated.models
     public void Print(PrettyPrinter printer)
     {
       printer.Println("IlStmtDto_Unknown (");
+      using (printer.IndentCookie()) {
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
+      }
       printer.Print(")");
     }
     //toString
@@ -6497,7 +6658,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:81</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:82</p>
   /// </summary>
   public sealed class IlSubOpDto : IlBinaryOpDto
   {
@@ -6600,7 +6761,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:179</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:216</p>
   /// </summary>
   public sealed class IlThrowStmtDto : IlEhStmtDto
   {
@@ -6611,8 +6772,11 @@ namespace org.jacodb.api.net.generated.models
     //private fields
     //primary constructor
     public IlThrowStmtDto(
-      [NotNull] IlExprDto value
-    )
+      [NotNull] IlExprDto value,
+      [Nullable] int? fileLineIdx
+    ) : base (
+      fileLineIdx
+     ) 
     {
       if (value == null) throw new ArgumentNullException("value");
       
@@ -6624,15 +6788,19 @@ namespace org.jacodb.api.net.generated.models
     
     public static new CtxReadDelegate<IlThrowStmtDto> Read = (ctx, reader) => 
     {
+      var fileLineIdx = ReadIntNullable(ctx, reader);
       var value = IlExprDto.Read(ctx, reader);
-      var _result = new IlThrowStmtDto(value);
+      var _result = new IlThrowStmtDto(value, fileLineIdx);
       return _result;
     };
+    public static CtxReadDelegate<int?> ReadIntNullable = JetBrains.Rd.Impl.Serializers.ReadInt.NullableStruct();
     
     public static new CtxWriteDelegate<IlThrowStmtDto> Write = (ctx, writer, value) => 
     {
+      WriteIntNullable(ctx, writer, value.FileLineIdx);
       IlExprDto.Write(ctx, writer, value.Value);
     };
+    public static  CtxWriteDelegate<int?> WriteIntNullable = JetBrains.Rd.Impl.Serializers.WriteInt.NullableStruct();
     
     //constants
     
@@ -6650,7 +6818,7 @@ namespace org.jacodb.api.net.generated.models
     {
       if (ReferenceEquals(null, other)) return false;
       if (ReferenceEquals(this, other)) return true;
-      return Equals(Value, other.Value);
+      return Equals(Value, other.Value) && Equals(FileLineIdx, other.FileLineIdx);
     }
     //hash code trait
     public override int GetHashCode()
@@ -6658,6 +6826,7 @@ namespace org.jacodb.api.net.generated.models
       unchecked {
         var hash = 0;
         hash = hash * 31 + Value.GetHashCode();
+        hash = hash * 31 + (FileLineIdx != null ? FileLineIdx.GetHashCode() : 0);
         return hash;
       }
     }
@@ -6667,6 +6836,7 @@ namespace org.jacodb.api.net.generated.models
       printer.Println("IlThrowStmtDto (");
       using (printer.IndentCookie()) {
         printer.Print("value = "); Value.PrintEx(printer); printer.Println();
+        printer.Print("fileLineIdx = "); FileLineIdx.PrintEx(printer); printer.Println();
       }
       printer.Print(")");
     }
@@ -7236,7 +7406,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:133</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:153</p>
   /// </summary>
   public sealed class IlUnboxExprDto : IlCastExprDto
   {
@@ -7327,7 +7497,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:148</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:174</p>
   /// </summary>
   public sealed class IlUnmanagedDerefExprDto : IlDerefExprDto
   {
@@ -7412,7 +7582,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:146</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:170</p>
   /// </summary>
   public sealed class IlUnmanagedRefExprDto : IlRefExprDto
   {
@@ -7609,7 +7779,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:208</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:253</p>
   /// </summary>
   public sealed class IlVarAccessDto : IlValueDto
   {
@@ -7702,7 +7872,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:200</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:245</p>
   /// </summary>
   public enum IlVarKind {
     local,
@@ -7712,7 +7882,7 @@ namespace org.jacodb.api.net.generated.models
   
   
   /// <summary>
-  /// <p>Generated from: IlMethodBodyModel.kt:87</p>
+  /// <p>Generated from: IlMethodBodyModel.kt:94</p>
   /// </summary>
   public sealed class IlXorOpDto : IlBinaryOpDto
   {

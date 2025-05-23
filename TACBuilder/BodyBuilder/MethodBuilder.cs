@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using TACBuilder.BodyBuilder;
+using TACBuilder.BodyBuilder.ILBodyParser;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
-using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
 namespace TACBuilder;
@@ -21,6 +21,7 @@ class MethodBuilder(IlMethod method)
     public Dictionary<int, BlockTacBuilder> BlockTacBuilders = new();
     public readonly Queue<BlockTacBuilder> Worklist = new();
 
+    public readonly List<IlMonoInst> MonoInstructions = method._ilMonoBody;
     public List<IlStmt> Build()
     {
         try

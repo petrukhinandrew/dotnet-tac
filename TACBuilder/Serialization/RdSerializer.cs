@@ -4,7 +4,6 @@ using org.jacodb.api.net.generated.models;
 using TACBuilder.BodyBuilder;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
-using TACBuilder.ILTAC.TypeSystem;
 
 // ReSharper disable UnusedType.Global
 
@@ -15,8 +14,8 @@ public static class RdSerializer
     public static List<IlTypeDto> Serialize(List<IlType> instances)
     {
         var res = new List<IlTypeDto>();
-        foreach (var (idx, type) in instances.OrderBy(t => (t as IlType)!.Name)
-                     .Select((v, i) => (i, (v as IlType)!)))
+        foreach (var (_, type) in instances.OrderBy(t => t.Name)
+                     .Select((v, i) => (i, v)))
         {
             // Console.WriteLine($"handling {idx}/{instances.Count} {type.FullName}");
             var fields = type.Fields.Select(field =>
@@ -264,18 +263,46 @@ public static class RdSerializer
     {
         return stmt switch
         {
-            IlAssignStmt assignStmt => new IlAssignStmtDto(lhv: (IlValueDto)SerializeExpr(assignStmt.Lhs),
-                rhv: SerializeExpr(assignStmt.Rhs)),
-            IlCallStmt callStmt => new IlCallStmtDto((IlCallDto)callStmt.Call.SerializeExpr()),
-            IlCalliStmt calliStmt => new IlCalliStmtDto((IlCalliDto)calliStmt.Call.SerializeExpr()),
-            IlReturnStmt returnStmt => new IlReturnStmtDto(returnStmt.RetVal?.SerializeExpr()),
-            IlGotoStmt gotoStmt => new IlGotoStmtDto(gotoStmt.Target),
-            IlIfStmt ifStmt => new IlIfStmtDto(target: ifStmt.Target, cond: ifStmt.Condition.SerializeExpr()),
-            IlThrowStmt throwStmt => new IlThrowStmtDto(throwStmt.Value.SerializeExpr()),
-            IlRethrowStmt => new IlRethrowStmtDto(),
-            IlEndFinallyStmt => new IlEndFinallyStmtDto(),
-            IlEndFaultStmt => new IlEndFaultStmtDto(),
-            IlEndFilterStmt endFilterStmt => new IlEndFilterStmtDto(endFilterStmt.Value.SerializeExpr()),
+            IlAssignStmt assignStmt => new IlAssignStmtDto(
+                fileLineIdx: stmt.Line,
+                lhv: (IlValueDto)SerializeExpr(assignStmt.Lhs),
+                rhv: SerializeExpr(assignStmt.Rhs)
+            ),
+            IlCallStmt callStmt => new IlCallStmtDto(
+                fileLineIdx: stmt.Line,
+                call: (IlCallDto)callStmt.Call.SerializeExpr()
+            ),
+            IlCalliStmt calliStmt => new IlCalliStmtDto(
+                fileLineIdx: stmt.Line,
+                calli: (IlCalliDto)calliStmt.Call.SerializeExpr()),
+            IlReturnStmt returnStmt =>
+                new IlReturnStmtDto(
+                    fileLineIdx: stmt.Line,
+                    retVal: returnStmt.RetVal?.SerializeExpr()),
+            IlGotoStmt gotoStmt => new IlGotoStmtDto(
+                fileLineIdx: stmt.Line,
+                target: gotoStmt.Target),
+            IlIfStmt ifStmt => new IlIfStmtDto(
+                fileLineIdx: stmt.Line,
+                target: ifStmt.Target,
+                cond: ifStmt.Condition.SerializeExpr()),
+            IlThrowStmt throwStmt => new IlThrowStmtDto(
+                fileLineIdx: stmt.Line,
+                value: throwStmt.Value.SerializeExpr()
+            ),
+            IlRethrowStmt => new IlRethrowStmtDto(
+                fileLineIdx: stmt.Line
+            ),
+            IlEndFinallyStmt => new IlEndFinallyStmtDto(
+                fileLineIdx: stmt.Line
+            ),
+            IlEndFaultStmt => new IlEndFaultStmtDto(
+                fileLineIdx: stmt.Line
+            ),
+            IlEndFilterStmt endFilterStmt => new IlEndFilterStmtDto(
+                fileLineIdx: stmt.Line,
+                value: endFilterStmt.Value.SerializeExpr()
+            ),
             _ => throw new Exception($"{stmt} stmt serialization not yet supported")
         };
     }
@@ -494,7 +521,8 @@ public static class RdSerializer
             isConstructed: method.IsConstructed,
             baseMethod: method.BaseMethod.GetRefIdNullable(),
             isVirtual: method.IsVirtual,
-            isAbstract: method.IsAbstract
+            isAbstract: method.IsAbstract,
+            filePath: method.FilePath
         );
     }
 }

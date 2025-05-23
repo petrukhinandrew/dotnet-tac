@@ -1,19 +1,30 @@
 using System.Diagnostics;
 using System.Reflection;
-using System.Reflection.Emit;
+using Mono.Cecil;
+using Mono.Cecil.Cil;
+using Mono.Cecil.Pdb;
+using Mono.Cecil.Rocks;
 using TACBuilder.ILReflection;
+using MethodBody = System.Reflection.MethodBody;
+using OpCode = System.Reflection.Emit.OpCode;
+using OperandType = System.Reflection.Emit.OperandType;
 
-namespace TACBuilder.BodyBuilder;
+namespace TACBuilder.BodyBuilder.ILBodyParser;
 
-public class ILBodyParser(MethodBase methodBase)
+public class IlMonoInst(Instruction inst)
 {
-    private MethodBase _methodBase = methodBase;
-    private MethodBody _methodBody = methodBase.GetMethodBody()!;
+    public Instruction Inst = inst;
+    public SequencePoint? SequencePoint;
+}
 
-    private Module _module = methodBase.Module;
+public class IlBodyParser(MethodBase methodBase)
+{
+    private readonly MethodBody? _methodBody = methodBase.GetMethodBody();
+    
     private byte[] _il = [];
-    private ILInstr[] _offsetToInstr = [];
-    private ILInstr _back = new ILInstr.Back();
+    private List<IlMonoInst> _ilMono = [];
+    private IlInstr[] _offsetToInstr = [];
+    private IlInstr _back = new IlInstr.Back();
     private ehClause[] _ehs = [];
 
     public void Parse()
@@ -22,11 +33,15 @@ public class ILBodyParser(MethodBase methodBase)
         ImportEH();
     }
 
-    public ILInstr Instructions => _back.next;
+    public IlInstr Instructions => _back.next;
+    public List<IlMonoInst> IlMonoInstructions => _ilMono;
+    public string? FilePath = null;
     public List<ehClause> EhClauses => _ehs.ToList();
 
     private void ImportEH()
     {
+        if (_methodBody == null) return;
+        
         var clauses = _methodBody.ExceptionHandlingClauses
             .Select(ehc => new exceptionHandlingClause(ehc)).ToArray();
         _ehs = clauses.Select(ParseEh).ToArray();
@@ -38,19 +53,19 @@ public class ILBodyParser(MethodBase methodBase)
          */
         ehClause ParseEh(exceptionHandlingClause c)
         {
-            ILInstr tryBegin = _offsetToInstr[c.tryOffset];
+            IlInstr tryBegin = _offsetToInstr[c.tryOffset];
             Debug.Assert(tryBegin is not null);
 
             int te = c.tryOffset + c.tryLength;
             Debug.Assert(_offsetToInstr[te].prev is not null);
-            ILInstr tryEnd = _offsetToInstr[te].prev;
+            IlInstr tryEnd = _offsetToInstr[te].prev;
 
-            ILInstr handlerBegin = _offsetToInstr[c.handlerOffset];
+            IlInstr handlerBegin = _offsetToInstr[c.handlerOffset];
             Debug.Assert(handlerBegin is not null);
 
             int he = c.handlerOffset + c.handlerLength;
             Debug.Assert(_offsetToInstr[he].prev is not null);
-            ILInstr handlerEnd = _offsetToInstr[he].prev;
+            IlInstr handlerEnd = _offsetToInstr[he].prev;
             Debug.Assert(handlerBegin.idx <= handlerEnd.idx);
             int fd = 0;
             if (c.type is ehcType.Filter filt)
@@ -65,7 +80,7 @@ public class ILBodyParser(MethodBase methodBase)
             }
             rewriterEhcType type = c.type switch
             {
-                ehcType.Filter f => new rewriterEhcType.FilterEH(_offsetToInstr[fd]),
+                ehcType.Filter _ => new rewriterEhcType.FilterEH(_offsetToInstr[fd]),
                 ehcType.Catch ct => new rewriterEhcType.CatchEH(ct.type),
                 ehcType.Finally => new rewriterEhcType.FinallyEH(),
                 ehcType.Fault => new rewriterEhcType.FaultEH(),
@@ -78,8 +93,11 @@ public class ILBodyParser(MethodBase methodBase)
 
     private void ImportIL()
     {
+        if (_methodBody == null) return;
+        
         _il = _methodBody.GetILAsByteArray() ?? [];
-        _offsetToInstr = new ILInstr[_il.Length + 1];
+        
+        _offsetToInstr = new IlInstr[_il.Length + 1];
 
         _back.next = _back;
         _back.prev = _back;
@@ -89,7 +107,7 @@ public class ILBodyParser(MethodBase methodBase)
         while (offset < _il.Length)
         {
             int opOffset = offset;
-            (OpCode op, int d) = OpCodeOp.GetOpCode(_il, offset);
+            (OpCode op, int _) = OpCodeOp.GetOpCode(_il, offset);
             offset += op.Size;
             int size =
                 op.OperandType switch
@@ -114,9 +132,9 @@ public class ILBodyParser(MethodBase methodBase)
                     _ => throw new Exception("unreachable " + op.OperandType.ToString())
                 };
             if (offset + size > _il.Length) throw new Exception("IL stream unexpectedly ended!");
-            ILInstr.InsertBefore(_back, new ILInstr.Instr(op, opOffset));
+            IlInstr.InsertBefore(_back, new IlInstr.Instr(op, opOffset));
             _offsetToInstr[opOffset] = _back.prev;
-            ILInstr instr = _offsetToInstr[opOffset];
+            IlInstr instr = _offsetToInstr[opOffset];
             Debug.Assert(_back.prev == instr);
             switch (op.OperandType)
             {
@@ -141,20 +159,20 @@ public class ILBodyParser(MethodBase methodBase)
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedMethod(
-                        IlInstanceBuilder.GetMethod(_methodBase, token)
+                        IlInstanceBuilder.GetMethod(methodBase, token)
                     );
                     break;
                 }
                 case OperandType.InlineType:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedType(IlInstanceBuilder.GetType(_methodBase, token));
+                    instr.arg = new ILInstrOperand.ResolvedType(IlInstanceBuilder.GetType(methodBase, token));
                     break;
                 }
                 case OperandType.InlineString:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
-                    instr.arg = new ILInstrOperand.ResolvedString(IlInstanceBuilder.GetString(_methodBase, token));
+                    instr.arg = new ILInstrOperand.ResolvedString(IlInstanceBuilder.GetString(methodBase, token));
                     break;
                 }
                 case OperandType.InlineSig:
@@ -162,7 +180,7 @@ public class ILBodyParser(MethodBase methodBase)
                     var token = BitConverter.ToInt32(_il, offset);
 
                     instr.arg = new ILInstrOperand.ResolvedSignature(
-                        IlInstanceBuilder.GetSignature(_methodBase, token));
+                        IlInstanceBuilder.GetSignature(methodBase, token));
 
                     break;
                 }
@@ -170,14 +188,14 @@ public class ILBodyParser(MethodBase methodBase)
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedMember(
-                        IlInstanceBuilder.GetMember(_methodBase, token));
+                        IlInstanceBuilder.GetMember(methodBase, token));
                     break;
                 }
                 case OperandType.InlineField:
                 {
                     var token = BitConverter.ToInt32(_il, offset);
                     instr.arg = new ILInstrOperand.ResolvedField(
-                        IlInstanceBuilder.GetField(_methodBase, token));
+                        IlInstanceBuilder.GetField(methodBase, token));
                     break;
                 }
 
@@ -227,13 +245,13 @@ public class ILBodyParser(MethodBase methodBase)
                             throw new Exception("IL stream unexpectedly ended!");
                         }
 
-                        ILInstr instrArg = new ILInstr.SwitchArg(i)
+                        IlInstr instrArg = new IlInstr.SwitchArg(i)
                         {
                             arg = new ILInstrOperand.Arg32(BitConverter.ToInt32(_il, offset) + baseOffset)
                         };
                         offset += sizeOfInt;
 
-                        ILInstr.InsertBefore(_back, instrArg);
+                        IlInstr.InsertBefore(_back, instrArg);
                     }
 
                     branch = true;
@@ -252,29 +270,64 @@ public class ILBodyParser(MethodBase methodBase)
             throw new Exception("offset != il.Length");
         }
 
+        // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         Debug.Assert(ILInstrs().All(i => i is not null));
-        if (branch)
+        
+        if (!branch) return;
+        
+        foreach (var cur in ILInstrs())
         {
-            foreach (var cur in ILInstrs())
+            if (!cur.IsJump) continue;
+            if (cur.arg is ILInstrOperand.Arg32 a32)
             {
-                if (!cur.IsJump) continue;
-                if (cur.arg is ILInstrOperand.Arg32 a32)
-                {
-                    Debug.Assert(_offsetToInstr[a32.value] != null);
+                Debug.Assert(_offsetToInstr[a32.value] != null);
 
-                    cur.arg = new ILInstrOperand.Target(_offsetToInstr[a32.value]);
-                }
-                else
+                cur.arg = new ILInstrOperand.Target(_offsetToInstr[a32.value]);
+            }
+            else
+            {
+                throw new Exception("Wrong operand of branching instruction!");
+            }
+        }
+        try
+        {
+            var readerParameters = new ReaderParameters
+            {
+                SymbolReaderProvider = new PdbReaderProvider(),
+                ReadSymbols = true
+            };
+            var asmPath = methodBase.Module.Assembly.Location;
+            var module = ModuleDefinition.ReadModule(asmPath, readerParameters);
+
+            var monoMethod = module.GetTypes().First(t => 
+                t.MetadataToken.ToInt32() == (methodBase.ReflectedType ?? methodBase.DeclaringType)!.MetadataToken).
+                GetMethods().First(m =>
+                    m.MetadataToken.ToInt32() == methodBase.MetadataToken);
+            var insts = monoMethod.Body.Instructions;
+            string? filePath = null;
+            SequencePoint? sp = null;
+            foreach (var inst in insts)
+            {
+                _ilMono.Add(new IlMonoInst(inst));
+                sp = monoMethod.DebugInformation.GetSequencePoint(inst) ?? sp;
+                if (sp != null)
                 {
-                    throw new Exception("Wrong operand of branching instruction!");
+                    _ilMono.Last().SequencePoint = sp;
+                    filePath ??= sp.Document.Url;
                 }
             }
+            FilePath = filePath;
+        }
+        catch (Exception e)
+        {
+            if (!e.Message.Contains("em.Private.CoreLib.pdb"))
+                Console.WriteLine($"\n\n{e.Message}\n\n");
         }
     }
 
-    public IEnumerable<ILInstr> ILInstrs()
+    public IEnumerable<IlInstr> ILInstrs()
     {
-        ILInstr cur = _back.next;
+        IlInstr cur = _back.next;
         while (cur != _back)
         {
             yield return cur;

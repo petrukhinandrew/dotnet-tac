@@ -1,16 +1,16 @@
 using System.Reflection.Emit;
 using TACBuilder.ILReflection;
 
-namespace TACBuilder.BodyBuilder;
+namespace TACBuilder.BodyBuilder.ILBodyParser;
 
-public abstract class ILInstr
+public abstract class IlInstr
 {
     public ILInstrOperand arg = new ILInstrOperand.NoArg();
     public int idx;
-    public ILInstr next;
-    public ILInstr prev;
+    public IlInstr next;
+    public IlInstr prev;
 
-    ILInstr()
+    IlInstr()
     {
         next = this;
         prev = this;
@@ -24,7 +24,7 @@ public abstract class ILInstr
 
     public bool IsCondJump => this is SwitchArg || this is Instr { opCode.FlowControl: FlowControl.Cond_Branch };
 
-    public static void InsertBefore(ILInstr where, ILInstr what)
+    public static void InsertBefore(IlInstr where, IlInstr what)
     {
         what.next = where;
         what.prev = where.prev;
@@ -33,7 +33,7 @@ public abstract class ILInstr
         what.idx = what.prev.idx + 1;
     }
 
-    public sealed class Instr(OpCode op, int offset) : ILInstr
+    public sealed class Instr(OpCode op, int offset) : IlInstr
     {
         public OpCode opCode = op;
 
@@ -43,7 +43,7 @@ public abstract class ILInstr
         }
     }
 
-    public sealed class SwitchArg(int value) : ILInstr
+    public sealed class SwitchArg(int value) : IlInstr
     {
         public int Value => value;
 
@@ -53,7 +53,7 @@ public abstract class ILInstr
         }
     }
 
-    public sealed class Back : ILInstr
+    public sealed class Back : IlInstr
     {
         public override string ToString()
         {
@@ -61,7 +61,7 @@ public abstract class ILInstr
         }
     }
 
-    public virtual bool Equals(ILInstr? other)
+    public virtual bool Equals(IlInstr? other)
     {
         return other != null && idx.Equals(other.idx);
     }
@@ -84,7 +84,7 @@ public abstract record ILInstrOperand
 
     public record Arg64(long value) : ILInstrOperand;
 
-    public record Target(ILInstr value) : ILInstrOperand
+    public record Target(IlInstr value) : ILInstrOperand
     {
         public override string ToString()
         {

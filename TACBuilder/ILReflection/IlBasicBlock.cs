@@ -1,11 +1,12 @@
 using TACBuilder.BodyBuilder;
+using TACBuilder.BodyBuilder.ILBodyParser;
 
 namespace TACBuilder.ILReflection;
 
-public class IlBasicBlock(ILInstr entry, ILInstr exit)
+public class IlBasicBlock(IlInstr entry, IlInstr exit)
 {
-    public ILInstr Entry => entry;
-    public ILInstr Exit => exit;
+    public IlInstr Entry => entry;
+    public IlInstr Exit => exit;
     private IlMethod? _methodMeta;
     public IlMethod? MethodMeta => _methodMeta;
 

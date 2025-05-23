@@ -1,11 +1,11 @@
 using System.Diagnostics;
-using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
 
-namespace TACBuilder.ILTAC.TypeSystem;
+namespace TACBuilder.Exprs;
 
 public abstract class IlStmt()
 {
+    public int? Line = null;
     private int Index = Indexer++;
     private static int Indexer = 0;
     public new abstract string ToString();

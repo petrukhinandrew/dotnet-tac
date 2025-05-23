@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using TACBuilder.BodyBuilder.ILBodyParser;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
-using TACBuilder.ILTAC.TypeSystem;
 
 namespace TACBuilder.BodyBuilder;
 
@@ -101,8 +101,8 @@ static class BlockTacLineBuilder
         while (true)
         {
             // TODO check if it is proper
-            if (blockBuilder.CurInstr is ILInstr.Back) return true;
-            if (blockBuilder.CurInstr is ILInstr.SwitchArg switchBranch)
+            if (blockBuilder.CurInstr is IlInstr.Back) return true;
+            if (blockBuilder.CurInstr is IlInstr.SwitchArg switchBranch)
             {
                 var target = (ILInstrOperand.Target)switchBranch.arg;
                 Debug.Assert(blockBuilder.SwitchRegister is not null);
@@ -118,9 +118,9 @@ static class BlockTacLineBuilder
                 if (blockBuilder.CurInstrIsLast()) return true;
             }
 
-            Debug.Assert(blockBuilder.CurInstr is ILInstr.Instr,
+            Debug.Assert(blockBuilder.CurInstr is IlInstr.Instr,
                 blockBuilder.CurInstr + " on " + blockBuilder.Meta.MethodMeta.Name);
-            switch (((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name)
+            switch (((IlInstr.Instr)blockBuilder.CurInstr).opCode.Name)
             {
                 case "ckfinite":
                 case "mkrefany":
@@ -131,7 +131,7 @@ static class BlockTacLineBuilder
                 case "cpobj":
                 case "cpblk":
                     throw new KnownBug("not implemented " +
-                                       ((ILInstr.Instr)blockBuilder.CurInstr).opCode.Name);
+                                       ((IlInstr.Instr)blockBuilder.CurInstr).opCode.Name);
                 case "arglist":
                 {
                     blockBuilder.Push(new IlArgListRef(blockBuilder.Meta.MethodMeta));

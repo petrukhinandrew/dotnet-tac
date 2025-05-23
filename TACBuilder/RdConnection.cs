@@ -27,7 +27,6 @@ public class RdConnection(AppTacBuilder builder)
                     var protocol = new Protocol("client side", serializers, new Identities(idKind), scheduler, wire,
                         lifetime);
                     var ilModel = new IlModel(lifetime, protocol);
-
                     ilModel.GetIlSigModel().Publication.SetSync((lt, request) =>
                     {
                         foreach (var target in request.RootAsms)

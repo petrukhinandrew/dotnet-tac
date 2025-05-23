@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace TACBuilder.BodyBuilder;
+namespace TACBuilder.BodyBuilder.ILBodyParser;
 
 public abstract record ehcType
 {
@@ -15,7 +15,7 @@ public abstract record ehcType
 
 public abstract record rewriterEhcType
 {
-    public record FilterEH(ILInstr instr) : rewriterEhcType;
+    public record FilterEH(IlInstr instr) : rewriterEhcType;
 
     public record CatchEH(Type type) : rewriterEhcType;
 
@@ -24,12 +24,12 @@ public abstract record rewriterEhcType
     public record FaultEH() : rewriterEhcType;
 }
 
-public class ehClause(ILInstr tryB, ILInstr tryE, ILInstr handlerB, ILInstr handlerE, rewriterEhcType type)
+public class ehClause(IlInstr tryB, IlInstr tryE, IlInstr handlerB, IlInstr handlerE, rewriterEhcType type)
 {
-    public ILInstr tryBegin = tryB;
-    public ILInstr tryEnd = tryE;
-    public ILInstr handlerBegin = handlerB;
-    public ILInstr handlerEnd = handlerE;
+    public IlInstr tryBegin = tryB;
+    public IlInstr tryEnd = tryE;
+    public IlInstr handlerBegin = handlerB;
+    public IlInstr handlerEnd = handlerE;
     public rewriterEhcType ehcType = type;
 
     public override string ToString()

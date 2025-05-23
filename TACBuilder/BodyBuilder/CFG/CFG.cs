@@ -1,14 +1,15 @@
 ﻿using System.Diagnostics;
 using System.Reflection.Emit;
+using TACBuilder.BodyBuilder.ILBodyParser;
 using TACBuilder.ILReflection;
 
 namespace TACBuilder.BodyBuilder;
 
 public class CFG
 {
-    private readonly ILInstr _entry;
+    private readonly IlInstr _entry;
     private readonly List<ehClause> _ehClauses;
-    private HashSet<ILInstr> _leaders = new();
+    private HashSet<IlInstr> _leaders = new();
     private Dictionary<int, List<int>> _succsessors;
     private Dictionary<int, List<int>> _predecessors;
     private readonly HashSet<IlBasicBlock> _blocks = [];
@@ -17,7 +18,7 @@ public class CFG
     public List<IlBasicBlock> BasicBlocks => _blocks.ToList();
     public Dictionary<int, List<int>> Succsessors => _succsessors;
 
-    public CFG(ILInstr entry, List<ehClause> ehClauses)
+    public CFG(IlInstr entry, List<ehClause> ehClauses)
     {
         _entry = entry;
         _ehClauses = ehClauses;
@@ -39,9 +40,9 @@ public class CFG
 
     private bool CheckAllBlockHaveSuccessors()
     {
-        bool AcceptableExitInstr(ILInstr instr)
+        bool AcceptableExitInstr(IlInstr instr)
         {
-            return instr.next is ILInstr.Back || instr is ILInstr.Instr
+            return instr.next is IlInstr.Back || instr is IlInstr.Instr
             {
                 opCode.FlowControl: FlowControl.Return or FlowControl.Throw
             };
@@ -68,8 +69,8 @@ public class CFG
     private void CollectLeaders()
     {
         _leaders.Add(_entry);
-        ILInstr cur = _entry;
-        while (cur is not ILInstr.Back)
+        IlInstr cur = _entry;
+        while (cur is not IlInstr.Back)
         {
             Debug.Assert(cur is not null);
             if (cur.IsJump)
@@ -78,7 +79,7 @@ public class CFG
                 _leaders.Add(((ILInstrOperand.Target)cur.arg).value);
             }
 
-            if (cur.IsCondJump || cur is ILInstr.SwitchArg)
+            if (cur.IsCondJump || cur is IlInstr.SwitchArg)
             {
                 Debug.Assert(cur.next is not null);
                 _leaders.Add(cur.next);
@@ -113,8 +114,8 @@ public class CFG
     {
         foreach (var leader in _leaders)
         {
-            ILInstr cur = leader;
-            while (cur is ILInstr.Instr
+            IlInstr cur = leader;
+            while (cur is IlInstr.Instr
                    {
                        opCode.FlowControl: FlowControl.Next or FlowControl.Call or FlowControl.Meta
                    } && !_leaders.Contains(cur.next))
@@ -128,13 +129,13 @@ public class CFG
                 var targetIdx = ((ILInstrOperand.Target)cur.arg).value.idx;
                 _succsessors[leader.idx].Add(targetIdx);
                 _predecessors[targetIdx].Add(leader.idx);
-                if (cur.IsCondJump || cur is ILInstr.SwitchArg)
+                if (cur.IsCondJump || cur is IlInstr.SwitchArg)
                 {
                     _succsessors[leader.idx].Add(cur.idx + 1);
                     _predecessors[cur.idx + 1].Add(leader.idx);
                 }
             }
-            else if (cur is not ILInstr.Instr { opCode.FlowControl: FlowControl.Throw or FlowControl.Return })
+            else if (cur is not IlInstr.Instr { opCode.FlowControl: FlowControl.Throw or FlowControl.Return })
             {
                 _succsessors[leader.idx].Add(cur.idx + 1);
                 _predecessors[cur.idx + 1].Add(leader.idx);

@@ -1,8 +1,8 @@
 using System.Diagnostics;
 using TACBuilder.BodyBuilder;
+using TACBuilder.BodyBuilder.ILBodyParser;
 using TACBuilder.Exprs;
 using TACBuilder.ILReflection;
-using TACBuilder.ILTAC.TypeSystem;
 using TACBuilder.Utils;
 
 namespace TACBuilder;
@@ -20,8 +20,8 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
     internal IlExpr? SwitchRegister;
     internal int? SwitchBranch;
 
-    internal readonly ILInstr FirstInstr = meta.Entry;
-    internal ILInstr CurInstr = meta.Entry;
+    internal readonly IlInstr FirstInstr = meta.Entry;
+    internal IlInstr CurInstr = meta.Entry;
 
     private EvaluationStack<IlExpr> _entryStackState =
         meta.StackErrType is null ? new EvaluationStack<IlExpr>() : new EvaluationStack<IlExpr>([methodBuilder.GetNewErr(meta.StackErrType)]);
@@ -139,6 +139,14 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
 
     public void NewLine(IlStmt line)
     {
+        if (CurInstr.idx < methodBuilder.MonoInstructions.Count)
+        {
+            var sp = methodBuilder.MonoInstructions[CurInstr.idx].SequencePoint;
+            if (sp != null)
+            {
+                line.Line = sp.StartLine;
+            }
+        }
         TacLines.Add(line);
     }
 

@@ -1,3 +1,5 @@
+using TACBuilder.BodyBuilder.ILBodyParser;
+
 namespace TACBuilder.BodyBuilder;
 
 public abstract class EhScope
