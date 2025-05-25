@@ -272,7 +272,44 @@ public class IlBodyParser(MethodBase methodBase)
 
         // ReSharper disable once ConditionIsAlwaysTrueOrFalseAccordingToNullableAPIContract
         Debug.Assert(ILInstrs().All(i => i is not null));
-        
+        try
+        {
+            if (IlInstanceBuilder.MethodFilters.All(f => !f(methodBase))) return;
+
+            var asmPath = methodBase.Module.Assembly.Location;
+            if (!moduleReaderCache.ContainsKey(asmPath))
+                moduleReaderCache.Add(asmPath, ModuleDefinition.ReadModule(asmPath, readerParameters));
+            var module = moduleReaderCache[asmPath];
+            
+            var monoMethod = module.GetTypes().First(t => 
+                    t.MetadataToken.ToInt32() == (methodBase.ReflectedType ?? methodBase.DeclaringType)!.MetadataToken).
+                GetMethods().First(m =>
+                    m.MetadataToken.ToInt32() == methodBase.MetadataToken);
+            var insts = monoMethod.Body.Instructions;
+            string? filePath = null;
+            SequencePoint? sp = null;
+            foreach (var inst in insts)
+            {
+                _ilMono.Add(new IlMonoInst(inst));
+                sp = monoMethod.DebugInformation.GetSequencePoint(inst) ?? sp;
+                if (sp != null)
+                {
+                    _ilMono.Last().SequencePoint = sp;
+                    filePath ??= sp.Document.Url;
+                }
+            }
+
+            if (sp != null)
+            {
+                Console.WriteLine($"found sp for {methodBase.Name}");
+            }
+            FilePath = filePath;
+        }
+        catch (Exception e)
+        {
+            if (!e.Message.Contains("em.Private.CoreLib.pdb"))
+                Console.WriteLine($"\n{methodBase.Name}\n\n");
+        }
         if (!branch) return;
         
         foreach (var cur in ILInstrs())
@@ -289,41 +326,15 @@ public class IlBodyParser(MethodBase methodBase)
                 throw new Exception("Wrong operand of branching instruction!");
             }
         }
-        try
-        {
-            var readerParameters = new ReaderParameters
-            {
-                SymbolReaderProvider = new PdbReaderProvider(),
-                ReadSymbols = true
-            };
-            var asmPath = methodBase.Module.Assembly.Location;
-            var module = ModuleDefinition.ReadModule(asmPath, readerParameters);
-
-            var monoMethod = module.GetTypes().First(t => 
-                t.MetadataToken.ToInt32() == (methodBase.ReflectedType ?? methodBase.DeclaringType)!.MetadataToken).
-                GetMethods().First(m =>
-                    m.MetadataToken.ToInt32() == methodBase.MetadataToken);
-            var insts = monoMethod.Body.Instructions;
-            string? filePath = null;
-            SequencePoint? sp = null;
-            foreach (var inst in insts)
-            {
-                _ilMono.Add(new IlMonoInst(inst));
-                sp = monoMethod.DebugInformation.GetSequencePoint(inst) ?? sp;
-                if (sp != null)
-                {
-                    _ilMono.Last().SequencePoint = sp;
-                    filePath ??= sp.Document.Url;
-                }
-            }
-            FilePath = filePath;
-        }
-        catch (Exception e)
-        {
-            if (!e.Message.Contains("em.Private.CoreLib.pdb"))
-                Console.WriteLine($"\n\n{e.Message}\n\n");
-        }
     }
+
+    private static ReaderParameters readerParameters = new ReaderParameters
+    {
+        SymbolReaderProvider = new PdbReaderProvider(),
+        ReadSymbols = true
+    };
+
+    private static Dictionary<string, ModuleDefinition> moduleReaderCache = new Dictionary<string, ModuleDefinition>();
 
     public IEnumerable<IlInstr> ILInstrs()
     {
