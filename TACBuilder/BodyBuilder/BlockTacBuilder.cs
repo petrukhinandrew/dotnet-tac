@@ -139,14 +139,15 @@ class BlockTacBuilder(MethodBuilder methodBuilder, IlBasicBlock meta)
 
     public void NewLine(IlStmt line)
     {
-        if (CurInstr.idx < methodBuilder.MonoInstructions.Count)
+        if (methodBuilder.MonoInstructions.Count > 0)
         {
-            var sp = methodBuilder.MonoInstructions[CurInstr.idx].SequencePoint;
+            var sp = methodBuilder.MonoInstructions[CurInstr.idx - 1].SequencePoint;
             if (sp != null)
             {
                 line.Line = sp.StartLine;
             }
         }
+ 
         TacLines.Add(line);
     }
 
