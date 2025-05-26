@@ -25,22 +25,22 @@ public static class IlInstanceBuilder
 
     private static readonly List<Type> _requireConstruction =
     [
-        typeof(byte),
-        typeof(sbyte),
-        typeof(ushort),
-        typeof(short),
-        typeof(char),
+        // typeof(byte),
+        // typeof(sbyte),
+        // typeof(ushort),
+        // typeof(short),
+        // typeof(char),
         typeof(int),
-        typeof(uint),
-        typeof(long),
-        typeof(ulong),
-        typeof(float),
-        typeof(double),
-        typeof(nint),
-        typeof(nuint),
+        // typeof(uint),
+        // typeof(long),
+        // typeof(ulong),
+        // typeof(float),
+        // typeof(double),
+        // typeof(nint),
+        // typeof(nuint),
         typeof(string),
-        typeof(bool),
-        typeof(Array)
+        // typeof(bool),
+        // typeof(Array)
     ];
     public static IlAssembly BuildFrom(string assemblyPath)
     {

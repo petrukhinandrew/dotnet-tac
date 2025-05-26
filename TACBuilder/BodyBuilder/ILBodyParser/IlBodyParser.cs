@@ -280,10 +280,13 @@ public class IlBodyParser(MethodBase methodBase)
             if (!moduleReaderCache.ContainsKey(asmPath))
                 moduleReaderCache.Add(asmPath, ModuleDefinition.ReadModule(asmPath, readerParameters));
             var module = moduleReaderCache[asmPath];
-            
-            var monoMethod = module.GetTypes().First(t => 
-                    t.MetadataToken.ToInt32() == (methodBase.ReflectedType ?? methodBase.DeclaringType)!.MetadataToken).
-                GetMethods().First(m =>
+
+            var monoDeclType = module.GetTypes().First(t =>
+                t.MetadataToken.ToInt32() == (methodBase.ReflectedType ?? methodBase.DeclaringType)!.MetadataToken);
+            var monoMethod = methodBase.IsConstructor
+                ? monoDeclType.GetConstructors().First(m =>
+                    m.MetadataToken.ToInt32() == methodBase.MetadataToken)
+                : monoDeclType.GetMethods().First(m =>
                     m.MetadataToken.ToInt32() == methodBase.MetadataToken);
             var insts = monoMethod.Body.Instructions;
             string? filePath = null;
@@ -297,11 +300,6 @@ public class IlBodyParser(MethodBase methodBase)
                     _ilMono.Last().SequencePoint = sp;
                     filePath ??= sp.Document.Url;
                 }
-            }
-
-            if (sp != null)
-            {
-                Console.WriteLine($"found sp for {methodBase.Name}");
             }
             FilePath = filePath;
         }
